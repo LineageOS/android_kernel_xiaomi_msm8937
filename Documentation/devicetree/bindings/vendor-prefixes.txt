@@ -41,6 +41,7 @@ auvidea Auvidea GmbH
 avago	Avago Technologies
 avia	avia semiconductor
 avic	Shanghai AVIC Optoelectronics Co., Ltd.
+awinic	AWINIC Technology Co.Ltd
 axis	Axis Communications AB
 boe	BOE Technology Group Co., Ltd.
 bosch	Bosch Sensortec GmbH
