@@ -28,14 +28,13 @@
 #include <linux/string.h>
 #include <linux/vmalloc.h>
 #include <linux/err.h>
-#include <linux/show_mem_notifier.h>
 #include <linux/ratelimit.h>
+#include <linux/idr.h>
 
 #include "zram_drv.h"
 
-/* Globals */
+static DEFINE_IDR(zram_index_idr);
 static int zram_major;
-static struct zram *zram_devices;
 static const char *default_compressor = "lzo";
 
 /*
@@ -72,49 +71,6 @@ static inline bool init_done(struct zram *zram)
 {
 	return zram->disksize;
 }
-
-static int zram_show_mem_notifier(struct notifier_block *nb,
-				unsigned long action,
-				void *data)
-{
-	int i;
-
-	if (!zram_devices)
-		return 0;
-
-	for (i = 0; i < num_devices; i++) {
-		struct zram *zram = &zram_devices[i];
-		struct zram_meta *meta = zram->meta;
-
-		if (!down_read_trylock(&zram->init_lock))
-			continue;
-
-		if (init_done(zram)) {
-			u64 val;
-			u64 data_size;
-			u64 orig_data_size;
-
-			val = zs_get_total_pages(meta->mem_pool);
-			data_size = atomic64_read(&zram->stats.compr_data_size);
-			orig_data_size = atomic64_read(
-						&zram->stats.pages_stored);
-			pr_info("Zram[%d] mem_used_total = %llu\n", i,
-							val << PAGE_SHIFT);
-			pr_info("Zram[%d] compr_data_size = %llu\n", i,
-				(unsigned long long)data_size);
-			pr_info("Zram[%d] orig_data_size = %llu\n", i,
-				(unsigned long long)orig_data_size);
-		}
-
-		up_read(&zram->init_lock);
-	}
-
-	return 0;
-}
-
-static struct notifier_block zram_show_mem_notifier_block = {
-	.notifier_call = zram_show_mem_notifier
-};
 
 static inline struct zram *dev_to_zram(struct device *dev)
 {
@@ -1208,10 +1164,20 @@ static const struct attribute_group *zram_disk_attr_groups[] = {
 	NULL,
 };
 
-static int create_device(struct zram *zram, int device_id)
+static int zram_add(int device_id)
 {
+	struct zram *zram;
 	struct request_queue *queue;
-	int ret = -ENOMEM;
+	int ret;
+
+	zram = kzalloc(sizeof(struct zram), GFP_KERNEL);
+	if (!zram)
+		return -ENOMEM;
+
+	ret = idr_alloc(&zram_index_idr, zram, device_id,
+			device_id + 1, GFP_KERNEL);
+	if (ret < 0)
+		goto out_free_dev;
 
 	init_rwsem(&zram->init_lock);
 
@@ -1219,7 +1185,8 @@ static int create_device(struct zram *zram, int device_id)
 	if (!queue) {
 		pr_err("Error allocating disk queue for device %d\n",
 			device_id);
-		goto out;
+		ret = -ENOMEM;
+		goto out_free_idr;
 	}
 
 	blk_queue_make_request(queue, zram_make_request);
@@ -1282,28 +1249,42 @@ static int create_device(struct zram *zram, int device_id)
 
 out_free_queue:
 	blk_cleanup_queue(queue);
-out:
+out_free_idr:
+	idr_remove(&zram_index_idr, device_id);
+out_free_dev:
+	kfree(zram);
 	return ret;
 }
 
-static void destroy_devices(unsigned int nr)
+static void zram_remove(struct zram *zram)
 {
-	struct zram *zram;
-	unsigned int i;
+	/*
+	 * Remove sysfs first, so no one will perform a disksize
+	 * store while we destroy the devices
+	 */
+	sysfs_remove_group(&disk_to_dev(zram->disk)->kobj,
+			&zram_disk_attr_group);
 
-	for (i = 0; i < nr; i++) {
-		zram = &zram_devices[i];
+	zram_reset_device(zram);
+	idr_remove(&zram_index_idr, zram->disk->first_minor);
+	blk_cleanup_queue(zram->disk->queue);
+	del_gendisk(zram->disk);
+	put_disk(zram->disk);
+	kfree(zram);
+}
 
-		zram_reset_device(zram);
+static int zram_remove_cb(int id, void *ptr, void *data)
+{
+	zram_remove(ptr);
+	return 0;
+}
 
-		blk_cleanup_queue(zram->disk->queue);
-		del_gendisk(zram->disk);
-		put_disk(zram->disk);
-	}
-
-	kfree(zram_devices);
+static void destroy_devices(void)
+{
+	idr_for_each(&zram_index_idr, &zram_remove_cb, NULL);
+	idr_destroy(&zram_index_idr);
 	unregister_blkdev(zram_major, "zram");
-	pr_info("Destroyed %u device(s)\n", nr);
+	pr_info("Destroyed device(s)\n");
 }
 
 static int __init zram_init(void)
@@ -1322,32 +1303,24 @@ static int __init zram_init(void)
 		return -EBUSY;
 	}
 
-	/* Allocate the device array and initialize each one */
-	zram_devices = kzalloc(num_devices * sizeof(struct zram), GFP_KERNEL);
-	if (!zram_devices) {
-		unregister_blkdev(zram_major, "zram");
-		return -ENOMEM;
-	}
-
 	for (dev_id = 0; dev_id < num_devices; dev_id++) {
-		ret = create_device(&zram_devices[dev_id], dev_id);
-		if (ret)
+		ret = zram_add(dev_id);
+		if (ret != 0)
 			goto out_error;
 	}
 
-	show_mem_notifier_register(&zram_show_mem_notifier_block);
 	pr_info("Created %u device(s) ...\n", num_devices);
 
 	return 0;
 
 out_error:
-	destroy_devices(dev_id);
+	destroy_devices();
 	return ret;
 }
 
 static void __exit zram_exit(void)
 {
-	destroy_devices(num_devices);
+	destroy_devices();
 }
 
 module_init(zram_init);
