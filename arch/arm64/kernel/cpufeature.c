@@ -617,6 +617,19 @@ has_cpuid_feature(const struct arm64_cpu_capabilities *entry)
 	return feature_matches(val, entry);
 }
 
+#define __ID_FEAT_CHK(reg)						\
+static bool __maybe_unused						\
+has_##reg##_feature(const struct arm64_cpu_capabilities *entry)		\
+{									\
+	u64 val;							\
+									\
+	val = read_cpuid(reg##_el1);					\
+	return feature_matches(val, entry);				\
+}
+
+__ID_FEAT_CHK(id_aa64pfr0);
+__ID_FEAT_CHK(id_aa64mmfr1);
+
 static const struct arm64_cpu_capabilities arm64_features[] = {
 	{
 		.desc = "GIC system register CPU interface",
