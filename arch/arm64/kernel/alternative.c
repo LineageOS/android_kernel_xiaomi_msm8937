@@ -98,7 +98,7 @@ static void __apply_alternatives(void *alt_region)
 		if (!cpus_have_cap(alt->cpufeature))
 			continue;
 
-		BUG_ON(alt->alt_len > alt->orig_len);
+		BUG_ON(alt->alt_len != alt->orig_len);
 
 		pr_info_once("patching kernel code\n");
 
@@ -108,7 +108,7 @@ static void __apply_alternatives(void *alt_region)
 
 		for (i = 0; i < nr_inst; i++) {
 			insn = get_alt_insn(alt, origptr + i, replptr + i);
-			*(origptr + i) = cpu_to_le32(insn);
+			BUG_ON(aarch64_insn_patch_text_nosync(origptr + i, insn));
 		}
 
 		flush_icache_range((uintptr_t)origptr,
