@@ -217,16 +217,6 @@ lr	.req	x30		// link register
 	.endm
 
 /*
- * Annotate a function as position independent, i.e., safe to be called before
- * the kernel virtual mapping is activated.
- */
-#define ENDPIPROC(x)			\
-	.globl	__pi_##x;		\
-	.type 	__pi_##x, %function;	\
-	.set	__pi_##x, x;		\
-	.size	__pi_##x, . - x;	\
-	ENDPROC(x)
-/*
  * vma_vm_mm - get mm pointer from vma pointer (vma->vm_mm)
  */
 	.macro	vma_vm_mm, rd, rn
@@ -310,5 +300,16 @@ lr	.req	x30		// link register
 	.macro	get_thread_info, rd
 	mrs	\rd, sp_el0
 	.endm
+
+/*
+ * Annotate a function as position independent, i.e., safe to be called before
+ * the kernel virtual mapping is activated.
+ */
+#define ENDPIPROC(x)			\
+	.globl	__pi_##x;		\
+	.type 	__pi_##x, %function;	\
+	.set	__pi_##x, x;		\
+	.size	__pi_##x, . - x;	\
+	ENDPROC(x)
 
 #endif	/* __ASM_ASSEMBLER_H */
