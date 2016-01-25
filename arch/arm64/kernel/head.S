@@ -452,6 +452,7 @@ __mmap_switched:
 	b.hs	2f
 	str	xzr, [x6], #8			// Clear BSS
 	b	1b
+	dsb	ishst				// Make zero page visible to PTW
 2:
 	adr_l	sp, initial_sp, x4
 	mov	x4, sp
