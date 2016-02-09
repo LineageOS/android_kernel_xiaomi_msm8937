@@ -4022,8 +4022,7 @@ static int cpp_probe(struct platform_device *pdev)
 	if (rc < 0)
 		goto cpp_probe_init_error;
 
-	media_entity_init(&cpp_dev->msm_sd.sd.entity, 0, NULL, 0);
-	cpp_dev->msm_sd.sd.entity.type = MEDIA_ENT_T_V4L2_SUBDEV;
+	media_entity_pads_init(&cpp_dev->msm_sd.sd.entity, 0, NULL);
 	cpp_dev->msm_sd.sd.entity.group_id = MSM_CAMERA_SUBDEV_CPP;
 	cpp_dev->msm_sd.sd.entity.name = pdev->name;
 	cpp_dev->msm_sd.close_seq = MSM_SD_CLOSE_3RD_CATEGORY;

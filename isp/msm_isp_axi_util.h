@@ -49,6 +49,8 @@ void legacy_m_msm_isp_reset_framedrop(struct vfe_device *vfe_dev,
 	struct msm_vfe_axi_stream *stream_info);
 
 int legacy_m_msm_isp_request_axi_stream(struct vfe_device *vfe_dev, void *arg);
+void legacy_m_msm_isp_start_avtimer(void);
+void legacy_m_msm_isp_stop_avtimer(void);
 void legacy_m_msm_isp_get_avtimer_ts(struct msm_isp_timestamp *time_stamp);
 int legacy_m_msm_isp_cfg_axi_stream(struct vfe_device *vfe_dev, void *arg);
 int legacy_m_msm_isp_release_axi_stream(struct vfe_device *vfe_dev, void *arg);

@@ -2129,7 +2129,7 @@ int legacy_m_msm_isp_open_node(struct v4l2_subdev *sd, struct v4l2_subdev_fh *fh
 #ifdef CONFIG_MSM_AVTIMER
 void legacy_m_msm_isp_end_avtimer(void)
 {
-	avcs_core_disable_power_collapse(0);
+	legacy_m_msm_isp_stop_avtimer();
 }
 #else
 void legacy_m_msm_isp_end_avtimer(void)
