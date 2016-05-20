@@ -657,7 +657,7 @@ static int zram_bvec_write(struct zram *zram, struct bio_vec *bvec, u32 index,
 {
 	int ret = 0;
 	size_t clen;
-	unsigned long handle;
+	unsigned long handle = 0;
 	struct page *page;
 	unsigned char *user_mem, *cmem, *src, *uncmem = NULL;
 	struct zram_meta *meta = zram->meta;
@@ -681,9 +681,8 @@ static int zram_bvec_write(struct zram *zram, struct bio_vec *bvec, u32 index,
 			goto out;
 	}
 
-	zstrm = zcomp_strm_find(zram->comp);
+compress_again:
 	user_mem = kmap_atomic(page);
-
 	if (is_partial_io(bvec)) {
 		memcpy(uncmem + offset, user_mem + bvec->bv_offset,
 		       bvec->bv_len);
@@ -707,6 +706,7 @@ static int zram_bvec_write(struct zram *zram, struct bio_vec *bvec, u32 index,
 		goto out;
 	}
 
+	zstrm = zcomp_strm_find(zram->comp);
 	ret = zcomp_compress(zram->comp, zstrm, uncmem, &clen);
 	if (!is_partial_io(bvec)) {
 		kunmap_atomic(user_mem);
@@ -718,6 +718,7 @@ static int zram_bvec_write(struct zram *zram, struct bio_vec *bvec, u32 index,
 		pr_err("Compression failed! err=%d\n", ret);
 		goto out;
 	}
+
 	src = zstrm->buffer;
 	if (unlikely(clen > max_zpage_size)) {
 		clen = PAGE_SIZE;
@@ -725,8 +726,31 @@ static int zram_bvec_write(struct zram *zram, struct bio_vec *bvec, u32 index,
 			src = uncmem;
 	}
 
-	handle = zs_malloc(meta->mem_pool, clen, GFP_NOIO | __GFP_HIGHMEM);
+	/*
+	 * handle allocation has 2 paths:
+	 * a) fast path is executed with preemption disabled (for
+	 *  per-cpu streams) and has __GFP_DIRECT_RECLAIM bit clear,
+	 *  since we can't sleep;
+	 * b) slow path enables preemption and attempts to allocate
+	 *  the page with __GFP_DIRECT_RECLAIM bit set. we have to
+	 *  put per-cpu compression stream and, thus, to re-do
+	 *  the compression once handle is allocated.
+	 *
+	 * if we have a 'non-null' handle here then we are coming
+	 * from the slow path and handle has already been allocated.
+	 */
+	if (!handle)
+		handle = zs_malloc(meta->mem_pool, clen,
+				__GFP_NOWARN |
+				__GFP_HIGHMEM);
 	if (!handle) {
+		zcomp_strm_release(zram->comp, zstrm);
+		zstrm = NULL;
+ 		handle = zs_malloc(meta->mem_pool, clen,
+				GFP_NOIO | __GFP_HIGHMEM);
+		if (handle)
+			goto compress_again;
+
 		if (printk_timed_ratelimit(&zram_rs_time,
 					   ALLOC_ERROR_LOG_RATE_MS))
 			pr_err("Error allocating memory for compressed page: %u, size=%zu\n",
@@ -1047,7 +1071,7 @@ static ssize_t disksize_store(struct device *dev,
 	if (!meta)
 		return -ENOMEM;
 
-	comp = zcomp_create(zram->compressor, zram->max_comp_streams);
+	comp = zcomp_create(zram->compressor);
 	if (IS_ERR(comp)) {
 		pr_err("Cannot initialise %s compressing backend\n",
 				zram->compressor);
