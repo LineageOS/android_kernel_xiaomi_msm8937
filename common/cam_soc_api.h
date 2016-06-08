@@ -21,6 +21,7 @@
 #include <linux/regulator/consumer.h>
 #include <linux/interrupt.h>
 #include <linux/slab.h>
+#include <linux/reset.h>
 #include <soc/qcom/camera2-legacy-m.h>
 
 enum cam_bus_client {
@@ -187,6 +188,21 @@ int legacy_m_msm_camera_clk_enable(struct device *dev,
 long legacy_m_msm_camera_clk_set_rate(struct device *dev,
 				struct clk *clk,
 				long clk_rate);
+
+/**
+ * @brief      : Gets reset info
+ *
+ * This function extracts the reset information for a specific
+ * platform device
+ *
+ * @param pdev   : platform device to get reset information
+ * @param micro_iface_reset : Pointer to populate the reset names
+ *
+ * @return Status of operation. Negative in case of error. Zero otherwise.
+ */
+
+int legacy_m_msm_camera_get_reset_info(struct platform_device *pdev,
+			struct reset_control **micro_iface_reset);
 /**
  * @brief      : Gets regulator info
  *
