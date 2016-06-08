@@ -4300,11 +4300,20 @@ static int cpp_probe(struct platform_device *pdev)
 		goto mem_err;
 	}
 
+	rc = legacy_msm_camera_get_reset_info(pdev,
+			&cpp_dev->micro_iface_reset);
+	if (rc < 0) {
+		cpp_dev->micro_iface_reset = NULL;
+		pr_err("%s: failed to get micro_iface_reset\n",
+				__func__);
+		goto get_reg_err;
+	}
+
 	rc = legacy_msm_camera_get_regulator_info(pdev, &cpp_dev->cpp_vdd,
 		&cpp_dev->num_reg);
 	if (rc < 0) {
 		pr_err("%s: failed to get the regulators\n", __func__);
-		goto get_reg_err;
+		goto get_reset_err;
 	}
 
 	legacy_msm_cpp_fetch_dt_params(cpp_dev);
@@ -4392,6 +4401,8 @@ bus_de_init:
 cpp_probe_init_error:
 	media_entity_cleanup(&cpp_dev->msm_sd.sd.entity);
 	legacy_msm_sd_unregister(&cpp_dev->msm_sd);
+get_reset_err:
+	reset_control_put(cpp_dev->micro_iface_reset);
 get_reg_err:
 	legacy_msm_camera_put_clk_info(pdev, &cpp_dev->clk_info, &cpp_dev->cpp_clk,
 		cpp_dev->num_clks);
@@ -4449,6 +4460,9 @@ static int cpp_device_remove(struct platform_device *dev)
 	legacy_msm_camera_unregister_bus_client(CAM_BUS_CLIENT_CPP);
 	mutex_destroy(&cpp_dev->mutex);
 	kfree(cpp_dev->work);
+
+	reset_control_put(cpp_dev->micro_iface_reset);
+
 	destroy_workqueue(cpp_dev->timer_wq);
 	kfree(cpp_dev->cpp_clk);
 	kfree(cpp_dev);
