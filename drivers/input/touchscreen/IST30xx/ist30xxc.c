@@ -139,6 +139,12 @@ void tsp_printk(int level, const char *fmt, ...)
 	va_end(args);
 }
 
+static ssize_t ist30xx_disable_keys_show(struct device *dev,
+	struct device_attribute *attr, char *buf);
+
+static ssize_t ist30xx_disable_keys_store(struct device *dev,
+struct device_attribute *attr, const char *buf, size_t count);
+
 long get_milli_second(void)
 {
 	ktime_get_ts(&t_current);
@@ -828,7 +834,7 @@ static void report_input_data(struct ist30xx_data *data, int finger_counts,
 						 fingers[idx].bit_field.w);
 				idx++;
 			}
-			if (key_press == true) {
+			if ( (key_press == true) && (data->disable_keys == false) ) {
 				tsp_info("key press ( %d, %d)\n",
 					 fhd_key_dim_x[id + 1], FHD_KEY_Y);
 				input_mt_slot(data->input_dev, 0);
@@ -1858,6 +1864,53 @@ static int get_boot_mode(struct i2c_client *client)
 }
 #endif
 
+static DEVICE_ATTR(disable_keys, S_IWUSR | S_IRUSR, ist30xx_disable_keys_show,
+		   ist30xx_disable_keys_store);
+
+static struct attribute *ist30xx_attrs[] = {
+    &dev_attr_disable_keys.attr,
+	NULL
+};
+
+static const struct attribute_group ist30xx_attr_group = {
+	.attrs = ist30xx_attrs,
+};
+
+static int ist30xx_proc_init(struct ist30xx_data *data)
+{
+       struct i2c_client *client = data->client;
+
+       int ret = 0;
+       char *buf, *path = NULL;
+       char *key_disabler_sysfs_node;
+       struct proc_dir_entry *proc_entry_tp = NULL;
+       struct proc_dir_entry *proc_symlink_tmp = NULL;
+
+       buf = kzalloc(sizeof(struct ist30xx_data), GFP_KERNEL);
+       if (buf)
+               path = "/devices/soc/78b7000.i2c/i2c-3/3-0050";
+
+       proc_entry_tp = proc_mkdir("touchpanel", NULL);
+       if (proc_entry_tp == NULL) {
+               dev_err(&client->dev, "Couldn't create touchpanel dir in procfs\n");
+               ret = -ENOMEM;
+       }
+
+       key_disabler_sysfs_node = kzalloc(sizeof(struct ist30xx_data), GFP_KERNEL);
+       if (key_disabler_sysfs_node)
+               sprintf(key_disabler_sysfs_node, "/sys%s/%s", path, "disable_keys");
+       proc_symlink_tmp = proc_symlink("capacitive_keys_enable",
+                       proc_entry_tp, key_disabler_sysfs_node);
+       if (proc_symlink_tmp == NULL) {
+               dev_err(&client->dev, "Couldn't create capacitive_keys_enable symlink\n");
+               ret = -ENOMEM;
+       }
+
+       kfree(buf);
+       kfree(key_disabler_sysfs_node);
+       return ret;
+}
+
 static int ist30xx_probe(struct i2c_client *client,
 			 const struct i2c_device_id *id)
 {
@@ -2186,6 +2239,14 @@ static int ist30xx_probe(struct i2c_client *client,
 	ist30xx_write_cmd(data, IST30XX_HIB_CMD,
 			  (eHCOM_FW_HOLD << 16) | (0 & 0xFFFF));
 
+        err = sysfs_create_group(&client->dev.kobj, &ist30xx_attr_group);
+	if (err) {
+		dev_err(&client->dev, "Failure %d creating sysfs group\n",
+			err);
+		goto err_sysfs;
+        }
+
+        ist30xx_proc_init(data);
 	data->initialized = true;
 
 	tsp_info("### IMAGIS probe success ###\n");
@@ -2237,6 +2298,7 @@ static int ist30xx_remove(struct i2c_client *client)
 	unregister_early_suspend(&data->early_suspend);
 #endif
 
+        sysfs_remove_group(&client->dev.kobj, &ist30xx_attr_group);
 	ist30xx_disable_irq(data);
 	free_irq(client->irq, data);
 	ist30xx_power_off(data);
@@ -2263,6 +2325,29 @@ static void ist30xx_shutdown(struct i2c_client *client)
 	ist30xx_internal_suspend(data);
 	clear_input_data(data);
 	mutex_unlock(&ist30xx_mutex);
+}
+
+static ssize_t ist30xx_disable_keys_show(struct device *dev,
+	struct device_attribute *attr, char *buf)
+{
+	struct ist30xx_data *data = dev_get_drvdata(dev);
+	char c = data->disable_keys ? '1' : '0';
+	return sprintf(buf, "%c\n", c);
+}
+
+static ssize_t ist30xx_disable_keys_store(struct device *dev,
+	struct device_attribute *attr, const char *buf, size_t count)
+{
+	struct ist30xx_data *data = dev_get_drvdata(dev);
+	int i;
+
+	if (sscanf(buf, "%u", &i) == 1 && i < 2) {
+		data->disable_keys = (i == 1);
+		return count;
+	} else {
+		dev_dbg(dev, "disable_keys write error\n");
+		return -EINVAL;
+	}
 }
 
 static struct i2c_device_id ist30xx_idtable[] = {

@@ -85,9 +85,11 @@ static u8 pre_charger_status;
 
 #endif
 
+static ssize_t ft5x06_ts_disable_keys_show(struct device *dev,
+	struct device_attribute *attr, char *buf);
 
-
-
+static ssize_t ft5x06_ts_disable_keys_store(struct device *dev,
+struct device_attribute *attr, const char *buf, size_t count);
 
 static int ft5x06_i2c_read(struct i2c_client *client, char *writebuf,
 						   int writelen, char *readbuf, int readlen)
@@ -231,6 +233,10 @@ static irqreturn_t ft5x06_ts_interrupt(int irq, void *dev_id)
 			break;
 
 		if (y == 2000) {
+
+                if (data->disable_keys)
+                    break;
+
 			y = 1344;
 
 			switch (x) {
@@ -806,6 +812,53 @@ static int ft5x06_parse_dt(struct device *dev,
 }
 #endif
 
+static DEVICE_ATTR(disable_keys, S_IWUSR | S_IRUSR, ft5x06_ts_disable_keys_show,
+		   ft5x06_ts_disable_keys_store);
+
+static struct attribute *ft5x06_ts_attrs[] = {
+    &dev_attr_disable_keys.attr,
+	NULL
+};
+
+static const struct attribute_group ft5x06_ts_attr_group = {
+	.attrs = ft5x06_ts_attrs,
+};
+
+static int ft5x06_proc_init(struct ft5x06_ts_data *data)
+{
+       struct i2c_client *client = data->client;
+
+       int ret = 0;
+       char *buf, *path = NULL;
+       char *key_disabler_sysfs_node;
+       struct proc_dir_entry *proc_entry_tp = NULL;
+       struct proc_dir_entry *proc_symlink_tmp = NULL;
+
+       buf = kzalloc(sizeof(struct ft5x06_ts_data), GFP_KERNEL);
+       if (buf)
+               path = "/devices/soc/78b7000.i2c/i2c-3/3-003e";
+
+       proc_entry_tp = proc_mkdir("touchpanel", NULL);
+       if (proc_entry_tp == NULL) {
+               dev_err(&client->dev, "Couldn't create touchpanel dir in procfs\n");
+               ret = -ENOMEM;
+       }
+
+       key_disabler_sysfs_node = kzalloc(sizeof(struct ft5x06_ts_data), GFP_KERNEL);
+       if (key_disabler_sysfs_node)
+               sprintf(key_disabler_sysfs_node, "/sys%s/%s", path, "disable_keys");
+       proc_symlink_tmp = proc_symlink("capacitive_keys_enable",
+                       proc_entry_tp, key_disabler_sysfs_node);
+       if (proc_symlink_tmp == NULL) {
+               dev_err(&client->dev, "Couldn't create capacitive_keys_enable symlink\n");
+               ret = -ENOMEM;
+       }
+
+       kfree(buf);
+       kfree(key_disabler_sysfs_node);
+       return ret;
+}
+
 static int ft5x06_ts_probe(struct i2c_client *client,
 						   const struct i2c_device_id *id)
 {
@@ -1047,6 +1100,14 @@ static int ft5x06_ts_probe(struct i2c_client *client,
 		CTP_DEBUG("tp battery supply not found\n");
 #endif
 
+        err = sysfs_create_group(&client->dev.kobj, &ft5x06_ts_attr_group);
+	if (err) {
+		dev_err(&client->dev, "Failure %d creating sysfs group\n",
+			err);
+		goto free_reset_gpio;
+        }
+
+        ft5x06_proc_init(data);
 	enable_irq(data->client->irq);
 
 	return 0;
@@ -1121,9 +1182,34 @@ static int ft5x06_ts_remove(struct i2c_client *client)
 	else
 		ft5x06_power_init(data, false);
 
+        sysfs_remove_group(&client->dev.kobj, &ft5x06_ts_attr_group);
+
 	input_unregister_device(data->input_dev);
 
 	return 0;
+}
+
+static ssize_t ft5x06_ts_disable_keys_show(struct device *dev,
+	struct device_attribute *attr, char *buf)
+{
+	struct ft5x06_ts_data *data = dev_get_drvdata(dev);
+	const char c = data->disable_keys ? '1' : '0';
+	return sprintf(buf, "%c\n", c);
+}
+
+static ssize_t ft5x06_ts_disable_keys_store(struct device *dev,
+	struct device_attribute *attr, const char *buf, size_t count)
+{
+	struct ft5x06_ts_data *data = dev_get_drvdata(dev);
+	int i;
+
+	if (sscanf(buf, "%u", &i) == 1 && i < 2) {
+		data->disable_keys = (i == 1);
+		return count;
+	} else {
+		dev_dbg(dev, "disable_keys write error\n");
+		return -EINVAL;
+	}
 }
 
 static const struct i2c_device_id ft5x06_ts_id[] = {
