@@ -533,6 +533,7 @@ struct ist30xx_data {
 	struct pinctrl_state *gpio_state_suspend;
 	u32 product_id;
 	u32 lockdown_upper;
+        bool disable_keys;
 };
 
 extern struct mutex ist30xx_mutex;
