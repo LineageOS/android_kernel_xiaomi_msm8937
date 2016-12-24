@@ -44,7 +44,7 @@
 #include <linux/debugfs.h>
 #include <linux/proc_fs.h>
 #include <linux/fs.h>
-#include <asm/uaccess.h>
+#include <linux/uaccess.h>
 
 #include <asm/unaligned.h>
 #include <linux/uaccess.h>

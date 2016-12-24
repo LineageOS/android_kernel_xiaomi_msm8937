@@ -28,7 +28,7 @@
 #include <linux/slab.h>
 #include <linux/compat.h>
 #include <linux/delay.h>
-#include <asm/uaccess.h>
+#include <linux/uaccess.h>
 #include <linux/ktime.h>
 #include <linux/interrupt.h>
 #include <linux/irq.h>

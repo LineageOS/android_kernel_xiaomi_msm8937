@@ -855,7 +855,7 @@ EXPORT_SYMBOL(mxt_unregister_glove_mode_notifier);
 #ifdef TOUCH_WAKEUP_EVENT_RECORD
 #include <linux/fs.h>
 #include <asm/fcntl.h>
-#include <asm/uaccess.h>
+#include <linux/uaccess.h>
 #include <linux/rtc.h>
 
 #define EVENT_TOUCH_WAKEUP	0
