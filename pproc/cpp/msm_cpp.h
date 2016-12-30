@@ -284,6 +284,8 @@ struct cpp_device {
 int legacy_m_msm_cpp_set_micro_clk(struct cpp_device *cpp_dev);
 int legacy_m_msm_update_freq_tbl(struct cpp_device *cpp_dev);
 int legacy_m_msm_cpp_get_clock_index(struct cpp_device *cpp_dev, const char *clk_name);
+int legacy_m_msm_cpp_get_regulator_index(struct cpp_device *cpp_dev,
+	const char *regulator_name);
 long legacy_m_msm_cpp_set_core_clk(struct cpp_device *cpp_dev, long rate, int idx);
 void legacy_m_msm_cpp_fetch_dt_params(struct cpp_device *cpp_dev);
 int legacy_m_msm_cpp_read_payload_params_from_dt(struct cpp_device *cpp_dev);
