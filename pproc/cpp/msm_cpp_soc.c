@@ -66,6 +66,18 @@ int legacy_msm_cpp_get_clock_index(struct cpp_device *cpp_dev, const char *clk_n
 	return -EINVAL;
 }
 
+int legacy_msm_cpp_get_regulator_index(struct cpp_device *cpp_dev,
+	const char *regulator_name)
+{
+	uint32_t i = 0;
+
+	for (i = 0; i < cpp_dev->num_reg; i++) {
+		if (!strcmp(regulator_name, cpp_dev->cpp_vdd[i].name))
+			return i;
+	}
+	return -EINVAL;
+}
+
 static int cpp_get_clk_freq_tbl(struct clk *clk, struct cpp_hw_info *hw_info,
 	uint32_t min_clk_rate)
 {

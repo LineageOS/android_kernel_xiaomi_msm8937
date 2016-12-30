@@ -4128,26 +4128,22 @@ static  int msm_cpp_update_gdscr_status(struct cpp_device *cpp_dev,
 	bool status)
 {
 	int rc = 0;
-	int value = 0;
+	uint32_t msm_cpp_reg_idx;
 	if (!cpp_dev) {
 		pr_err("%s: cpp device invalid\n", __func__);
 		rc = -EINVAL;
 		goto end;
 	}
-
-	if (cpp_dev->camss_cpp_base) {
-		value = legacy_msm_camera_io_r(cpp_dev->camss_cpp_base);
-		pr_debug("value from camss cpp %x, status %d\n", value, status);
-		if (status) {
-			value &= CPP_GDSCR_SW_COLLAPSE_ENABLE;
-			value |= CPP_GDSCR_HW_CONTROL_ENABLE;
-		} else {
-			value |= CPP_GDSCR_HW_CONTROL_DISABLE;
-			value &= CPP_GDSCR_SW_COLLAPSE_DISABLE;
-		}
-		pr_debug("value %x after camss cpp mask\n", value);
-		legacy_msm_camera_io_w(value, cpp_dev->camss_cpp_base);
+	msm_cpp_reg_idx = legacy_msm_cpp_get_regulator_index(cpp_dev, "vdd");
+	if (msm_cpp_reg_idx < 0) {
+		pr_err(" Fail to regulator index\n");
+		return -EINVAL;
 	}
+	rc = legacy_msm_camera_regulator_set_mode(cpp_dev->cpp_vdd +
+		msm_cpp_reg_idx, 1, status);
+	if (rc < 0)
+		pr_err("update cpp gdscr status failed\n");
+
 end:
 	return rc;
 }
@@ -4253,14 +4249,6 @@ static int cpp_probe(struct platform_device *pdev)
 	cpp_dev->pdev = pdev;
 	memset(&cpp_vbif, 0, sizeof(struct msm_cpp_vbif_data));
 	cpp_dev->vbif_data = &cpp_vbif;
-
-	cpp_dev->camss_cpp_base =
-		legacy_msm_camera_get_reg_base(pdev, "camss_cpp", true);
-	if (!cpp_dev->camss_cpp_base) {
-		rc = -ENOMEM;
-		pr_err("failed to get camss_cpp_base\n");
-		goto camss_cpp_base_failed;
-	}
 
 	cpp_dev->base =
 		legacy_msm_camera_get_reg_base(pdev, "cpp", true);
@@ -4415,7 +4403,7 @@ vbif_base_failed:
 cpp_base_failed:
 	legacy_msm_camera_put_reg_base(pdev, cpp_dev->camss_cpp_base,
 		"camss_cpp", true);
-camss_cpp_base_failed:
+
 	kfree(cpp_dev);
 	return rc;
 }
