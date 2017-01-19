@@ -120,7 +120,7 @@
 	.if	\el == 0
 	ct_user_enter
 	ldr	x23, [sp, #S_SP]		// load return stack pointer
-
+	msr	sp_el0, x23
 #ifdef CONFIG_ARM64_ERRATUM_845719
 	alternative_insn						\
 	"nop",								\
