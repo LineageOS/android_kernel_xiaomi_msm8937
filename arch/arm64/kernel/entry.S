@@ -407,9 +407,9 @@ el0_sync:
 	b.eq	el0_fpsimd_acc
 	cmp	x24, #ESR_EL1_EC_FP_EXC64	// FP/ASIMD exception
 	b.eq	el0_fpsimd_exc
-	cmp	x24, #ESR_EL1_EC_SYS64		// configurable trap
+	cmp	x24, #ESR_ELx_EC_SYS64		// configurable trap
 	b.eq	el0_sys
-	cmp	x24, #ESR_EL1_EC_SP_ALIGN	// stack alignment exception
+	cmp	x24, #ESR_ELx_EC_SP_ALIGN	// stack alignment exception
 	b.eq	el0_sp_pc
 	cmp	x24, #ESR_EL1_EC_PC_ALIGN	// pc alignment exception
 	b.eq	el0_sp_pc
