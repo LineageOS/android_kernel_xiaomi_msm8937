@@ -403,6 +403,9 @@ struct arm_smmu_domain {
 	struct iommu_domain		domain;
 };
 
+static DEFINE_SPINLOCK(arm_smmu_devices_lock);
+static LIST_HEAD(arm_smmu_devices);
+
 struct arm_smmu_option_prop {
 	u32 opt;
 	const char *prop;
@@ -2430,6 +2433,22 @@ static int arm_smmu_init_asid(struct iommu_domain *domain,
 	return 0;
 }
 
+static struct arm_smmu_device *arm_smmu_get_by_list(struct device_node *np)
+{
+	struct arm_smmu_device *smmu;
+	unsigned long flags;
+
+	spin_lock_irqsave(&arm_smmu_devices_lock, flags);
+	list_for_each_entry(smmu, &arm_smmu_devices, list) {
+		if (smmu->dev->of_node == np) {
+			spin_unlock_irqrestore(&arm_smmu_devices_lock, flags);
+			return smmu;
+		}
+	}
+	spin_unlock_irqrestore(&arm_smmu_devices_lock, flags);
+	return NULL;
+}
+
 static void arm_smmu_free_asid(struct iommu_domain *domain)
 {
 	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
@@ -3873,7 +3892,7 @@ struct arm_smmu_device *arm_smmu_get_by_fwnode(struct fwnode_handle *fwnode)
 	struct device *dev = driver_find_device(&arm_smmu_driver.driver, NULL,
 						fwnode, arm_smmu_match_node);
 	put_device(dev);
-	return dev ? dev_get_drvdata(dev) : NULL;
+	return dev ? dev_get_drvdata(dev) : arm_smmu_get_by_list(to_of_node(fwnode));
 }
 
 #ifdef CONFIG_MSM_TZ_SMMU
@@ -5838,6 +5857,11 @@ static int arm_smmu_device_dt_probe(struct platform_device *pdev)
 	arm_smmu_interrupt_selftest(smmu);
 	arm_smmu_atos_selftest(smmu);
 	arm_smmu_power_off(smmu->pwr);
+
+	INIT_LIST_HEAD(&smmu->list);
+	spin_lock(&arm_smmu_devices_lock);
+	list_add(&smmu->list, &arm_smmu_devices);
+	spin_unlock(&arm_smmu_devices_lock);
 
 	/*
 	 * For ACPI and generic DT bindings, an SMMU will be probed before
