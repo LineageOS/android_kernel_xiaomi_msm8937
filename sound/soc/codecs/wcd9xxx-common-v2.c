@@ -453,8 +453,8 @@ static void wcd_clsh_set_hph_mode(struct snd_soc_codec *codec,
 {
 	u8 val;
 	u8 gain;
-	u8 res_val = VREF_FILT_R_0OHM;
-	u8 ipeak = DELTA_I_50MA;
+	u8 res_val;
+	u8 ipeak;
 
 	struct wcd9xxx *wcd9xxx = dev_get_drvdata(codec->dev->parent);
 
@@ -477,6 +477,7 @@ static void wcd_clsh_set_hph_mode(struct snd_soc_codec *codec,
 		break;
 	case CLS_H_LP:
 		val = 0x04;
+		gain = DAC_GAIN_0DB;
 		ipeak = DELTA_I_30MA;
 		break;
 	default:
