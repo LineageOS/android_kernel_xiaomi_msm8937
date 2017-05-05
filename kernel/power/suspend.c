@@ -64,6 +64,8 @@ static DECLARE_SWAIT_QUEUE_HEAD(s2idle_wait_head);
 enum s2idle_states __read_mostly s2idle_state;
 static DEFINE_RAW_SPINLOCK(s2idle_lock);
 
+extern void thaw_fingerprintd(void);
+
 bool pm_suspend_via_s2idle(void)
 {
 	return mem_sleep_current == PM_SUSPEND_TO_IDLE;
@@ -475,6 +477,8 @@ static int suspend_enter(suspend_state_t state, bool *wakeup)
 	enable_nonboot_cpus();
 
  Platform_wake:
+	thaw_fingerprintd();
+
 	platform_resume_noirq(state);
 	dpm_resume_noirq(PMSG_RESUME);
 
