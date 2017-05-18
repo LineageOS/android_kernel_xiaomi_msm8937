@@ -31,6 +31,9 @@
 #include "msm-audio-pinctrl.h"
 #include "../codecs/msm8x16-wcd.h"
 #include "../codecs/wsa881x-analog.h"
+#ifdef CONFIG_SND_SOC_AW87319
+#include "../codecs/aw87319.h"
+#endif /* CONFIG_SND_SOC_AW87319 */
 #include <linux/regulator/consumer.h>
 #define DRV_NAME "msm8952-asoc-wcd"
 
@@ -48,8 +51,9 @@
 #define QUIN_MI2S_ID	(1 << 4)
 
 #define DEFAULT_MCLK_RATE 9600000
+#ifndef CONFIG_SND_SOC_AW87319
 #define AW8738_MODE 5
-
+#endif
 #define WCD_MBHC_DEF_RLOADS 5
 #define MAX_WSA_CODEC_NAME_LENGTH 80
 #define MSM_DT_MAX_PROP_SIZE 80
@@ -753,16 +757,22 @@ static void msm8952_ext_hs_delay_enable(struct work_struct *work)
 
 static void msm8952_ext_spk_control(u32 enable)
 {
+#ifndef CONFIG_SND_SOC_AW87319
 	int i = 0;
-
+#endif /* CONFIG_SND_SOC_AW87319 */
 	if (enable) {
 		/* Open external audio PA device */
+#ifdef CONFIG_SND_SOC_AW87319
+		AW87319_Audio_Speaker();
+#else
 		for (i = 0; i < AW8738_MODE; i++) {
 			gpio_direction_output(spk_pa_gpio, false);
 			gpio_direction_output(spk_pa_gpio, true);
 		}
+
 		usleep_range(EXT_CLASS_D_EN_DELAY,
 		EXT_CLASS_D_EN_DELAY + EXT_CLASS_D_DELAY_DELTA);
+#endif /* CONFIG_SND_SOC_AW87319 */
 	} else {
 		gpio_direction_output(spk_pa_gpio, false);
 		/* time takes disable the external power amplifier */
@@ -776,35 +786,44 @@ static void msm8952_ext_spk_control(u32 enable)
 
 static void msm8952_ext_spk__delayed_enable(struct work_struct *work)
 {
+#ifndef CONFIG_SND_SOC_AW87319
 	int i = 0;
-
+#endif
 	/* Open external audio PA device */
+#ifdef CONFIG_SND_SOC_AW87319
+	AW87319_Audio_Speaker();
+#else
 	for (i = 0; i < AW8738_MODE; i++) {
 		gpio_direction_output(spk_pa_gpio, false);
 		gpio_direction_output(spk_pa_gpio, true);
 	}
+
 	usleep_range(EXT_CLASS_D_EN_DELAY,
 	EXT_CLASS_D_EN_DELAY + EXT_CLASS_D_DELAY_DELTA);
-
+#endif /* CONFIG_SND_SOC_AW87319 */
 	pr_err("%s:  [hjf]  external speaker enable.\n", __func__);
 }
 
 static void msm8x16_ext_spk_delayed_dualmode(struct work_struct *work)
 {
+#ifndef CONFIG_SND_SOC_AW87319
 	int i = 0;
-
+#endif
 	/* Open the headset device */
 	gpio_direction_output(headset_gpio, true);
 	usleep_range(EXT_CLASS_D_EN_DELAY,
 		EXT_CLASS_D_EN_DELAY + EXT_CLASS_D_DELAY_DELTA);
-
+#ifdef CONFIG_SND_SOC_AW87319
+	AW87319_Audio_Speaker();
+#else
 	for (i = 0; i < AW8738_MODE; i++) {
 		gpio_direction_output(spk_pa_gpio, false);
 		gpio_direction_output(spk_pa_gpio, true);
 	}
+
 	usleep_range(EXT_CLASS_D_EN_DELAY,
 		EXT_CLASS_D_EN_DELAY + EXT_CLASS_D_DELAY_DELTA);
-
+#endif /* CONFIG_SND_SOC_AW87319 */
 	pr_debug("%s: Enable external speaker PAs dualmode.\n", __func__);
 }
 
@@ -1233,8 +1252,8 @@ static const struct snd_kcontrol_new msm_snd_controls[] = {
 			mi2s_rx_sample_rate_get, mi2s_rx_sample_rate_put),
 	SOC_ENUM_EXT("Lineout_1 amp", msm_snd_enum[7],
 		lineout_status_get, lineout_status_put),
-		SOC_ENUM_EXT("headset amp", msm_snd_enum[8],
-	headset_status_get, headset_status_put),
+	SOC_ENUM_EXT("headset amp", msm_snd_enum[8],
+		headset_status_get, headset_status_put),
 };
 
 static int msm8952_mclk_event(struct snd_soc_dapm_widget *w,
