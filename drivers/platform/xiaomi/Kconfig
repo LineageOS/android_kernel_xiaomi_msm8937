@@ -1,0 +1,15 @@
+config MACH_XIAOMI_MSM8937
+	bool "Xiaomi MSM8937"
+	depends on ARCH_MSM8937
+	help
+	  Support for MSM8937 Xiaomi variants
+
+menu "Xiaomi board selection"
+
+config MACH_XIAOMI_LAND
+	bool "land board"
+	select MACH_XIAOMI_MSM8937
+	help
+	  Support for Redmi 3S/Prime/Plus/3X land
+
+endmenu
