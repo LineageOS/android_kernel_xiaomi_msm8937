@@ -1150,4 +1150,10 @@ config TOUCHSCREEN_HIMAX_CHIPSET
 
 source "drivers/input/touchscreen/hxchipset/Kconfig"
 
+config TOUCHSCREEN_FT5336
+	tristate "FOCALTECH touchpanel FT5336 series"
+	depends on I2C
+
+source "drivers/input/touchscreen/FT5336/Kconfig"
+
 endif
