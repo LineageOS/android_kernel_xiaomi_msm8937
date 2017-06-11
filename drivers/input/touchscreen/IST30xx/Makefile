@@ -1,0 +1,8 @@
+#IST30xx touchpanel driver
+
+obj-$(CONFIG_TOUCHSCREEN_IST30XX) += ist30xxc.o
+obj-$(CONFIG_TOUCHSCREEN_IST30XX) += ist30xxc_update.o
+obj-$(CONFIG_TOUCHSCREEN_IST30XX) += ist30xxc_cmcs.o
+obj-$(CONFIG_TOUCHSCREEN_IST30XX) += ist30xxc_misc.o
+obj-$(CONFIG_TOUCHSCREEN_IST30XX) += ist30xxc_sys.o
+obj-$(CONFIG_TOUCHSCREEN_IST30XX) += ist30xxc_tracking.o

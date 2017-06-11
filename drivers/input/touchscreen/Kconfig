@@ -1464,4 +1464,9 @@ config TOUCHSCREEN_RAYDIUM_CHIPSET
 
 	  If unsure, say N.
 
+config TOUCHSCREEN_IST30XX
+	tristate "IMAGES touchpanel IST30XX series"
+	depends on I2C
+
+source "drivers/input/touchscreen/IST30xx/Kconfig"
 endif
