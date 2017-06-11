@@ -1137,4 +1137,10 @@ config TOUCHSCREEN_MAXIM_STI
 
 source "drivers/input/touchscreen/gt9xx/Kconfig"
 
+config TOUCHSCREEN_FT5336
+	tristate "FOCALTECH touchpanel FT5336 series"
+	depends on I2C
+
+source "drivers/input/touchscreen/FT5336/Kconfig"
+
 endif
