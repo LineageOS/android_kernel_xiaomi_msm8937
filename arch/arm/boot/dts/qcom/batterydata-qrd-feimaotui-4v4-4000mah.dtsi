@@ -1,5 +1,5 @@
 
-qcom,2336564_s88537a1scud_4000mah_averaged_masterslave_mar1st2016 {
+qcom,2336564_wingtech_s88537a1scud_4000mah_averaged_masterslave_mar1st2016 {
 	qcom,max-voltage-uv = <4400000>;
 	qcom,nom-batt-capacity-mah = <4100>;
 	qcom,batt-id-kohm = <10>;

@@ -1,5 +1,5 @@
 
-qcom,2336567_s88537a1coslight_4000mah_averaged_masterslave_mar3rd2016 {
+qcom,2336567_wingtech_s88537a1coslight_4000mah_averaged_masterslave_mar3rd2016 {
 	qcom,max-voltage-uv = <4400000>;
 	qcom,nom-batt-capacity-mah = <4000>;
 	qcom,batt-id-kohm = <100>;

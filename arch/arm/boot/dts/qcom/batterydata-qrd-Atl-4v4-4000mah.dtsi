@@ -1,5 +1,5 @@
 
-qcom,2312470_a12atl_4000mah_averaged_masterslave_feb1st2016 {
+qcom,2312470_wingtech_a12atl_4000mah_averaged_masterslave_feb1st2016 {
 	qcom,max-voltage-uv = <4400000>;
 	qcom,nom-batt-capacity-mah = <4000>;
 	qcom,batt-id-kohm = <68>;
