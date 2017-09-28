@@ -295,6 +295,7 @@ struct ft5x06_ts_data {
 	struct pinctrl *ts_pinctrl;
 	struct pinctrl_state *gpio_state_active;
 	struct pinctrl_state *gpio_state_suspend;
+        bool disable_keys;
 };
 
 
