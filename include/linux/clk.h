@@ -21,6 +21,8 @@ struct clk;
 struct device_node;
 struct of_phandle_args;
 
+#ifdef CONFIG_COMMON_CLK
+
 /**
  * DOC: clk notifier callback types
  *
@@ -77,6 +79,7 @@ struct clk_notifier_data {
 	unsigned long		new_rate;
 };
 
+<<<<<<< HEAD
 /**
  * struct clk_bulk_data - Data used for bulk clk operations.
  *
@@ -94,6 +97,8 @@ struct clk_bulk_data {
 
 #ifdef CONFIG_COMMON_CLK
 
+=======
+>>>>>>> 0dc6e78a3fb3 (clk: msm: Add snapshot of clock framework files)
 /**
  * clk_notifier_register: register a clock rate-change notifier callback
  * @clk: clock whose rate we are interested in
@@ -788,7 +793,7 @@ static inline void clk_bulk_disable_unprepare(int num_clks,
 	clk_bulk_unprepare(num_clks, clks);
 }
 
-#if defined(CONFIG_OF) && defined(CONFIG_COMMON_CLK)
+#if defined(CONFIG_OF)
 struct clk *of_clk_get(struct device_node *np, int index);
 struct clk *of_clk_get_by_name(struct device_node *np, const char *name);
 struct clk *of_clk_get_from_provider(struct of_phandle_args *clkspec);
