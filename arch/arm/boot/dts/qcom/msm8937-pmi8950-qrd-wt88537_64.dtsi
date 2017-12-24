@@ -52,9 +52,9 @@
 			ftech,irq-gpio = <&tlmm 65 0x2008>;
 			ftech,display-coords = <0 0 720 1280>;
 			ftech,panel-coords = <0 0 720 1280>;
-			ftech,virtual-key1 = <139 180 2000>;/*menu*/
-			ftech,virtual-key2 = <172 540 2000>;/*home*/
-			ftech,virtual-key3 = <158 900 2000>;/*back*/
+		        ftech,button-map= <139 172 158>; /* APP_SWITCH HOME BACK just like stock rom */
+		        ftech,button-y-coord = <2040>;
+                        ftech,button-x-coords = <120 500 900>;
 			ftech,no-force-update;
 			ftech,i2c-pull-up;
 			ftech,group-id = <1>;
