@@ -416,6 +416,9 @@ int bq2560x_set_chargecurrent(struct bq2560x *bq, int curr)
 {
 	u8 ichg;
 
+	if (curr < REG02_ICHG_BASE)
+		curr = REG02_ICHG_BASE;
+
 	ichg = (curr - REG02_ICHG_BASE)/REG02_ICHG_LSB;
 	return bq2560x_update_bits(bq, BQ2560X_REG_02, REG02_ICHG_MASK, 
 				ichg << REG02_ICHG_SHIFT);
@@ -425,6 +428,9 @@ int bq2560x_set_chargecurrent(struct bq2560x *bq, int curr)
 int bq2560x_set_term_current(struct bq2560x *bq, int curr)
 {
 	u8 iterm;
+
+	if (curr < REG03_ITERM_BASE)
+		curr = REG03_ITERM_BASE;
 
 	iterm = (curr - REG03_ITERM_BASE) / REG03_ITERM_LSB;
 
@@ -437,6 +443,9 @@ int bq2560x_set_prechg_current(struct bq2560x *bq, int curr)
 {
 	u8 iprechg;
 
+	if (curr < REG03_IPRECHG_BASE)
+		curr = REG03_IPRECHG_BASE;
+
 	iprechg = (curr - REG03_IPRECHG_BASE) / REG03_IPRECHG_LSB;
 
 	return bq2560x_update_bits(bq, BQ2560X_REG_03, REG03_IPRECHG_MASK, 
@@ -447,6 +456,9 @@ int bq2560x_set_chargevolt(struct bq2560x *bq, int volt)
 {
 	u8 val;
 	
+	if (volt < REG04_VREG_BASE)
+		volt = REG04_VREG_BASE;
+
 	val = (volt - REG04_VREG_BASE)/REG04_VREG_LSB;
 	return bq2560x_update_bits(bq, BQ2560X_REG_04, REG04_VREG_MASK, 
 				val << REG04_VREG_SHIFT);
@@ -457,6 +469,9 @@ int bq2560x_set_input_volt_limit(struct bq2560x *bq, int volt)
 {
 	u8 val;
 
+	if (volt < REG06_VINDPM_BASE)
+		volt = REG06_VINDPM_BASE;
+
 	val = (volt - REG06_VINDPM_BASE) / REG06_VINDPM_LSB;
 	return bq2560x_update_bits(bq, BQ2560X_REG_06, REG06_VINDPM_MASK, 
 				val << REG06_VINDPM_SHIFT);
@@ -465,6 +480,9 @@ int bq2560x_set_input_volt_limit(struct bq2560x *bq, int volt)
 int bq2560x_set_input_current_limit(struct bq2560x *bq, int curr)
 {
 	u8 val;
+
+	if (curr < REG00_IINLIM_BASE)
+		curr = REG00_IINLIM_BASE;
 
 	val = (curr - REG00_IINLIM_BASE) / REG00_IINLIM_LSB;
 	return bq2560x_update_bits(bq, BQ2560X_REG_00, REG00_IINLIM_MASK, 
@@ -2150,6 +2168,10 @@ static void bq2560x_dump_status(struct bq2560x* bq)
 /*
 	pr_err("bq Reg[0x00 -0x0B] = ");
 	for (addr = 0x0; addr <= 0x0B; addr++) {
+		if (addr == 0x09) {
+			pr_err("bq Reg[09] = 0x%02X\n", bq->fault_status);
+			continue;
+		}
 		ret = bq2560x_read_byte(bq, &val, addr);
 		if (!ret) {
 			printk("0x%02X, ", val);
@@ -2159,6 +2181,20 @@ static void bq2560x_dump_status(struct bq2560x* bq)
 
 	printk("\n");
 */
+
+	ret = bq2560x_read_byte(bq, &status, BQ2560X_REG_0A);
+	if (ret) {
+		pr_err("failed to read reg0a\n");
+		return;
+	}
+
+	mutex_lock(&bq->data_lock);
+	bq->vbus_good = !!(status & REG0A_VBUS_GD_MASK);
+	bq->vindpm_triggered = !!(status & REG0A_VINDPM_STAT_MASK);
+	bq->iindpm_triggered = !!(status & REG0A_IINDPM_STAT_MASK);
+	bq->topoff_active = !!(status & REG0A_TOPOFF_ACTIVE_MASK);
+	bq->acov_triggered = !!(status & REG0A_ACOV_STAT_MASK);
+	mutex_unlock(&bq->data_lock);
 
 	if (!bq->power_good)
 		pr_info("Power Poor\n");
@@ -2218,26 +2254,16 @@ static void bq2560x_update_status(struct bq2560x *bq)
 	u8 status;
 	int ret;
 
-	ret = bq2560x_read_byte(bq, &status, BQ2560X_REG_0A);
-	if (ret) {
-		pr_err("failed to read reg0a\n");
-		return;
-	}
-
-	mutex_lock(&bq->data_lock);
-	bq->vbus_good = !!(status & REG0A_VBUS_GD_MASK);
-	bq->vindpm_triggered = !!(status & REG0A_VINDPM_STAT_MASK);
-	bq->iindpm_triggered = !!(status & REG0A_IINDPM_STAT_MASK);
-	bq->topoff_active = !!(status & REG0A_TOPOFF_ACTIVE_MASK);
-	bq->acov_triggered = !!(status & REG0A_ACOV_STAT_MASK);
-	mutex_unlock(&bq->data_lock);
-
 	/* Read twice to get present status */
 	ret = bq2560x_read_byte(bq, &status, BQ2560X_REG_09);
+	if (ret)
+		return;
+	pr_err("First read of REG[09] = 0x%02x\n", status);
 	ret = bq2560x_read_byte(bq, &status, BQ2560X_REG_09);
 	if (ret)
 		return;
 
+	pr_err("Second read of REG[09] = 0x%02x\n", status);
 	mutex_lock(&bq->data_lock);
 	bq->fault_status = status;
 	mutex_unlock(&bq->data_lock);
