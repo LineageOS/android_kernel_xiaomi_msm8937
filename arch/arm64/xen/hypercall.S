@@ -99,5 +99,10 @@ ENTRY(privcmd_call)
 	 */
 	uaccess_ttbr0_enable x6, x7, x8
 	hvc XEN_IMM
+
+	/*
+	 * Disable userspace access from kernel once the hyp call completed.
+	 */
+	uaccess_ttbr0_disable x6, x7
 	ret
 ENDPROC(privcmd_call);
