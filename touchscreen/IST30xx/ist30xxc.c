@@ -52,6 +52,15 @@
 #include <linux/file.h>
 #include <linux/err.h>
 
+#if (defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) && !defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE))
+#include <linux/input/doubletap2wake.h>
+#elif (defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) && !defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE))
+#include <linux/input/sweep2wake.h>
+#elif (defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) && defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE))
+#include <linux/input/doubletap2wake.h>
+#include <linux/input/sweep2wake.h>
+#endif
+
 #ifdef CONFIG_OF
 #include <linux/of.h>
 #include <linux/of_gpio.h>
@@ -1338,10 +1347,57 @@ irq_ic_err:
 	return IRQ_HANDLED;
 }
 
+#if (defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE))
+static bool ev_btn_status = false;
+static bool ist30xx_irq_active = false;
+static void ist30xx_irq_handler(int irq, bool active)
+{
+	if (active) {
+		if (!ist30xx_irq_active) {
+			enable_irq_wake(irq);
+			ist30xx_irq_active = true;
+		}
+	} else {
+		if (ist30xx_irq_active) {
+			disable_irq_wake(irq);
+			ist30xx_irq_active = false;
+		}
+	}
+}
+#endif
+
 #ifdef CONFIG_PM
 static int ist30xx_suspend(struct device *dev)
 {
 	struct ist30xx_data *data = dev_get_drvdata(dev);
+#if (defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE))
+	int i;
+#endif
+
+#if (defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) && !defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE))
+	if (dt2w_switch > 0 && !gesture_incall) {
+#elif (defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) && !defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE))
+	if (s2w_switch == 1 && !gesture_incall) {
+#elif (defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) && defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE))
+	if ((dt2w_switch > 0 || s2w_switch == 1) &&
+		!gesture_incall) {
+#endif
+#if (defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE))
+		if (!ev_btn_status) {
+			/* release all touches */
+			for (i = 0; i < IST30XX_MAX_MT_FINGERS; i++) {
+				input_mt_slot(data->input_dev, i);
+				input_mt_report_slot_state(data->input_dev, MT_TOOL_FINGER, 0);
+			}
+			input_mt_report_pointer_emulation(data->input_dev, false);
+			__clear_bit(BTN_TOUCH, data->input_dev->keybit);
+			input_sync(data->input_dev);
+			ev_btn_status = true;
+		}
+		ist30xx_irq_handler(data->client->irq, true);
+		return 0;
+	}
+#endif
 
 	if (data->debugging_mode)
 		return 0;
@@ -1372,6 +1428,23 @@ static int ist30xx_suspend(struct device *dev)
 static int ist30xx_resume(struct device *dev)
 {
 	struct ist30xx_data *data = dev_get_drvdata(dev);
+
+#if (defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) && !defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE))
+	if (dt2w_switch > 0) {
+#elif (defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) && !defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE))
+	if (s2w_switch == 1) {
+#elif (defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) && defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE))
+	if (dt2w_switch > 0 || s2w_switch == 1) {
+#endif
+#if (defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE))
+		if (ev_btn_status) {
+			__set_bit(BTN_TOUCH, data->input_dev->keybit);
+			input_sync(data->input_dev);
+			ev_btn_status = false;
+		}
+		ist30xx_irq_handler(data->client->irq, false);
+	}
+#endif
 
 	data->noise_mode |= (1 << NOISE_MODE_POWER);
 
@@ -1451,9 +1524,26 @@ static int fb_notifier_callback(struct notifier_block *self,
 		blank = evdata->data;
 		if (*blank == FB_BLANK_UNBLANK
 				|| *blank == FB_BLANK_NORMAL
-				|| *blank == FB_BLANK_VSYNC_SUSPEND)
+				|| *blank == FB_BLANK_VSYNC_SUSPEND){
+#if (defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) && !defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE))
+			dt2w_scr_suspended = false;
+#elif (defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) && !defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE))
+			s2w_scr_suspended = false;
+#elif (defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) && defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE))
+			dt2w_scr_suspended = false;
+			s2w_scr_suspended = false;
+#endif
 			schedule_work(&ist_data->fb_notify_work);
+		}
 		else if (*blank == FB_BLANK_POWERDOWN) {
+#if (defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) && !defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE))
+			dt2w_scr_suspended = true;
+#elif (defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) && !defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE))
+			s2w_scr_suspended = true;
+#elif (defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) && defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE))
+			dt2w_scr_suspended = true;
+			s2w_scr_suspended = true;
+#endif
 			flush_work(&ist_data->fb_notify_work);
 			ist30xx_suspend(&ist_data->client->dev);
 		}

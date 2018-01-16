@@ -536,6 +536,10 @@ struct ist30xx_data {
 	bool disable_keys;
 };
 
+#if (defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE))
+extern bool gesture_incall;
+#endif
+
 extern struct mutex ist30xx_mutex;
 extern int ist30xx_dbg_level;
 extern struct class *ist30xx_class;
