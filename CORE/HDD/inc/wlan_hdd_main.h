@@ -241,11 +241,14 @@ typedef v_U8_t tWlanHddMacAddr[HDD_MAC_ADDR_LEN];
 #define MIN(a, b) (a > b ? b : a)
 
 #endif
+
 #define SCAN_REJECT_THRESHOLD_TIME 300000 /* Time is in msec, equal to 5 mins */
 #define SCAN_REJECT_THRESHOLD 15
 
 
 #define WLAN_WAIT_TIME_EXTSCAN  1000
+
+#define HDD_MAX_STA_COUNT (HAL_NUM_STA)
 
 /*
  * Generic asynchronous request/response support
