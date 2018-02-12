@@ -69,6 +69,10 @@
 	dpdm-supply = <&usb_otg>;
 };
 
+&usb_otg {
+	extcon = <&qpnp_smbcharger>;
+};
+
 &blsp1_uart2 {
 	status = "ok";
 	pinctrl-names = "default";
