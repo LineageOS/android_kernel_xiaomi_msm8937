@@ -836,8 +836,11 @@ static int ft5x06_proc_init(struct ft5x06_ts_data *data)
 
        buf = kzalloc(sizeof(struct ft5x06_ts_data), GFP_KERNEL);
        if (buf)
+#ifdef CONFIG_MACH_XIAOMI_SANTONI
+	       path = "/devices/soc/78b7000.i2c/i2c-3/3-0038";
+#else
                path = "/devices/soc/78b7000.i2c/i2c-3/3-003e";
-
+#endif
        proc_entry_tp = proc_mkdir("touchpanel", NULL);
        if (proc_entry_tp == NULL) {
                dev_err(&client->dev, "Couldn't create touchpanel dir in procfs\n");
