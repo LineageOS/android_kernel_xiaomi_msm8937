@@ -16,3 +16,7 @@
 	qcom,warm-bat-decidegc = <450>;
 	qcom,warm-bat-india-decidegc = <500>;
 };
+
+&usb_otg {
+	extcon = <&qpnp_smbcharger>;
+};
