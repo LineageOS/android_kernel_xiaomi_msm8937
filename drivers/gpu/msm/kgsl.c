@@ -2879,6 +2879,7 @@ long kgsl_ioctl_gpuobj_sync(struct kgsl_device_private *dev_priv,
 		full_flush = check_full_flush(size, objs[i].op);
 		if (full_flush) {
 			trace_kgsl_mem_sync_full_cache(i, size);
+			flush_cache_all();
 			goto out;
 		}
 
