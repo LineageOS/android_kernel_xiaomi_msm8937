@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-only
-/* Copyright (c) 2015-2017, 2019 The Linux Foundation. All rights reserved.
+/* Copyright (c) 2015-2018, 2019 The Linux Foundation. All rights reserved.
  */
 
 #include <linux/kernel.h>
@@ -13,9 +13,9 @@
 #include <linux/platform_device.h>
 #include <linux/gpio.h>
 #include <linux/of_gpio.h>
-#include <dt-bindings/clock/audio-ext-clk.h>
-#include <sound/q6afe-v2.h>
-#include "audio-ext-clk-up.h"
+#include <dt-bindings/clock/qcom,audio-ext-clk.h>
+#include <dsp/q6afe-v2.h>
+#include "audio-ext-clk.h"
 
 struct pinctrl_info {
 	struct pinctrl *pinctrl;
@@ -141,7 +141,6 @@ static struct audio_ext_pmi_clk audio_pmi_clk = {
 	.gpio = -EINVAL,
 	.c = {
 		.dbg_name = "audio_ext_pmi_clk",
-		.ops = &clk_ops_dummy,
 		CLK_INIT(audio_pmi_clk.c),
 	},
 };
@@ -150,7 +149,6 @@ static struct audio_ext_pmi_clk audio_pmi_lnbb_clk = {
 	.gpio = -EINVAL,
 	.c = {
 		.dbg_name = "audio_ext_pmi_lnbb_clk",
-		.ops = &clk_ops_dummy,
 		CLK_INIT(audio_pmi_lnbb_clk.c),
 	},
 };
