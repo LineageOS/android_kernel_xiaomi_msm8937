@@ -1,11 +1,15 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Copyright (c) 2017, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2017-2018, The Linux Foundation. All rights reserved.
  */
 
 #include <linux/module.h>
 #include <sound/wcd-dsp-mgr.h>
+#if IS_ENABLED(CONFIG_COMMON_CLK_QCOM)
 #include "audio-ext-clk-up.h"
+#else
+#include "audio-ext-clk.h"
+#endif
 
 static int __init wcd9xxx_soc_init(void)
 {
