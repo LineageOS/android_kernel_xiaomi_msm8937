@@ -1,0 +1,4 @@
+config FINGERPRINT_FPC1020_LANDTONI
+	bool "FingerPrint Cards fingerprint drvier support"
+	help
+	  Say Y here to enable goodix fingerprint driver support!
