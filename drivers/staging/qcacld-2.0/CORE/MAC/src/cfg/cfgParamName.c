@@ -333,5 +333,13 @@ unsigned char *gCfgParamName[] = {
     (unsigned char *)"DFS_MASTER_ENABLED",
     (unsigned char *)"VHT_ENABLE_TXBF_20MHZ",
     (unsigned char *)"TDLS_WMM_MODE_ENABLED",
+    (unsigned char *)"EDCA_ETSI_ACBK_LOCAL",
+    (unsigned char *)"EDCA_ETSI_ACBE_LOCAL",
+    (unsigned char *)"EDCA_ETSI_ACVI_LOCAL",
+    (unsigned char *)"EDCA_ETSI_ACVO_LOCAL",
+    (unsigned char *)"EDCA_ETSI_ACBK",
+    (unsigned char *)"EDCA_ETSI_ACBE",
+    (unsigned char *)"EDCA_ETSI_ACVI",
+    (unsigned char *)"EDCA_ETSI_ACVO",
 };
 

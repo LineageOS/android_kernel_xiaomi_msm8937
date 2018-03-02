@@ -5781,7 +5781,7 @@ static void wlan_hdd_cfg80211_link_layer_stats_callback(void *ctx,
     case SIR_HAL_LL_STATS_RESULTS_RSP:
         {
             hddLog(VOS_TRACE_LEVEL_INFO,
-                 "LL_STATS RESP paramID = 0x%x, ifaceId = %u respId = %u, moreResultToFollow = %u, num radio = %u result = %p",
+                 "LL_STATS RESP paramID = 0x%x, ifaceId = %u respId = %u, moreResultToFollow = %u, num radio = %u result = %pK",
                  linkLayerStatsResults->paramId, linkLayerStatsResults->ifaceId,
                  linkLayerStatsResults->rspId,
                  linkLayerStatsResults->moreResultToFollow,
@@ -14568,7 +14568,7 @@ static int __wlan_hdd_cfg80211_start_ap(struct wiphy *wiphy,
         return -EINVAL;
     }
 
-    hddLog(LOG2, FL("pAdapter = %p, device mode %s(%d)"),
+    hddLog(LOG2, FL("pAdapter = %pK, device mode %s(%d)"),
            pAdapter, hdd_device_mode_to_string(pAdapter->device_mode),
            pAdapter->device_mode);
 
@@ -17032,7 +17032,7 @@ static eHalStatus hdd_cfg80211_scan_done_callback(tHalHandle halHandle,
 #endif
 
     hddLog(VOS_TRACE_LEVEL_INFO,
-            "%s called with halHandle = %p, pContext = %p,"
+            "%s called with halHandle = %pK, pContext = %pK,"
             "scanID = %d, returned status = %d",
             __func__, halHandle, pContext, (int) scanId, (int) status);
 
@@ -18735,6 +18735,12 @@ int wlan_hdd_cfg80211_set_ie(hdd_adapter_t *pAdapter,
                 }
                 break;
             case DOT11F_EID_RSN:
+                if (eLen > (MAX_WPA_RSN_IE_LEN - 2)) {
+                    hddLog(VOS_TRACE_LEVEL_FATAL, "%s: Invalid WPA RSN IE length[%d], exceeds %d bytes",
+                            __func__, eLen, MAX_WPA_RSN_IE_LEN - 2);
+                    VOS_ASSERT(0);
+                    return -EINVAL;
+                }
                 hddLog (VOS_TRACE_LEVEL_INFO, "%s Set RSN IE(len %d)",__func__, eLen + 2);
                 memset( pWextState->WPARSNIE, 0, MAX_WPA_RSN_IE_LEN );
                 memcpy( pWextState->WPARSNIE, genie - 2, (eLen + 2)/*ie_len*/);
@@ -21661,7 +21667,7 @@ static int __wlan_hdd_cfg80211_sched_scan_start(struct wiphy *wiphy,
            (WLAN_HDD_GET_STATION_CTX_PTR(pAdapter))->conn_info.connState))
     {
         hddLog(VOS_TRACE_LEVEL_ERROR,
-                "%s: %p(%d) Connection in progress: sched_scan_start denied (EBUSY)",
+                "%s: %pK(%d) Connection in progress: sched_scan_start denied (EBUSY)",
                __func__,
                 WLAN_HDD_GET_STATION_CTX_PTR(pAdapter), pAdapter->sessionId);
         return -EBUSY;
@@ -23497,7 +23503,7 @@ void wlan_hdd_testmode_rx_event(void *buf, size_t buf_len)
 
     if (!buf || !buf_len) {
         VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_ERROR,
-                  "%s: buf or buf_len invalid, buf = %p buf_len = %zu",
+                  "%s: buf or buf_len invalid, buf = %pK buf_len = %zu",
                   __func__, buf, buf_len);
         return;
     }

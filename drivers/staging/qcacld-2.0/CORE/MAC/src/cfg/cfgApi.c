@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2011-2016, 2018 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -140,6 +140,8 @@ tSirRetStatus cfgInit(tpAniSirGlobal pMac)
     pMac->cfg.gCfgSBuf     = __gCfgSBuf;
     pMac->cfg.gSBuffer     = __gSBuffer;
     pMac->cfg.gCfgEntry    = __gCfgEntry;
+    pMac->cfg.gCfgMaxIBufSize = CFG_STA_IBUF_MAX_SIZE;
+    pMac->cfg.gCfgMaxSBufSize = CFG_STA_SBUF_MAX_SIZE;
 
     for (i = 0; i < CFG_PARAM_MAX_NUM; i++) {
         if (!(cfg_static[i].control & CFG_CTL_INT))
@@ -1129,8 +1131,9 @@ uint8_t* cfg_get_vendor_ie_ptr_from_oui(tpAniSirGlobal mac_ctx,
 			return NULL;
 		}
 		if (SIR_MAC_EID_VENDOR == elem_id) {
-			if(memcmp(&ptr[2], oui, oui_size)==0)
-			return ptr;
+			if((elem_len>=oui_size) &&
+				(memcmp(&ptr[2], oui, oui_size)==0))
+				return ptr;
 		}
 
 		left -= elem_len;

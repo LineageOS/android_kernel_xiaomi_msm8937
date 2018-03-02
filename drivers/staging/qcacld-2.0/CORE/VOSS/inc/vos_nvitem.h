@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2011-2017 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -306,4 +306,11 @@ bool vos_is_dsrc_channel(uint16_t);
 uint32_t vos_nv_get_channel_flags(uint32_t rf_channel);
 int vos_update_band(uint8_t  band);
 void vos_reset_global_reg_params(void);
+/**
+ * vos_is_etsi_europe_country - check ETSI Europe country or not
+ * @country: country string with two Characters
+ *
+ * Return: true if country in ETSI Europe country list
+ */
+bool vos_is_etsi_europe_country(uint8_t *country);
 #endif // __VOS_NVITEM_H
