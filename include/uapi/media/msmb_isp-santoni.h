@@ -1,10 +1,3 @@
-#ifdef CONFIG_MACH_XIAOMI
-#ifdef CONFIG_MACH_XIAOMI_MSM8940
-#ifdef CONFIG_MACH_XIAOMI_SANTONI
-#include "msmb_isp-santoni.h"
-#endif /* CONFIG_MACH_XIAOMI_SANTONI */
-#endif /* CONFIG_MACH_XIAOMI_MSM8940 */
-#else
 #ifndef __UAPI_MSMB_ISP__
 #define __UAPI_MSMB_ISP__
 
@@ -24,7 +17,6 @@
 #define ISP1_BIT              (0x10000 << 2)
 #define ISP_META_CHANNEL_BIT  (0x10000 << 3)
 #define ISP_SCRATCH_BUF_BIT   (0x10000 << 4)
-#define ISP_PDAF_CHANNEL_BIT   (0x10000 << 5)
 #define ISP_OFFLINE_STATS_BIT (0x10000 << 5)
 #define ISP_SVHDR_IN_BIT      (0x10000 << 6) /* RDI hw stream for SVHDR */
 #define ISP_SVHDR_OUT_BIT     (0x10000 << 7) /* SVHDR output bufq stream*/
@@ -307,36 +299,7 @@ enum msm_stream_memory_input_t {
 	MEMORY_INPUT_ENABLED
 };
 
-enum msm_stream_rdi_input_type {
-	MSM_CAMERA_RDI_MIN,
-	MSM_CAMERA_RDI_PDAF,
-	MSM_CAMERA_RDI_MAX,
-};
-
 struct msm_vfe_axi_stream_request_cmd {
-	uint32_t session_id;
-	uint32_t stream_id;
-	uint32_t vt_enable;
-	uint32_t output_format;/*Planar/RAW/Misc*/
-	enum msm_vfe_axi_stream_src stream_src; /*CAMIF/IDEAL/RDIs*/
-	struct msm_vfe_axi_plane_cfg plane_cfg[MAX_PLANES_PER_STREAM];
-
-	uint32_t burst_count;
-	uint32_t hfr_mode;
-	uint8_t frame_base;
-
-	uint32_t init_frame_drop; /*MAX 31 Frames*/
-	enum msm_vfe_frame_skip_pattern frame_skip_pattern;
-	uint8_t buf_divert; /* if TRUE no vb2 buf done. */
-	/*Return values*/
-	uint32_t axi_stream_handle;
-	uint32_t controllable_output;
-	uint32_t burst_len;
-	/* Flag indicating memory input stream */
-	enum msm_stream_rdi_input_type rdi_input_type;
-};
-
-struct msm_vfe32_axi_stream_request_cmd {
 	uint32_t session_id;
 	uint32_t stream_id;
 	uint32_t vt_enable;
@@ -362,11 +325,6 @@ struct msm_vfe32_axi_stream_request_cmd {
 struct msm_vfe_axi_stream_release_cmd {
 	uint32_t stream_handle;
 };
-
-struct msm_vfe_update_fe_frame_id {
-	uint32_t frame_id;
-};
-
 
 enum msm_vfe_axi_stream_cmd {
 	STOP_STREAM,
@@ -444,10 +402,6 @@ struct msm_vfe_axi_reset_cmd {
 
 struct msm_vfe_axi_restart_cmd {
 	uint32_t enable_camif;
-};
-
-struct msm_vfe_restart_fe_cmd {
-	uint32_t restart_fe;
 };
 
 struct msm_vfe_axi_stream_update_cmd {
@@ -718,9 +672,7 @@ enum msm_isp_event_idx {
 	ISP_PING_PONG_MISMATCH = 12,
 	ISP_REG_UPDATE_MISSING = 13,
 	ISP_BUF_FATAL_ERROR = 14,
-	ISP_EVENT_MAX         = 15,
-	ISP_WM_BUS_OVERFLOW = 16,
-	ISP_CAMIF_ERROR     = 17
+	ISP_EVENT_MAX         = 15
 };
 
 #define ISP_EVENT_OFFSET          8
@@ -750,8 +702,6 @@ enum msm_isp_event_idx {
 #define ISP_EVENT_REG_UPDATE_MISSING (ISP_EVENT_BASE + ISP_REG_UPDATE_MISSING)
 #define ISP_EVENT_BUF_FATAL_ERROR (ISP_EVENT_BASE + ISP_BUF_FATAL_ERROR)
 #define ISP_EVENT_STREAM_UPDATE_DONE   (ISP_STREAM_EVENT_BASE)
-#define ISP_EVENT_CAMIF_ERROR     (ISP_EVENT_BASE + ISP_CAMIF_ERROR)
-#define ISP_EVENT_WM_BUS_OVERFLOW (ISP_EVENT_BASE + ISP_WM_BUS_OVERFLOW)
 
 /* The msm_v4l2_event_data structure should match the
  * v4l2_event.u.data field.
@@ -775,7 +725,6 @@ struct msm_isp_fetch_eng_event {
 struct msm_isp_stats_event {
 	uint32_t stats_mask;                        /* 4 bytes */
 	uint8_t stats_buf_idxs[MSM_ISP_STATS_MAX];  /* 11 bytes */
-	uint8_t pd_stats_idx;
 };
 
 struct msm_isp_stream_ack {
@@ -798,11 +747,6 @@ struct msm_isp_error_info {
 	uint32_t session_id;
 	uint32_t stream_id;
 	uint32_t stream_id_mask;
-};
-
-struct msm_isp32_error_info {
-	/* 1 << msm_isp_event_idx */
-	uint32_t error_mask;
 };
 
 /* This structure reports delta between master and slave */
@@ -873,25 +817,6 @@ struct msm_isp_event_data {
 	} u; /* union can have max 52 bytes */
 };
 
-struct msm_isp32_event_data {
-	/*Wall clock except for buffer divert events
-	 *which use monotonic clock
-	 */
-	struct timeval timestamp;
-	/* Monotonic timestamp since bootup */
-	struct timeval mono_timestamp;
-	enum msm_vfe_input_src input_intf;
-	uint32_t frame_id;
-	union {
-		/* Sent for Stats_Done event */
-		struct msm_isp_stats_event stats;
-		/* Sent for Buf_Divert event */
-		struct msm_isp_buf_event buf_done;
-		struct msm_isp32_error_info error_info;
-	} u; /* union can have max 52 bytes */
-	uint32_t is_skip_pproc;
-};
-
 enum msm_vfe_ahb_clk_vote {
 	MSM_ISP_CAMERA_AHB_SVS_VOTE = 1,
 	MSM_ISP_CAMERA_AHB_TURBO_VOTE = 2,
@@ -924,10 +849,6 @@ struct msm_isp_ahb_clk_cfg {
 #define V4L2_PIX_FMT_P16GBRG10 v4l2_fourcc('P', 'G', 'B', '0')
 #define V4L2_PIX_FMT_P16GRBG10 v4l2_fourcc('P', 'G', 'R', '0')
 #define V4L2_PIX_FMT_P16RGGB10 v4l2_fourcc('P', 'R', 'G', '0')
-#define V4L2_PIX_FMT_P16BGGR12 v4l2_fourcc('P', 'B', 'G', '2')
-#define V4L2_PIX_FMT_P16GBRG12 v4l2_fourcc('P', 'G', 'B', '2')
-#define V4L2_PIX_FMT_P16GRBG12 v4l2_fourcc('P', 'G', 'R', '2')
-#define V4L2_PIX_FMT_P16RGGB12 v4l2_fourcc('P', 'R', 'G', '2')
 #define V4L2_PIX_FMT_NV14 v4l2_fourcc('N', 'V', '1', '4')
 #define V4L2_PIX_FMT_NV41 v4l2_fourcc('N', 'V', '4', '1')
 #define V4L2_PIX_FMT_META v4l2_fourcc('Q', 'M', 'E', 'T')
@@ -967,9 +888,6 @@ enum msm_isp_ioctl_cmd_code {
 	MSM_ISP_MAP_BUF_START_MULTI_PASS_FE,
 	MSM_ISP_CFG_HW_STATE,
 	MSM_ISP_AHB_CLK_CFG,
-	MSM_ISP_UPDATE_FE_FRAME_ID,
-	MSM_ISP_RESTART_FE,
-	MSM_ISP32_REQUEST_STREAM,
 };
 
 #define VIDIOC_MSM_VFE_REG_CFG \
@@ -991,10 +909,6 @@ enum msm_isp_ioctl_cmd_code {
 #define VIDIOC_MSM_ISP_REQUEST_STREAM \
 	_IOWR('V', MSM_ISP_REQUEST_STREAM, \
 		struct msm_vfe_axi_stream_request_cmd)
-
-#define VIDIOC_MSM_ISP32_REQUEST_STREAM \
-	_IOWR('V', MSM_ISP32_REQUEST_STREAM, \
-		struct msm_vfe32_axi_stream_request_cmd)
 
 #define VIDIOC_MSM_ISP_CFG_STREAM \
 	_IOWR('V', MSM_ISP_CFG_STREAM, \
@@ -1056,10 +970,6 @@ enum msm_isp_ioctl_cmd_code {
 	_IOWR('V', MSM_ISP_AXI_RESTART, \
 		struct msm_vfe_axi_restart_cmd)
 
-#define VIDIOC_MSM_ISP_RESTART_FE \
-	_IOWR('V', MSM_ISP_RESTART_FE,\
-		struct msm_vfe_restart_fe_cmd)
-
 #define VIDIOC_MSM_ISP_FETCH_ENG_START \
 	_IOWR('V', MSM_ISP_FETCH_ENG_START, \
 		struct msm_vfe_fetch_eng_start)
@@ -1075,10 +985,6 @@ enum msm_isp_ioctl_cmd_code {
 #define VIDIOC_MSM_ISP_MAP_BUF_START_FE \
 	_IOWR('V', MSM_ISP_MAP_BUF_START_FE, \
 		struct msm_vfe_fetch_eng_start)
-
-#define VIDIOC_MSM_ISP_UPDATE_FE_FRAME_ID \
-	_IOWR('V', MSM_ISP_UPDATE_FE_FRAME_ID, \
-		struct msm_vfe_update_fe_frame_id)
 
 #define VIDIOC_MSM_ISP_UNMAP_BUF \
 	_IOWR('V', MSM_ISP_UNMAP_BUF, \
@@ -1098,9 +1004,4 @@ enum msm_isp_ioctl_cmd_code {
 
 #define VIDIOC_MSM_ISP_AHB_CLK_CFG \
 	_IOWR('V', MSM_ISP_AHB_CLK_CFG, struct msm_isp_ahb_clk_cfg)
-
-#define VIDIOC_MSM_ISP_BUF_DONE \
-	_IOWR('V', BASE_VIDIOC_PRIVATE+21, struct msm_isp32_event_data)
-
-#endif/* __MSMB_ISP__ */
-#endif /* CONFIG_MACH_XIAOMI */
+#endif /* __MSMB_ISP__ */

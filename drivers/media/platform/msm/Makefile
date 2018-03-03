@@ -10,6 +10,10 @@ ifeq ($(CONFIG_MACH_XIAOMI_MSM8937),y)
 ifeq ($(CONFIG_MACH_XIAOMI_LAND),y)
 obj-$(CONFIG_MSMB_CAMERA) += camera_v2-land/
 endif
+else ifeq ($(CONFIG_MACH_XIAOMI_MSM8940),y)
+ifeq ($(CONFIG_MACH_XIAOMI_SANTONI),y)
+obj-$(CONFIG_MSMB_CAMERA) += camera_v2-santoni/
+endif
 endif
 else
 obj-$(CONFIG_MSMB_CAMERA) += camera_v2/
