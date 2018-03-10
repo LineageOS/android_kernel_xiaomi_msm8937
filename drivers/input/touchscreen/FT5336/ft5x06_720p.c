@@ -1021,7 +1021,16 @@ static int ft5x06_ts_probe(struct i2c_client *client,
 	err = ft5x06_i2c_read(client, &reg_addr, 1, &reg_value, 1);
 	if (err < 0) {
 		dev_err(&client->dev, "version read failed");
+#ifdef CONFIG_MACH_XIAOMI_SANTONI
+		client->addr = 0x3E;
+		err = ft5x06_i2c_read(client, &reg_addr, 1, &reg_value, 1);
+		if (err < 0) {
+				dev_err(&client->dev, "version read failed addr -----3E");
+				goto free_reset_gpio;
+		}
+#else
 		goto free_reset_gpio;
+#endif
 	}
 	ic_name = reg_value;
 
