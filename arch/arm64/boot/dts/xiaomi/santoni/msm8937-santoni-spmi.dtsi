@@ -1,0 +1,88 @@
+&spmi_bus {
+	qcom,pm8937@0 {
+		qcom,power-on@800 {
+			qcom,pon_1 {
+				qcom,s1-timer = <4480>;
+			};
+		};
+	};
+
+	qcom,pm8937@1 {
+		pm8937_s5: spm-regulator@2000 {
+			qcom,mode = "pwm";
+		};
+	};
+
+	qcom,pmi8950@3 {
+		labibb: qpnp-labibb-regulator {
+			ibb_regulator: qcom,ibb@dc00 {
+				/delete-property/
+					qcom,qpnp-ibb-use-default-voltage;
+				qcom,qpnp-ibb-init-lcd-voltage = <5500000>;
+			};
+
+			lab_regulator: qcom,lab@de00 {
+				/delete-property/
+					qcom,qpnp-ibb-use-default-voltage;
+				qcom,qpnp-ibb-init-lcd-voltage = <5500000>;
+			};
+		};
+	};
+};
+
+&sdc2_cmd_on {
+	config {
+		drive-strength = <12>;
+	};
+};
+
+&sdc2_data_on {
+	config {
+		drive-strength = <12>;
+	};
+};
+
+&pmi_haptic {
+	/delete-property/ qcom,en-brake;
+	qcom,vmax-mv = <2700>;
+};
+
+&pmi8950_charger {
+       qcom,battery-data = <&qrd_batterydata>;
+       qcom,float-voltage-mv = <4400>;
+       qcom,chg-inhibit-fg;
+       qcom,thermal-mitigation = <2000 1500 1200 700 0>;
+       status = "okay";
+       qcom,vchg_sns-vadc = <&pmi8950_vadc>;
+       qcom,vchg-adc-channel-id = <3>;
+};
+
+&pmi8950_fg {
+	qcom,battery-data = <&qrd_batterydata>;
+	qcom,cold-bat-decidegc = <(0)>;
+	qcom,cool-bat-decidegc = <(150)>;
+	qcom,hot-bat-decidegc = <550>;
+	qcom,warm-bat-decidegc = <450>;
+	qcom,warm-bat-india-decidegc = <500>;
+	qcom,fg-iterm-ma = <180>;
+	qcom,fg-chg-iterm-ma = <130>;
+	qcom,resume-soc = <99>;
+	qcom,resume-soc-raw = <253>;
+	qcom,vbat-estimate-diff-mv = <100>;
+	qcom,fg-cutoff-voltage-mv = <3400>;
+	qcom,fg-cc-cv-threshold-mv = <4390>;
+	qcom,cl-max-increment-deciperc = <1>;
+	qcom,cl-max-decrement-deciperc = <1>;
+	qcom,fg-delta-soc = <1>;
+	qcom,bad-battery-detection-enable;
+	qcom,hold-soc-while-full;
+	qcom,thermal-coefficients = [B7 85 B2 49 71 35];
+};
+
+&usb_otg {
+	qcom,usbin-vadc = <&pmi8950_vadc>;
+};
+
+&apc_vreg_corner {
+	/delete-property/ qcom.cpr-enable;
+};
