@@ -1,0 +1,116 @@
+/*
+ * Copyright (c) 2015-2017, The Linux Foundation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 and
+ * only version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+&spmi_bus {
+	qcom,pmi8950@2 {
+		qcom,leds@a100 {
+			/delete-property/ status;
+			/delete-node/ qcom,led_mpp_2;
+		};
+
+		qcom,fg {
+			qcom,fg-cc-cv-threshold-mv = <4390>;
+		};
+	};
+
+	qcom,pm8937@0 {
+		qcom,power-on@800 {
+			qcom,pon_1 {
+				qcom,s1-timer = <10256>;
+			};
+		};
+	};
+
+	qcom,pmi8950@3 {
+		labibb: qpnp-labibb-regulator {
+			ibb_regulator: qcom,ibb@dc00 {
+				/delete-property/
+					qcom,qpnp-ibb-use-default-voltage;
+				qcom,qpnp-ibb-init-lcd-voltage = <5000000>;
+			};
+
+			lab_regulator: qcom,lab@de00 {
+				/delete-property/
+					qcom,qpnp-ibb-use-default-voltage;
+				qcom,qpnp-ibb-init-lcd-voltage = <5000000>;
+			};
+		};
+	};
+};
+
+&ibb_regulator {
+	/delete-property/ qcom,qpnp-ibb-use-default-voltage;
+	qcom,qpnp-ibb-init-lcd-voltage = <5000000>;
+};
+
+&lab_regulator {
+	/delete-property/ qcom,qpnp-ibb-use-default-voltage;
+	qcom,qpnp-ibb-init-lcd-voltage = <5000000>;
+};
+
+&usb_otg {
+	qcom,hsusb-otg-phy-init-seq =
+		<0x53 0x80 0x32 0x81 0x07 0x82 0x13 0x83 0xffffffff>;
+};
+
+&pmi8950_charger {
+	qcom,qpnp-smbcharger {
+			/delete-property/qcom,float-voltage-mv;
+			qcom,thermal-mitigation = <2000 1000 800 800>;
+			/delete-property/qcom,parallel-usb-min-current-ma;
+			/delete-property/qcom,parallel-usb-9v-min-current-ma;
+			/delete-property/qcom,parallel-allowed-lowering-ma;
+			/delete-property/qcom,autoadjust-vfloat;
+	};
+};
+
+&pmi8950_flash0 {
+		qcom,current = <595>;
+};
+
+&pmi8950_torch0 {
+		qcom,current = <100>;
+};
+
+&pmi8950_flash1 {
+                qcom,current = <595>;
+};
+
+&pmi8950_torch1 {
+                qcom,current = <100>;
+};
+
+&pmi8950_charger {
+	qcom,battery-data = <&qrd_batterydata>;
+	qcom,float-voltage-mv = <4400>;
+	qcom,thermal-mitigation = <2000 1500 1200 800 800>;
+	status = "okay";
+};
+
+&pmi8950_fg {
+	qcom,battery-data = <&qrd_batterydata>;
+	qcom,cold-bat-decidegc = <(0)>;
+	qcom,cool-bat-decidegc = <(100)>;
+	qcom,hot-bat-decidegc = <600>;
+	qcom,warm-bat-decidegc = <450>;
+	qcom,warm-bat-india-decidegc = <500>;
+	qcom,fg-iterm-ma = <200>;
+	qcom,fg-chg-iterm-ma = <150>;
+	qcom,resume-soc = <99>;
+	qcom,fg-cutoff-voltage-mv = <3500>;
+	qcom,cl-max-increment-deciperc = <1>;
+	qcom,cl-max-decrement-deciperc = <1>;
+	qcom,fg-delta-soc = <1>;
+	qcom,bad-battery-detection-enable;
+	qcom,hold-soc-while-full;
+};
