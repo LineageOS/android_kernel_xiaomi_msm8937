@@ -1,0 +1,6 @@
+#include "msm8937-audio.dtsi"
+#include "msm8937.dtsi"
+#include "msm8937-i2c.dtsi"
+#include "msm8937-pinctrl.dtsi"
+#include "msm8937-spi.dtsi"
+#include "msm8937-spmi.dtsi"
