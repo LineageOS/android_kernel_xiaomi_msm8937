@@ -60,7 +60,6 @@
 
 // local functions
 static tSirRetStatus getWmmLocalParams(tpAniSirGlobal pMac, tANI_U32 params[][WNI_CFG_EDCA_ANI_ACBK_LOCAL_LEN]);
-static void setSchEdcaParams(tpAniSirGlobal pMac, tANI_U32 params[][WNI_CFG_EDCA_ANI_ACBK_LOCAL_LEN], tpPESession psessionEntry);
 
 // --------------------------------------------------------------------
 /**
@@ -331,6 +330,15 @@ schGetParams(
         for (idx=0; idx < len; idx++)
             params[i][idx] = (tANI_U32) data[idx];
     }
+
+    /* If gStaLocalEDCAEnable = 1,
+     * WNI_CFG_EDCA_ETSI_ACBE Txop limit minus 500us
+     */
+    if (local && (val == WNI_CFG_EDCA_PROFILE_ETSI_EUROPE) &&
+        pMac->roam.configParam.gStaLocalEDCAEnable) {
+        /* Txop limit 5500us / 32 = 0xab */
+        params[0][WNI_CFG_EDCA_PROFILE_TXOPA_IDX] = 0xab;
+    }
     PELOG1(schLog(pMac, LOG1, FL("GetParams: local=%d, profile = %d Done"), local, val);)
     return eSIR_SUCCESS;
 }
@@ -487,7 +495,7 @@ schSetDefaultEdcaParams(tpAniSirGlobal pMac, tpPESession psessionEntry)
 \param   tpAniSirGlobal  pMac
 \return  none
 \ ------------------------------------------------------------ */
-static void
+void
 setSchEdcaParams(tpAniSirGlobal pMac, tANI_U32 params[][WNI_CFG_EDCA_ANI_ACBK_LOCAL_LEN], tpPESession psessionEntry)
 {
     tANI_U32 i;
@@ -533,6 +541,7 @@ setSchEdcaParams(tpAniSirGlobal pMac, tANI_U32 params[][WNI_CFG_EDCA_ANI_ACBK_LO
                 psessionEntry->gLimEdcaParams[i].cw.min,
                 psessionEntry->gLimEdcaParams[i].cw.max,
                 psessionEntry->gLimEdcaParams[i].txoplimit);)
+
 
     }
     return;
