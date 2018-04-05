@@ -33,3 +33,13 @@
 		qcom,ce-opp-freq = <100000000>;
 	};
 };
+
+&firmware {
+	android {
+		fstab {
+			vendor {
+				status = "disabled";
+			};
+		};
+	};
+};
