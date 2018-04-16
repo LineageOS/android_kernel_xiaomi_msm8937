@@ -2672,14 +2672,6 @@ int gpiod_direction_output(struct gpio_desc *desc, int value)
 	else
 		value = !!value;
 
-	/* GPIOs used for IRQs shall not be set as output */
-	if (test_bit(FLAG_USED_AS_IRQ, &desc->flags)) {
-		gpiod_err(desc,
-			  "%s: tried to set a GPIO tied to an IRQ as output\n",
-			  __func__);
-		return -EIO;
-	}
-
 	gc = desc->gdev->chip;
 	if (test_bit(FLAG_OPEN_DRAIN, &desc->flags)) {
 		/* First see if we can enable open drain in hardware */
