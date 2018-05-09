@@ -84,7 +84,6 @@ static char tp_string_version[40];
 #if CTP_LOCKDOWN_INFO
 lockinfoH Lockdown_Info_High;
 lockinfoL Lockdown_Info_LOW;
-extern u8 tp_color;
 #endif
 
 #if CTP_CHARGER_DETECT
@@ -2183,7 +2182,6 @@ static int ist30xx_probe(struct i2c_client *client,
 	mod_timer(&event_timer, get_jiffies_64() + EVENT_TIMER_INTERVAL * 2);
 
 	ret = ist30xx_get_info(data);
-	tp_color = Lockdown_Info_High.lockinfo[1];
 	dev_info(&client->dev,
 		 "Lockdown info: %02X %02X %02X %02X %02X %02X %02X %02X",
 		 Lockdown_Info_High.lockinfo[3], Lockdown_Info_High.lockinfo[2],
