@@ -86,6 +86,14 @@
 		qcom,current = <100>;
 };
 
+&pmi8950_flash1 {
+                qcom,current = <595>;
+};
+
+&pmi8950_torch1 {
+                qcom,current = <100>;
+};
+
 &pmi8950_charger {
 	qcom,battery-data = <&qrd_batterydata>;
 	qcom,float-voltage-mv = <4400>;
