@@ -38,7 +38,7 @@
 	android {
 		fstab {
 			vendor {
-				status = "disabled";
+				dev = "/dev/block/platform/soc/7824900.sdhci/by-name/cust";
 			};
 		};
 	};
