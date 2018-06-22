@@ -1,5 +1,6 @@
 &qpnp_smbcharger {
 	/delete-property/ qcom,autoadjust-vfloat;
+	dpdm-supply = <&usb_otg>;
 	qcom,float-voltage-mv = <4400>;
 	status = "okay";
 };
