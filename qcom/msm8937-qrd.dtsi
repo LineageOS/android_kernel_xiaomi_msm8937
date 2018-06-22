@@ -65,6 +65,10 @@
 	status = "okay";
 };
 
+&qpnp_smbcharger {
+	dpdm-supply = <&usb_otg>;
+};
+
 &blsp1_uart2 {
 	status = "ok";
 	pinctrl-names = "default";
