@@ -1743,8 +1743,7 @@ void hdd_update_indoor_channel(hdd_context_t *hdd_ctx,
  */
 void hdd_modify_indoor_channel_state_flags(
     struct ieee80211_channel *wiphy_chan,
-    v_U32_t rfChannel,
-    bool disable);
+    v_U32_t rfChannel, bool disable, hdd_context_t *hdd_ctx);
 
 
 v_U8_t* wlan_hdd_cfg80211_get_ie_ptr(
@@ -1876,5 +1875,16 @@ void wlan_hdd_sap_get_sta_rssi(hdd_adapter_t *adapter, uint8_t staid, s8 *rssi);
 VOS_STATUS wlan_hdd_send_sta_authorized_event(hdd_adapter_t *adapter,
                                               hdd_context_t *hdd_ctx,
                                               const v_MACADDR_t *mac_addr);
+
+/**
+ * wlan_hdd_disconnect() - hdd disconnect api
+ * @pAdapter: Pointer to adapter
+ * @reason: Disconnect reason code
+ *
+ * This function is used to issue a disconnect request to SME
+ *
+ * Return: 0 for success, non-zero for failure
+ */
+int wlan_hdd_disconnect(hdd_adapter_t *pAdapter, u16 reason);
 
 #endif

@@ -8874,8 +8874,7 @@ const struct wiphy_vendor_command hdd_wiphy_vendor_commands[] =
         .info.vendor_id = QCA_NL80211_VENDOR_ID,
         .info.subcmd = QCA_NL80211_VENDOR_SUBCMD_GET_LOGGER_FEATURE_SET,
         .flags = WIPHY_VENDOR_CMD_NEED_WDEV |
-                 WIPHY_VENDOR_CMD_NEED_NETDEV |
-                 WIPHY_VENDOR_CMD_NEED_RUNNING,
+                 WIPHY_VENDOR_CMD_NEED_NETDEV,
         .doit = wlan_hdd_cfg80211_get_logger_supp_feature
    },
 };
@@ -10554,13 +10553,14 @@ VOS_STATUS wlan_hdd_set_dhcp_server_offload(hdd_adapter_t *hostapd_adapter,
  * @wiphy_chan: wiphy channel number
  * @rfChannel: channel hw value
  * @disable: Disable/enable the flags
+ * @hdd_ctx: The HDD context handler
  *
  * Modify wiphy flags and cds state if channel is indoor.
  *
  * Return: void
  */
 void hdd_modify_indoor_channel_state_flags(struct ieee80211_channel *wiphy_chan,
-    v_U32_t rfChannel, bool disable)
+    v_U32_t rfChannel, bool disable, hdd_context_t *hdd_ctx)
 {
     v_U32_t channelLoop;
     eRfChannels channelEnum = INVALID_RF_CHANNEL;
@@ -10582,6 +10582,8 @@ void hdd_modify_indoor_channel_state_flags(struct ieee80211_channel *wiphy_chan,
                 IEEE80211_CHAN_DISABLED;
             regChannels[channelEnum].enabled =
                 NV_CHANNEL_DISABLE;
+            hddLog(VOS_TRACE_LEVEL_INFO, "Channel: %d marked as DISABLE",
+                                                           channelEnum);
         }
     } else {
         if (wiphy_chan->flags & IEEE80211_CHAN_INDOOR_ONLY) {
@@ -10591,16 +10593,26 @@ void hdd_modify_indoor_channel_state_flags(struct ieee80211_channel *wiphy_chan,
              * Indoor channels are marked as DFS
              * during regulatory processing
              */
+           if ((wiphy_chan->flags & (IEEE80211_CHAN_RADAR |
+                           IEEE80211_CHAN_PASSIVE_SCAN)) ||
+                           ((hdd_ctx->cfg_ini->indoor_channel_support == false)
+			     && (wiphy_chan->flags &
+                           IEEE80211_CHAN_INDOOR_ONLY))) {
+               regChannels[channelEnum].enabled = NV_CHANNEL_DFS;
+               hddLog(VOS_TRACE_LEVEL_INFO, "Channel: %d marked as DFS",
+                                                           channelEnum);
+           } else {
+               regChannels[channelEnum].enabled =
+                   NV_CHANNEL_ENABLE;
+               hddLog(VOS_TRACE_LEVEL_INFO, "Channel: %d marked as ENABLE",
+                                                           channelEnum);
+	   }
+       }
 
-            regChannels[channelEnum].enabled =
-                    NV_CHANNEL_DFS;
-        }
-    }
-
+   }
 }
 
-void hdd_update_indoor_channel(hdd_context_t *hdd_ctx,
-                    bool disable)
+void hdd_update_indoor_channel(hdd_context_t *hdd_ctx, bool disable)
 {
     int band_num;
     int chan_num;
@@ -10626,16 +10638,12 @@ void hdd_update_indoor_channel(hdd_context_t *hdd_ctx,
             rfChannel = wiphy->bands[band_num]->channels[chan_num].hw_value;
 
             hdd_modify_indoor_channel_state_flags(wiphy_chan, rfChannel,
-                                        disable);
+                                        disable, hdd_ctx);
         }
     }
     EXIT();
 }
 
-/*
- * FUNCTION: wlan_hdd_disconnect
- * This function is used to issue a disconnect request to SME
- */
 int wlan_hdd_disconnect( hdd_adapter_t *pAdapter, u16 reason )
 {
     int status, result = 0;
@@ -10988,6 +10996,7 @@ static int wlan_hdd_cfg80211_start_bss(hdd_adapter_t *pHostapdAdapter,
     hdd_config_t *iniConfig;
     v_SINT_t i;
     hdd_context_t *pHddCtx = WLAN_HDD_GET_CTX(pHostapdAdapter);
+    hdd_adapter_t *sta_adapter;
     tSmeConfigParams *psmeConfig;
     v_BOOL_t MFPCapable = VOS_FALSE;
     v_BOOL_t MFPRequired = VOS_FALSE;
@@ -10998,6 +11007,31 @@ static int wlan_hdd_cfg80211_start_bss(hdd_adapter_t *pHostapdAdapter,
     ENTER();
 
     wlan_hdd_tdls_disable_offchan_and_teardown_links(pHddCtx);
+
+    /*
+     * For STA+SAP concurrency support from GUI, first STA connection gets
+     * triggered and while it is in progress, SAP start also comes up.
+     * Once STA association is successful, STA connect event is sent to
+     * kernel which gets queued in kernel workqueue and supplicant won't
+     * process M1 received from AP and send M2 until this NL80211_CONNECT
+     * event is received. Workqueue is not scheduled as RTNL lock is already
+     * taken by hostapd thread which has issued start_bss command to driver.
+     * Driver cannot complete start_bss as the pending command at the head
+     * of the SME command pending list is hw_mode_update for STA session
+     * which cannot be processed as SME is in WAITforKey state for STA
+     * interface. The start_bss command for SAP interface is queued behind
+     * the hw_mode_update command and so it cannot be processed until
+     * hw_mode_update command is processed. This is causing a deadlock so
+     * disconnect the STA interface first if connection or key exchange is
+     * in progress and then start SAP interface.
+     */
+    sta_adapter = hdd_get_sta_connection_in_progress(pHddCtx);
+    if (sta_adapter) {
+        hddLog(LOG1, FL("Disconnecting STA with session id: %d"),
+               sta_adapter->sessionId);
+        wlan_hdd_disconnect(sta_adapter, eCSR_DISCONNECT_REASON_DEAUTH);
+    }
+
     iniConfig = pHddCtx->cfg_ini;
 
     /* Mark the indoor channel (passive) to disable */
@@ -11470,8 +11504,9 @@ static int wlan_hdd_cfg80211_start_bss(hdd_adapter_t *pHostapdAdapter,
     pConfig->acsBandSwitchThreshold = iniConfig->acsBandSwitchThreshold;
 
     set_bit(SOFTAP_INIT_DONE, &pHostapdAdapter->event_flags);
-
     pSapEventCallback = hdd_hostapd_SAPEventCB;
+
+    vos_event_reset(&pHostapdState->vosEvent);
     if(WLANSAP_StartBss(pVosContext, pSapEventCallback, pConfig,
                  (v_PVOID_t)pHostapdAdapter->dev) != VOS_STATUS_SUCCESS)
     {
@@ -11793,6 +11828,7 @@ static int __wlan_hdd_cfg80211_stop_ap (struct wiphy *wiphy,
 #endif
 {
     hdd_adapter_t *pAdapter =  WLAN_HDD_GET_PRIV_PTR(dev);
+    hdd_adapter_t  *staAdapter = NULL;
     hdd_context_t  *pHddCtx    = NULL;
     hdd_scaninfo_t *pScanInfo  = NULL;
     VOS_STATUS status;
@@ -11822,6 +11858,18 @@ static int __wlan_hdd_cfg80211_stop_ap (struct wiphy *wiphy,
     hddLog(VOS_TRACE_LEVEL_INFO, "%s: device_mode = %s (%d)",
            __func__, hdd_device_modetoString(pAdapter->device_mode),
                                              pAdapter->device_mode);
+
+    /*
+     * if a sta connection is in progress in another adapter, disconnect
+     * the sta and complete the sap operation. sta will reconnect
+     * after sap stop is done.
+     */
+    staAdapter = hdd_get_sta_connection_in_progress(pHddCtx);
+    if (staAdapter) {
+        hddLog(LOG1, FL("disconnecting sta with session id: %d"),
+               staAdapter->sessionId);
+        wlan_hdd_disconnect(staAdapter, eCSR_DISCONNECT_REASON_DEAUTH);
+    }
 
     ret = wlan_hdd_scan_abort(pAdapter);
 
@@ -11866,12 +11914,15 @@ static int __wlan_hdd_cfg80211_stop_ap (struct wiphy *wiphy,
         mutex_lock(&pHddCtx->sap_lock);
         if(test_bit(SOFTAP_BSS_STARTED, &pAdapter->event_flags))
         {
+            hdd_hostapd_state_t *pHostapdState =
+                                    WLAN_HDD_GET_HOSTAP_STATE_PTR(pAdapter);
+
             vos_flush_delayed_work(&pHddCtx->ecsa_chan_change_work);
             hdd_wait_for_ecsa_complete(pHddCtx);
+            vos_event_reset(&pHostapdState->vosEvent);
+
             if ( VOS_STATUS_SUCCESS == (status = WLANSAP_StopBss(pHddCtx->pvosContext) ) )
             {
-                hdd_hostapd_state_t *pHostapdState = WLAN_HDD_GET_HOSTAP_STATE_PTR(pAdapter);
-
                 status = vos_wait_single_event(&pHostapdState->vosEvent, 10000);
 
                 if (!VOS_IS_STATUS_SUCCESS(status))
@@ -15090,7 +15141,8 @@ v_BOOL_t hdd_isConnectionInProgress(hdd_context_t *pHddCtx, v_U8_t *session_id,
             {
                 pHddStaCtx = WLAN_HDD_GET_STATION_CTX_PTR(pAdapter);
                 if ((eConnectionState_Associated == pHddStaCtx->conn_info.connState) &&
-                    (VOS_FALSE == pHddStaCtx->conn_info.uIsAuthenticated))
+                    sme_is_sta_key_exchange_in_progress(pHddCtx->hHal,
+                    pAdapter->sessionId))
                 {
                     staMac = (v_U8_t *) &(pAdapter->macAddressCurrent.bytes[0]);
                     hddLog(LOG1,
@@ -17324,6 +17376,12 @@ static int wlan_hdd_cfg80211_set_privacy_ibss(
             if ( NULL != ie )
             {
                 pWextState->wpaVersion = IW_AUTH_WPA_VERSION_WPA;
+
+                if (ie[1] < DOT11F_IE_WPA_MIN_LEN ||
+                    ie[1] > DOT11F_IE_WPA_MAX_LEN) {
+                    hddLog(LOGE, FL("invalid ie len:%d"), ie[1]);
+                    return -EINVAL;
+                }
                 // Unpack the WPA IE
                 //Skip past the EID byte and length byte - and four byte WiFi OUI
                 ret = dot11fUnpackIeWPA((tpAniSirGlobal) halHandle,

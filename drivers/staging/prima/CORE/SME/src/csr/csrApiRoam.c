@@ -7879,8 +7879,14 @@ static void csrRoamJoinRspProcessor( tpAniSirGlobal pMac, tSirSmeJoinRsp *pSmeJo
         }
         if (pSession->abortConnection)
         {
-            smsLog(pMac, LOG1, FL("Disconnection in progess"
-                                  "abort Join request"));
+            smsLog(pMac, LOG1, FL("Disconnection in progess abort Join request"));
+
+            if (pSession->bRefAssocStartCnt)
+                pSession->bRefAssocStartCnt--;
+            csrRoamCallCallback(pMac, pSession->sessionId,
+                                NULL, roamId,
+                                eCSR_ROAM_ASSOCIATION_COMPLETION,
+                                eCSR_ROAM_RESULT_NOT_ASSOCIATED);
             csrRoamComplete( pMac, eCsrNothingToJoin, NULL );
             pSession->abortConnection = FALSE;
             return;
@@ -15218,6 +15224,7 @@ eHalStatus csrSendAssocCnfMsg( tpAniSirGlobal pMac, tpSirSmeAssocInd pAssocInd, 
     tANI_U8 *pBuf;
     tSirResultCodes statusCode;
     tANI_U16 wTmp;
+    vos_msg_t msg;
 
     smsLog( pMac, LOG1, FL("Posting eWNI_SME_ASSOC_CNF to LIM. "
                            "HalStatus : %d"),
@@ -15258,10 +15265,14 @@ eHalStatus csrSendAssocCnfMsg( tpAniSirGlobal pMac, tpSirSmeAssocInd pAssocInd, 
         pBuf += sizeof (tSirMacAddr);
         // alternateChannelId
         *pBuf = 11;
-        status = palSendMBMessage( pMac->hHdd, pMsg );
+        msg.type = pMsg->messageType;
+        msg.bodyval = 0;
+        msg.bodyptr = pMsg;
+        status = vos_mq_post_message_high_pri(VOS_MQ_ID_PE, &msg);
         if(!HAL_STATUS_SUCCESS(status))
         {
             //pMsg is freed by palSendMBMessage
+            vos_mem_free(pMsg);
             break;
         }
     } while( 0 );
