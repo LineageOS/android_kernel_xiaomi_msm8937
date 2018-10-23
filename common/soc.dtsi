@@ -1,3 +1,7 @@
+&msm_gpu {
+	qcom,disable-wake-on-touch;
+};
+
 &soc {
 	restart@4ab000 {
 		qcom,force-warm-reboot;
