@@ -35,7 +35,7 @@
 #include <linux/device.h>
 #include <linux/power_supply.h>
 
-#include <linux/wakelock.h>
+#include <linux/pm_wakeup.h>
 
 #include <xiaomi-msm8937/power_supply_legacy.h>
 
@@ -254,7 +254,7 @@ struct smb358_charger {
 	struct mutex		read_write_lock;
 	struct mutex		path_suspend_lock;
 	struct mutex		irq_complete;
-	struct wake_lock wake_lock_hightemp;
+	struct wakeup_source wakeup_source_hightemp;
 	u8			irq_cfg_mask[2];
 		u8                      power_ok;
 	int			irq_gpio;
@@ -561,7 +561,7 @@ static void qpnp_lbc_temp_alarm_work_fn(struct work_struct *work)
 
 
 	if ((batt_temp > 550 || batt_temp < 0) && !chg_disabled) {
-		wake_lock(&chip->wake_lock_hightemp);
+		__pm_stay_awake(&chip->wakeup_source_hightemp);
 		if ((disabled_delay_times++) >= DELAY_COUNT) {
 			pr_err("wgz temp high disable charger\n");
 			enabled_delay_times = 0;
@@ -584,11 +584,11 @@ static void qpnp_lbc_temp_alarm_work_fn(struct work_struct *work)
 				cool_status = 0;
 			}
 			smb358_charging_disable(chip, THERMAL, 1);
-			wake_unlock(&chip->wake_lock_hightemp);
+			__pm_relax(&chip->wakeup_source_hightemp);
 			power_supply_changed(&chip->batt_psy);
 		}
 	} else if (((batt_temp > 450 && batt_temp <= 550) || (batt_temp > 50 && batt_temp <= 150)) && !chg_enabled1) {
-		wake_lock(&chip->wake_lock_hightemp);
+		__pm_stay_awake(&chip->wakeup_source_hightemp);
 		if ((disabled_delay_times++) >= DELAY_COUNT) {
 			enabled_delay_times = 0;
 			disabled_delay_times = 0;
@@ -615,13 +615,13 @@ static void qpnp_lbc_temp_alarm_work_fn(struct work_struct *work)
 			smb358_charging_disable(chip, THERMAL, 0);
 			smb358_chg_set_appropriate_battery_current(chip);
 			smb358_chg_set_appropriate_vddmax(chip);
-			wake_unlock(&chip->wake_lock_hightemp);
+			__pm_relax(&chip->wakeup_source_hightemp);
 			power_supply_changed(&chip->batt_psy);
 		}
 	}
 
 	else if ((!chg_enabled3) && ((batt_temp >= 0) && (batt_temp <= 50))) {
-		wake_lock(&chip->wake_lock_hightemp);
+		__pm_stay_awake(&chip->wakeup_source_hightemp);
 		if ((disabled_delay_times++) >= DELAY_COUNT) {
 			pr_err("battery is too cool_cold\n");
 			enabled_delay_times = 0;
@@ -638,14 +638,14 @@ static void qpnp_lbc_temp_alarm_work_fn(struct work_struct *work)
 			cool_status_5 = 1;
 			smb358_chg_set_appropriate_battery_current(chip);
 			smb358_chg_set_appropriate_vddmax(chip);
-			wake_unlock(&chip->wake_lock_hightemp);
+			__pm_relax(&chip->wakeup_source_hightemp);
 			power_supply_changed(&chip->batt_psy);
 		}
 	}
 
 	else if ((!chg_enabled2) && ((batt_temp > 150) && (batt_temp <= 450))) {
 		{
-			wake_lock(&chip->wake_lock_hightemp);
+			__pm_stay_awake(&chip->wakeup_source_hightemp);
 			if (enabled_delay_times++ == DELAY_COUNT) {
 				pr_err("battery is normal\n");
 				enabled_delay_times = 0;
@@ -662,7 +662,7 @@ static void qpnp_lbc_temp_alarm_work_fn(struct work_struct *work)
 				cool_status = 0;
 				smb358_chg_set_appropriate_battery_current(chip);
 				smb358_chg_set_appropriate_vddmax(chip);
-				wake_unlock(&chip->wake_lock_hightemp);
+				__pm_relax(&chip->wakeup_source_hightemp);
 				power_supply_changed(&chip->batt_psy);
 			}
 		}
@@ -3189,7 +3189,7 @@ static int smb358_charger_probe(struct i2c_client *client,
 	mutex_init(&chip->read_write_lock);
 	mutex_init(&chip->path_suspend_lock);
 	mutex_init(&chip->current_change_lock);
-	wake_lock_init(&chip->wake_lock_hightemp, WAKE_LOCK_SUSPEND, "wake_lock_hightemp");
+	wakeup_source_init(&chip->wakeup_source_hightemp, "wakeup_source_hightemp");
 
 
 
@@ -3426,7 +3426,7 @@ static int smb358_charger_remove(struct i2c_client *client)
 		regulator_disable(chip->vcc_i2c);
 
 	mutex_destroy(&chip->irq_complete);
-	wake_lock_destroy(&chip->wake_lock_hightemp);
+	wakeup_source_trash(&chip->wakeup_source_hightemp);
 	debugfs_remove_recursive(chip->debug_root);
 
 	alarm_cancel(&chip->batt_temp_alarm);
