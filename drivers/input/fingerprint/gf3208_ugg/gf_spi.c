@@ -40,7 +40,6 @@
 #include <linux/fb.h>
 #include <linux/pm_qos.h>
 #include <linux/cpufreq.h>
-#include <linux/wakelock.h>
 #include <linux/proc_fs.h>
 #include "gf_spi.h"
 
@@ -72,7 +71,7 @@ static int SPIDEV_MAJOR;
 static DECLARE_BITMAP(minors, N_SPI_MINORS);
 static LIST_HEAD(device_list);
 static DEFINE_MUTEX(device_list_lock);
-static struct wake_lock fp_wakelock;
+static struct wakeup_source fp_wakelock;
 static struct gf_dev gf;
 
 #ifdef CONFIG_MACH_XIAOMI_ULYSSE
@@ -492,7 +491,7 @@ static irqreturn_t gf_irq(int irq, void *handle)
 {
 #if defined(GF_NETLINK_ENABLE)
 	char temp = GF_NET_EVENT_IRQ;
-	wake_lock_timeout(&fp_wakelock, msecs_to_jiffies(WAKELOCK_HOLD_TIME));
+	__pm_wakeup_event(&fp_wakelock, msecs_to_jiffies(WAKELOCK_HOLD_TIME));
 	sendnlmsg(&temp);
 #elif defined (GF_FASYNC)
 	struct gf_dev *gf_dev = &gf;
@@ -744,7 +743,7 @@ static int gf_probe(struct platform_device *pdev)
 
 	gf_dev->irq = gf_irq_num(gf_dev);
 
-	wake_lock_init(&fp_wakelock, WAKE_LOCK_SUSPEND, "fp_wakelock");
+	wakeup_source_init(&fp_wakelock, "fp_wakelock");
 	status = request_threaded_irq(gf_dev->irq, NULL, gf_irq,
 			IRQF_TRIGGER_RISING | IRQF_ONESHOT,
 			"gf", gf_dev);
@@ -805,7 +804,7 @@ static int gf_remove(struct platform_device *pdev)
 {
 	struct gf_dev *gf_dev = &gf;
 
-	wake_lock_destroy(&fp_wakelock);
+	wakeup_source_trash(&fp_wakelock);
 	if (gf_dev->irq)
 		free_irq(gf_dev->irq, gf_dev);
 
