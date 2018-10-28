@@ -23,7 +23,7 @@
 #include <linux/interrupt.h>
 #include <linux/irq.h>
 
-#include <linux/wakelock.h>
+#include <linux/pm_wakeup.h>
 
 #include "cw2015_battery.h"
 
@@ -811,7 +811,7 @@ static enum power_supply_property rk_battery_properties[] = {
 #ifdef BAT_LOW_INTERRUPT
 
 #define WAKE_LOCK_TIMEOUT       (10 * HZ)
-static struct wake_lock bat_low_wakelock;
+static struct wakeup_source bat_low_wakeup_source;
 
 static void bat_low_detect_do_wakeup(struct work_struct *work)
 {
@@ -829,7 +829,7 @@ static irqreturn_t bat_low_detect_irq_handler(int irq, void *dev_id)
 {
 	struct cw_battery *cw_bat = dev_id;
 
-	wake_lock_timeout(&bat_low_wakelock, WAKE_LOCK_TIMEOUT);
+	__pm_wakeup_event(&bat_low_wakeup_source, WAKE_LOCK_TIMEOUT);
 	queue_delayed_work(cw_bat->battery_workqueue, &cw_bat->bat_low_wakeup_work, msecs_to_jiffies(20));
 	return IRQ_HANDLED;
 }
@@ -1215,7 +1215,7 @@ static int cw_bat_probe(struct i2c_client *client, const struct i2c_device_id *i
 	}
 
 	INIT_DELAYED_WORK(&cw_bat->bat_low_wakeup_work, bat_low_detect_do_wakeup);
-	wake_lock_init(&bat_low_wakelock, WAKE_LOCK_SUSPEND, "bat_low_detect");
+	wakeup_source_init(&bat_low_wakeup_source, "bat_low_detect");
 	cw_bat->client->irq = gpio_to_irq(pdata->bat_low_pin);
 	ret = request_threaded_irq(client->irq, NULL,
 			  bat_low_detect_irq_handler, pdata->irq_flags,
