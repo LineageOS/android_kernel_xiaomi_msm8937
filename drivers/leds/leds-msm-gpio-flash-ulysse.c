@@ -226,7 +226,7 @@ static int led_gpio_flash_probe(struct platform_device *pdev)
 					__func__, D3_PM8953_L22);
 				goto vreg_set_voltage_fail;
 		}
-		rc = regulator_set_optimum_mode(reg_ptr, U_OPT_VOLTAGE);
+		rc = regulator_set_load(reg_ptr, U_OPT_VOLTAGE);
 		if (rc < 0) {
 				pr_err("lct %s: %s set optimum mode failed\n",
 					__func__, D3_PM8953_L22);
@@ -358,7 +358,7 @@ kerror_ptr:
 
 vreg_unconfig:
 	if (regulator_count_voltages(reg_ptr) > 0)
-		regulator_set_optimum_mode(reg_ptr, 0);
+		regulator_set_load(reg_ptr, 0);
 
 vreg_set_opt_mode_fail:
 	if (regulator_count_voltages(reg_ptr) > 0)
