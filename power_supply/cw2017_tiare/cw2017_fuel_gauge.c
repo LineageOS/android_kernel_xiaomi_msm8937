@@ -18,6 +18,7 @@
 #include <linux/of_batterydata.h>
 #include <linux/qpnp/qpnp-adc.h>
 #include <linux/err.h>
+#include <linux/pm_wakeup.h>
 
 
 #undef KERNEL_VERSION
@@ -870,7 +871,7 @@ static int cw_battery_prop_is_writeable(struct power_supply *psy,
 
 #ifdef CW2017_INTERRUPT
 #define WAKE_LOCK_TIMEOUT       (10 * HZ)
-static struct wake_lock cw2017_wakelock;
+static struct wakeup_source cw2017_wakelock;
 static void interrupt_work_do_wakeup(struct work_struct *work)
 {
         struct delayed_work *delay_work;
@@ -889,7 +890,7 @@ static void interrupt_work_do_wakeup(struct work_struct *work)
 static irqreturn_t ops_cw2017_int_handler_int_handler(int irq, void *dev_id)
 {
         struct cw_battery *cw_bat = dev_id;
-        wake_lock_timeout(&cw2017_wakelock, WAKE_LOCK_TIMEOUT);
+        __pm_wakeup_event(&cw2017_wakelock, WAKE_LOCK_TIMEOUT);
         queue_delayed_work(cw_bat->cwfg_workqueue, &cw_bat->interrupt_work, msecs_to_jiffies(20));
         return IRQ_HANDLED;
 }
@@ -1093,7 +1094,7 @@ static int cw2017_probe(struct i2c_client *client, const struct i2c_device_id *i
 
 #ifdef CW2017_INTERRUPT
 	INIT_DELAYED_WORK(&cw_bat->interrupt_work, interrupt_work_do_wakeup);
-	wake_lock_init(&cw2017_wakelock, WAKE_LOCK_SUSPEND, "cw2017_detect");
+	wakeup_source_init(&cw2017_wakelock, WAKE_LOCK_SUSPEND, "cw2017_detect");
 	if (client->irq > 0) {
 			irq = client->irq;
 			ret = request_irq(irq, ops_cw2017_int_handler_int_handler, IRQF_TRIGGER_FALLING, "cw2017_detect", cw_bat);
