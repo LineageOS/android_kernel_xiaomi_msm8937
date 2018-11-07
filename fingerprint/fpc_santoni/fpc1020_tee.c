@@ -43,7 +43,6 @@
 #include <linux/regulator/consumer.h>
 #include <soc/qcom/scm.h>
 #include <linux/platform_device.h>
-#include <linux/wakelock.h>
 #include <linux/hardware_info.h>
 
 #define FPC1020_RESET_LOW_US 1000
@@ -73,7 +72,7 @@ struct fpc1020_data {
 	struct clk *core_clk;
 #endif
 
-	struct wake_lock ttw_wl;
+	struct wakeup_source ttw_wl;
 	int irq_gpio;
 	int rst_gpio;
 	struct mutex lock;
@@ -439,7 +438,7 @@ static irqreturn_t fpc1020_irq_handler(int irq, void *handle)
 	smp_rmb();
 
 	if (fpc1020->wakeup_enabled) {
-		wake_lock_timeout(&fpc1020->ttw_wl,
+		__pm_wakeup_event(&fpc1020->ttw_wl,
 				msecs_to_jiffies(FPC_TTW_HOLD_TIME));
 	}
 
@@ -545,7 +544,7 @@ static int fpc1020_probe(struct platform_device *pdev)
 #endif
 
 	mutex_init(&fpc1020->lock);
-	wake_lock_init(&fpc1020->ttw_wl, WAKE_LOCK_SUSPEND, "fpc_ttw_wl");
+	wakeup_source_init(&fpc1020->ttw_wl, "fpc_ttw_wl");
 
 	rc = sysfs_create_group(&dev->kobj, &attribute_group);
 	if (rc) {
@@ -564,7 +563,7 @@ static int fpc1020_remove(struct platform_device *pdev)
 
 	sysfs_remove_group(&pdev->dev.kobj, &attribute_group);
 	mutex_destroy(&fpc1020->lock);
-	wake_lock_destroy(&fpc1020->ttw_wl);
+	wakeup_source_trash(&fpc1020->ttw_wl);
 	dev_info(&pdev->dev, "%s\n", __func__);
 	return 0;
 }
