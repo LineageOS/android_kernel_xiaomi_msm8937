@@ -53,7 +53,7 @@
 
 #define IC_TEST_VERSION  "Test version: V1.0.0--2016-08-01, (sync version of FT_MultipleTest: V4.0.0.0 ------ 2016-07-18)"
 
-#define FTS_INI_FILE_PATH "/system/etc/"
+#define FTS_INI_FILE_PATH "/vendor/etc/"
 #define FTS_CSV_FILE_PATH "/storage/"
 
 #define FTS_TEST_BUFFER_SIZE        80*1024

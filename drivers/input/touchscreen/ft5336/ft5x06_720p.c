@@ -1743,7 +1743,7 @@ static DEVICE_ATTR(ftsfwupgradeapp, S_IRUGO|S_IWUSR, ft5x0x_fwupgradeapp_show, f
 
 #if CTP_PROC_INTERFACE
 
-#define FT5X0X_INI_FILEPATH "/system/etc/"
+#define FT5X0X_INI_FILEPATH "/vendor/etc/"
 
 static int ft5x0x_GetInISize(char *config_name)
 {
