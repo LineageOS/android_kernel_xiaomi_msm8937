@@ -1207,6 +1207,28 @@ static void sdhci_msm_set_mmc_drv_type(struct sdhci_host *host, u32 opcode,
 			drv_type);
 }
 
+static void sdhci_msm_set_cdr(struct sdhci_host *host, bool enable)
+{
+	struct sdhci_pltfm_host *pltfm_host = sdhci_priv(host);
+	struct sdhci_msm_host *msm_host = pltfm_host->priv;
+	const struct sdhci_msm_offset *msm_host_offset =
+					msm_host->offset;
+
+	u32 config, oldconfig = readl_relaxed(host->ioaddr + msm_host_offset->CORE_DLL_CONFIG);
+
+	config = oldconfig;
+	if (enable) {
+		config |= CORE_CDR_EN;
+		config &= ~CORE_CDR_EXT_EN;
+	} else {
+		config &= ~CORE_CDR_EN;
+		config |= CORE_CDR_EXT_EN;
+	}
+
+	if (config != oldconfig)
+		writel_relaxed(config, host->ioaddr + msm_host_offset->CORE_DLL_CONFIG);
+}
+
 int sdhci_msm_execute_tuning(struct sdhci_host *host, u32 opcode)
 {
 	unsigned long flags;
@@ -1232,8 +1254,14 @@ int sdhci_msm_execute_tuning(struct sdhci_host *host, u32 opcode)
 	if (host->clock <= CORE_FREQ_100MHZ ||
 		!((ios.timing == MMC_TIMING_MMC_HS400) ||
 		(ios.timing == MMC_TIMING_MMC_HS200) ||
-		(ios.timing == MMC_TIMING_UHS_SDR104)))
+		(ios.timing == MMC_TIMING_UHS_SDR104))) {
+		msm_host->use_cdr = false;
+		sdhci_msm_set_cdr(host, false);
 		return 0;
+	}
+
+	/* Clock-Data-Recovery used to dynamically adjust RX sampling point */
+	msm_host->use_cdr = true;
 
 	/*
 	 * Don't allow re-tuning for CRC errors observed for any commands
@@ -4618,6 +4646,29 @@ static int sdhci_msm_notify_load(struct sdhci_host *host, enum mmc_load state)
 	return 0;
 }
 
+static void sdhci_msm_write_w(struct sdhci_host *host, u16 val, int reg)
+{
+	struct sdhci_pltfm_host *pltfm_host = sdhci_priv(host);
+	struct sdhci_msm_host *msm_host = sdhci_pltfm_priv(pltfm_host);
+
+	switch (reg) {
+	case SDHCI_TRANSFER_MODE:
+		msm_host->transfer_mode = val;
+		break;
+	case SDHCI_COMMAND:
+		if (!msm_host->use_cdr)
+			break;
+		if ((msm_host->transfer_mode & SDHCI_TRNS_READ) &&
+		    (SDHCI_GET_CMD(val) != MMC_SEND_TUNING_BLOCK_HS200) &&
+		    (SDHCI_GET_CMD(val) != MMC_SEND_TUNING_BLOCK))
+			sdhci_msm_set_cdr(host, true);
+		else
+			sdhci_msm_set_cdr(host, false);
+		break;
+	}
+	writew(val, host->ioaddr + reg);
+}
+
 static struct sdhci_ops sdhci_msm_ops = {
 	.crypto_engine_cfg = sdhci_msm_ice_cfg,
 	.crypto_engine_cmdq_cfg = sdhci_msm_ice_cmdq_cfg,
@@ -4646,6 +4697,7 @@ static struct sdhci_ops sdhci_msm_ops = {
 	.post_req = sdhci_msm_post_req,
 	.get_current_limit = sdhci_msm_get_current_limit,
 	.notify_load = sdhci_msm_notify_load,
+	.write_w = sdhci_msm_write_w,
 };
 
 static void sdhci_set_default_hw_caps(struct sdhci_msm_host *msm_host,
