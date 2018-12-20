@@ -27,7 +27,7 @@
 #include <media/v4l2-event.h>
 #include <media/v4l2-mediabus.h>
 #include <media/videobuf2-dma-contig.h>
-#include <media/msmb_camera.h>
+#include <media/msmb_camera-land.h>
 
 /* Setting MAX timeout to 6.5seconds considering
  * backend will operate @ .6fps in certain usecases

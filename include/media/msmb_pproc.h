@@ -152,4 +152,3 @@ struct msm_camera_v4l2_ioctl32_t {
 #endif
 
 #endif
-

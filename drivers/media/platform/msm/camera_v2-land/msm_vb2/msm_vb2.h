@@ -27,7 +27,7 @@
 #include <media/v4l2-event.h>
 #include <media/v4l2-mediabus.h>
 #include <media/videobuf2-dma-contig.h>
-#include <media/msmb_camera.h>
+#include <media/msmb_camera-land.h>
 #include <media/videobuf2-core.h>
 #include "msm.h"
 #include "msm_sd.h"
