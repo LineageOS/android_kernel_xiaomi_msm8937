@@ -1681,8 +1681,10 @@ static int fuse_retrieve(struct fuse_conn *fc, struct inode *inode,
 	req->in.args[1].size = total_len;
 
 	err = fuse_request_send_notify_reply(fc, req, outarg->notify_unique);
-	if (err)
+	if (err) {
 		fuse_retrieve_end(fc, req);
+		fuse_put_request(fc, req);
+	}
 
 	return err;
 }
@@ -1927,11 +1929,14 @@ static ssize_t fuse_dev_splice_write(struct pipe_inode_info *pipe,
 	if (!fc)
 		return -EPERM;
 
-	bufs = kmalloc(pipe->buffers * sizeof(struct pipe_buffer), GFP_KERNEL);
-	if (!bufs)
-		return -ENOMEM;
-
 	pipe_lock(pipe);
+
+	bufs = kmalloc(pipe->buffers * sizeof(struct pipe_buffer), GFP_KERNEL);
+	if (!bufs) {
+		pipe_unlock(pipe);
+		return -ENOMEM;
+	}
+
 	nbuf = 0;
 	rem = 0;
 	for (idx = 0; idx < pipe->nrbufs && rem < len; idx++)
