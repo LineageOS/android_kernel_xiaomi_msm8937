@@ -1331,13 +1331,6 @@ VOS_STATUS hdd_hostapd_SAPEventCB( tpSap_Event pSapEvent, v_PVOID_t usrDataForCa
 
             pHddApCtx->operatingChannel = 0; //Invalidate the channel info.
 
-            if (pHostapdAdapter->device_mode == WLAN_HDD_P2P_GO)
-            {
-                hddLog(LOG1,
-                       FL("P2P Go is getting removed and we are trying to re-enable TDLS"));
-                wlan_hdd_tdls_reenable(pHddCtx);
-            }
-
             goto stopbss;
         case eSAP_STA_SET_KEY_EVENT:
             //TODO: forward the message to hostapd once implementtation is done for now just print
@@ -1753,6 +1746,14 @@ stopbss :
         wireless_send_event(dev, we_event, &wrqu, (char *)we_custom_event_generic);
         hdd_dump_concurrency_info(pHddCtx);
     }
+        if (pHostapdAdapter->device_mode == WLAN_HDD_P2P_GO ||
+            pHostapdAdapter->device_mode == WLAN_HDD_SOFTAP)
+        {
+            hddLog(LOG1,
+                   FL("SAP or Go is getting removed and we are trying to re-enable TDLS"));
+            wlan_hdd_tdls_reenable(pHddCtx);
+        }
+
     return VOS_STATUS_SUCCESS;
 }
 
@@ -1797,11 +1798,12 @@ int hdd_softap_unpackIE(
         RSNIeLen = gen_ie_len - 2; 
         // Unpack the RSN IE
         memset(&dot11RSNIE, 0, sizeof(tDot11fIERSN));
-        status = dot11fUnpackIeRSN((tpAniSirGlobal) halHandle,
-                            pRsnIe,
-                            RSNIeLen,
-                            &dot11RSNIE);
-        if (DOT11F_FAILED(status))
+
+        status = sme_unpack_rsn_ie(halHandle,
+                                   pRsnIe,
+                                   RSNIeLen,
+                                   &dot11RSNIE);
+        if (!DOT11F_SUCCEEDED(status))
         {
              hddLog(LOGE,
                         FL("unpack failed for RSN IE status:(0x%08x)"),
@@ -1813,12 +1815,12 @@ int hdd_softap_unpackIE(
         hddLog(LOG1, FL("%s: pairwise cipher suite count: %d"),
                 __func__, dot11RSNIE.pwise_cipher_suite_count );
         hddLog(LOG1, FL("%s: authentication suite count: %d"),
-                __func__, dot11RSNIE.akm_suite_count);
+                __func__, dot11RSNIE.akm_suite_cnt);
         /*Here we have followed the apple base code, 
           but probably I suspect we can do something different*/
-        //dot11RSNIE.akm_suite_count
+        //dot11RSNIE.akm_suite_cnt
         // Just translate the FIRST one 
-        *pAuthType =  hdd_TranslateRSNToCsrAuthType(dot11RSNIE.akm_suites[0]); 
+        *pAuthType =  hdd_TranslateRSNToCsrAuthType(dot11RSNIE.akm_suite[0]);
         //dot11RSNIE.pwise_cipher_suite_count 
         *pEncryptType = hdd_TranslateRSNToCsrEncryptionType(dot11RSNIE.pwise_cipher_suites[0]);                     
         //dot11RSNIE.gp_cipher_suite_count 
@@ -1997,16 +1999,82 @@ static void hdd_unsafe_channel_restart_sap(hdd_adapter_t *adapter,
    return;
 }
 
+static v_U16_t hdd_get_safe_channel_from_acs_range(hdd_context_t *hdd_ctx,
+                         hdd_adapter_t *sap_adapter, v_U16_t *unsafeChannelList,
+                         v_U16_t unsafeChannelCount)
+{
+    v_U8_t     valid_channels[WNI_CFG_VALID_CHANNEL_LIST_LEN];
+    v_U32_t    startChannelNum;
+    v_U32_t    endChannelNum;
+    v_U32_t    valid_channel_count = WNI_CFG_VALID_CHANNEL_LIST_LEN;
+    v_U16_t    i, j;
+    eHalStatus status;
+    bool       found;
+
+    status = sme_GetCfgValidChannels(hdd_ctx->hHal, valid_channels,
+                                     &valid_channel_count);
+    if (!HAL_STATUS_SUCCESS(status))
+        return 0;
+
+    ccmCfgGetInt(hdd_ctx->hHal, WNI_CFG_SAP_CHANNEL_SELECT_START_CHANNEL,
+                 &startChannelNum);
+    ccmCfgGetInt(hdd_ctx->hHal, WNI_CFG_SAP_CHANNEL_SELECT_END_CHANNEL,
+                 &endChannelNum);
+
+    for (i = 0; i < valid_channel_count; i++) {
+        found = false;
+        for (j = 0; j < unsafeChannelCount; j++) {
+            if (valid_channels[i] == unsafeChannelList[j]) {
+                found = true;
+                break;
+            }
+        }
+
+        if (found)
+            continue;
+
+        if ((valid_channels[i] >= startChannelNum) &&
+            (valid_channels[i] <= endChannelNum)) {
+            return valid_channels[i];
+        }
+    }
+
+    return 0;
+}
+
 void hdd_check_for_unsafe_ch(hdd_adapter_t *phostapd_adapter,
                                            hdd_context_t *hdd_ctxt)
 {
     v_U16_t    channelLoop;
     v_U16_t    unsafeChannelCount = 0;
     v_U16_t    unsafeChannelList[NUM_20MHZ_RF_CHANNELS];
+    v_U16_t    sta_chan;
+    v_U16_t    restart_chan;
+    v_CONTEXT_t vos_ctx;
+    ptSapContext sap_ctx;
+
+    vos_ctx = hdd_ctxt->pvosContext;
+    if (!vos_ctx) {
+        hddLog(LOGE, FL("vos_ctx is NULL"));
+        return;
+    }
+
+    sap_ctx = VOS_GET_SAP_CB(vos_ctx);
+    if (!sap_ctx) {
+        hddLog(LOGE, FL("sap_ctx is NULL"));
+        return;
+    }
 
     /* Get unsafe channel list */
     vos_get_wlan_unsafe_channel(unsafeChannelList, sizeof(unsafeChannelList),
                                 &unsafeChannelCount);
+    sta_chan = hdd_get_operating_channel(hdd_ctxt, WLAN_HDD_INFRA_STATION);
+
+    if (sta_chan) {
+        hddLog(LOG1, FL("Only SCC supported for STA+SAP"));
+        return;
+    }
+
     for (channelLoop = 0; channelLoop < unsafeChannelCount; channelLoop++)
     {
         if ((unsafeChannelList[channelLoop] ==
@@ -2018,7 +2086,28 @@ void hdd_check_for_unsafe_ch(hdd_adapter_t *phostapd_adapter,
                 * current operating channel is un-safe channel
                 * restart driver
                 */
-                hdd_unsafe_channel_restart_sap(phostapd_adapter, hdd_ctxt);
+                if (hdd_ctxt->cfg_ini->force_scc_with_ecsa) {
+                    restart_chan = hdd_get_safe_channel_from_acs_range(hdd_ctxt,
+                                            phostapd_adapter, unsafeChannelList,
+                                            unsafeChannelCount);
+
+                    if (!restart_chan) {
+                        hddLog(LOGE, FL("Failed to restart SAP as no safe channel found"));
+                        return;
+                    } else {
+                        if (wlansap_chk_n_set_chan_change_in_progress(sap_ctx))
+                            return;
+                        INIT_COMPLETION(sap_ctx->ecsa_info.chan_switch_comp);
+                        if (wlansap_set_channel_change(vos_ctx, restart_chan,
+                            false)) {
+                            wlansap_reset_chan_change_in_progress(sap_ctx);
+                            complete(&sap_ctx->ecsa_info.chan_switch_comp);
+                            return;
+                        }
+                    }
+                } else {
+                    hdd_unsafe_channel_restart_sap(phostapd_adapter, hdd_ctxt);
+                }
                /*
                 * On LE, this event is handled by wlan-services to
                 * restart SAP. On android, this event would be

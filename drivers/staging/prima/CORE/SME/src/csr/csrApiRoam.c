@@ -5318,7 +5318,7 @@ eHalStatus csrRoamSaveSecurityRspIE(tpAniSirGlobal pMac,
                     nIeLen = 8 //version + gp_cipher_suite + pwise_cipher_suite_count
                         + pIesLocal->RSN.pwise_cipher_suite_count * 4    //pwise_cipher_suites
                         + 2 //akm_suite_count
-                        + pIesLocal->RSN.akm_suite_count * 4 //akm_suites
+                        + pIesLocal->RSN.akm_suite_cnt * 4 //akm_suites
                         + 2; //reserved
                     if( pIesLocal->RSN.pmkid_count )
                     {
@@ -5333,7 +5333,7 @@ eHalStatus csrRoamSaveSecurityRspIE(tpAniSirGlobal pMac,
                         vos_mem_set(pSession->pWpaRsnRspIE, nIeLen + 2, 0);
                         pSession->pWpaRsnRspIE[0] = DOT11F_EID_RSN;
                         pSession->pWpaRsnRspIE[1] = (tANI_U8)nIeLen;
-                        //copy upto akm_suites
+                        //copy upto akm_suite
                         pIeBuf = pSession->pWpaRsnRspIE + 2;
                         vos_mem_copy(pIeBuf, &pIesLocal->RSN.version,
                                      sizeof(pIesLocal->RSN.version));
@@ -5352,19 +5352,19 @@ eHalStatus csrRoamSaveSecurityRspIE(tpAniSirGlobal pMac,
                                          pIesLocal->RSN.pwise_cipher_suite_count * 4);
                             pIeBuf += pIesLocal->RSN.pwise_cipher_suite_count * 4;
                         }
-                        vos_mem_copy(pIeBuf, &pIesLocal->RSN.akm_suite_count, 2);
+                        vos_mem_copy(pIeBuf, &pIesLocal->RSN.akm_suite_cnt, 2);
                         pIeBuf += 2;
-                        if( pIesLocal->RSN.akm_suite_count )
+                        if( pIesLocal->RSN.akm_suite_cnt )
                         {
-                            //copy akm_suites
+                            //copy akm_suite
                             vos_mem_copy(pIeBuf,
-                                         pIesLocal->RSN.akm_suites,
-                                         pIesLocal->RSN.akm_suite_count * 4);
-                            pIeBuf += pIesLocal->RSN.akm_suite_count * 4;
+                                         pIesLocal->RSN.akm_suite,
+                                         pIesLocal->RSN.akm_suite_cnt * 4);
+                            pIeBuf += pIesLocal->RSN.akm_suite_cnt * 4;
                         }
                         //copy the rest
                         vos_mem_copy(pIeBuf,
-                                     pIesLocal->RSN.akm_suites + pIesLocal->RSN.akm_suite_count * 4,
+                                     pIesLocal->RSN.akm_suite + pIesLocal->RSN.akm_suite_cnt * 4,
                                      2 + pIesLocal->RSN.pmkid_count * 4);
                         pSession->nWpaRsnRspIeLength = nIeLen + 2; 
                     }
@@ -6661,6 +6661,7 @@ eHalStatus csrRoamCopyProfile(tpAniSirGlobal pMac, tCsrRoamProfile *pDstProfile,
         pDstProfile->ieee80211d        = pSrcProfile->ieee80211d;
         pDstProfile->force_24ghz_in_ht20 =
                        pSrcProfile->force_24ghz_in_ht20;
+        pDstProfile->force_rsne_override = pSrcProfile->force_rsne_override;
         vos_mem_copy(&pDstProfile->Keys, &pSrcProfile->Keys,
                      sizeof(pDstProfile->Keys));
 #ifdef WLAN_FEATURE_VOWIFI_11R
@@ -9542,6 +9543,7 @@ eHalStatus csrRoamPrepareFilterFromProfile(tpAniSirGlobal pMac, tCsrRoamProfile 
     eHalStatus status = eHAL_STATUS_SUCCESS;
     tANI_U32 size = 0;
     tANI_U8  index = 0;
+    uint8_t i;
     
     do
     {
@@ -9629,9 +9631,31 @@ eHalStatus csrRoamPrepareFilterFromProfile(tpAniSirGlobal pMac, tCsrRoamProfile 
             break;
         }
         pScanFilter->uapsd_mask = pProfile->uapsd_mask;
-        pScanFilter->authType = pProfile->AuthType;
-        pScanFilter->EncryptionType = pProfile->EncryptionType;
-        pScanFilter->mcEncryptionType = pProfile->mcEncryptionType;
+        if (pProfile->force_rsne_override) {
+                smsLog(pMac, LOG1, FL("force_rsne_override enabled fill all auth type and enctype"));
+
+                pScanFilter->authType.numEntries = eCSR_NUM_OF_SUPPORT_AUTH_TYPE;
+                for (i = 0; i < pScanFilter->authType.numEntries; i++)
+                        pScanFilter->authType.authType[i] = i;
+                index = 0;
+                for (i = 0; i < eCSR_NUM_OF_ENCRYPT_TYPE; i++) {
+                        if (i == eCSR_ENCRYPT_TYPE_TKIP ||
+                            i == eCSR_ENCRYPT_TYPE_AES) {
+                                pScanFilter->
+                                   EncryptionType.encryptionType[index] = i;
+                                pScanFilter->
+                                   mcEncryptionType.encryptionType[index] = i;
+                                index++;
+                        }
+                }
+                pScanFilter->EncryptionType.numEntries = index;
+                pScanFilter->mcEncryptionType.numEntries = index;
+                pScanFilter->ignore_pmf_cap = true;
+        } else {
+                pScanFilter->authType = pProfile->AuthType;
+                pScanFilter->EncryptionType = pProfile->EncryptionType;
+                pScanFilter->mcEncryptionType = pProfile->mcEncryptionType;
+        }
         pScanFilter->BSSType = pProfile->BSSType;
         pScanFilter->phyMode = pProfile->phyMode;
 #ifdef FEATURE_WLAN_WAPI
@@ -10484,11 +10508,14 @@ void csrRoamCheckForLinkStatusChange( tpAniSirGlobal pMac, tSirSmeRsp *pSirMsg )
                                 if(pNewBss)
                                 {
                                     vos_mem_copy(pIbssLog->bssid, pNewBss->bssId, 6);
-                                    if(pNewBss->ssId.length)
-                                    {
-                                        vos_mem_copy(pIbssLog->ssid, pNewBss->ssId.ssId,
-                                                     pNewBss->ssId.length);
-                                    }
+                                    if(pNewBss->ssId.length >
+                                       VOS_LOG_MAX_SSID_SIZE)
+                                        pNewBss->ssId.length =
+                                                          VOS_LOG_MAX_SSID_SIZE;
+
+                                    vos_mem_copy(pIbssLog->ssid,
+                                                 pNewBss->ssId.ssId,
+                                                 pNewBss->ssId.length);
                                     pIbssLog->operatingChannel = pNewBss->channelNumber;
                                 }
                                 if(HAL_STATUS_SUCCESS(ccmCfgGetInt(pMac, WNI_CFG_BEACON_INTERVAL, &bi)))
@@ -11438,6 +11465,15 @@ eHalStatus csrRoamLostLink( tpAniSirGlobal pMac, tANI_U32 sessionId, tANI_U32 ty
     else if ( eWNI_SME_DEAUTH_IND == type )
     {
         status = csrSendMBDeauthCnfMsg(pMac, pDeauthIndMsg);
+    }
+
+    if(CSR_IS_INFRASTRUCTURE(&pSession->connectedProfile))
+    {
+        //remove the connected BSS in infrastructure mode
+        csrRoamRemoveConnectedBssFromScanCache(pMac,
+                                               &pSession->connectedProfile);
+
+        csrScanStartIdleScan(pMac);
     }
 
     return (status);
@@ -13546,6 +13582,8 @@ eHalStatus csrSendJoinReqMsg( tpAniSirGlobal pMac, tANI_U32 sessionId, tSirBssDe
             // Insert the RSN IE into the join request
             ieLen = csrRetrieveRsnIe( pMac, sessionId, pProfile, pBssDescription, pIes,
                     (tCsrRSNIe *)( wpaRsnIE ) );
+            pMsg->force_rsne_override =
+                            pProfile->force_rsne_override;
         }
 #ifdef FEATURE_WLAN_WAPI
         else if( csrIsProfileWapi( pProfile ) )
@@ -15376,12 +15414,13 @@ eHalStatus csrSendMBSetContextReqMsg( tpAniSirGlobal pMac, tANI_U32 sessionId,
 {
     tSirSmeSetContextReq *pMsg;
     tANI_U16 msgLen;
-    eHalStatus status = eHAL_STATUS_FAILURE;
+    VOS_STATUS status;
     tAniEdType tmpEdType;
     tAniKeyDirection tmpDirection;
     tANI_U8 *pBuf = NULL;
     tANI_U8 *p = NULL;
     tCsrRoamSession *pSession = CSR_GET_SESSION( pMac, sessionId );
+    vos_msg_t msg;
     smsLog( pMac, LOG1, FL("keylength is %d, Encry type is : %d"),
                             keyLength, edType);
     do {
@@ -15451,9 +15490,19 @@ eHalStatus csrSendMBSetContextReqMsg( tpAniSirGlobal pMac, tANI_U32 sessionId,
                 p = pal_set_U16( p, pal_cpu_to_be16(keyLength) );
         if ( keyLength && pKey ) 
             vos_mem_copy(p, pKey, keyLength);
-        status = palSendMBMessage(pMac->hHdd, pMsg);
+        msg.type = pMsg->messageType;
+        msg.bodyptr = pMsg;
+        msg.bodyval = 0;
+        if (fUnicast)
+            status = vos_mq_post_message_high_pri(VOS_MQ_ID_PE, &msg);
+        else
+            status = vos_mq_post_message(VOS_MQ_ID_PE, &msg);
+        if (!VOS_IS_STATUS_SUCCESS(status)) {
+            vos_mem_free(pMsg);
+            return eHAL_STATUS_FAILURE;
+        }
     } while( 0 );
-    return( status );
+    return eHAL_STATUS_SUCCESS;
 }
 
 eHalStatus csrSendMBStartBssReqMsg( tpAniSirGlobal pMac, tANI_U32 sessionId, eCsrRoamBssType bssType, 

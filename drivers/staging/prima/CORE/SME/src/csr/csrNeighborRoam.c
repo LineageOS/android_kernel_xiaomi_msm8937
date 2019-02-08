@@ -5396,6 +5396,15 @@ eHalStatus csrNeighborRoamCandidateFoundIndHdlr(tpAniSirGlobal pMac, void* pMsg)
 {
     tpCsrNeighborRoamControlInfo    pNeighborRoamInfo = &pMac->roam.neighborRoamInfo;
     eHalStatus status = eHAL_STATUS_SUCCESS;
+    tCsrRoamSession *pSession = CSR_GET_SESSION(pMac,
+                                               pNeighborRoamInfo->csrSessionId);
+
+    if(!pSession)
+    {
+        smsLog(pMac, LOGE, FL("session %d not found "),
+               pNeighborRoamInfo->csrSessionId);
+        return eHAL_STATUS_FAILURE;
+    }
 
     if (vos_check_monitor_state())
     {
@@ -5413,8 +5422,9 @@ eHalStatus csrNeighborRoamCandidateFoundIndHdlr(tpAniSirGlobal pMac, void* pMsg)
     else
     {
         /* We are about to start a fresh scan cycle,
-         * purge non-P2P results from the past */
-        csrScanFlushSelectiveResult(pMac, VOS_FALSE);
+         * purge connected SSID results from the past */
+        csrScanFlushSelectiveSsid(pMac, pSession->connectedProfile.SSID.ssId,
+                                  pSession->connectedProfile.SSID.length);
         /* Once it gets the candidates found indication from PE, will issue a scan
          - req to PE with “freshScan” in scanreq structure set as follows:
          0x42 - Return & purge LFR scan results
@@ -5660,13 +5670,18 @@ eHalStatus csrNeighborRoamHandoffReqHdlr(tpAniSirGlobal pMac, void* pMsg)
                              pHandoffReqInfo->bssid,
                              6);
                 pNeighborRoamInfo->uOsRequestedHandoff = 1;
-                status = csrRoamOffloadScan(pMac, ROAM_SCAN_OFFLOAD_STOP,
-                                            REASON_OS_REQUESTED_ROAMING_NOW);
-                if (eHAL_STATUS_SUCCESS != status)
-                {
-                    smsLog(pMac, LOGE, FL("csrRoamOffloadScan failed"));
-                    pNeighborRoamInfo->uOsRequestedHandoff = 0;
-                }
+               if (pNeighborRoamInfo->lastSentCmd != ROAM_SCAN_OFFLOAD_STOP)
+               {
+                   status = csrRoamOffloadScan(pMac, ROAM_SCAN_OFFLOAD_STOP,
+                                               REASON_OS_REQUESTED_ROAMING_NOW);
+                   if (eHAL_STATUS_SUCCESS != status)
+                   {
+                       smsLog(pMac, LOGE, FL("csrRoamOffloadScan failed"));
+                       pNeighborRoamInfo->uOsRequestedHandoff = 0;
+                   }
+               }
+               else
+                 csrNeighborRoamProceedWithHandoffReq(pMac);
             }
             else
             {

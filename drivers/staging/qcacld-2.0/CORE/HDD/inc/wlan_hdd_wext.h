@@ -146,7 +146,7 @@ typedef enum
 } hdd_wlan_wmm_ts_info_ack_policy_e;
 
 /** Maximum Length of WPA/RSN IE */
-#define MAX_WPA_RSN_IE_LEN 40
+#define MAX_WPA_RSN_IE_LEN 255
 
 /** Maximum Number of WEP KEYS */
 #define MAX_WEP_KEYS 4
@@ -345,6 +345,10 @@ typedef struct ccp_freq_chan_map_s{
     v_U32_t freq;
     v_U32_t chan;
 }hdd_freq_chan_map_t;
+
+struct temperature_info {
+	int temperature;
+};
 
 #define wlan_hdd_get_wps_ie_ptr(ie, ie_len) \
     wlan_hdd_get_vendor_oui_ie_ptr(WPS_OUI_TYPE, WPS_OUI_TYPE_SIZE, ie, ie_len)

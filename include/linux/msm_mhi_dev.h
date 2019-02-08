@@ -67,7 +67,7 @@ struct mhi_req {
 	u32                             snd_cmpl;
 	void                            *context;
 	size_t                          len;
-	size_t                          actual_len;
+	size_t                          transfer_len;
 	uint32_t                        rd_offset;
 	struct mhi_dev_client           *client;
 	struct list_head                list;
@@ -135,6 +135,7 @@ enum mhi_client_channel {
 	MHI_CLIENT_RESERVED_2_LOWER = 102,
 	MHI_CLIENT_RESERVED_2_UPPER = 127,
 	MHI_MAX_CHANNELS = 102,
+	MHI_CLIENT_INVALID = 0xFFFFFFFF
 };
 
 struct mhi_dev_client_cb_data {

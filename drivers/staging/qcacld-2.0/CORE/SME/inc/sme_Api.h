@@ -4960,4 +4960,33 @@ eHalStatus sme_thermal_throttle_set_conf_cmd(tHalHandle hHal, bool enable,
                                              tANI_U32 prio);
 eHalStatus sme_thermal_throttle_mgmt_cmd(tHalHandle hHal, tANI_U16 lower_thresh_deg,
                                          tANI_U16 higher_thresh_deg);
+/**
+ * sme_unpack_rsn_ie: wrapper to unpack RSN IE and update def RSN params
+ * if optional fields are not present.
+ * @hal: handle returned by mac_open
+ * @buf: rsn ie buffer pointer
+ * @buf_len: rsn ie buffer length
+ * @rsn_ie: outframe rsn ie structure
+ * @append_ie: flag to indicate if the rsn_ie need to be appended from buf
+ *
+ * Return: parse status
+ */
+uint32_t sme_unpack_rsn_ie(tHalHandle hal, uint8_t *buf,
+                        uint8_t buf_len, tDot11fIERSN *rsn_ie);
+
+typedef struct {
+	uint32_t vdev_id;              /* Vdev ID */
+	uint32_t start;                /* Start/Stop */
+	uint32_t sync_time;            /* Lower 32-bit of the TSF at which the
+                                        * pulse should be synced */
+	uint32_t pulse_interval;       /* Periodicity of pulses in micro secs */
+	uint32_t active_sync_period;   /* Number of beacons to sync before generating
+                                        * pulse in units of beacon interval.
+                                        * Valid for clock slaves only */
+	uint32_t gpio_pin;             /* GPIO Pin number to be used */
+	uint32_t pulse_width;          /* Duration of pulse in micro secs */
+} tSirHpcsPulseParmasConfig;
+
+eHalStatus sme_hpcs_pulse_params_conf_cmd(tHalHandle hHal, tSirHpcsPulseParmasConfig *pHpcsPulseParams);
+
 #endif //#if !defined( __SME_API_H )

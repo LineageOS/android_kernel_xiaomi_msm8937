@@ -1128,6 +1128,7 @@ typedef struct sMacOpenParameters
 
     bool      tx_chain_mask_cck;
     uint16_t  self_gen_frm_pwr;
+    bool keep_dwell_time_passive;
 #ifdef WLAN_FEATURE_LPSS
     bool is_lpass_enabled;
 #endif
@@ -1296,6 +1297,7 @@ typedef struct sAniSirGlobal
     bool     sta_change_cc_via_beacon;
     bool max_power_cmd_pending;
     uint32_t sta_auth_retries_for_code17;
+    uint32_t rx_packet_drop_counter;
 } tAniSirGlobal;
 
 typedef enum

@@ -4168,6 +4168,11 @@ static int hdd_extscan_start_fill_bucket_channel_spec(
 			total_channels++;
 		}
 
+		if (j != pReqMsg->buckets[bktIndex].numChannels) {
+			hddLog(LOG1, FL("Input parameters didn't match"));
+			return -EINVAL;
+		}
+
 		hdd_extscan_update_dwell_time_limits(
 					pReqMsg, bktIndex,
 					min_dwell_time_active_bucket,
@@ -8402,12 +8407,19 @@ wlan_hdd_thermal_cmd_get_temperature(struct wiphy *wiphy,
 		struct wireless_dev *wdev)
 {
 	eHalStatus status;
-	struct statsContext temp_context;
+	int ret;
 	unsigned long rc;
 	struct sk_buff *nl_resp = 0;
 	hdd_context_t *hdd_ctx = wiphy_priv(wiphy);
 	struct net_device *dev = wdev->netdev;
 	hdd_adapter_t *adapter = WLAN_HDD_GET_PRIV_PTR(dev);
+	void *cookie;
+	struct hdd_request *request;
+	struct temperature_info *priv = NULL;
+	static const struct hdd_request_params params = {
+		.priv_size = sizeof(*priv),
+		.timeout_ms = WLAN_WAIT_TIME_STATS,
+	};
 
 	if (VOS_FTM_MODE == hdd_get_conparam()) {
 		  hddLog(LOGE, FL("Command not allowed in FTM mode"));
@@ -8417,28 +8429,43 @@ wlan_hdd_thermal_cmd_get_temperature(struct wiphy *wiphy,
 	if (wlan_hdd_validate_context(hdd_ctx))
 		  return -EINVAL;
 
-	/* prepare callback context and magic pattern */
-	init_completion(&temp_context.completion);
-	temp_context.pAdapter = adapter;
-	temp_context.magic = TEMP_CONTEXT_MAGIC;
+	if (NULL == adapter)
+	{
+		hddLog(VOS_TRACE_LEVEL_ERROR,
+		       FL("adapter is NULL"));
+		return VOS_STATUS_E_FAULT;
+	}
+
+	request = hdd_request_alloc(&params);
+	if (!request) {
+		hddLog(VOS_TRACE_LEVEL_ERROR,
+		       "%s: Request allocation failure", __func__);
+		return VOS_STATUS_E_NOMEM;
+	}
+	cookie = hdd_request_cookie(request);
 
 	status = sme_GetTemperature(WLAN_HDD_GET_HAL_CTX(adapter),
-				&temp_context, hdd_GetTemperatureCB);
+				cookie, hdd_GetTemperatureCB);
 	if (eHAL_STATUS_SUCCESS != status) {
 		  hddLog(VOS_TRACE_LEVEL_ERROR, FL("Unable to get temperature"));
 	} else {
-		  rc = wait_for_completion_timeout(&temp_context.completion,
-				msecs_to_jiffies(1000));
-		  if (!rc) {
-			hddLog(VOS_TRACE_LEVEL_ERROR,
-				FL("SME timed out while getting temperature"));
-			return -EBUSY;
-		  }
+		/* request was sent -- wait for the response */
+		ret = hdd_request_wait_for_response(request);
+		if (ret) {
+			hddLog(VOS_TRACE_LEVEL_WARN,
+			       FL("timeout when get temperature"));
+			/* we'll returned a cached value below */
+		} else {
+			/* update the adapter with the fresh results */
+			priv = hdd_request_priv(request);
+			/* ignore it if this was 0 */
+			if (priv->temperature != 0)
+				adapter->temperature =
+						 priv->temperature;
+		}
 	}
 
-	spin_lock(&hdd_context_lock);
-	temp_context.magic = 0;
-	spin_unlock(&hdd_context_lock);
+	hdd_request_put(request);
 
 	nl_resp = cfg80211_vendor_cmd_alloc_reply_skb(wiphy, 4 + NLMSG_HDRLEN);
 	if (!nl_resp) {
@@ -9846,6 +9873,13 @@ static int __wlan_hdd_cfg80211_do_acs(struct wiphy *wiphy,
 	status = wlan_hdd_validate_context(hdd_ctx);
 	if (0 != status)
 		return status;
+
+	if (!((adapter->device_mode == WLAN_HDD_SOFTAP) ||
+	      (adapter->device_mode == WLAN_HDD_P2P_GO))) {
+		hddLog(LOGE, FL("Invalid device mode %d"),
+		       adapter->device_mode);
+		return -EINVAL;
+	}
 
 	if (hdd_cfg_is_static_sub20_channel_width_enabled(hdd_ctx)) {
 		hddLog(LOGE, FL("ACS not support if static sub20 enable"));
@@ -13692,6 +13726,7 @@ __wlan_hdd_cfg80211_avoid_freq(struct wiphy *wiphy,
 	int unsafe_channel_index;
 	tHddAvoidFreqList *channel_list;
 	tVOS_CON_MODE curr_mode;
+	uint8_t num_args = 0;
 
 	ENTER();
         curr_mode = hdd_get_conparam();
@@ -13705,9 +13740,26 @@ __wlan_hdd_cfg80211_avoid_freq(struct wiphy *wiphy,
 	if (0 != ret)
 		return -EINVAL;
 
-	channel_list = (tHddAvoidFreqList *)data;
-	if (!channel_list) {
+	if (!data || data_len < (sizeof(channel_list->avoidFreqRangeCount) +
+				 sizeof(tHddAvoidFreqRange))) {
 		hddLog(LOGE, FL("Avoid frequency channel list empty"));
+		return -EINVAL;
+	}
+	num_args = (data_len - sizeof(channel_list->avoidFreqRangeCount)) /
+		   sizeof(channel_list->avoidFreqRange[0].startFreq);
+
+	if (num_args < 2 || num_args > HDD_MAX_AVOID_FREQ_RANGES * 2 ||
+	    num_args % 2 != 0) {
+		hddLog(LOGE,FL("Invalid avoid frequency channel list"));
+		return -EINVAL;
+	}
+
+	channel_list = (tHddAvoidFreqList *)data;
+	if (channel_list->avoidFreqRangeCount == 0 ||
+	    channel_list->avoidFreqRangeCount > HDD_MAX_AVOID_FREQ_RANGES ||
+	    2 * channel_list->avoidFreqRangeCount != num_args) {
+		hddLog(VOS_TRACE_LEVEL_ERROR, "Invalid freq range count %d",
+		       channel_list->avoidFreqRangeCount);
 		return -EINVAL;
 	}
 
@@ -17071,6 +17123,16 @@ int wlan_hdd_cfg80211_update_apies(hdd_adapter_t* pHostapdAdapter)
     pConfig = &pHostapdAdapter->sessionCtx.ap.sapConfig;
     pBeacon = pHostapdAdapter->sessionCtx.ap.beacon;
 
+    /* FIx CR2299453 that the pHostapdAdapter->sessionCtx.ap.beacon will be
+     * set NULL during ap stop at function wlan_hdd_cfg80211_stop_ap()
+     * but then received fw indicator 0x6 and trigger driver reset, and then
+     * cause this NULL pointer operation when re-init.
+     */
+    if (pBeacon == NULL) {
+        hddLog(LOGE, FL("Invalid pointer pBeacon = NULL!"));
+        return -EINVAL;
+    }
+
     genie = vos_mem_malloc(MAX_GENIE_LEN);
 
     if(genie == NULL) {
@@ -19099,6 +19161,129 @@ void hdd_update_beacon_rate(hdd_adapter_t *pAdapter, struct wiphy *wiphy,
 
 #if (LINUX_VERSION_CODE > KERNEL_VERSION(3,3,0)) || defined(WITH_BACKPORTS)
 
+static int hdd_config_sub20_channel(hdd_context_t *pHddCtx, uint8_t channel,
+			      uint32_t channel_width)
+{
+	bool channel_support_sub20 = true;
+	tSmeConfigParams *sme_config;
+	uint8_t sub20_config;
+	uint8_t sub20_dyn_channelwidth = 0;
+	uint8_t sub20_static_channelwidth = 0;
+	uint8_t sub20_channelwidth = 0;
+	enum phy_ch_width phy_sub20_channel_width = CH_WIDTH_INVALID;
+
+	sme_config = vos_mem_malloc(sizeof(tSmeConfigParams));
+	if (!sme_config) {
+		hddLog(VOS_TRACE_LEVEL_ERROR,
+		       FL("Can't alloc mem for sme config"));
+		return -EINVAL;
+	}
+	vos_mem_zero(sme_config, sizeof(tSmeConfigParams));
+
+	sme_GetConfigParam(pHddCtx->hHal, sme_config);
+	sub20_config = sme_config->sub20_config_info;
+
+	switch (sub20_config) {
+		case CFG_SUB_20_CHANNEL_WIDTH_5MHZ:
+			sub20_static_channelwidth = SUB20_MODE_5MHZ;
+			break;
+		case CFG_SUB_20_CHANNEL_WIDTH_10MHZ:
+			sub20_static_channelwidth = SUB20_MODE_10MHZ;
+			break;
+		case CFG_SUB_20_CHANNEL_WIDTH_DYN_5MHZ:
+			sub20_dyn_channelwidth = SUB20_MODE_5MHZ;
+			break;
+		case CFG_SUB_20_CHANNEL_WIDTH_DYN_10MHZ:
+			sub20_dyn_channelwidth = SUB20_MODE_10MHZ;
+			break;
+		case CFG_SUB_20_CHANNEL_WIDTH_DYN_ALL:
+			sub20_dyn_channelwidth = SUB20_MODE_5MHZ | SUB20_MODE_10MHZ;
+			break;
+		default:
+			break;
+	}
+
+	if (channel == 0) {
+		hddLog(VOS_TRACE_LEVEL_WARN,
+		       FL("Can't start SAP-ACS with sub20 channel width"));
+		vos_mem_free(sme_config);
+		return -EINVAL;
+	}
+
+	if (CSR_IS_CHANNEL_DFS(channel)) {
+		hddLog(VOS_TRACE_LEVEL_WARN,
+		       FL("Can't start SAP-DFS with sub20 channel width"));
+		vos_mem_free(sme_config);
+		return -EINVAL;
+	}
+
+	if (channel_width != NL80211_CHAN_WIDTH_20 &&
+		channel_width != NL80211_CHAN_WIDTH_20_NOHT) {
+		hddLog(VOS_TRACE_LEVEL_WARN,
+		       FL("Hostapd (20+MHz) conflicts config.ini(sub20)"));
+		vos_mem_free(sme_config);
+		return -EINVAL;
+	}
+
+	switch (sub20_config) {
+	case CFG_SUB_20_CHANNEL_WIDTH_5MHZ:
+	case CFG_SUB_20_CHANNEL_WIDTH_10MHZ:
+	case CFG_SUB_20_CHANNEL_WIDTH_DYN_5MHZ:
+	case CFG_SUB_20_CHANNEL_WIDTH_DYN_10MHZ:
+		sub20_channelwidth = (sub20_static_channelwidth != 0) ?
+		sub20_static_channelwidth : sub20_dyn_channelwidth;
+		phy_sub20_channel_width =
+			(sub20_channelwidth == SUB20_MODE_5MHZ) ?
+				      CH_WIDTH_5MHZ : CH_WIDTH_10MHZ;
+		channel_support_sub20 =
+			vos_is_channel_support_sub20(channel,
+						     phy_sub20_channel_width,
+						     0);
+		if (!channel_support_sub20) {
+			hddLog(VOS_TRACE_LEVEL_ERROR,
+			       FL("ch%dwidth%d unsupport by reg domain"),
+			       channel, phy_sub20_channel_width);
+			vos_mem_free(sme_config);
+			return -EINVAL;
+		}
+		break;
+		case CFG_SUB_20_CHANNEL_WIDTH_DYN_ALL:
+			channel_support_sub20 =
+				vos_is_channel_support_sub20(channel,
+							     CH_WIDTH_5MHZ, 0);
+			if (!channel_support_sub20) {
+				hddLog(VOS_TRACE_LEVEL_ERROR,
+				       FL("ch%dwidth5M unsupport by reg domain"),
+				       channel);
+				sub20_dyn_channelwidth &= ~SUB20_MODE_5MHZ;
+			}
+
+			channel_support_sub20 =
+				vos_is_channel_support_sub20(channel,
+							     CH_WIDTH_10MHZ, 0);
+			if (!channel_support_sub20) {
+				hddLog(VOS_TRACE_LEVEL_ERROR,
+				       FL("ch%dwidth10M unsupport by reg domain"),
+				       channel);
+				sub20_dyn_channelwidth &= ~SUB20_MODE_10MHZ;
+			}
+
+			if (sub20_dyn_channelwidth == 0) {
+				vos_mem_free(sme_config);
+				return -EINVAL;
+			} else {
+				sme_config->sub20_dynamic_channelwidth =
+							sub20_dyn_channelwidth;
+				sme_UpdateConfig(pHddCtx->hHal, sme_config);
+			}
+			break;
+		default:
+			break;
+	}
+	vos_mem_free(sme_config);
+	return 0;
+}
+
 static int __wlan_hdd_cfg80211_start_ap(struct wiphy *wiphy,
                                       struct net_device *dev,
                                       struct cfg80211_ap_settings *params)
@@ -19108,6 +19293,7 @@ static int __wlan_hdd_cfg80211_start_ap(struct wiphy *wiphy,
     uint32_t channel_width;
     hdd_context_t *pHddCtx;
     int            status;
+    int ret = 0;
     ENTER();
 
     clear_bit(SOFTAP_INIT_DONE, &pAdapter->event_flags);
@@ -19149,108 +19335,9 @@ static int __wlan_hdd_cfg80211_start_ap(struct wiphy *wiphy,
 
     /* Avoid ACS/DFS, and overwrite channel width to 20 */
     if (hdd_cfg_is_sub20_channel_width_enabled(pHddCtx)) {
-            bool channel_support_sub20 = true;
-            tSmeConfigParams sme_config;
-            uint8_t sub20_config;
-            uint8_t sub20_dyn_channelwidth = 0;
-            uint8_t sub20_static_channelwidth = 0;
-            uint8_t sub20_channelwidth = 0;
-            enum phy_ch_width phy_sub20_channel_width = CH_WIDTH_INVALID;
-
-            vos_mem_zero(&sme_config, sizeof(sme_config));
-            sme_GetConfigParam(pHddCtx->hHal, &sme_config);
-            sub20_config = sme_config.sub20_config_info;
-
-            switch (sub20_config) {
-            case CFG_SUB_20_CHANNEL_WIDTH_5MHZ:
-                sub20_static_channelwidth = SUB20_MODE_5MHZ;
-                break;
-            case CFG_SUB_20_CHANNEL_WIDTH_10MHZ:
-                sub20_static_channelwidth = SUB20_MODE_10MHZ;
-                break;
-            case CFG_SUB_20_CHANNEL_WIDTH_DYN_5MHZ:
-                sub20_dyn_channelwidth = SUB20_MODE_5MHZ;
-                break;
-            case CFG_SUB_20_CHANNEL_WIDTH_DYN_10MHZ:
-                sub20_dyn_channelwidth = SUB20_MODE_10MHZ;
-                break;
-            case CFG_SUB_20_CHANNEL_WIDTH_DYN_ALL:
-                sub20_dyn_channelwidth = SUB20_MODE_5MHZ | SUB20_MODE_10MHZ;
-                break;
-            default:
-                break;
-            }
-
-            if (channel == 0) {
-                    hddLog(VOS_TRACE_LEVEL_WARN,
-                           FL("Can't start SAP-ACS with sub20 channel width"));
-                    return -EINVAL;
-            }
-
-            if (CSR_IS_CHANNEL_DFS(channel)) {
-                    hddLog(VOS_TRACE_LEVEL_WARN,
-                           FL("Can't start SAP-DFS with sub20 channel width"));
-                    return -EINVAL;
-            }
-
-            if (channel_width != NL80211_CHAN_WIDTH_20 &&
-                channel_width != NL80211_CHAN_WIDTH_20_NOHT) {
-                    hddLog(VOS_TRACE_LEVEL_WARN,
-                           FL("Hostapd (20+MHz) conflicts config.ini(sub20)"));
-                    return -EINVAL;
-            }
-
-            switch (sub20_config) {
-            case CFG_SUB_20_CHANNEL_WIDTH_5MHZ:
-            case CFG_SUB_20_CHANNEL_WIDTH_10MHZ:
-            case CFG_SUB_20_CHANNEL_WIDTH_DYN_5MHZ:
-            case CFG_SUB_20_CHANNEL_WIDTH_DYN_10MHZ:
-                sub20_channelwidth = (sub20_static_channelwidth != 0) ?
-                        sub20_static_channelwidth : sub20_dyn_channelwidth;
-                phy_sub20_channel_width =
-                        (sub20_channelwidth == SUB20_MODE_5MHZ) ?
-                            CH_WIDTH_5MHZ : CH_WIDTH_10MHZ;
-                channel_support_sub20 =
-                        vos_is_channel_support_sub20(channel,
-                                                     phy_sub20_channel_width,
-                                                     0);
-                if (!channel_support_sub20) {
-                        hddLog(VOS_TRACE_LEVEL_ERROR,
-                               FL("ch%dwidth%d unsupport by reg domain"),
-                               channel, phy_sub20_channel_width);
-                        return -EINVAL;
-                }
-                break;
-            case CFG_SUB_20_CHANNEL_WIDTH_DYN_ALL:
-                channel_support_sub20 =
-                    vos_is_channel_support_sub20(channel, CH_WIDTH_5MHZ, 0);
-                if (!channel_support_sub20) {
-                        hddLog(VOS_TRACE_LEVEL_ERROR,
-                               FL("ch%dwidth5M unsupport by reg domain"),
-                               channel);
-                        sub20_dyn_channelwidth &= ~SUB20_MODE_5MHZ;
-                }
-
-                channel_support_sub20 =
-                    vos_is_channel_support_sub20(channel, CH_WIDTH_10MHZ, 0);
-                if (!channel_support_sub20) {
-                        hddLog(VOS_TRACE_LEVEL_ERROR,
-                               FL("ch%dwidth10M unsupport by reg domain"),
-                               channel);
-                        sub20_dyn_channelwidth &= ~SUB20_MODE_10MHZ;
-                }
-
-                if (sub20_dyn_channelwidth == 0) {
-                        return -EINVAL;
-                } else {
-                        sme_config.sub20_dynamic_channelwidth =
-                                 sub20_dyn_channelwidth;
-                        sme_UpdateConfig(pHddCtx->hHal, &sme_config);
-                }
-                break;
-            default:
-                break;
-            }
+        ret = hdd_config_sub20_channel(pHddCtx, channel, channel_width);
+        if (ret)
+            return ret;
     }
 
     if (pAdapter->device_mode == WLAN_HDD_P2P_GO) {
@@ -22485,17 +22572,20 @@ int __wlan_hdd_cfg80211_scan( struct wiphy *wiphy,
             !pHddCtx->last_scan_reject_timestamp) {
             pHddCtx->last_scan_reject_session_id = curr_session_id;
             pHddCtx->last_scan_reject_reason = curr_reason;
-            pHddCtx->last_scan_reject_timestamp =
-              jiffies_to_msecs(jiffies) + SCAN_REJECT_THRESHOLD_TIME;
+            pHddCtx->last_scan_reject_timestamp = jiffies +
+                  msecs_to_jiffies(SCAN_REJECT_THRESHOLD_TIME);
             pHddCtx->scan_reject_cnt = 0;
         } else {
             pHddCtx->scan_reject_cnt++;
             if ((pHddCtx->scan_reject_cnt >=
                SCAN_REJECT_THRESHOLD) &&
-               vos_system_time_after(jiffies_to_msecs(jiffies),
+               vos_system_time_after(jiffies,
                pHddCtx->last_scan_reject_timestamp)) {
-		hddLog(LOGE, FL("scan reject threshold reached Session %d reason %d reject cnt %d"),
-			curr_session_id, curr_reason, pHddCtx->scan_reject_cnt);
+        hddLog(LOGE, FL("scan reject threshold reached Session %d reason %d reject cnt %d reject times tamp %lu jiffies %lu"),
+            curr_session_id, curr_reason,
+            pHddCtx->scan_reject_cnt,
+            pHddCtx->last_scan_reject_timestamp,
+            jiffies);
                 pHddCtx->last_scan_reject_timestamp = 0;
                 pHddCtx->scan_reject_cnt = 0;
                 if (pHddCtx->cfg_ini->enable_fatal_event) {
@@ -22585,7 +22675,8 @@ int __wlan_hdd_cfg80211_scan( struct wiphy *wiphy,
              */
             if((WLAN_HDD_SOFTAP == pAdapter->device_mode) && \
                (pHddCtx->no_of_active_sessions[VOS_STA_SAP_MODE] >= 1) && \
-               (pHddCtx->no_of_open_sessions[VOS_STA_SAP_MODE] > 1)) {
+               (pHddCtx->no_of_open_sessions[VOS_STA_SAP_MODE] > 1) && \
+	       (!cfg_param->keeppassivedwelltime)) {
                 scanRequest.scanType = eSIR_ACTIVE_SCAN;
             }
             else {
@@ -26673,6 +26764,92 @@ static int wlan_hdd_get_station_remote(struct wiphy *wiphy,
 	return status;
 }
 
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 0, 0))
+/*
+ * wlan_hdd_fill_summary_stats() - populate station_info summary stats
+ * @stats: summary stats to use as a source
+ * @info: kernel station_info struct to use as a destination
+ *
+ * Return: None
+ */
+static void wlan_hdd_fill_summary_stats(tCsrSummaryStatsInfo *stats,
+					struct station_info *info)
+{
+	int i;
+
+	info->rx_packets = stats->rx_frm_cnt;
+	info->tx_packets = 0;
+	info->tx_retries = 0;
+	info->tx_failed = 0;
+
+	for (i = 0; i < 4; ++i) {
+		info->tx_packets += stats->tx_frm_cnt[i];
+		info->tx_retries += stats->multiple_retry_cnt[i];
+		info->tx_failed += stats->fail_cnt[i];
+	}
+
+	info->filled |= STATION_INFO_TX_PACKETS |
+			STATION_INFO_TX_RETRIES |
+			STATION_INFO_TX_FAILED |
+			STATION_INFO_RX_PACKETS;
+}
+#else
+/*
+ * wlan_hdd_fill_summary_stats() - populate station_info summary stats
+ * @stats: summary stats to use as a source
+ * @info: kernel station_info struct to use as a destination
+ *
+ * Return: None
+ */
+static void wlan_hdd_fill_summary_stats(tCsrSummaryStatsInfo *stats,
+					struct station_info *info)
+{
+	int i;
+
+	info->rx_packets = stats->rx_frm_cnt;
+	info->tx_packets = 0;
+	info->tx_retries = 0;
+	info->tx_failed = 0;
+
+	for (i = 0; i < 4; ++i) {
+		info->tx_packets += stats->tx_frm_cnt[i];
+		info->tx_retries += stats->multiple_retry_cnt[i];
+		info->tx_failed += stats->fail_cnt[i];
+	}
+
+	info->filled |= BIT(NL80211_STA_INFO_TX_PACKETS) |
+			BIT(NL80211_STA_INFO_TX_RETRIES) |
+			BIT(NL80211_STA_INFO_TX_FAILED) |
+			BIT(NL80211_STA_INFO_RX_PACKETS);
+}
+#endif
+/**
+ * wlan_hdd_get_sap_stats() - get aggregate SAP stats
+ * @adapter: sap adapter to get stats for
+ * @info: kernel station_info struct to populate
+ *
+ * Fetch the vdev-level aggregate stats for the given SAP adapter. This is to
+ * support "station dump" and "station get" for SAP vdevs, even though they
+ * aren't technically stations.
+ *
+ * Return: errno
+ */
+static int
+wlan_hdd_get_sap_stats(hdd_adapter_t *adapter, struct station_info *info)
+{
+	VOS_STATUS status;
+
+	status = wlan_hdd_get_station_stats(adapter);
+	if (!VOS_IS_STATUS_SUCCESS(status)) {
+		hddLog(LOGE, FL("Failed to get SAP stats; status:%d"), status);
+		return 0;
+	}
+
+	wlan_hdd_fill_summary_stats(&adapter->hdd_stats.summary_stat, info);
+
+	return 0;
+}
+
 static int __wlan_hdd_cfg80211_get_station(struct wiphy *wiphy,
                                            struct net_device *dev,
                                            const u8* mac,
@@ -26715,13 +26892,20 @@ static int __wlan_hdd_cfg80211_get_station(struct wiphy *wiphy,
 
     ENTER();
 
+    status = wlan_hdd_validate_context(pHddCtx);
+    if (0 != status)
+        return status;
+
     if (VOS_FTM_MODE == hdd_get_conparam()) {
         hddLog(LOGE, FL("Command not allowed in FTM mode"));
         return -EINVAL;
     }
-    if (pAdapter->device_mode == WLAN_HDD_SOFTAP &&
-		    pCfg->sap_get_peer_info)
-        return wlan_hdd_get_station_remote(wiphy, dev, mac, sinfo);
+    if (pAdapter->device_mode == WLAN_HDD_SOFTAP) {
+        if (pCfg->sap_get_peer_info)
+            return wlan_hdd_get_station_remote(wiphy, dev, mac, sinfo);
+        else
+            return wlan_hdd_get_sap_stats(pAdapter, sinfo);
+    }
 
     if ((eConnectionState_Associated != pHddStaCtx->conn_info.connState) ||
             (0 == ssidlen))
@@ -26743,10 +26927,6 @@ static int __wlan_hdd_cfg80211_get_station(struct wiphy *wiphy,
         sinfo->signal = pAdapter->rssi;
         return 0;
     }
-
-    status = wlan_hdd_validate_context(pHddCtx);
-    if (0 != status)
-        return status;
 
     wlan_hdd_get_rssi(pAdapter, &sinfo->signal);
     wlan_hdd_get_snr(pAdapter, &snr);
@@ -27098,15 +27278,13 @@ static int __wlan_hdd_cfg80211_get_station(struct wiphy *wiphy,
                 sinfo->txrate.flags |= RATE_INFO_FLAGS_40_MHZ_WIDTH;
 #endif
             }
-            else if (rate_flags & eHAL_TX_RATE_VHT20)
+            else
             {
                 sinfo->txrate.flags |= RATE_INFO_FLAGS_VHT_MCS;
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 0, 0))
                 sinfo->txrate.bw = RATE_INFO_BW_20;
 #endif
             }
-            else
-                sinfo->txrate.flags |= RATE_INFO_FLAGS_VHT_MCS;
 #endif /* WLAN_FEATURE_11AC */
             if (rate_flags & (eHAL_TX_RATE_HT20 | eHAL_TX_RATE_HT40))
             {
@@ -27159,6 +27337,9 @@ static int __wlan_hdd_cfg80211_get_station(struct wiphy *wiphy,
 #ifdef WLAN_FEATURE_11AC
             sinfo->txrate.nss = nss;
             sinfo->txrate.flags |= RATE_INFO_FLAGS_VHT_MCS;
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 0, 0))
+            sinfo->txrate.bw = RATE_INFO_BW_20;
+#endif
             if (rate_flags & eHAL_TX_RATE_VHT80)
             {
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 0, 0))
@@ -30673,7 +30854,8 @@ static int wlan_hdd_thermal_resume(hdd_context_t *pHddCtx, bool thermal)
 	}
 
 	/* send auto shutdown timer val 1 to fw as resume */
-	sme_set_auto_shutdown_timer(pHddCtx->hHal, 1);
+	if (thermal)
+		sme_set_auto_shutdown_timer(pHddCtx->hHal, 1);
 
 	return 0;
 }
@@ -30839,18 +31021,12 @@ static bool wlan_hdd_is_thermal_suspended(hdd_context_t *pHddCtx)
 	}
 	return false;
 }
-
-static VOS_STATUS wlan_hdd_suspend_mc_thread(pVosSchedContext vosSchedCtx,
-					hdd_context_t *pHddCtx)
-{
-	return VOS_STATUS_SUCCESS;
-}
 #else
 static bool wlan_hdd_is_thermal_suspended(hdd_context_t *pHddCtx)
 {
 	return false;
 }
-
+#endif
 static VOS_STATUS wlan_hdd_suspend_mc_thread(pVosSchedContext vosSchedCtx,
 					hdd_context_t *pHddCtx)
 {
@@ -30875,7 +31051,6 @@ static VOS_STATUS wlan_hdd_suspend_mc_thread(pVosSchedContext vosSchedCtx,
 	return VOS_STATUS_SUCCESS;
 }
 
-#endif
 /*
  * FUNCTION: __wlan_hdd_cfg80211_suspend_wlan
  * this is called when cfg80211 driver suspends
@@ -31025,11 +31200,14 @@ int __wlan_hdd_cfg80211_suspend_wlan(struct wiphy *wiphy,
        goto resume_tx;
     }
 
-    /* Suspend MC thread */
-    status = wlan_hdd_suspend_mc_thread(vosSchedContext, pHddCtx);
-    if (VOS_STATUS_SUCCESS != status)
-        goto resume_tx;
-
+    /* Suspend MC thread. In thermal suspend, MC thread should be alive
+     * to receive FW temperature data and compare to the threshold for resume.
+     */
+    if (!thermal) {
+        status = wlan_hdd_suspend_mc_thread(vosSchedContext, pHddCtx);
+        if (VOS_STATUS_SUCCESS != status)
+            goto resume_tx;
+    }
 #ifdef QCA_CONFIG_SMP
     /* Suspend tlshim rx thread */
     set_bit(RX_SUSPEND_EVENT, &vosSchedContext->tlshimRxEvtFlg);
@@ -31844,7 +32022,9 @@ wlan_hdd_cfg80211_extscan_signif_wifi_change_results_ind(
         for (j = 0; j < ap_info->numOfRssi; j++)
             hddLog(LOG1, "Rssi %d", *rssi++);
 
-        ap_info += ap_info->numOfRssi * sizeof(*rssi);
+        ap_info = (tSirWifiSignificantChange *)((char *)ap_info +
+                    ap_info->numOfRssi * sizeof(*rssi) +
+                    sizeof(*ap_info));
     }
 
     if (nla_put_u32(skb, QCA_WLAN_VENDOR_ATTR_EXTSCAN_RESULTS_REQUEST_ID,
@@ -31887,7 +32067,9 @@ wlan_hdd_cfg80211_extscan_signif_wifi_change_results_ind(
 
               nla_nest_end(skb, ap);
 
-            ap_info += ap_info->numOfRssi * sizeof(*rssi);
+            ap_info = (tSirWifiSignificantChange *)((char *)ap_info +
+                      ap_info->numOfRssi * sizeof(*rssi) +
+                      sizeof(*ap_info));
         }
         nla_nest_end(skb, aps);
 

@@ -398,10 +398,9 @@ typedef struct tagCsrEseCckmInfo
 #endif
 
 #if defined(FEATURE_WLAN_ESE) && defined(FEATURE_WLAN_ESE_UPLOAD)
-#define CSR_DOT11F_IE_RSN_MAX_LEN   (114)  /*TODO: duplicate one in dot11f.h */
 typedef struct tagCsrEseCckmIe
 {
-    tANI_U8 cckmIe[CSR_DOT11F_IE_RSN_MAX_LEN];
+    tANI_U8 cckmIe[DOT11F_IE_RSN_MAX_LEN];
     tANI_U8 cckmIeLen;
 } tCsrEseCckmIe;
 #endif /* FEATURE_WLAN_ESE && FEATURE_WLAN_ESE_UPLOAD */
@@ -565,6 +564,7 @@ typedef enum
     // Channel sw update notification
     eCSR_ROAM_DFS_CHAN_SW_NOTIFY,
     eCSR_ROAM_EXT_CHG_CHNL_IND,
+    eCSR_ROAM_STA_CHANNEL_SWITCH,
 
     eCSR_ROAM_NDP_STATUS_UPDATE,
     eCSR_ROAM_UPDATE_SCAN_RESULT,
@@ -1420,6 +1420,7 @@ typedef struct tagCsrConfigParam
 #ifdef WLAN_FEATURE_SAP_TO_FOLLOW_STA_CHAN
     tANI_U32    sap_ch_switch_with_csa;
 #endif//#ifdef WLAN_FEATURE_SAP_TO_FOLLOW_STA_CHAN
+    bool enable_bcast_probe_rsp;
 }tCsrConfigParam;
 
 //Tush
