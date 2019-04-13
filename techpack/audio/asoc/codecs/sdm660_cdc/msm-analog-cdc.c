@@ -581,10 +581,18 @@ static void msm_anlg_cdc_mbhc_internal_micbias_ctrl(struct snd_soc_codec *codec,
 						    bool enable)
 {
 	if (micbias_num == 1) {
-		if (enable)
+		if (enable) {
+#if defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
+			if (xiaomi_series_read() == XIAOMI_SERIES_LANDTONI) {
+			snd_soc_update_bits(codec,
+				MSM89XX_PMIC_ANALOG_MICB_1_INT_RBIAS,
+				0x18, 0x18);
+			} else
+#endif
 			snd_soc_update_bits(codec,
 				MSM89XX_PMIC_ANALOG_MICB_1_INT_RBIAS,
 				0x10, 0x10);
+		}
 		else
 			snd_soc_update_bits(codec,
 				MSM89XX_PMIC_ANALOG_MICB_1_INT_RBIAS,
@@ -4790,6 +4798,12 @@ static int msm_anlg_cdc_probe(struct platform_device *pdev)
 	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA) {
 		micbias_default_val = 2400000;
 		spkr_boost_en = false;
+	}
+#endif
+
+#if defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
+	if (xiaomi_series_read() == XIAOMI_SERIES_LANDTONI) {
+		micbias_default_val = 2700000;
 	}
 #endif
 

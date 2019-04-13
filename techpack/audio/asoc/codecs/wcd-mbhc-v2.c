@@ -323,8 +323,8 @@ out_micb_en:
 			wcd_enable_curr_micbias(mbhc, WCD_MBHC_EN_PULLUP);
 		else
 			/* enable current source and disable mb, pullup*/
-#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
-			if (xiaomi_series_read() == XIAOMI_SERIES_ROVA)
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE) || defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
+			if (xiaomi_series_read() == XIAOMI_SERIES_ROVA || xiaomi_series_read() == XIAOMI_SERIES_LANDTONI)
 				wcd_enable_curr_micbias(mbhc, WCD_MBHC_EN_MB);
 			else
 #endif
@@ -354,8 +354,8 @@ out_micb_en:
 			wcd_enable_curr_micbias(mbhc, WCD_MBHC_EN_MB);
 		else
 			/* Disable micbias, pullup & enable cs */
-#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
-	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA)
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE) || defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
+	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA || xiaomi_series_read() == XIAOMI_SERIES_LANDTONI)
 		wcd_enable_curr_micbias(mbhc, WCD_MBHC_EN_MB);
 	else
 #endif
@@ -377,8 +377,8 @@ out_micb_en:
 			wcd_enable_curr_micbias(mbhc, WCD_MBHC_EN_MB);
 		else
 			/* Disable micbias, pullup & enable cs */
-#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
-	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA)
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE) || defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
+	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA || xiaomi_series_read() == XIAOMI_SERIES_LANDTONI)
 		wcd_enable_curr_micbias(mbhc, WCD_MBHC_EN_MB);
 	else
 #endif
@@ -1218,6 +1218,7 @@ static irqreturn_t wcd_mbhc_btn_press_handler(int irq, void *data)
 	struct wcd_mbhc *mbhc = data;
 	int mask;
 	unsigned long msec_val;
+	int val = 400;
 
 	pr_debug("%s: enter\n", __func__);
 	complete(&mbhc->btn_press_compl);
@@ -1253,8 +1254,14 @@ static irqreturn_t wcd_mbhc_btn_press_handler(int irq, void *data)
 	}
 	mbhc->buttons_pressed |= mask;
 	mbhc->mbhc_cb->lock_sleep(mbhc, true);
+
+#if defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
+	if (xiaomi_series_read() == XIAOMI_SERIES_LANDTONI)
+		val = 500;
+#endif
+
 	if (schedule_delayed_work(&mbhc->mbhc_btn_dwork,
-				msecs_to_jiffies(400)) == 0) {
+				msecs_to_jiffies(val)) == 0) {
 		WARN(1, "Button pressed twice without release event\n");
 		mbhc->mbhc_cb->lock_sleep(mbhc, false);
 	}
@@ -1452,10 +1459,22 @@ static int wcd_mbhc_initialise(struct wcd_mbhc *mbhc)
 		/* Insertion debounce set to 48ms */
 		WCD_MBHC_REG_UPDATE_BITS(WCD_MBHC_INSREM_DBNC, 4);
 	} else {
+#if defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
+		if (xiaomi_series_read() == XIAOMI_SERIES_LANDTONI) {
+		/* Insertion debounce set to 256ms */
+		WCD_MBHC_REG_UPDATE_BITS(WCD_MBHC_INSREM_DBNC, 9);
+		} else
+#endif
 		/* Insertion debounce set to 96ms */
 		WCD_MBHC_REG_UPDATE_BITS(WCD_MBHC_INSREM_DBNC, 6);
 	}
 
+#if defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
+	if (xiaomi_series_read() == XIAOMI_SERIES_LANDTONI) {
+	/* Button Debounce set to 32ms */
+	WCD_MBHC_REG_UPDATE_BITS(WCD_MBHC_BTN_DBNC, 3);
+	} else
+#endif
 	/* Button Debounce set to 16ms */
 	WCD_MBHC_REG_UPDATE_BITS(WCD_MBHC_BTN_DBNC, 2);
 

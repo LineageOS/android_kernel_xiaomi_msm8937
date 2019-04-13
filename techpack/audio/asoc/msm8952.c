@@ -42,9 +42,18 @@ extern int xiaomi_series_read(void);
 #endif
 
 #define DRV_NAME "msm8952-asoc-wcd"
+#if defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
+#define LANDTONI_AW8738_MODE 5
+#endif
 
 #define MSM_INT_DIGITAL_CODEC "msm-dig-codec"
 #define PMIC_INT_ANALOG_CODEC "analog-codec"
+
+#if defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
+#define LANDTONI_EXT_CLASS_D_EN_DELAY 13000
+#define LANDTONI_EXT_CLASS_D_DIS_DELAY 3000
+#define LANDTONI_EXT_CLASS_D_DELAY_DELTA 2000
+#endif
 
 #if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
 #define ROVA_AW8736_MODE 3
@@ -85,6 +94,15 @@ static struct snd_info_entry *codec_root;
 #if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
 static int rova_headset_gpio;
 static int rova_spk_pa_gpio;
+#endif
+
+#if defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
+static int landtoni_headset_gpio;
+static int landtoni_spk_pa_gpio;
+
+static struct delayed_work landtoni_lineout_amp_enable;
+static struct delayed_work landtoni_lineout_amp_dualmode;
+static struct delayed_work landtoni_lineout_hs_sw_enable;
 #endif
 
 static int msm8952_enable_dig_cdc_clk(struct snd_soc_codec *codec, int enable,
@@ -165,9 +183,9 @@ static const char *const vi_feed_ch_text[] = {"One", "Two"};
 static char const *mi2s_rx_sample_rate_text[] = {"KHZ_48",
 					"KHZ_96", "KHZ_192"};
 
-#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
-static const char *const rova_lineout_text[] = {"DISABLE", "ENABLE", "DUALMODE"};
-static const char *const rova_hs_amp_text[] = {"DISABLE", "ENABLE"};
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE) || defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
+static const char *const rova_landtoni_lineout_text[] = {"DISABLE", "ENABLE", "DUALMODE"};
+static const char *const rova_landtoni_hs_amp_text[] = {"DISABLE", "ENABLE"};
 #endif
 
 #ifdef CONFIG_MACH_XIAOMI_ULYSSE
@@ -1073,6 +1091,138 @@ exit:
 }
 #endif
 
+#if defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
+static void landtoni_msm8952_ext_hs_control(u32 enable)
+{
+
+	gpio_direction_output(landtoni_headset_gpio, enable);
+	pr_err("%s: %s [zjm]  headset 111PAs.\n", __func__,
+	  enable ? "Enable" : "Disable");
+}
+
+static void landtoni_msm8952_ext_hs_delay_enable(struct work_struct *work)
+{
+
+	gpio_direction_output(landtoni_headset_gpio, true);
+	pr_err("%s:  [zjm]  headset 111PAs.\n", __func__);
+}
+
+static void landtoni_msm8952_ext_spk_control(u32 enable)
+{
+	int i = 0;
+
+	if (enable) {
+		/* Open external audio PA device */
+		for (i = 0; i < LANDTONI_AW8738_MODE; i++) {
+			gpio_direction_output(landtoni_spk_pa_gpio, false);
+			gpio_direction_output(landtoni_spk_pa_gpio, true);
+		}
+		usleep_range(LANDTONI_EXT_CLASS_D_EN_DELAY,
+		LANDTONI_EXT_CLASS_D_EN_DELAY + LANDTONI_EXT_CLASS_D_DELAY_DELTA);
+	} else {
+		gpio_direction_output(landtoni_spk_pa_gpio, false);
+		/* time takes disable the external power amplifier */
+		usleep_range(LANDTONI_EXT_CLASS_D_DIS_DELAY,
+		LANDTONI_EXT_CLASS_D_DIS_DELAY + LANDTONI_EXT_CLASS_D_DELAY_DELTA);
+	}
+
+	pr_err("%s: %s [hjf]  external speaker 222PAs.\n", __func__,
+		enable ? "Enable" : "Disable");
+}
+
+static void landtoni_msm8952_ext_spk__delayed_enable(struct work_struct *work)
+{
+	int i = 0;
+
+	/* Open external audio PA device */
+	for (i = 0; i < LANDTONI_AW8738_MODE; i++) {
+		gpio_direction_output(landtoni_spk_pa_gpio, false);
+		gpio_direction_output(landtoni_spk_pa_gpio, true);
+	}
+	usleep_range(LANDTONI_EXT_CLASS_D_EN_DELAY,
+	LANDTONI_EXT_CLASS_D_EN_DELAY + LANDTONI_EXT_CLASS_D_DELAY_DELTA);
+
+	pr_err("%s:  [hjf]  external speaker enable.\n", __func__);
+}
+
+static void landtoni_msm8x16_ext_spk_delayed_dualmode(struct work_struct *work)
+{
+	int i = 0;
+
+	/* Open the headset device */
+	gpio_direction_output(landtoni_headset_gpio, true);
+	usleep_range(LANDTONI_EXT_CLASS_D_EN_DELAY,
+		LANDTONI_EXT_CLASS_D_EN_DELAY + LANDTONI_EXT_CLASS_D_DELAY_DELTA);
+
+	for (i = 0; i < LANDTONI_AW8738_MODE; i++) {
+		gpio_direction_output(landtoni_spk_pa_gpio, false);
+		gpio_direction_output(landtoni_spk_pa_gpio, true);
+	}
+	usleep_range(LANDTONI_EXT_CLASS_D_EN_DELAY,
+		LANDTONI_EXT_CLASS_D_EN_DELAY + LANDTONI_EXT_CLASS_D_DELAY_DELTA);
+
+	pr_debug("%s: Enable external speaker PAs dualmode.\n", __func__);
+}
+
+static int landtoni_headset_status_get(struct snd_kcontrol *kcontrol,
+	struct snd_ctl_elem_value *ucontrol)
+{
+	pr_err("%s: [hjf] get1111\n", __func__);
+	return 0;
+}
+
+static int landtoni_headset_status_put(struct snd_kcontrol *kcontrol,
+	struct snd_ctl_elem_value *ucontrol)
+{
+	int state = 0;
+	state = ucontrol->value.integer.value[0];
+	pr_err("%s: [hjf]  external speaker PAAA mode:%d\n", __func__, state);
+
+	switch (state) {
+	case 1:
+		schedule_delayed_work(&landtoni_lineout_hs_sw_enable, msecs_to_jiffies(50));
+		break;
+	case 0:
+		landtoni_msm8952_ext_hs_control(0);
+		break;
+	default:
+		pr_err("%s: [hjf]  Unexpected input value\n", __func__);
+		break;
+	}
+	return 0;
+}
+
+static int landtoni_lineout_status_get(struct snd_kcontrol *kcontrol,
+	struct snd_ctl_elem_value *ucontrol)
+{
+	pr_err("%s: [hjf] get222\n", __func__);
+	return 0;
+}
+static int landtoni_lineout_status_put(struct snd_kcontrol *kcontrol,
+	struct snd_ctl_elem_value *ucontrol)
+{
+	int state = 0;
+	state = ucontrol->value.integer.value[0];
+	pr_err("%s: [hjf]  external speaker PA mode:%d\n", __func__, state);
+
+	switch (state) {
+	case 1:
+		schedule_delayed_work(&landtoni_lineout_amp_enable, msecs_to_jiffies(50));
+		break;
+	case 0:
+		landtoni_msm8952_ext_spk_control(0);
+		break;
+	case 2:
+		schedule_delayed_work(&landtoni_lineout_amp_dualmode, msecs_to_jiffies(50));
+		break;
+	default:
+		pr_err("%s: [hjf]  Unexpected input value\n", __func__);
+		break;
+	}
+	return 0;
+}
+#endif
+
 static int msm_btsco_rate_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
@@ -1353,11 +1503,65 @@ static const struct soc_enum msm_snd_enum[] = {
 				vi_feed_ch_text),
 	SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(mi2s_rx_sample_rate_text),
 				mi2s_rx_sample_rate_text),
-#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
-	SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(rova_lineout_text), rova_lineout_text),
-	SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(rova_hs_amp_text), rova_hs_amp_text),
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE) || defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
+	SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(rova_landtoni_lineout_text), rova_landtoni_lineout_text),
+	SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(rova_landtoni_hs_amp_text), rova_landtoni_hs_amp_text),
 #endif
 };
+
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE) || defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
+static int rova_landtoni_lineout_status_get(struct snd_kcontrol *kcontrol,
+	struct snd_ctl_elem_value *ucontrol)
+{
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
+	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA)
+		return rova_lineout_status_get(kcontrol,ucontrol);
+#endif
+#if defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
+	if (xiaomi_series_read() == XIAOMI_SERIES_LANDTONI)
+		return landtoni_lineout_status_get(kcontrol,ucontrol);
+#endif
+}
+
+static int rova_landtoni_lineout_status_put(struct snd_kcontrol *kcontrol,
+	struct snd_ctl_elem_value *ucontrol)
+{
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
+	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA)
+		return rova_lineout_status_put(kcontrol,ucontrol);
+#endif
+#if defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
+	if (xiaomi_series_read() == XIAOMI_SERIES_LANDTONI)
+		return landtoni_lineout_status_put(kcontrol,ucontrol);
+#endif
+}
+
+static int rova_landtoni_headset_status_get(struct snd_kcontrol *kcontrol,
+	struct snd_ctl_elem_value *ucontrol)
+{
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
+	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA)
+		return rova_headset_status_get(kcontrol,ucontrol);
+#endif
+#if defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
+	if (xiaomi_series_read() == XIAOMI_SERIES_LANDTONI)
+		return landtoni_headset_status_get(kcontrol,ucontrol);
+#endif
+}
+
+static int rova_landtoni_headset_status_put(struct snd_kcontrol *kcontrol,
+	struct snd_ctl_elem_value *ucontrol)
+{
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
+	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA)
+		return rova_headset_status_put(kcontrol,ucontrol);
+#endif
+#if defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
+	if (xiaomi_series_read() == XIAOMI_SERIES_LANDTONI)
+		return landtoni_headset_status_put(kcontrol,ucontrol);
+#endif
+}
+#endif
 
 static const struct snd_kcontrol_new msm_snd_controls[] = {
 	SOC_ENUM_EXT("MI2S_RX Format", msm_snd_enum[0],
@@ -1376,11 +1580,11 @@ static const struct snd_kcontrol_new msm_snd_controls[] = {
 			msm_vi_feed_tx_ch_get, msm_vi_feed_tx_ch_put),
 	SOC_ENUM_EXT("MI2S_RX SampleRate", msm_snd_enum[6],
 			mi2s_rx_sample_rate_get, mi2s_rx_sample_rate_put),
-#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE) || defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
 	SOC_ENUM_EXT("Lineout_1 amp", msm_snd_enum[7],
-    			rova_lineout_status_get, rova_lineout_status_put),
+				rova_landtoni_lineout_status_get, rova_landtoni_lineout_status_put),
 	SOC_ENUM_EXT("headset amp", msm_snd_enum[8],
-    			rova_headset_status_get, rova_headset_status_put),
+				rova_landtoni_headset_status_get, rova_landtoni_headset_status_put),
 #endif
 };
 
@@ -1828,8 +2032,8 @@ static void *def_msm8952_wcd_mbhc_cal(void)
 		return NULL;
 
 #define S(X, Y) ((WCD_MBHC_CAL_PLUG_TYPE_PTR(msm8952_wcd_cal)->X) = (Y))
-#ifdef CONFIG_MACH_XIAOMI_ULYSSE
-	if (xiaomi_series_read() == XIAOMI_SERIES_ULYSSE) {
+#if defined(CONFIG_MACH_XIAOMI_ULYSSE) || defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
+	if (xiaomi_series_read() == XIAOMI_SERIES_ULYSSE || xiaomi_series_read() == XIAOMI_SERIES_LANDTONI) {
 		S(v_hs_max, 1600);		/*increase vref for more headphone compatibility*/
 	} else
 #endif
@@ -1885,8 +2089,8 @@ static void *def_msm8952_wcd_mbhc_cal(void)
 	}
 #endif
 
-#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
-	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA) {
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE) || defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
+	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA || xiaomi_series_read() == XIAOMI_SERIES_LANDTONI) {
 		btn_low[0] = 25;
 		btn_high[0] = 75;
 		btn_low[1] = 200;
@@ -1948,6 +2152,17 @@ static int msm_audrx_init(struct snd_soc_pcm_runtime *rtd)
 			return ret;
 		}
 	}
+
+#if defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
+	if (xiaomi_series_read() == XIAOMI_SERIES_LANDTONI) {
+		INIT_DELAYED_WORK(&landtoni_lineout_amp_enable, landtoni_msm8952_ext_spk__delayed_enable);
+
+		INIT_DELAYED_WORK(&landtoni_lineout_amp_dualmode, landtoni_msm8x16_ext_spk_delayed_dualmode);
+
+		INIT_DELAYED_WORK(&landtoni_lineout_hs_sw_enable, landtoni_msm8952_ext_hs_delay_enable);
+	}
+#endif
+
 	card = rtd->card->snd_card;
 	if (!codec_root)
 		codec_root = snd_info_create_subdir(card->module, "codecs",
@@ -3477,8 +3692,8 @@ static int msm8952_asoc_machine_probe(struct platform_device *pdev)
 	}
 #endif
 
-#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
-	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA) {
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE) || defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
+	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA || xiaomi_series_read() == XIAOMI_SERIES_LANDTONI) {
 		mbhc_cfg.key_code[1] = 251; /* KEY_PREVIOUSSONG_NEW */
 		mbhc_cfg.key_code[2] = 250; /* KEY_NEXTSONG_NEW */
 		mbhc_cfg.key_code[3] = KEY_VOICECOMMAND;
@@ -3588,6 +3803,31 @@ parse_mclk_freq:
 			}
 		}
 		pr_debug("%s:request rova_headset_gpio is %d!\n", __func__, rova_headset_gpio);
+	}
+#endif
+#if defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
+	if (xiaomi_series_read() == XIAOMI_SERIES_LANDTONI) {
+		landtoni_spk_pa_gpio = of_get_named_gpio(pdev->dev.of_node, "ext-spk-amp-gpio", 0);
+		if (landtoni_spk_pa_gpio < 0) {
+			dev_err(&pdev->dev,
+			"%s: error! landtoni_spk_pa_gpio is :%d\n", __func__, landtoni_spk_pa_gpio);
+		} else {
+			if (gpio_request_one(landtoni_spk_pa_gpio, GPIOF_DIR_OUT, "spk_enable")) {
+				pr_err("%s: request landtoni_spk_pa_gpio  fail!\n", __func__);
+			}
+		}
+		pr_err("%s: [hjf] request landtoni_spk_pa_gpio is %d!\n", __func__, landtoni_spk_pa_gpio);
+
+		landtoni_headset_gpio = of_get_named_gpio(pdev->dev.of_node, "headset-gpio", 0);
+		if (landtoni_headset_gpio < 0) {
+			dev_err(&pdev->dev,
+			"%s: error! landtoni_headset_gpio is :%d\n", __func__, landtoni_headset_gpio);
+		} else {
+			if (gpio_request_one(landtoni_headset_gpio, GPIOF_DIR_OUT, "headset_enable")) {
+				pr_err("%s: request landtoni_headset_gpio fail!\n", __func__);
+			}
+		}
+		pr_err("%s: [hjf] request landtoni_headset_gpio is %d!\n", __func__, landtoni_headset_gpio);
 	}
 #endif
 	/*reading the gpio configurations from dtsi file*/
