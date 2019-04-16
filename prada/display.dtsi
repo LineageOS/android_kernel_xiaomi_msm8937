@@ -9,4 +9,5 @@
 &wled {
 	/delete-property/ qcom,en-ext-pfet-sc-pro;
 	qcom,en-cabc;
+	qcom,wled-stepper-en;
 };
