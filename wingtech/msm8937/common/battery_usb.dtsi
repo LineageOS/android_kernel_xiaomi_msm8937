@@ -13,7 +13,7 @@
 	qcom,fg-cc-cv-threshold-mv = <4390>;
 	qcom,fg-delta-soc = <1>;
 	qcom,hold-soc-while-full;
-	qcom,resume-soc = <99>;
+	qcom,resume-soc-raw = <254>;
 	qcom,warm-bat-decidegc = <450>;
 	qcom,warm-bat-india-decidegc = <500>;
 };

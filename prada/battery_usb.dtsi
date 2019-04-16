@@ -22,6 +22,6 @@
 	qcom,fg-vbat-estimate-diff-mv = <200>;
 	qcom,hold-soc-while-full;
 	qcom,hot-bat-decidegc = <600>;
-	qcom,resume-soc = <99>;
+	qcom,resume-soc-raw = <254>;
 	qcom,warm-bat-decidegc = <450>;
 };
