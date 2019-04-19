@@ -19,6 +19,10 @@ ifeq ($(CONFIG_MACH_XIAOMI_TIARE), y)
 CONFIG_SND_SOC_AW87329=y
 export
 endif
+ifeq ($(CONFIG_MACH_XIAOMI_SANTONI), y)
+CONFIG_SND_SOC_AW87319=y
+export
+endif
 
 # Use USERINCLUDE when you must reference the UAPI directories only.
 USERINCLUDE     += \
