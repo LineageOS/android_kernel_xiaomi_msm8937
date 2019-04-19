@@ -33,12 +33,22 @@
 #include "msm8952.h"
 
 #ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_device.h>
+extern int xiaomi_device_read(void);
+#endif
+
+#ifdef CONFIG_MACH_XIAOMI
 #include <linux/xiaomi_series.h>
 extern int xiaomi_series_read(void);
 #endif
 
 #ifdef CONFIG_MACH_XIAOMI_ULYSSE
 #include <linux/sched.h>
+#endif
+
+#if defined(CONFIG_MACH_XIAOMI_SANTONI) && defined(CONFIG_SND_SOC_AW87319)
+extern unsigned char AW87319_Audio_Speaker(void);
+extern unsigned char AW87319_Audio_OFF(void);
 #endif
 
 #define DRV_NAME "msm8952-asoc-wcd"
@@ -402,16 +412,28 @@ static int enable_spk_ext_pa(struct snd_soc_codec *codec, int enable)
 	struct msm_asoc_mach_data *pdata = snd_soc_card_get_drvdata(card);
 	int ret;
 
+#if defined(CONFIG_MACH_XIAOMI_SANTONI) && defined(CONFIG_SND_SOC_AW87319)
+	if (xiaomi_device_read() != XIAOMI_DEVICE_SANTONI) {
+#endif
 	if (!gpio_is_valid(pdata->spk_ext_pa_gpio)) {
 		pr_err("%s: Invalid gpio: %d\n", __func__,
 			pdata->spk_ext_pa_gpio);
 		return false;
 	}
 
+#if defined(CONFIG_MACH_XIAOMI_SANTONI) && defined(CONFIG_SND_SOC_AW87319)
+	}
+#endif
+
 	pr_debug("%s: %s external speaker PA\n", __func__,
 		enable ? "Enable" : "Disable");
 
 	if (enable) {
+#if defined(CONFIG_MACH_XIAOMI_SANTONI) && defined(CONFIG_SND_SOC_AW87319)
+	if (xiaomi_device_read() == XIAOMI_DEVICE_SANTONI)
+		AW87319_Audio_Speaker();
+	else {
+#endif
 #if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
 		if (xiaomi_series_read() == XIAOMI_SERIES_ROVA) {
 			pr_debug("%s spk pa mode %d\n", __func__, ROVA_AW8736_MODE);
@@ -432,7 +454,15 @@ static int enable_spk_ext_pa(struct snd_soc_codec *codec, int enable)
 #if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
 		}
 #endif
+#if defined(CONFIG_MACH_XIAOMI_SANTONI) && defined(CONFIG_SND_SOC_AW87319)
+	}
+#endif
 	} else {
+#if defined(CONFIG_MACH_XIAOMI_SANTONI) && defined(CONFIG_SND_SOC_AW87319)
+	if (xiaomi_device_read() == XIAOMI_DEVICE_SANTONI)
+		AW87319_Audio_OFF();
+	else {
+#endif
 #if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
 		if (xiaomi_series_read() == XIAOMI_SERIES_ROVA) {
 			gpio_direction_output(pdata->spk_ext_pa_gpio, false);
@@ -451,6 +481,9 @@ static int enable_spk_ext_pa(struct snd_soc_codec *codec, int enable)
 		}
 #if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
 		}
+#endif
+#if defined(CONFIG_MACH_XIAOMI_SANTONI) && defined(CONFIG_SND_SOC_AW87319)
+	}
 #endif
 	}
 	return 0;
@@ -1113,17 +1146,33 @@ static void landtoni_msm8952_ext_spk_control(u32 enable)
 
 	if (enable) {
 		/* Open external audio PA device */
+#if defined(CONFIG_MACH_XIAOMI_SANTONI) && defined(CONFIG_SND_SOC_AW87319)
+	if (xiaomi_device_read() == XIAOMI_DEVICE_SANTONI)
+		AW87319_Audio_Speaker();
+	else {
+#endif
 		for (i = 0; i < LANDTONI_AW8738_MODE; i++) {
 			gpio_direction_output(landtoni_spk_pa_gpio, false);
 			gpio_direction_output(landtoni_spk_pa_gpio, true);
 		}
 		usleep_range(LANDTONI_EXT_CLASS_D_EN_DELAY,
 		LANDTONI_EXT_CLASS_D_EN_DELAY + LANDTONI_EXT_CLASS_D_DELAY_DELTA);
+#if defined(CONFIG_MACH_XIAOMI_SANTONI) && defined(CONFIG_SND_SOC_AW87319)
+	}
+#endif
 	} else {
+#if defined(CONFIG_MACH_XIAOMI_SANTONI) && defined(CONFIG_SND_SOC_AW87319)
+	if (xiaomi_device_read() == XIAOMI_DEVICE_SANTONI)
+		AW87319_Audio_OFF();
+	else {
+#endif
 		gpio_direction_output(landtoni_spk_pa_gpio, false);
 		/* time takes disable the external power amplifier */
 		usleep_range(LANDTONI_EXT_CLASS_D_DIS_DELAY,
 		LANDTONI_EXT_CLASS_D_DIS_DELAY + LANDTONI_EXT_CLASS_D_DELAY_DELTA);
+#if defined(CONFIG_MACH_XIAOMI_SANTONI) && defined(CONFIG_SND_SOC_AW87319)
+	}
+#endif
 	}
 
 	pr_err("%s: %s [hjf]  external speaker 222PAs.\n", __func__,
@@ -1134,6 +1183,12 @@ static void landtoni_msm8952_ext_spk__delayed_enable(struct work_struct *work)
 {
 	int i = 0;
 
+#if defined(CONFIG_MACH_XIAOMI_SANTONI) && defined(CONFIG_SND_SOC_AW87319)
+	if (xiaomi_device_read() == XIAOMI_DEVICE_SANTONI)
+		AW87319_Audio_Speaker();
+	else {
+#endif
+
 	/* Open external audio PA device */
 	for (i = 0; i < LANDTONI_AW8738_MODE; i++) {
 		gpio_direction_output(landtoni_spk_pa_gpio, false);
@@ -1141,6 +1196,10 @@ static void landtoni_msm8952_ext_spk__delayed_enable(struct work_struct *work)
 	}
 	usleep_range(LANDTONI_EXT_CLASS_D_EN_DELAY,
 	LANDTONI_EXT_CLASS_D_EN_DELAY + LANDTONI_EXT_CLASS_D_DELAY_DELTA);
+
+#if defined(CONFIG_MACH_XIAOMI_SANTONI) && defined(CONFIG_SND_SOC_AW87319)
+	}
+#endif
 
 	pr_err("%s:  [hjf]  external speaker enable.\n", __func__);
 }
@@ -1154,12 +1213,22 @@ static void landtoni_msm8x16_ext_spk_delayed_dualmode(struct work_struct *work)
 	usleep_range(LANDTONI_EXT_CLASS_D_EN_DELAY,
 		LANDTONI_EXT_CLASS_D_EN_DELAY + LANDTONI_EXT_CLASS_D_DELAY_DELTA);
 
+#if defined(CONFIG_MACH_XIAOMI_SANTONI) && defined(CONFIG_SND_SOC_AW87319)
+	if (xiaomi_device_read() == XIAOMI_DEVICE_SANTONI)
+		AW87319_Audio_Speaker();
+	else {
+#endif
+
 	for (i = 0; i < LANDTONI_AW8738_MODE; i++) {
 		gpio_direction_output(landtoni_spk_pa_gpio, false);
 		gpio_direction_output(landtoni_spk_pa_gpio, true);
 	}
 	usleep_range(LANDTONI_EXT_CLASS_D_EN_DELAY,
 		LANDTONI_EXT_CLASS_D_EN_DELAY + LANDTONI_EXT_CLASS_D_DELAY_DELTA);
+
+#if defined(CONFIG_MACH_XIAOMI_SANTONI) && defined(CONFIG_SND_SOC_AW87319)
+	}
+#endif
 
 	pr_debug("%s: Enable external speaker PAs dualmode.\n", __func__);
 }
