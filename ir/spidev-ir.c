@@ -51,7 +51,7 @@
  * nodes, since there is no fixed association of minor numbers with any
  * particular SPI bus or device.
  */
-#define SPIDEV_MAJOR			153	/* assigned */
+static int spi_ir_major = -1;
 #define N_SPI_MINORS			32	/* ... up to 256 */
 
 static DECLARE_BITMAP(minors, N_SPI_MINORS);
@@ -745,7 +745,7 @@ static int spidev_probe(struct spi_device *spi)
 	if (minor < N_SPI_MINORS) {
 		struct device *dev;
 
-		spidev->devt = MKDEV(SPIDEV_MAJOR, minor);
+		spidev->devt = MKDEV(spi_ir_major, minor);
 		dev = device_create(spidev_class, &spi->dev, spidev->devt,
 				    spidev, "spidev%d.%d",
 				    spi->master->bus_num, spi->chip_select);
@@ -853,20 +853,20 @@ static int __init spidev_init(void)
 	 * the driver which manages those device numbers.
 	 */
 	BUILD_BUG_ON(N_SPI_MINORS > 256);
-	status = register_chrdev(SPIDEV_MAJOR, "spi-ir", &spidev_fops);
-	if (status < 0)
-		return status;
+	spi_ir_major = register_chrdev(0, "spi-ir", &spidev_fops);
+	if (spi_ir_major < 0)
+		return spi_ir_major;
 
 	spidev_class = class_create(THIS_MODULE, "spidev-ir");
 	if (IS_ERR(spidev_class)) {
-		unregister_chrdev(SPIDEV_MAJOR, spidev_spi_driver.driver.name);
+		unregister_chrdev(spi_ir_major, spidev_spi_driver.driver.name);
 		return PTR_ERR(spidev_class);
 	}
 
 	status = spi_register_driver(&spidev_spi_driver);
 	if (status < 0) {
 		class_destroy(spidev_class);
-		unregister_chrdev(SPIDEV_MAJOR, spidev_spi_driver.driver.name);
+		unregister_chrdev(spi_ir_major, spidev_spi_driver.driver.name);
 	}
 	return status;
 }
@@ -876,7 +876,8 @@ static void __exit spidev_exit(void)
 {
 	spi_unregister_driver(&spidev_spi_driver);
 	class_destroy(spidev_class);
-	unregister_chrdev(SPIDEV_MAJOR, spidev_spi_driver.driver.name);
+	if (spi_ir_major >= 0)
+		unregister_chrdev(spi_ir_major, spidev_spi_driver.driver.name);
 }
 module_exit(spidev_exit);
 
