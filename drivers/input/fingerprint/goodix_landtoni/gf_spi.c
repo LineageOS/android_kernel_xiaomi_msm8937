@@ -103,7 +103,7 @@ static LIST_HEAD(device_list);
 static DEFINE_MUTEX(device_list_lock);
 static struct gf_dev gf;
 static struct class *gf_class;
-static unsigned int gf_major = -1;
+static int gf_major = -1;
 static int driver_init_partial(struct gf_dev *gf_dev);
 
 static void gf_enable_irq(struct gf_dev *gf_dev)
@@ -858,7 +858,7 @@ static int __init gf_init(void)
 	if (gf_major < 0) {
 		pr_warn("Failed to register char device!\n");
 		FUNC_EXIT();
-		return status;
+		return gf_major;
 	}
 	gf_class = class_create(THIS_MODULE, CLASS_NAME);
 	if (IS_ERR(gf_class)) {
