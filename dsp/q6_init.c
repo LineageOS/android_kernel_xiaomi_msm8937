@@ -10,7 +10,9 @@
 static int __init audio_q6_init(void)
 {
 	adsp_err_init();
+#ifdef MODULE
 	audio_cal_init();
+#endif
 	rtac_init();
 	adm_init();
 	afe_init();
@@ -43,7 +45,9 @@ static void __exit audio_q6_exit(void)
 	spk_params_exit();
 	adm_exit();
 	rtac_exit();
+#ifdef MODULE
 	audio_cal_exit();
+#endif
 	adsp_err_exit();
 	voice_mhi_exit();
 }
