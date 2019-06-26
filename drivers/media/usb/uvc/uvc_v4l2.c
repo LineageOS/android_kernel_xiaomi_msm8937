@@ -288,7 +288,6 @@ static int uvc_v4l2_try_format(struct uvc_streaming *stream,
 	fmt->fmt.pix.sizeimage = probe->dwMaxVideoFrameSize;
 	fmt->fmt.pix.pixelformat = format->fcc;
 	fmt->fmt.pix.colorspace = format->colorspace;
-	fmt->fmt.pix.priv = 0;
 
 	if (uvc_format != NULL)
 		*uvc_format = format;
@@ -325,7 +324,6 @@ static int uvc_v4l2_get_format(struct uvc_streaming *stream,
 	fmt->fmt.pix.bytesperline = uvc_v4l2_get_bytesperline(format, frame);
 	fmt->fmt.pix.sizeimage = stream->ctrl.dwMaxVideoFrameSize;
 	fmt->fmt.pix.colorspace = format->colorspace;
-	fmt->fmt.pix.priv = 0;
 
 done:
 	mutex_unlock(&stream->mutex);
