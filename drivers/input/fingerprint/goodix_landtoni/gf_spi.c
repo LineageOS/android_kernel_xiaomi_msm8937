@@ -105,6 +105,7 @@ static DEFINE_MUTEX(device_list_lock);
 static struct gf_dev gf;
 static struct class *gf_class;
 static int driver_init_partial(struct gf_dev *gf_dev);
+static int gf_notifier_init = 0;
 
 static void gf_enable_irq(struct gf_dev *gf_dev)
 {
@@ -575,20 +576,19 @@ static const struct file_operations gf_fops = {
 static int goodix_fb_state_chg_callback(struct notifier_block *nb,
 					unsigned long val, void *data)
 {
-	struct gf_dev *gf_dev;
-	struct fb_event *evdata = data;
+	struct gf_dev *gf_dev = NULL;
+	struct fb_event *evdata = NULL;
 	unsigned int blank;
-
 #if defined(GF_NETLINK_ENABLE)
 	char temp = 0;
 #endif
 
 	if (val != FB_EARLY_EVENT_BLANK)
 		return 0;
-	pr_info("[info] %s go to the goodix_fb_state_chg_callback value = %d\n",
-		__func__, (int)val);
-	gf_dev = container_of(nb, struct gf_dev, notifier);
-	if (evdata && evdata->data && val == FB_EARLY_EVENT_BLANK && gf_dev) {
+
+	evdata = data;
+	gf_dev = container_of(nb, struct gf_dev, gf_notifier);
+	if (evdata && evdata->data && gf_dev) {
 		blank = *(int *)(evdata->data);
 		switch (blank) {
 		case FB_BLANK_POWERDOWN:
@@ -603,8 +603,6 @@ static int goodix_fb_state_chg_callback(struct notifier_block *nb,
 							POLL_IN);
 				}
 #endif
-/*device unavailable */
-
 			}
 			break;
 		case FB_BLANK_UNBLANK:
@@ -619,21 +617,16 @@ static int goodix_fb_state_chg_callback(struct notifier_block *nb,
 						POLL_IN);
 				}
 #endif
-				/*device available */
-
 			}
 			break;
 		default:
-			pr_info("%s defalut\n", __func__);
+			pr_debug("%s defalut\n", __func__);
 			break;
 		}
 	}
-	return NOTIFY_OK;
-}
 
-static struct notifier_block goodix_noti_block = {
-	.notifier_call = goodix_fb_state_chg_callback,
-};
+	return 0;
+}
 
 static void gf_reg_key_kernel(struct gf_dev *gf_dev)
 {
@@ -725,8 +718,13 @@ static int gf_probe(struct platform_device *pdev)
 		spi_clock_set(gf_dev, 4.8*1000*1000);
 #endif
 
-		gf_dev->notifier = goodix_noti_block;
-		fb_register_client(&gf_dev->notifier);
+#ifdef CONFIG_FB
+		gf_dev->gf_notifier.notifier_call = goodix_fb_state_chg_callback;
+		gf_notifier_init = fb_register_client(&gf_dev->gf_notifier);
+		if (!gf_notifier_init)
+			pr_err("%s: Fail to register fb notifier\n", __func__);
+#endif
+
 		gf_reg_key_kernel(gf_dev);
 
 		wake_lock_init(&gf_dev->ttw_wl, WAKE_LOCK_SUSPEND, "goodix_ttw_wl");
@@ -892,7 +890,17 @@ module_init(gf_init);
 
 static void __exit gf_exit(void)
 {
+#ifdef CONFIG_FB
+	struct gf_dev *gf_dev = &gf;
+#endif
+
 	FUNC_ENTRY();
+
+#ifdef CONFIG_FB
+	if (gf_notifier_init)
+		fb_unregister_client(&gf_dev->gf_notifier);
+#endif
+
 #ifdef GF_NETLINK_ENABLE
 	netlink_exit();
 #endif
