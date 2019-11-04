@@ -2,3 +2,4 @@
 #include "audio.dtsi"
 #include "delete-unused-peripherals.dtsi"
 #include "display.dtsi"
+#include "soc.dtsi"
