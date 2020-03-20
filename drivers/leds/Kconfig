@@ -778,6 +778,15 @@ config LEDS_NIC78BX
 	  To compile this driver as a module, choose M here: the module
 	  will be called leds-nic78bx.
 
+config LEDS_MSM_GPIO_FLASH
+	tristate "Support for GPIO Flash LEDs"
+	help
+	  This driver supports the leds functionality of GPIO Flash LED. It
+	  includes flash mode and torch mode.
+
+	  To compile this driver as a module, choose M here: the module will
+	  be called leds-gpio-flash.
+
 config LEDS_QTI_TRI_LED
 	tristate "LED support for Qualcomm Technologies, Inc. TRI_LED"
 	depends on LEDS_CLASS && MFD_SPMI_PMIC && PWM && OF
