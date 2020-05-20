@@ -19,7 +19,7 @@
 #include <media/v4l2-subdev.h>
 #include <linux/workqueue.h>
 #include <media/msm_cam_sensor-land.h>
-#include <soc/qcom/camera2.h>
+#include <soc/qcom/camera2-land.h>
 #include "msm_sd.h"
 
 #define NUM_MASTERS 2

@@ -18,7 +18,7 @@
 #include <media/v4l2-subdev.h>
 #include <media/v4l2-ioctl.h>
 #include <media/msm_cam_sensor-land.h>
-#include <soc/qcom/camera2.h>
+#include <soc/qcom/camera2-land.h>
 #include "msm_camera_i2c.h"
 #include "msm_sd.h"
 
