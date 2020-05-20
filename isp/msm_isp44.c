@@ -504,10 +504,11 @@ static void msm_vfe44_process_epoch_irq(struct vfe_device *vfe_dev,
 			pix_stream_count == 0) {
 			ISP_DBG("%s: SOF IRQ\n", __func__);
 			legacy_m_msm_isp_notify(vfe_dev, ISP_EVENT_SOF, VFE_PIX_0, ts);
-			if (vfe_dev->axi_data.stream_update[VFE_PIX_0])
+			if (vfe_dev->axi_data.stream_update[VFE_PIX_0]) {
 				legacy_m_msm_isp_axi_stream_update(vfe_dev, VFE_PIX_0);
 				vfe_dev->hw_info->vfe_ops.core_ops.reg_update(
 				   vfe_dev, VFE_PIX_0);
+			}
 		}
 	}
 }
