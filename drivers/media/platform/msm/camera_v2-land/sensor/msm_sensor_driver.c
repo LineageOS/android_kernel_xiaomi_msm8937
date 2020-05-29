@@ -701,12 +701,7 @@ int32_t msm_sensor_driver_probe(void *setting,
 		slave_info->camera_id = slave_info32->camera_id;
 
 		slave_info->i2c_freq_mode = slave_info32->i2c_freq_mode;
-		slave_info->sensor_id_info.sensor_id_reg_addr =
-			slave_info32->sensor_id_info.sensor_id_reg_addr;
-		slave_info->sensor_id_info.sensor_id_mask =
-			slave_info32->sensor_id_info.sensor_id_mask;
-		slave_info->sensor_id_info.sensor_id =
-				slave_info32->sensor_id_info.sensor_id;
+		slave_info->sensor_id_info = slave_info32->sensor_id_info;
 
 		slave_info->slave_addr = slave_info32->slave_addr;
 		slave_info->power_setting_array.size =
