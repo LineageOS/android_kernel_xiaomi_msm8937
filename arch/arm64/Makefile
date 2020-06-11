@@ -141,6 +141,10 @@ else
 TEXT_OFFSET := 0x00080000
 endif
 
+ifdef CONFIG_ARCH_MSM8937
+KBUILD_CFLAGS += -mcpu=cortex-a53 -Wa,-mcpu=cortex-a53 -mtune=cortex-a53
+endif
+
 ifeq ($(cc-name),clang)
 KBUILD_CFLAGS += $(call cc-disable-warning, asm-operand-widths)
 endif

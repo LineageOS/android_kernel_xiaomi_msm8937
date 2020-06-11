@@ -58,8 +58,13 @@ VDSO_CAFLAGS += -DDISABLE_BRANCH_PROFILING
 # Try to compile for ARMv8. If the compiler is too old and doesn't support it,
 # fall back to v7. There is no easy way to check for what architecture the code
 # is being compiled, so define a macro specifying that (see arch/arm/Makefile).
+ifndef CONFIG_ARCH_MSM8937
 VDSO_CAFLAGS += $(call cc32-option,-march=armv8-a -D__LINUX_ARM_ARCH__=8,\
                                    -march=armv7-a -D__LINUX_ARM_ARCH__=7)
+else
+# Always compile for ARMv8 as compilers supported by AOSP support this.
+VDSO_CAFLAGS += -D__LINUX_ARM_ARCH__=8
+endif
 
 VDSO_CFLAGS := $(VDSO_CAFLAGS)
 # KBUILD_CFLAGS from top-level Makefile
@@ -98,6 +103,10 @@ endif
 ifeq ($(cc-name),clang)
 # Snapdragon LLVM specific warning
 VDSO_CFLAGS += $(call cc32-disable-warning, vectorizer-no-neon)
+endif
+
+ifdef CONFIG_ARCH_MSM8937
+VDSO_CFLAGS += -mcpu=cortex-a53 -Wa,-mcpu=cortex-a53 -mtune=cortex-a53
 endif
 
 VDSO_AFLAGS := $(VDSO_CAFLAGS)
