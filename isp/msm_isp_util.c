@@ -20,8 +20,6 @@
 #include "msm_isp_stats_util.h"
 #include "msm_camera_io_util.h"
 #include "cam_smmu_api.h"
-#define CREATE_TRACE_POINTS
-#include "trace/events/msm_cam_legacy.h"
 
 #define MAX_ISP_V4l2_EVENTS 100
 #define MAX_ISP_REG_LIST 100
@@ -1926,8 +1924,6 @@ void legacy_msm_isp_process_overflow_irq(
 	ISP_DBG("%s: VFE%d Bus overflow detected: start recovery!\n",
 		__func__, vfe_dev->pdev->id);
 
-	trace_legacy_msm_cam_isp_overflow(vfe_dev, *irq_status0, *irq_status1);
-
 	/* maks off irq for current vfe */
 	vfe_dev->recovery_irq0_mask = vfe_dev->irq0_mask;
 	vfe_dev->recovery_irq1_mask = vfe_dev->irq1_mask;
@@ -2464,7 +2460,6 @@ void legacy_msm_isp_dump_irq_debug(void)
 		count = dump_data.first;
 	}
 	for (i = 0; i < count; i++) {
-		trace_legacy_msm_cam_ping_pong_debug_dump(dump_data.arr[index]);
 		index = (index + 1) % MAX_ISP_PING_PONG_DUMP_SIZE;
 	}
 }
@@ -2481,7 +2476,6 @@ void legacy_msm_isp_dump_taskelet_debug(void)
 		count = tasklet_data.first;
 	}
 	for (i = 0; i < count; i++) {
-		trace_legacy_msm_cam_tasklet_debug_dump(tasklet_data.arr[index]);
 		index = (index + 1) % MAX_ISP_PING_PONG_DUMP_SIZE;
 	}
 }
@@ -2499,9 +2493,7 @@ void legacy_msm_isp_dump_ping_pong_mismatch(void)
 		(uint32_t)dump_data.vfe_dev->common_data->dual_vfe_res->vfe_dev[
 			i]->vfe_irq->start);
 	}
-	trace_legacy_msm_cam_string(" ***** legacy_msm_isp_dump_irq_debug ****");
 	legacy_msm_isp_dump_irq_debug();
-	trace_legacy_msm_cam_string(" ***** legacy_msm_isp_dump_taskelet_debug ****");
 	legacy_msm_isp_dump_taskelet_debug();
 	spin_unlock(&dump_tasklet_lock);
 }
