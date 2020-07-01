@@ -86,7 +86,7 @@ struct scratch_mapping {
 
 struct cam_context_bank_info {
 	struct device *dev;
-	struct dma_iommu_mapping *mapping;
+	struct iommu_domain *domain;
 	dma_addr_t va_start;
 	size_t va_len;
 	const char *name;
@@ -523,9 +523,11 @@ static int cam_smmu_attach_device(int idx)
 {
 	int rc;
 	struct cam_context_bank_info *cb = &iommu_cb_set.cb_info[idx];
+	struct iommu_domain *domain =
+		iommu_cb_set.cb_info[idx].domain;
 
 	/* attach the mapping to device */
-	rc = arm_iommu_attach_device(cb->dev, cb->mapping);
+	rc = iommu_attach_device(domain, cb->dev);
 	if (rc < 0) {
 		pr_err("Error: ARM IOMMU attach failed. ret = %d\n", rc);
 		return -ENODEV;
@@ -1007,7 +1009,7 @@ static int cam_smmu_alloc_scratch_buffer_add_to_list(int idx,
 
 
 	/* Get the domain from within our cb_set struct and map it*/
-	domain = iommu_cb_set.cb_info[idx].mapping->domain;
+	domain = iommu_cb_set.cb_info[idx].domain;
 
 	rc = cam_smmu_alloc_scratch_va(&iommu_cb_set.cb_info[idx].scratch_map,
 					virt_len, &iova);
@@ -1076,7 +1078,7 @@ static int cam_smmu_free_scratch_buffer_remove_from_list(
 	int rc = 0;
 	size_t unmapped;
 	struct iommu_domain *domain =
-		iommu_cb_set.cb_info[idx].mapping->domain;
+		iommu_cb_set.cb_info[idx].domain;
 	struct scratch_mapping *scratch_map =
 		&iommu_cb_set.cb_info[idx].scratch_map;
 
@@ -1408,8 +1410,8 @@ static void cam_smmu_release_cb(struct platform_device *pdev)
 	int i = 0;
 
 	for (i = 0; i < iommu_cb_set.cb_num; i++) {
-		arm_iommu_detach_device(iommu_cb_set.cb_info[i].dev);
-		arm_iommu_release_mapping(iommu_cb_set.cb_info[i].mapping);
+		iommu_detach_device(iommu_cb_set.cb_info[i].domain,
+				iommu_cb_set.cb_info[i].dev);
 	}
 
 	devm_kfree(&pdev->dev, iommu_cb_set.cb_info);
@@ -1449,10 +1451,10 @@ static int cam_smmu_setup_cb(struct cam_context_bank_info *cb,
 	}
 
 	/* create a virtual mapping */
-	cb->mapping = arm_iommu_create_mapping(&platform_bus_type,
-		cb->va_start, cb->va_len);
-	if (IS_ERR(cb->mapping)) {
-		pr_err("Error: create mapping Failed\n");
+	cb->domain = iommu_get_domain_for_dev(cb->dev);
+	if (IS_ERR(cb->domain)) {
+		pr_err("iommu get domain for dev: %s failed\n",
+			dev_name(cb->dev));
 		rc = -ENODEV;
 		goto end;
 	}
@@ -1561,7 +1563,7 @@ static int cam_populate_smmu_context_banks(struct device *dev,
 	if (rc < 0)
 		pr_err("Error: failed to setup cb : %s\n", cb->name);
 
-	iommu_set_fault_handler(cb->mapping->domain,
+	iommu_set_fault_handler(cb->domain,
 			cam_smmu_iommu_fault_handler,
 			(void *)cb->name);
 
