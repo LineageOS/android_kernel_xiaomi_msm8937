@@ -298,7 +298,7 @@ static void msm_enqueue(struct msm_device_queue *queue,
 static int msm_cpp_notify_frame_done(struct cpp_device *cpp_dev,
 	uint8_t put_buf);
 static int32_t cpp_load_fw(struct cpp_device *cpp_dev, char *fw_name_bin);
-static void cpp_timer_callback(unsigned long data);
+static void cpp_timer_callback(struct timer_list *cpp_t);
 
 uint8_t legacy_induce_error;
 static int msm_cpp_enable_debugfs(struct cpp_device *cpp_dev);
@@ -1825,7 +1825,7 @@ error:
 	return;
 }
 
-void cpp_timer_callback(unsigned long data)
+static void cpp_timer_callback(struct timer_list *cpp_t)
 {
 	struct msm_cpp_work_t *work =
 		legacy_cpp_timer.data.cpp_dev->work;
@@ -4372,8 +4372,8 @@ static int cpp_probe(struct platform_device *pdev)
 	atomic_set(&legacy_cpp_timer.used, 0);
 	/* install timer for cpp timeout */
 	CPP_DBG("Installing legacy_cpp_timer\n");
-	setup_timer(&legacy_cpp_timer.legacy_cpp_timer,
-		cpp_timer_callback, (unsigned long)&legacy_cpp_timer);
+	timer_setup(&legacy_cpp_timer.legacy_cpp_timer,
+		cpp_timer_callback, 0);
 	cpp_dev->fw_name_bin = NULL;
 	cpp_dev->max_timeout_trial_cnt = MSM_CPP_MAX_TIMEOUT_TRIAL;
 	if (rc == 0)
