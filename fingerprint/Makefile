@@ -1,0 +1,2 @@
+obj-$(CONFIG_FINGERPRINT_FPC1020_UGG) += fpc_ugg/
+obj-$(CONFIG_FINGERPRINT_GF3208) += gf3208_ugg/
