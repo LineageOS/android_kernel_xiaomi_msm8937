@@ -58,6 +58,7 @@
 	};
 };
 &usb_otg {
+	extcon = <&bq2560x_otg_supply>;
 	interrupts = <0 134 0>,<0 140 0>,<0 136 0>;
 	interrupt-names = "core_irq", "async_irq","phy_irq";
 	qcom,hsusb-otg-mode = <3>;

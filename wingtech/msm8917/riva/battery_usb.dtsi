@@ -69,6 +69,7 @@
 	#include "batterydata/batterydata-wingtech-guangyu_Coslight-4v4-4000mah.dtsi"
 };
 &usb_otg {
+	extcon = <&bq2560x_otg_supply>;
 	qcom,hsusb-otg-phy-init-seq =
 		<0x53 0x80 0x39 0x81 0x37 0x82 0xffffffff>;
 	vbus_otg-supply = <&bq2560x_otg_supply>;

@@ -57,6 +57,7 @@
 	#include "batterydata/batterydata-wingtech-xingwangda_ATL-4v4-3030mah.dtsi"
 };
 &usb_otg {
+	extcon = <&smb358_otg_vreg>;
 	qcom,hsusb-otg-phy-init-seq =
 		<0x39 0x81 0x37 0x82 0xffffffff>;
 	vbus_otg-supply = <&smb358_otg_vreg>;
