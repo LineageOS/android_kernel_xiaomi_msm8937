@@ -20,6 +20,11 @@
 #include "core.h"
 #include "wcd9xxx-common-v2.h"
 
+#ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_series.h>
+extern int xiaomi_series_read(void);
+#endif
+
 #define WCD_USLEEP_RANGE 50
 #define MAX_IMPED_PARAMS 6
 
@@ -283,6 +288,14 @@ void wcd_clsh_imped_config(struct snd_soc_codec *codec, int imped, bool reset)
 		return;
 	}
 	index = get_impedance_index(imped);
+#ifdef CONFIG_MACH_XIAOMI_ULYSSE
+	if (xiaomi_series_read() == XIAOMI_SERIES_ULYSSE) {
+		if (index >= ARRAY_SIZE(imped_index)) {
+			pr_debug("%s, impedance not in range = %d\n", __func__, imped);
+			return;
+		}
+	}
+#endif
 	if (index >= (ARRAY_SIZE(imped_index) - 1)) {
 		pr_debug("%s, impedance not in range = %d\n", __func__, imped);
 		return;

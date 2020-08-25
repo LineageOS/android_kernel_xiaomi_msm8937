@@ -154,6 +154,11 @@ do {                                                    \
 #define ANC_DETECT_RETRY_CNT 7
 #define WCD_MBHC_SPL_HS_CNT  1
 
+#ifdef CONFIG_MACH_XIAOMI_ULYSSE
+#define ULYSSE_PA_GPIO 1
+extern int ulysse_smg_in_gpio;
+#endif
+
 enum wcd_mbhc_detect_logic {
 	WCD_DETECTION_LEGACY,
 	WCD_DETECTION_ADC,

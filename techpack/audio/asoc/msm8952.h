@@ -62,6 +62,16 @@ struct msm_asoc_mach_data {
 	int ext_pa;
 	int us_euro_gpio;
 	int spk_ext_pa_gpio;
+#ifdef CONFIG_MACH_XIAOMI_ULYSSE
+	int ulysse_spk_ext_pa_gpio_lc;
+	int ulysse_spk_hs_switch_gpio;
+	struct delayed_work ulysse_pa_gpio_work;
+	struct delayed_work ulysse_pa_gpio_work_close;
+	struct delayed_work ulysse_hs_gpio_work;
+	unsigned char ulysse_pa_is_on;
+	unsigned char ulysse_hs_is_on;
+	const char *ulysse_spk_pa_name;
+#endif
 	int mclk_freq;
 	bool native_clk_set;
 	int lb_mode;
