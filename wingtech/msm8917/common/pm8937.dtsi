@@ -24,28 +24,25 @@
 	};
 };
 &pm8937_gpios {
-	gpio@c400 {
-		qcom,mode = <0>;
-		qcom,output-type = <0>;
-		qcom,pull = <0>;
-		qcom,vin-sel = <2>;
-		qcom,out-strength = <3>;
-		qcom,src-sel = <0>;
-		qcom,master-en = <1>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pwm_pwr_en_default &batt_id_pin>;
+	pwm_pwr_en_default: pm8937_gpio8 {
+		pins = "gpio8";
+		function = "dtest2";
+		output-low;
+		bias-disable;
+		qcom,drive-strength = <2>;
 		status = "okay";
 	};
-	gpio@c700 {
-		reg = <0xc700 0x100>;
-		qcom,pin-num = <8>;
-		qcom,mode = <1>;       /*QPNP_PIN_MODE_DIG_OUT*/
-		qcom,output-type = <0>;       /*QPNP_PIN_OUT_BUF_CMOS*/
-		qcom,invert = <0>;     /*QPNP_PIN_INVERT_DISABLE*/
-		qcom,pull = <5>;       /*QPNP_PIN_PULL_NO*/
-		qcom,vin-sel = <0>;    /*QPNP_PIN_VIN2, VREG_S3A*/
-		qcom,out-strength = <3>;/*QPNP_PIN_OUT_STRENGTH_MED*/
-		qcom,src-sel = <5>;    /*QPNP_PIN_SEL_FUNC_2*/
-		qcom,master-en = <1>;  /*Enable GPIO by default*/
-		status = "ok";
+
+	batt_id_pin: pm8937_gpio5 {
+		pins = "gpio5";
+		function = "normal";
+		input-enable;
+		bias-pull-up;
+		qcom,pull-up-strength = <1>;
+		qcom,drive-strength = <2>;
+		status = "okay";
 	};
 };
 &pm8937_vadc {
