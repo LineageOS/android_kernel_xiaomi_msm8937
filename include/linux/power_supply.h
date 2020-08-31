@@ -514,6 +514,9 @@ extern int power_supply_is_system_supplied(void);
 static inline int power_supply_is_system_supplied(void) { return -EIO; }
 #endif
 
+extern int power_supply_set_online(struct power_supply *psy, bool enable);
+extern int power_supply_set_present(struct power_supply *psy, bool enable);
+
 extern int power_supply_get_property(struct power_supply *psy,
 			    enum power_supply_property psp,
 			    union power_supply_propval *val);
