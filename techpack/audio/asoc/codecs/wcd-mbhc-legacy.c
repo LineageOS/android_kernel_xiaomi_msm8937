@@ -340,8 +340,18 @@ static void wcd_enable_mbhc_supply(struct wcd_mbhc *mbhc,
 				wcd_enable_curr_micbias(mbhc, WCD_MBHC_EN_CS);
 			}
 		} else if (plug_type == MBHC_PLUG_TYPE_HEADPHONE) {
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
+			if (xiaomi_series_read() == XIAOMI_SERIES_ROVA)
+				wcd_enable_curr_micbias(mbhc, WCD_MBHC_EN_MB);
+			else
+#endif
 			wcd_enable_curr_micbias(mbhc, WCD_MBHC_EN_CS);
 		} else {
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
+			if (xiaomi_series_read() == XIAOMI_SERIES_ROVA)
+				wcd_enable_curr_micbias(mbhc, WCD_MBHC_EN_MB);
+			else
+#endif
 			wcd_enable_curr_micbias(mbhc, WCD_MBHC_EN_NONE);
 		}
 	}
@@ -835,8 +845,15 @@ exit:
 		wcd_mbhc_hs_elec_irq(mbhc, WCD_MBHC_ELEC_HS_REM, true);
 		WCD_MBHC_RSC_UNLOCK(mbhc);
 	}
-	if (mbhc->mbhc_cb->set_cap_mode)
+	if (mbhc->mbhc_cb->set_cap_mode) {
+	#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
+		if (xiaomi_series_read() == XIAOMI_SERIES_ROVA || plug_type == MBHC_PLUG_TYPE_HEADSET) {
+			mbhc->mbhc_cb->set_cap_mode(codec, micbias1, true);
+			pr_debug("%s:set_cap_mode micbias1=%d, micbias2 = %d==>true , MBHC_PLUG_TYPE_HEADSET\n", __func__, micbias1, micbias2);
+		} else
+	#endif
 		mbhc->mbhc_cb->set_cap_mode(codec, micbias1, micbias2);
+	}
 
 	if (mbhc->mbhc_cb->hph_pull_down_ctrl)
 		mbhc->mbhc_cb->hph_pull_down_ctrl(codec, true);

@@ -46,6 +46,13 @@ extern int xiaomi_series_read(void);
 #define MSM_INT_DIGITAL_CODEC "msm-dig-codec"
 #define PMIC_INT_ANALOG_CODEC "analog-codec"
 
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
+#define ROVA_AW8736_MODE 3
+#define ROVA_EXT_CLASS_D_EN_DELAY 13000
+#define ROVA_EXT_CLASS_D_DIS_DELAY 3000
+#define ROVA_EXT_CLASS_D_DELAY_DELTA 2000
+#endif
+
 enum btsco_rates {
 	RATE_8KHZ_ID,
 	RATE_16KHZ_ID,
@@ -74,6 +81,11 @@ static atomic_t quat_mi2s_clk_ref;
 static atomic_t quin_mi2s_clk_ref;
 static atomic_t auxpcm_mi2s_clk_ref;
 static struct snd_info_entry *codec_root;
+
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
+static int rova_headset_gpio;
+static int rova_spk_pa_gpio;
+#endif
 
 static int msm8952_enable_dig_cdc_clk(struct snd_soc_codec *codec, int enable,
 					bool dapm);
@@ -152,6 +164,11 @@ static const char *const proxy_rx_ch_text[] = {"One", "Two", "Three", "Four",
 static const char *const vi_feed_ch_text[] = {"One", "Two"};
 static char const *mi2s_rx_sample_rate_text[] = {"KHZ_48",
 					"KHZ_96", "KHZ_192"};
+
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
+static const char *const rova_lineout_text[] = {"DISABLE", "ENABLE", "DUALMODE"};
+static const char *const rova_hs_amp_text[] = {"DISABLE", "ENABLE"};
+#endif
 
 #ifdef CONFIG_MACH_XIAOMI_ULYSSE
 struct ulysse_cdc_pdm_pinctrl_info {
@@ -377,6 +394,15 @@ static int enable_spk_ext_pa(struct snd_soc_codec *codec, int enable)
 		enable ? "Enable" : "Disable");
 
 	if (enable) {
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
+		if (xiaomi_series_read() == XIAOMI_SERIES_ROVA) {
+			pr_debug("%s spk pa mode %d\n", __func__, ROVA_AW8736_MODE);
+			for (ret = 0; ret < ROVA_AW8736_MODE; ret++) {
+				gpio_direction_output(pdata->spk_ext_pa_gpio, false);
+				gpio_direction_output(pdata->spk_ext_pa_gpio, true);
+			}
+		} else {
+#endif
 		ret =  msm_cdc_pinctrl_select_active_state(
 					pdata->spk_ext_pa_gpio_p);
 		if (ret) {
@@ -385,7 +411,18 @@ static int enable_spk_ext_pa(struct snd_soc_codec *codec, int enable)
 			return ret;
 		}
 		gpio_set_value_cansleep(pdata->spk_ext_pa_gpio, enable);
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
+		}
+#endif
 	} else {
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
+		if (xiaomi_series_read() == XIAOMI_SERIES_ROVA) {
+			gpio_direction_output(pdata->spk_ext_pa_gpio, false);
+			/* time takes disable the external power amplifier */
+			usleep_range(ROVA_EXT_CLASS_D_DIS_DELAY,
+				ROVA_EXT_CLASS_D_DIS_DELAY + ROVA_EXT_CLASS_D_DELAY_DELTA);
+		} else {
+#endif
 		gpio_set_value_cansleep(pdata->spk_ext_pa_gpio, enable);
 		ret = msm_cdc_pinctrl_select_sleep_state(
 				pdata->spk_ext_pa_gpio_p);
@@ -394,6 +431,9 @@ static int enable_spk_ext_pa(struct snd_soc_codec *codec, int enable)
 					__func__, "ext_spk_gpio");
 			return ret;
 		}
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
+		}
+#endif
 	}
 	return 0;
 }
@@ -896,6 +936,143 @@ static int msm8952_enable_dig_cdc_clk(struct snd_soc_codec *codec,
 	return ret;
 }
 
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
+static void rova_msm8952_ext_hs_control(u32 enable)
+{
+	gpio_direction_output(rova_headset_gpio, enable);
+	 pr_err("%s: %s [hjf]  headset 111PAs.\n", __func__,
+	 enable ? "Enable" : "Disable");
+}
+static void rova_msm8952_ext_spk_control(u32 enable)
+{
+		int i = 0;
+
+    if (enable) {
+	/* Open external audio PA device */
+	for (i = 0; i < ROVA_AW8736_MODE; i++) {
+		gpio_direction_output(rova_spk_pa_gpio, false);
+		gpio_direction_output(rova_spk_pa_gpio, true);
+	}
+		 usleep_range(ROVA_EXT_CLASS_D_EN_DELAY,
+			ROVA_EXT_CLASS_D_EN_DELAY + ROVA_EXT_CLASS_D_DELAY_DELTA);
+    } else {
+		 gpio_direction_output(rova_spk_pa_gpio, false);
+		 /* time takes disable the external power amplifier */
+		 usleep_range(ROVA_EXT_CLASS_D_DIS_DELAY,
+			ROVA_EXT_CLASS_D_DIS_DELAY + ROVA_EXT_CLASS_D_DELAY_DELTA);
+    }
+
+    pr_err("%s: %s [hjf]  external speaker 222PAs.\n", __func__,
+		 enable ? "Enable" : "Disable");
+}
+static void rova_msm8x16_ext_spk_delayed_dualmode(u32 enable)
+{
+    int i = 0;
+
+    /* Open the headset device */
+    gpio_direction_output(rova_headset_gpio, true);
+    usleep_range(ROVA_EXT_CLASS_D_EN_DELAY,
+		 ROVA_EXT_CLASS_D_EN_DELAY + ROVA_EXT_CLASS_D_DELAY_DELTA);
+
+    for (i = 0; i < ROVA_AW8736_MODE; i++) {
+		 gpio_direction_output(rova_spk_pa_gpio, false);
+		 gpio_direction_output(rova_spk_pa_gpio, true);
+    }
+    usleep_range(ROVA_EXT_CLASS_D_EN_DELAY,
+		 ROVA_EXT_CLASS_D_EN_DELAY + ROVA_EXT_CLASS_D_DELAY_DELTA);
+
+    pr_debug("%s: Enable external speaker PAs dualmode.\n", __func__);
+}
+
+static int rova_headset_status_get(struct snd_kcontrol *kcontrol,
+	struct snd_ctl_elem_value *ucontrol)
+{
+	if (xiaomi_series_read() != XIAOMI_SERIES_ROVA) {
+		pr_err("Executed on non-rova device, exiting");
+		goto exit;
+	}
+
+	pr_debug("%s:  get headset_status_get\n", __func__);
+
+exit:
+	return 0;
+}
+
+static int rova_headset_status_put(struct snd_kcontrol *kcontrol,
+	struct snd_ctl_elem_value *ucontrol)
+{
+	int state = 0;
+
+	if (xiaomi_series_read() != XIAOMI_SERIES_ROVA) {
+		pr_err("Executed on non-rova device, exiting");
+		goto exit;
+	}
+
+	state = ucontrol->value.integer.value[0];
+	pr_debug("%s:  set external speaker PA mode:%d\n", __func__, state);
+
+	switch (state) {
+	case 1:
+		rova_msm8952_ext_hs_control(1);
+		break;
+	case 0:
+		rova_msm8952_ext_hs_control(0);
+		break;
+	default:
+		pr_err("%s: Unexpected input value\n", __func__);
+		break;
+	}
+
+exit:
+	return 0;
+}
+
+static int rova_lineout_status_get(struct snd_kcontrol *kcontrol,
+	struct snd_ctl_elem_value *ucontrol)
+{
+	if (xiaomi_series_read() != XIAOMI_SERIES_ROVA) {
+		pr_err("Executed on non-rova device, exiting");
+		goto exit;
+	}
+
+	pr_debug("%s: get lineout_status_get\n", __func__);
+
+exit:
+	return 0;
+}
+static int rova_lineout_status_put(struct snd_kcontrol *kcontrol,
+	struct snd_ctl_elem_value *ucontrol)
+{
+	int state = 0;
+
+	if (xiaomi_series_read() != XIAOMI_SERIES_ROVA) {
+		pr_err("Executed on non-rova device, exiting");
+		goto exit;
+	}
+
+	state = ucontrol->value.integer.value[0];
+	pr_debug("%s:  external speaker PA mode:%d\n", __func__, state);
+
+	switch (state) {
+	case 1:
+		rova_msm8952_ext_spk_control(1);
+		break;
+	case 0:
+		rova_msm8952_ext_spk_control(0);
+		break;
+	case 2:
+		rova_msm8x16_ext_spk_delayed_dualmode(1);
+		break;
+	default:
+		pr_err("%s:  Unexpected input value\n", __func__);
+		break;
+	}
+
+exit:
+	return 0;
+}
+#endif
+
 static int msm_btsco_rate_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
@@ -1176,6 +1353,10 @@ static const struct soc_enum msm_snd_enum[] = {
 				vi_feed_ch_text),
 	SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(mi2s_rx_sample_rate_text),
 				mi2s_rx_sample_rate_text),
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
+	SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(rova_lineout_text), rova_lineout_text),
+	SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(rova_hs_amp_text), rova_hs_amp_text),
+#endif
 };
 
 static const struct snd_kcontrol_new msm_snd_controls[] = {
@@ -1195,6 +1376,12 @@ static const struct snd_kcontrol_new msm_snd_controls[] = {
 			msm_vi_feed_tx_ch_get, msm_vi_feed_tx_ch_put),
 	SOC_ENUM_EXT("MI2S_RX SampleRate", msm_snd_enum[6],
 			mi2s_rx_sample_rate_get, mi2s_rx_sample_rate_put),
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
+	SOC_ENUM_EXT("Lineout_1 amp", msm_snd_enum[7],
+    			rova_lineout_status_get, rova_lineout_status_put),
+	SOC_ENUM_EXT("headset amp", msm_snd_enum[8],
+    			rova_headset_status_get, rova_headset_status_put),
+#endif
 };
 
 static int msm8952_enable_wsa_mclk(struct snd_soc_card *card, bool enable)
@@ -1646,6 +1833,11 @@ static void *def_msm8952_wcd_mbhc_cal(void)
 		S(v_hs_max, 1600);		/*increase vref for more headphone compatibility*/
 	} else
 #endif
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
+	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA) {
+		S(v_hs_max, 1700);
+	} else
+#endif
 	S(v_hs_max, 1500);
 #undef S
 #define S(X, Y) ((WCD_MBHC_CAL_BTN_DET_PTR(msm8952_wcd_cal)->X) = (Y))
@@ -1690,6 +1882,21 @@ static void *def_msm8952_wcd_mbhc_cal(void)
 		btn_high[2] = 450;
 		btn_low[3] = 500;
 		btn_high[3] = 500;
+	}
+#endif
+
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
+	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA) {
+		btn_low[0] = 25;
+		btn_high[0] = 75;
+		btn_low[1] = 200;
+		btn_high[1] = 225;
+		btn_low[2] = 325;
+		btn_high[2] = 450;
+		btn_low[3] = 500;
+		btn_high[3] = 510;
+		btn_low[4] = 530;
+		btn_high[4] = 540;
 	}
 #endif
 
@@ -3270,6 +3477,14 @@ static int msm8952_asoc_machine_probe(struct platform_device *pdev)
 	}
 #endif
 
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
+	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA) {
+		mbhc_cfg.key_code[1] = 251; /* KEY_PREVIOUSSONG_NEW */
+		mbhc_cfg.key_code[2] = 250; /* KEY_NEXTSONG_NEW */
+		mbhc_cfg.key_code[3] = KEY_VOICECOMMAND;
+	}
+#endif
+
 	pdata = devm_kzalloc(&pdev->dev,
 				sizeof(struct msm_asoc_mach_data),
 				GFP_KERNEL);
@@ -3349,6 +3564,31 @@ parse_mclk_freq:
 
 #ifdef CONFIG_MACH_XIAOMI_ULYSSE
 	if (xiaomi_series_read() != XIAOMI_SERIES_ULYSSE) {
+#endif
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
+	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA) {
+		rova_spk_pa_gpio = of_get_named_gpio(pdev->dev.of_node, "ext-spk-amp-gpio", 0);
+		if (rova_spk_pa_gpio < 0) {
+			dev_err(&pdev->dev,
+			"%s: error! rova_spk_pa_gpio is :%d\n", __func__, rova_spk_pa_gpio);
+		} else {
+			if (gpio_request_one(rova_spk_pa_gpio, GPIOF_DIR_OUT , "spk_enable")) {
+				dev_err(&pdev->dev, "%s: request rova_spk_pa_gpio  fail!\n", __func__);
+			}
+		}
+		pr_debug("%s:  request rova_spk_pa_gpio is %d!\n", __func__, rova_spk_pa_gpio);
+
+		rova_headset_gpio = of_get_named_gpio(pdev->dev.of_node, "headset-gpio", 0);
+		if (rova_headset_gpio < 0) {
+			dev_err(&pdev->dev,
+			"%s: error! rova_headset_gpio is :%d\n", __func__, rova_headset_gpio);
+		} else {
+			if (gpio_request_one(rova_headset_gpio, GPIOF_DIR_OUT , "headset_enable")) {
+				dev_err(&pdev->dev, "%s: request rova_headset_gpio  fail!\n", __func__);
+			}
+		}
+		pr_debug("%s:request rova_headset_gpio is %d!\n", __func__, rova_headset_gpio);
+	}
 #endif
 	/*reading the gpio configurations from dtsi file*/
 	num_strings = of_property_count_strings(pdev->dev.of_node,
@@ -3610,6 +3850,14 @@ err:
 			kfree(msm8952_codec_conf[i].name_prefix);
 		}
 	}
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
+	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA) {
+		if (rova_spk_pa_gpio > 0)
+			gpio_free(rova_spk_pa_gpio);
+		if (rova_headset_gpio > 0)
+			gpio_free(rova_headset_gpio);
+	}
+#endif
 err1:
 	devm_kfree(&pdev->dev, pdata);
 	return ret;
