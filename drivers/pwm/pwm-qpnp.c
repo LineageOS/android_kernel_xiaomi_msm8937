@@ -1,4 +1,5 @@
 /* Copyright (c) 2012-2017, The Linux Foundation. All rights reserved.
+ * Copyright (C) 2018 XiaoMi, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -28,6 +29,10 @@
 #include <linux/of_address.h>
 #include <linux/radix-tree.h>
 #include <linux/qpnp/pwm.h>
+#ifdef CONFIG_MACH_XIAOMI_ULYSSE
+#include <linux/time.h>
+#include <linux/delay.h>
+#endif
 
 #define QPNP_LPG_DRIVER_NAME	"qcom,qpnp-pwm"
 #define QPNP_LPG_CHANNEL_BASE	"qpnp-lpg-channel-base"
@@ -339,8 +344,24 @@ struct qpnp_pwm_chip {
 	u32			dtest_line;
 	u32			dtest_output;
 	bool			in_test_mode;
+#ifdef CONFIG_MACH_XIAOMI_ULYSSE
+	struct mutex    lock;
+#endif
 };
 
+#ifdef CONFIG_MACH_XIAOMI_ULYSSE
+struct qpnp_pwm_chip	*pwm_chip;
+
+struct pwm_ir_packet {
+	struct completion  done;
+	struct hrtimer     timer;
+	struct pwm_device *pwm;
+	bool               abort;
+	unsigned int      *buffer;
+	unsigned int       length;
+	unsigned int       next;
+};
+#endif
 /* Internal functions */
 static inline struct qpnp_pwm_chip *qpnp_pwm_from_pwm_dev(
 					struct pwm_device *pwm)
@@ -1067,6 +1088,144 @@ static int qpnp_dtest_config(struct qpnp_pwm_chip *chip, bool enable)
 	return rc;
 }
 
+#ifdef CONFIG_MACH_XIAOMI_ULYSSE
+void pull_down_dtest1(void)
+{
+
+	u8 reg = 0;
+	long rc = 0;
+
+	reg = 0xA5;
+	rc = regmap_write(pwm_chip->regmap,
+									pwm_chip->lpg_config.base_addr+0xD0, reg);
+	if(rc)
+		pr_err("Failed to unlock the Secure register\n ");
+	reg = 0x1;
+	rc = regmap_write(pwm_chip->regmap,
+					pwm_chip->lpg_config.base_addr+0xE2, reg);
+	if(rc)
+		pr_err("Failed to setting DTEST1 LPG_OUT_lo\n");
+}
+
+long stop_ir_pwm_data(void)
+{
+
+	u8 reg = 0;
+	long rc = 0;
+
+	if(pwm_chip->dtest_line!=1) {
+		pwm_chip->enabled = false;
+
+		reg = 0x0;
+		regmap_write(pwm_chip->regmap, pwm_chip->lpg_config.base_addr+0x46, reg);
+		if(rc){
+			pr_err("Failed to disable PWM output disable\n");
+			return -1;
+		}
+	}
+	return 0;
+}
+
+long qpnp_ir_pwm_data(void *arg)
+{
+	struct pwm_ir_packet *pkt = arg;
+	u8 reg = 0;
+	long rc = 0;
+	unsigned long flags;
+
+	mutex_lock(&pwm_chip->lock);
+	spin_lock_irqsave(&pwm_chip->lpg_lock, flags);
+
+	reg = 0xA5;
+	rc = regmap_write(pwm_chip->regmap, pwm_chip->lpg_config.base_addr+0xD0, reg);
+	if(rc){
+		pr_err("Failed to unlock the Secure register\n ");
+		goto error;
+	}
+
+	if(pwm_chip->dtest_line == 1) {
+		reg = 0x1;
+		rc = regmap_write(pwm_chip->regmap,
+									pwm_chip->lpg_config.base_addr+0xE2, reg);
+		if(rc){
+			pr_err("Failed to setting DTEST1 LPG_OUT_lo\n");
+			goto error;
+		}
+	}
+
+	reg = 0xA8;
+	rc  = regmap_write(pwm_chip->regmap,
+								   pwm_chip->lpg_config.base_addr+0x44, reg);
+	if(rc){
+		pr_err("LSB:Failed to setting PWM duty as 0.33\n");
+	goto error;
+	}
+	reg = 0x0;
+	rc = regmap_write(pwm_chip->regmap,
+								   pwm_chip->lpg_config.base_addr+0x45, reg);
+	if(rc){
+		pr_err("MSB: Failed to setting PWM duty as 0.33 \n");
+		goto error;
+	}
+	for (; pkt->next < pkt->length; pkt->next++) {
+		if (signal_pending(current))
+			break;
+		if (pkt->next & 0x01)
+		{
+			reg = 0x0;
+			regmap_write(pwm_chip->regmap,
+												pwm_chip->lpg_config.base_addr+0x46, reg);
+			if(rc){
+				pr_err("Failed to disable PWM output disable\n");
+				goto error;
+			}
+		} else {
+
+			reg = 0x80;
+			rc = regmap_write(pwm_chip->regmap,
+												pwm_chip->lpg_config.base_addr+0x46, reg);
+			if(rc){
+				pr_err("Failed to Writing PWM output enable register\n");
+				goto error;
+			}
+
+			reg = 0x1;
+			rc = regmap_write(pwm_chip->regmap,
+												pwm_chip->lpg_config.base_addr+0x47, reg);
+			if(rc){
+				pr_err("Failed to enable PWM output\n");
+				goto error;
+			}
+		}
+
+		ndelay(pkt->buffer[pkt->next]%1000);
+		udelay(pkt->buffer[pkt->next]/1000);
+
+	}
+
+	reg = 0x0;
+	rc = regmap_write(pwm_chip->regmap,
+												pwm_chip->lpg_config.base_addr+0x46, reg);
+	if(rc){
+			pr_err("Failed to disable PWM output\n");
+			goto error;
+	}
+
+	if(pwm_chip->dtest_line!=1)
+		pwm_chip->enabled = true;
+	spin_unlock_irqrestore(&pwm_chip->lpg_lock, flags);
+	mutex_unlock(&pwm_chip->lock);
+	return pkt->next ? : -ERESTARTSYS;
+
+error:
+	if(pwm_chip->dtest_line!=1)
+		pwm_chip->enabled = true;
+	spin_unlock_irqrestore(&pwm_chip->lpg_lock, flags);
+	mutex_unlock(&pwm_chip->lock);
+	return rc;
+
+}
+#endif
 static int qpnp_lpg_configure_lut_state(struct qpnp_pwm_chip *chip,
 				enum qpnp_lut_state state)
 {
@@ -2110,7 +2269,15 @@ static int qpnp_parse_dt_config(struct platform_device *pdev,
 
 	chip->pwm_mode = mode;
 	_pwm_change_mode(chip, mode);
+#ifdef CONFIG_MACH_XIAOMI_ULYSSE
+	if(chip->dtest_line!=1) {
+		_pwm_enable(chip);
+    } else {
+		pull_down_dtest1();
+    }
+#else
 	_pwm_enable(chip);
+#endif
 
 read_opt_props:
 	/* Initialize optional config parameters from DT if provided */
@@ -2134,7 +2301,9 @@ static struct pwm_ops qpnp_pwm_ops = {
 
 static int qpnp_pwm_probe(struct platform_device *pdev)
 {
+#ifndef CONFIG_MACH_XIAOMI_ULYSSE
 	struct qpnp_pwm_chip	*pwm_chip;
+#endif
 	int			rc;
 
 	pwm_chip = kzalloc(sizeof(*pwm_chip), GFP_KERNEL);
@@ -2149,6 +2318,9 @@ static int qpnp_pwm_probe(struct platform_device *pdev)
 	}
 
 	spin_lock_init(&pwm_chip->lpg_lock);
+#ifdef CONFIG_MACH_XIAOMI_ULYSSE
+	mutex_init(&pwm_chip->lock);
+#endif
 
 	pwm_chip->pdev = pdev;
 	dev_set_drvdata(&pdev->dev, pwm_chip);

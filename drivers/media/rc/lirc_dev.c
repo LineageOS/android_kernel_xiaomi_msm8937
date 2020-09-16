@@ -203,9 +203,12 @@ static int lirc_allocate_buffer(struct irctl *ir)
 	struct lirc_driver *d = &ir->d;
 
 	mutex_lock(&lirc_dev_lock);
-
+#ifdef CONFIG_IR_PWM
+	bytes_in_key = (d->code_length + 7) / 8;
+#else
 	bytes_in_key = BITS_TO_LONGS(d->code_length) +
 						(d->code_length % 8 ? 1 : 0);
+#endif
 	buffer_size = d->buffer_size ? d->buffer_size : BUFLEN / bytes_in_key;
 	chunk_size  = d->chunk_size  ? d->chunk_size  : bytes_in_key;
 

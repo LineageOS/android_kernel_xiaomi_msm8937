@@ -162,6 +162,9 @@ struct rc_dev {
 	u32				last_scancode;
 	u8				last_toggle;
 	u32				timeout;
+#ifdef CONFIG_IR_PWM
+	u32				open_count;
+#endif
 	u32				min_timeout;
 	u32				max_timeout;
 	u32				rx_resolution;
