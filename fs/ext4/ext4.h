@@ -1142,6 +1142,7 @@ struct ext4_inode_info {
 #define EXT4_MOUNT_BLOCK_VALIDITY	0x20000000 /* Block validity checking */
 #define EXT4_MOUNT_DISCARD		0x40000000 /* Issue DISCARD requests */
 #define EXT4_MOUNT_INIT_INODE_TABLE	0x80000000 /* Initialize uninitialized itables */
+#define EXT4_MOUNT_NO_SEHASH_XATTR	0x100000000 /* Ignore security.sehash extended attribute */
 
 /*
  * Mount flags set either automatically (could not be set by mount option)
