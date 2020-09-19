@@ -32,15 +32,26 @@
 };
 
 /* From stock msm8937-mtp.dtsi */
-&pm8937_gpios{
-	gpio@c500{
+/* Adapted for msm-4.9 */
+&pm8937_gpios {
+	interrupts = <0x0 0xc0 0 IRQ_TYPE_NONE>,
+		 <0x0 0xc1 0 IRQ_TYPE_NONE>,
+		 <0x0 0xc4 0 IRQ_TYPE_NONE>,
+		 <0x0 0xc5 0 IRQ_TYPE_NONE>,
+		 <0x0 0xc6 0 IRQ_TYPE_NONE>,
+		 <0x0 0xc7 0 IRQ_TYPE_NONE>;
+	interrupt-names = "pm8937_gpio1", "pm8937_gpio2", "pm8937_gpio5",
+			  "pm8937_gpio6", "pmi8937_gpio7", "pm8937_gpio8";
+	qcom,gpios-disallowed = <3 4>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pwm_ir_default>;
+	pwm_ir_default: pm8937_gpio6 {
+		pins = "gpio6";
+		function = "dtest2";
+		qcom,drive-strength = <2>;
+		output-low;
+		bias-disable;
 		status = "okay";
-		qcom,mode = <1>;
-		qcom,pull = <5>;
-		qcom,src-sel = <5>;
-		qcom,vin-sel = <3>;
-		qcom,master-en = <1>;
-		qcom,out-strength = <3>;
 	};
 };
 
