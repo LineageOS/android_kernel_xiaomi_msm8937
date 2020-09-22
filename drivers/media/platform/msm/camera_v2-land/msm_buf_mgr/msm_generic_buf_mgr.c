@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2016, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2013-2018, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -73,9 +73,6 @@ static int32_t msm_buf_mngr_get_buf(struct msm_buf_mngr_device *dev,
 	new_entry->session_id = buf_info->session_id;
 	new_entry->stream_id = buf_info->stream_id;
 	new_entry->index = new_entry->vb2_buf->v4l2_buf.index;
-	spin_lock_irqsave(&dev->buf_q_spinlock, flags);
-	list_add_tail(&new_entry->entry, &dev->buf_qhead);
-	spin_unlock_irqrestore(&dev->buf_q_spinlock, flags);
 	buf_info->index = new_entry->vb2_buf->v4l2_buf.index;
 	if (buf_info->type == MSM_CAMERA_BUF_MNGR_BUF_USER) {
 		mutex_lock(&dev->cont_mutex);
@@ -87,6 +84,15 @@ static int32_t msm_buf_mngr_get_buf(struct msm_buf_mngr_device *dev,
 			rc = -EINVAL;
 		}
 		mutex_unlock(&dev->cont_mutex);
+	}
+	if (!rc) {
+		spin_lock_irqsave(&dev->buf_q_spinlock, flags);
+		list_add_tail(&new_entry->entry, &dev->buf_qhead);
+		spin_unlock_irqrestore(&dev->buf_q_spinlock, flags);
+	} else {
+		pr_err("List not empty or msm_buf_mngr_hdl_cont_get_buf failed %pK\n",
+			new_entry->vb2_buf);
+		kfree(new_entry);
 	}
 	return rc;
 }
@@ -249,8 +255,8 @@ static void msm_buf_mngr_sd_shutdown(struct msm_buf_mngr_device *dev,
 	if (!list_empty(&dev->buf_qhead)) {
 		list_for_each_entry_safe(bufs,
 			save, &dev->buf_qhead, entry) {
-			pr_info("%s: Delete invalid bufs =%lx, session_id=%u, bufs->ses_id=%d, str_id=%d, idx=%d\n",
-				__func__, (unsigned long)bufs, session->session,
+			pr_info("%s: Delete invalid bufs =%pK, session_id=%u, bufs->ses_id=%d, str_id=%d, idx=%d\n",
+				__func__, (void *)bufs, session->session,
 				bufs->session_id, bufs->stream_id,
 				bufs->index);
 			if (session->session == bufs->session_id) {
