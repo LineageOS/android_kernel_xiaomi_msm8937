@@ -166,6 +166,23 @@ static int msm_jpegdma_hw_get_num_pipes(struct msm_jpegdma_device *dma)
 }
 
 /*
+ * msm_jpegdma_hw_get_clock_index - Get clock index by name
+ * @dma: Pointer to dma device.
+ * @clk_name: clock name.
+ */
+int msm_jpegdma_hw_get_clock_index(struct msm_jpegdma_device *dma,
+		const char *clk_name)
+{
+	uint32_t i = 0;
+
+	for (i = 0; i < dma->num_clk; i++) {
+		if (!strcmp(clk_name, dma->jpeg_clk_info[i].clk_name))
+			return i;
+	}
+	return -EINVAL;
+}
+
+/*
  * msm_jpegdma_hw_reset - Reset jpeg dma core.
  * @dma: Pointer to dma device.
  */
@@ -782,12 +799,20 @@ static int msm_jpegdma_hw_calc_speed(struct msm_jpegdma_device *dma,
 	u64 height;
 	u64 real_clock;
 	u64 calc_rate;
+	int core_clk_idx;
 
 	width = size->in_size.width + size->in_size.left;
 	height = size->in_size.height + size->in_size.top;
 
 	calc_rate = (width * height * size->format.depth * size->fps) / 16;
-	real_clock = clk_round_rate(dma->clk[MSM_JPEGDMA_CORE_CLK], calc_rate);
+	core_clk_idx = msm_jpegdma_hw_get_clock_index(dma,
+		MSM_JPEGDMA_CORE_CLK);
+	if (core_clk_idx < 0) {
+		dev_err(dma->dev, "Can get clock index for dma %s\n",
+			MSM_JPEGDMA_CORE_CLK);
+	}
+
+	real_clock = clk_round_rate(dma->clk[core_clk_idx], calc_rate);
 	if (real_clock < 0) {
 		dev_err(dma->dev, "Can not round core clock\n");
 		return -EINVAL;
@@ -817,6 +842,7 @@ static int msm_jpegdma_hw_set_speed(struct msm_jpegdma_device *dma,
 	struct msm_jpegdma_speed new_sp;
 	struct msm_jpegdma_size_config new_size;
 	int ret;
+	int core_clk_idx;
 
 	if (dma->active_clock_rate >= speed->core_clock)
 		return 0;
@@ -830,7 +856,14 @@ static int msm_jpegdma_hw_set_speed(struct msm_jpegdma_device *dma,
 			return -EINVAL;
 	}
 
-	ret = clk_set_rate(dma->clk[MSM_JPEGDMA_CORE_CLK], new_sp.core_clock);
+	core_clk_idx = msm_jpegdma_hw_get_clock_index(dma,
+		MSM_JPEGDMA_CORE_CLK);
+	if (core_clk_idx < 0) {
+		dev_err(dma->dev, "Can get clock index for dma %s\n",
+			MSM_JPEGDMA_CORE_CLK);
+	}
+
+	ret = clk_set_rate(dma->clk[core_clk_idx], new_sp.core_clock);
 	if (ret < 0) {
 		dev_err(dma->dev, "Fail Core clock rate %d\n", ret);
 		return -EINVAL;
@@ -1022,13 +1055,20 @@ int msm_jpegdma_hw_set_config(struct msm_jpegdma_device *dma,
 	plane_cfg->plane[0].active_pipes = dma->hw_num_pipes;
 	plane_cfg->plane[0].type = size_cfg->format.planes[0];
 	msm_jpegdma_hw_calc_config(size_cfg, &plane_cfg->plane[0]);
+
+	in_offset = size_cfg->in_offset;
+	out_offset = size_cfg->out_offset;
+
+	msm_jpegdma_hw_add_plane_offset(&plane_cfg->plane[0],
+		in_offset, out_offset);
+
 	if (size_cfg->format.num_planes == 1)
 		return 0;
 
-	in_offset = size_cfg->in_size.scanline *
-		size_cfg->in_size.stride;
-	out_offset = size_cfg->out_size.scanline *
-		size_cfg->out_size.stride;
+	in_offset += (size_cfg->in_size.scanline *
+		size_cfg->in_size.stride);
+	out_offset += (size_cfg->out_size.scanline *
+		size_cfg->out_size.stride);
 
 	memset(&plane_size, 0x00, sizeof(plane_size));
 	for (i = 1; i < size_cfg->format.num_planes; i++) {
@@ -1331,42 +1371,48 @@ int msm_jpegdma_hw_get_mem_resources(struct platform_device *pdev,
  */
 int msm_jpegdma_hw_get_qos(struct msm_jpegdma_device *dma)
 {
-	int i;
+	int i, j;
 	int ret;
 	unsigned int cnt;
 	const void *property;
 
-	property = of_get_property(dma->dev->of_node, "qcom,qos-regs", &cnt);
+	property = of_get_property(dma->dev->of_node,
+		"qcom,qos-reg-settings", &cnt);
 	if (!property || !cnt) {
 		dev_dbg(dma->dev, "Missing qos settings\n");
 		return 0;
 	}
-	cnt /= 4;
 
-	dma->qos_regs = kzalloc((sizeof(*dma->qos_regs) * cnt), GFP_KERNEL);
+	cnt /= 4;
+	if (cnt % 2)
+		return -EINVAL;
+
+	dma->qos_regs_num = cnt / 2;
+
+	dma->qos_regs = kzalloc((sizeof(struct jpegdma_reg_cfg) *
+		dma->qos_regs_num), GFP_KERNEL);
 	if (!dma->qos_regs)
 		return -ENOMEM;
 
-	for (i = 0; i < cnt; i++) {
+	for (i = 0, j = 0; i < cnt; i += 2, j++) {
 		ret = of_property_read_u32_index(dma->dev->of_node,
-			"qcom,qos-regs", i,
-			&dma->qos_regs[i].reg);
+			"qcom,qos-reg-settings", i,
+			&dma->qos_regs[j].reg);
 		if (ret < 0) {
-			dev_err(dma->dev, "can not read qos reg %d\n", i);
+			dev_err(dma->dev, "can not read qos reg %d\n", j);
 			goto error;
 		}
 
 		ret = of_property_read_u32_index(dma->dev->of_node,
-			"qcom,qos-settings", i,
-			&dma->qos_regs[i].val);
+			"qcom,qos-reg-settings", i + 1,
+			&dma->qos_regs[j].val);
 		if (ret < 0) {
-			dev_err(dma->dev, "can not read qos setting %d\n", i);
+			dev_err(dma->dev, "can not read qos setting %d\n", j);
 			goto error;
 		}
-		dev_dbg(dma->dev, "Qos idx %d, reg %x val %x\n", i,
-			dma->qos_regs[i].reg, dma->qos_regs[i].val);
+		dev_dbg(dma->dev, "Qos idx %d, reg %x val %x\n", j,
+			dma->qos_regs[j].reg, dma->qos_regs[j].val);
 	}
-	dma->qos_regs_num = cnt;
 
 	return 0;
 error:
@@ -1392,43 +1438,49 @@ void msm_jpegdma_hw_put_qos(struct msm_jpegdma_device *dma)
  */
 int msm_jpegdma_hw_get_vbif(struct msm_jpegdma_device *dma)
 {
-	int i;
+	int i, j;
 	int ret;
 	unsigned int cnt;
 	const void *property;
 
-	property = of_get_property(dma->dev->of_node, "qcom,vbif-regs", &cnt);
+	property = of_get_property(dma->dev->of_node, "qcom,vbif-reg-settings",
+		&cnt);
 	if (!property || !cnt) {
 		dev_dbg(dma->dev, "Missing vbif settings\n");
 		return 0;
 	}
-	cnt /= 4;
 
-	dma->vbif_regs = kzalloc((sizeof(*dma->vbif_regs) * cnt), GFP_KERNEL);
+	cnt /= 4;
+	if (cnt % 2)
+		return -EINVAL;
+
+	dma->vbif_regs_num = cnt / 2;
+
+	dma->vbif_regs = kzalloc((sizeof(struct jpegdma_reg_cfg) *
+		dma->vbif_regs_num), GFP_KERNEL);
 	if (!dma->vbif_regs)
 		return -ENOMEM;
 
-	for (i = 0; i < cnt; i++) {
+	for (i = 0, j = 0; i < cnt; i += 2, j++) {
 		ret = of_property_read_u32_index(dma->dev->of_node,
-			"qcom,vbif-regs", i,
-			&dma->vbif_regs[i].reg);
+			"qcom,vbif-reg-settings", i,
+			&dma->vbif_regs[j].reg);
 		if (ret < 0) {
-			dev_err(dma->dev, "can not read vbif reg %d\n", i);
+			dev_err(dma->dev, "can not read vbif reg %d\n", j);
 			goto error;
 		}
 
 		ret = of_property_read_u32_index(dma->dev->of_node,
-			"qcom,vbif-settings", i,
-			&dma->vbif_regs[i].val);
+			"qcom,vbif-reg-settings", i + 1,
+			&dma->vbif_regs[j].val);
 		if (ret < 0) {
-			dev_err(dma->dev, "can not read vbif setting %d\n", i);
+			dev_err(dma->dev, "can not read vbif setting %d\n", j);
 			goto error;
 		}
 
-		dev_dbg(dma->dev, "Vbif idx %d, reg %x val %x\n", i,
-			dma->vbif_regs[i].reg, dma->vbif_regs[i].val);
+		dev_dbg(dma->dev, "Vbif idx %d, reg %x val %x\n", j,
+			dma->vbif_regs[j].reg, dma->vbif_regs[j].val);
 	}
-	dma->vbif_regs_num = cnt;
 
 	return 0;
 error:
@@ -1454,46 +1506,50 @@ void msm_jpegdma_hw_put_vbif(struct msm_jpegdma_device *dma)
  */
 int msm_jpegdma_hw_get_prefetch(struct msm_jpegdma_device *dma)
 {
-	int i;
+	int i, j;
 	int ret;
 	unsigned int cnt;
 	const void *property;
 
-	property = of_get_property(dma->dev->of_node, "qcom,prefetch-regs",
-		&cnt);
+	property = of_get_property(dma->dev->of_node,
+		"qcom,prefetch-reg-settings", &cnt);
 	if (!property || !cnt) {
 		dev_dbg(dma->dev, "Missing prefetch settings\n");
 		return 0;
 	}
-	cnt /= 4;
 
-	dma->prefetch_regs = kcalloc(cnt, sizeof(*dma->prefetch_regs),
-		GFP_KERNEL);
+	cnt /= 4;
+	if (cnt % 2)
+		return -EINVAL;
+
+	dma->prefetch_regs_num = cnt / 2;
+
+	dma->prefetch_regs = kzalloc((sizeof(struct jpegdma_reg_cfg) *
+		dma->prefetch_regs_num), GFP_KERNEL);
 	if (!dma->prefetch_regs)
 		return -ENOMEM;
 
-	for (i = 0; i < cnt; i++) {
+	for (i = 0, j = 0; i < cnt; i += 2, j++) {
 		ret = of_property_read_u32_index(dma->dev->of_node,
-			"qcom,prefetch-regs", i,
-			&dma->prefetch_regs[i].reg);
+			"qcom,prefetch-reg-settings", i,
+			&dma->prefetch_regs[j].reg);
 		if (ret < 0) {
-			dev_err(dma->dev, "can not read prefetch reg %d\n", i);
+			dev_err(dma->dev, "can not read prefetch reg %d\n", j);
 			goto error;
 		}
 
 		ret = of_property_read_u32_index(dma->dev->of_node,
-			"qcom,prefetch-settings", i,
-			&dma->prefetch_regs[i].val);
+			"qcom,prefetch-reg-settings", i + 1,
+			&dma->prefetch_regs[j].val);
 		if (ret < 0) {
 			dev_err(dma->dev, "can not read prefetch setting %d\n",
-				i);
+				j);
 			goto error;
 		}
 
-		dev_dbg(dma->dev, "Prefetch idx %d, reg %x val %x\n", i,
-			dma->prefetch_regs[i].reg, dma->prefetch_regs[i].val);
+		dev_dbg(dma->dev, "Prefetch idx %d, reg %x val %x\n", j,
+			dma->prefetch_regs[j].reg, dma->prefetch_regs[j].val);
 	}
-	dma->prefetch_regs_num = cnt;
 
 	return 0;
 error:
@@ -1598,6 +1654,9 @@ int msm_jpegdma_hw_get(struct msm_jpegdma_device *dma)
 		msm_jpegdma_hw_config_qos(dma);
 		msm_jpegdma_hw_config_vbif(dma);
 
+		msm_camera_register_threaded_irq(dma->pdev, dma->irq, NULL,
+			msm_jpegdma_hw_irq, IRQF_ONESHOT | IRQF_TRIGGER_RISING,
+			dev_name(&dma->pdev->dev), dma);
 		msm_jpegdma_hw_enable_irq(dma);
 
 		ret = msm_jpegdma_hw_reset(dma);
@@ -1666,7 +1725,7 @@ void msm_jpegdma_hw_put(struct msm_jpegdma_device *dma)
  */
 static int msm_jpegdma_hw_attach_iommu(struct msm_jpegdma_device *dma)
 {
-	int ret;
+	int ret = -EINVAL;
 
 	mutex_lock(&dma->lock);
 
