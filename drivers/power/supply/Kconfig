@@ -545,6 +545,12 @@ config NX30P6093
 	  usb_psy to disable CC detection on the event of any water/debris
 	  detected at USBIN.
 
+config BATTERY_CW2015
+	tristate "CW2015 battery driver"
+	depends on I2C
+	help
+	  Say Y here to enable Test sysfs Interface for CW2015 Drivers.
+
 source "drivers/power/supply/qcom/Kconfig"
 
 endif # POWER_SUPPLY
