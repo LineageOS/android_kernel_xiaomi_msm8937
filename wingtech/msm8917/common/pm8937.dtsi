@@ -11,17 +11,12 @@
 };
 
 /* From stock msm8917-pmi8937-qrd-sku5_S8850?.dtsi */
-&pm8937_1{
-	pm8937_pwm: pwm@bc00 {
-		status = "ok";
-		compatible = "qcom,qpnp-pwm";
-		reg = <0xbc00 0x100>;
-		reg-names = "qpnp-lpg-channel-base";
-		qcom,channel-id = <0>;
-		qcom,supported-sizes = <6>, <9>;
-		qcom,force-pwm-size = <9>;
-		#pwm-cells = <2>;
-	};
+&pm8937_pwm {
+	status = "ok";
+	compatible = "qcom,pwm-lpg";
+	reg = <0xbc00 0x100>;
+	reg-names = "lpg-base";
+	#pwm-cells = <2>;
 };
 &pm8937_gpios {
 	pinctrl-names = "default";
