@@ -2570,6 +2570,8 @@ void mmc_gate_clock(struct mmc_host *host)
  */
 void mmc_ungate_clock(struct mmc_host *host)
 {
+	struct mmc_card *card = host->card;
+
 	/*
 	 * We should previously have gated the clock, so the clock shall
 	 * be 0 here! The clock may however be 0 during initialization,
@@ -2587,6 +2589,7 @@ void mmc_ungate_clock(struct mmc_host *host)
 		 * To workaround this issue, we are triggering retuning of the
 		 * tuning circuit after ungating the controller clocks.
 		 */
+		if (!strstr(card->cid.prod_name,"HAG2e"))
 		mmc_retune_needed(host);
 	}
 }
