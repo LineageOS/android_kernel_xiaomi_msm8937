@@ -46,6 +46,7 @@
 		goodix,auto-update = <0>;
 		goodix,auto-update-cfg = <0>;
 		goodix,power-off-sleep = <0>;
+		goodix,slide-wakeup = <1>;
 		goodix,rst-gpio = <&tlmm 64 0x00>;
 		goodix,irq-gpio = <&tlmm 65 0x2008>;
 		goodix,cfg-group0 = [
