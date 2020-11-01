@@ -183,6 +183,8 @@
 #define SMB358_DEFAULT_BATT_CAPACITY	10
 #define SMB358_BATT_GOOD_THRE_2P5	0x1
 
+bool thermal = false;
+
 extern struct device_node *of_batterydata_get_best_profile(
 		const struct device_node *batterydata_container_node,
 		const char *psy_name,  const char  *batt_type);
@@ -192,6 +194,11 @@ enum {
 	THERMAL = BIT(1),
 	CURRENT = BIT(2),
 	SOC	= BIT(3),
+};
+
+enum path_type {
+	USB,
+	DC,
 };
 
 struct smb358_regulator {
@@ -234,6 +241,7 @@ struct smb358_charger {
 	struct mutex		path_suspend_lock;
 	struct mutex		irq_complete;
 	u8			irq_cfg_mask[2];
+	int			psy_usb_ma;
 	int			irq_gpio;
 	int			charging_disabled;
 	int			fastchg_current_max_ma;
@@ -273,6 +281,12 @@ struct smb358_charger {
 	const char 				*battery_type;
 	enum power_supply_type  charger_type;
 	u32	 cable_id;
+
+	/* Thermal */
+	unsigned int			thermal_levels;
+	unsigned int			therm_lvl_sel;
+	int			*thermal_mitigation;
+	struct mutex			current_change_lock;
 };
 
 struct smb_irq_info {
@@ -880,6 +894,7 @@ static enum power_supply_property smb358_battery_properties[] = {
 	POWER_SUPPLY_PROP_TEMP,
 	POWER_SUPPLY_PROP_VOLTAGE_NOW,
 	POWER_SUPPLY_PROP_CURRENT_NOW,
+	POWER_SUPPLY_PROP_SYSTEM_TEMP_LEVEL,
 	POWER_SUPPLY_PROP_BATTERY_TYPE,
 	POWER_SUPPLY_PROP_RESISTANCE_ID,
 };
@@ -1101,16 +1116,25 @@ static int smb358_path_suspend(struct smb358_charger *chip, int reason,
 }
 
 static int smb358_set_usb_chg_current(struct smb358_charger *chip,
-		int current_ma)
+		int curr_ma)
 {
 	int i, rc = 0;
 	u8 reg1 = 0, reg2 = 0, mask = 0;
+	int current_ma;
 
 	dev_dbg(chip->dev, "%s: USB current_ma = %d\n", __func__, current_ma);
 
 	if (chip->chg_autonomous_mode) {
 		dev_dbg(chip->dev, "%s: Charger in autonmous mode\n", __func__);
 		return 0;
+	}
+
+	if (thermal == false) {
+		current_ma = curr_ma;
+		pr_debug("current ma1 is %d\n", current_ma);
+	} else {
+		current_ma = min(curr_ma, chip->thermal_mitigation[chip->therm_lvl_sel]);
+		pr_debug("current ma2 is %d\n", current_ma);
 	}
 
 	if (current_ma < USB3_MIN_CURRENT_MA && current_ma != 2)
@@ -1178,6 +1202,7 @@ static int smb358_batt_property_is_writeable(struct power_supply *psy,
 	switch (psp) {
 	case POWER_SUPPLY_PROP_CHARGING_ENABLED:
 	case POWER_SUPPLY_PROP_CAPACITY:
+	case POWER_SUPPLY_PROP_SYSTEM_TEMP_LEVEL:
 		return 1;
 	default:
 		break;
@@ -1191,6 +1216,103 @@ static int bound_soc(int soc)
 	soc = max(0, soc);
 	soc = min(soc, 100);
 	return soc;
+}
+
+static int smb358_set_appropriate_current(struct smb358_charger *chip,
+		enum path_type path)
+{
+	int therm_ma;
+
+
+	int rc = 0;
+
+	if (!chip->usb_psy && path == USB)
+		return 0;
+	/*
+	* If battery is absent do not modify the current at all, these
+	* would be some appropriate values set by the bootloader or default
+	* configuration and since it is the only source of power we should
+	* not change it
+	*/
+	if (chip->battery_missing) {
+		pr_debug("ignoring current request since battery is absent\n");
+		return 0;
+	}
+
+	#if 0
+	if (path == USB) {
+		path_current = chip->usb_psy_ma;
+		func = smb135x_set_usb_chg_current;
+	} else {
+		path_current = chip->dc_psy_ma;
+		func = smb135x_set_dc_chg_current;
+		if (chip->dc_psy_type == -EINVAL)
+			func = NULL;
+	}
+	#endif
+
+	if (chip->therm_lvl_sel >= 0
+			&& chip->therm_lvl_sel <= (chip->thermal_levels - 1)) {	/*
+		* consider thermal limit only when it is active and not at
+		* the highest level
+		*/
+		therm_ma = chip->thermal_mitigation[chip->therm_lvl_sel];
+		if (chip->therm_lvl_sel == 0) {
+			thermal = false;
+		} else {
+			thermal = true;
+		}
+	} else {
+
+		pr_debug("Not effective thermal levels\n");
+				pr_debug("therm_ma is %d\n", therm_ma);
+	}
+
+
+	therm_ma = min(therm_ma, chip->psy_usb_ma);
+	pr_debug("therm_ma is %d\n", therm_ma);
+	pr_debug("chip->psy_usb_ma is %d\n", chip->psy_usb_ma);
+	pr_debug("thermal limited charging current to %d\n", therm_ma);
+
+	smb358_set_usb_chg_current(chip,  therm_ma);
+	return rc;
+}
+
+
+static int smb358_system_temp_level_set(struct smb358_charger *chip,
+								int lvl_sel)
+{
+	int rc = 0;
+	int prev_therm_lvl;
+
+	if (!chip->thermal_mitigation) {
+		pr_err("Thermal mitigation not supported\n");
+		return -EINVAL;
+	}
+
+	if (lvl_sel < 0) {
+		pr_err("Unsupported level selected %d\n", lvl_sel);
+		return -EINVAL;
+	}
+
+	if (lvl_sel >= chip->thermal_levels) {
+		pr_err("Unsupported level selected %d forcing %d\n", lvl_sel,
+				chip->thermal_levels - 1);
+		lvl_sel = chip->thermal_levels - 1;
+	}
+
+	if (lvl_sel == chip->therm_lvl_sel)
+		return 0;
+
+	mutex_lock(&chip->current_change_lock);
+	prev_therm_lvl = chip->therm_lvl_sel;
+	chip->therm_lvl_sel = lvl_sel;
+	pr_debug("chip->therm_lvl_sel = %d\n", chip->therm_lvl_sel);
+
+	smb358_set_appropriate_current(chip, USB);
+
+	mutex_unlock(&chip->current_change_lock);
+	return rc;
 }
 
 static int smb358_battery_set_property(struct power_supply *psy,
@@ -1247,6 +1369,9 @@ static int smb358_battery_set_property(struct power_supply *psy,
 		chip->fake_battery_soc = bound_soc(val->intval);
 		power_supply_changed(chip->batt_psy);
 		break;
+	case POWER_SUPPLY_PROP_SYSTEM_TEMP_LEVEL:
+		smb358_system_temp_level_set(chip, val->intval);
+		break;
 	default:
 		return -EINVAL;
 	}
@@ -1269,6 +1394,9 @@ static int smb358_battery_get_property(struct power_supply *psy,
 		break;
 	case POWER_SUPPLY_PROP_CAPACITY:
 		val->intval = smb358_get_prop_batt_capacity(chip);
+		break;
+	case POWER_SUPPLY_PROP_SYSTEM_TEMP_LEVEL:
+		val->intval = chip->therm_lvl_sel;
 		break;
 	case POWER_SUPPLY_PROP_CHARGING_ENABLED:
 		val->intval = !(chip->charging_disabled_status & USER);
@@ -1763,7 +1891,7 @@ static void smb358_external_power_changed(struct power_supply *psy)
 	else
 		current_limit = prop.intval / 1000;
 
-
+	chip->psy_usb_ma = current_limit;
 	smb358_enable_volatile_writes(chip);
 	smb358_set_usb_chg_current(chip, current_limit);
 
@@ -2087,6 +2215,28 @@ static int smb_parse_dt(struct smb358_charger *chip)
 				"%s: Failed to get vcc_i2c regulator\n",
 								__func__);
 			return PTR_ERR(chip->vcc_i2c);
+		}
+	}
+
+	if (of_find_property(node, "qcom,thermal-mitigation",
+					&chip->thermal_levels)) {
+		chip->thermal_mitigation = devm_kzalloc(chip->dev,
+			chip->thermal_levels,
+			GFP_KERNEL);
+
+		if (chip->thermal_mitigation == NULL) {
+			pr_err("thermal mitigation kzalloc() failed.\n");
+			return -ENOMEM;
+		}
+
+		chip->thermal_levels /= sizeof(int);
+		rc = of_property_read_u32_array(node,
+				"qcom,thermal-mitigation",
+				chip->thermal_mitigation, chip->thermal_levels);
+		pr_debug("thermal_mitigations = %d, %d, %d, %d; thermal_levels = %d\n", chip->thermal_mitigation[0], chip->thermal_mitigation[1], chip->thermal_mitigation[2], chip->thermal_mitigation[3], chip->thermal_levels);
+		if (rc) {
+			pr_err("Couldn't read threm limits rc = %d\n", rc);
+			return rc;
 		}
 	}
 
