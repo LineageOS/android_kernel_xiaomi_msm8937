@@ -57,6 +57,8 @@ static int gtp_esd_init(struct goodix_ts_data *ts);
 static void gtp_esd_check_func(struct work_struct *);
 static int gtp_init_ext_watchdog(struct i2c_client *client);
 
+static int gesture_done_flag = 1;
+
 /*
  * return: 2 - ok, < 0 - i2c transfer error
  */
@@ -333,6 +335,7 @@ static int gtp_gesture_handler(struct goodix_ts_data *ts)
 		/*  clear 0x814B */
 		doze_buf[2] = 0x00;
 		gtp_i2c_write(ts->client, doze_buf, 3);
+		gesture_done_flag = 1;
 	} else {
 		/*  clear 0x814B */
 		doze_buf[2] = 0x00;
@@ -573,7 +576,7 @@ static void gtp_work_func(struct goodix_ts_data *ts)
 		return;
 
 	/* gesture event */
-	if (ts->pdata->slide_wakeup && test_bit(DOZE_MODE, &ts->flags)) {
+	if (!gesture_done_flag && ts->pdata->slide_wakeup && test_bit(DOZE_MODE, &ts->flags)) {
 		ret =  gtp_gesture_handler(ts);
 		if (ret)
 			dev_err(&ts->client->dev,
@@ -2314,6 +2317,8 @@ static int gtp_gesture_wakeup(struct goodix_ts_data *ts)
 static void gtp_resume(struct goodix_ts_data *ts)
 {
 	int ret = 0;
+
+	gesture_done_flag = 0;
 
 	if (test_bit(FW_UPDATE_RUNNING, &ts->flags)) {
 		dev_info(&ts->client->dev,
