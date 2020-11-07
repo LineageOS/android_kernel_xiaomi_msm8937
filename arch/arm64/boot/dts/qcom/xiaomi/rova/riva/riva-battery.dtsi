@@ -37,6 +37,7 @@
 
 		regulator-name = "bq2560x_otg_supply";
 		vdd-supply = <&pm8937_l17>;
+		dpdm-supply = <&usb_otg>;
 
 		ti,bq2560x,chip-enable-gpio = <48>;
 		ti,bq2560x,usb-vlim = <4400>;
