@@ -9,6 +9,7 @@
 		pinctrl-0 = <&smb_int_default>;
 
 		regulator-name = "bq2560x_otg_supply";
+		dpdm-supply = <&usb_otg>;
 		vdd-supply = <&pm8937_l17>;
 		//qcom,bms-psy-name = "bms";
 
