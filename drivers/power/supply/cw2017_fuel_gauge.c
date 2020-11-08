@@ -23,7 +23,7 @@
 #undef KERNEL_VERSION
 #define KERNEL_VERSION(a, b, c) (((a) << 16) + ((b) << 8) + (c))
 #undef LINUX_VERSION_CODE
-#define LINUX_VERSION_CODE KERNEL_VERSION(3, 1, 8)
+#define LINUX_VERSION_CODE KERNEL_VERSION(4, 0, 9)
 
 #define SMB_VTG_MIN_UV		1800000
 #define SMB_VTG_MAX_UV		1800000
@@ -123,12 +123,7 @@ struct cw_battery {
 	struct delayed_work interrupt_work;
 #endif
 
-#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 1, 0)
-	struct power_supply cw_bat;
-#else
 	struct power_supply *cw_bat;
-#endif
-	struct power_supply *usb_psy;
 
 	/*User set*/
 	unsigned int design_capacity;
@@ -592,7 +587,7 @@ static void cw_bat_work(struct work_struct *work)
 
 		cw_bat->voltage_before_change = cw_bat->voltage;
 		#ifdef CW_PROPERTIES
-		#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 1, 0)
+		#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 0, 9)
 		power_supply_changed(&cw_bat->cw_bat);
 		#else
 		power_supply_changed(cw_bat->cw_bat);
@@ -637,20 +632,6 @@ static int cw_get_battid_resister(struct cw_battery *cw_bat)
 	return batt_id_kohm;
 }
 
-
-
-static int cw_get_usb_present(struct cw_battery *cw_bat)
-{
-	union power_supply_propval prop = {0,};
-	int ret;
-
-	ret = cw_bat->usb_psy->get_property(cw_bat->usb_psy,
-							POWER_SUPPLY_PROP_PRESENT, &prop);
-	if (ret < 0)
-		pr_err("could not read USB current_max property, ret=%d\n", ret);
-	return prop.intval;
-}
-
 static int cw_get_batt_status(struct cw_battery *cw_bat)
 {
 #if (0)
@@ -683,19 +664,11 @@ static int cw_battery_get_property(struct power_supply *psy,
 {
     int ret = 0;
 
-#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 1, 0)
-    struct cw_battery *cw_bat;
-    cw_bat = container_of(psy, struct cw_battery, cw_bat);
-#else
 	struct cw_battery *cw_bat = power_supply_get_drvdata(psy);
-#endif
 
     switch (psp) {
 	case POWER_SUPPLY_PROP_STATUS:
             val->intval = cw_get_batt_status(cw_bat);
-            break;
-	case POWER_SUPPLY_PROP_ONLINE:
-            val->intval = cw_get_usb_present(cw_bat);
             break;
     case POWER_SUPPLY_PROP_CAPACITY:
             val->intval = cw_get_capacity(cw_bat);
@@ -747,9 +720,6 @@ static int cw_battery_get_property(struct power_supply *psy,
             val->intval = cw_get_current(cw_bat);
             break;
 
-	case POWER_SUPPLY_PROP_RESISTANCE_ID:
-		    val->intval = (cw_bat->battery_id)*1000;
-            break;
 	case POWER_SUPPLY_PROP_BATTERY_TYPE:
             val->strval = cw_bat->battery_type;
             break;
@@ -805,12 +775,7 @@ static int cw_battery_set_property(struct power_supply *psy,
 {
 	int ret = 0;
 
-#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 1, 0)
-	struct cw_battery *cw_bat;
-	cw_bat = container_of(psy, struct cw_battery, cw_bat);
-#else
 	struct cw_battery *cw_bat = power_supply_get_drvdata(psy);
-#endif
 
 	switch (psp) {
 	case POWER_SUPPLY_PROP_UPDATE_NOW:
@@ -844,7 +809,6 @@ static enum power_supply_property cw_battery_properties[] = {
 	POWER_SUPPLY_PROP_CHARGE_FULL_DESIGN,
 	POWER_SUPPLY_PROP_CHARGE_FULL,
 	POWER_SUPPLY_PROP_CURRENT_NOW,
-	POWER_SUPPLY_PROP_RESISTANCE_ID,
 	POWER_SUPPLY_PROP_BATTERY_TYPE,
 	POWER_SUPPLY_PROP_UPDATE_NOW,
 };
@@ -906,13 +870,14 @@ static int cw_get_battery_profile(struct cw_battery *cw_bat)
 	const char *data;
 	int data_len = 0;
 	int i = 0;
+	char bms = "bms";
 
 	batt_node = of_parse_phandle(cw_bat->dev->of_node, "qcom,battery-data", 0);
 	if (!batt_node) {
 		pr_err("cw2017: No Batterydata is available\n");
 		return -ENODATA;
 	}
-	batt_data_node = of_batterydata_get_best_profile(batt_node, CW_PROPERTIES, NULL);
+	batt_data_node = of_batterydata_get_best_profile(batt_node, bms, NULL);
 	if (!batt_data_node) {
 		pr_err("cw2017: couldn't find battery profile handle\n");
 		return -ENODATA;
@@ -946,34 +911,20 @@ static int cw_get_battery_profile(struct cw_battery *cw_bat)
 	return 0;
 }
 
-
 static int cw2017_probe(struct i2c_client *client, const struct i2c_device_id *id)
 {
     int ret;
     int loop = 0;
-	struct power_supply *usb_psy;
 	struct cw_battery *cw_bat;
 
 #ifdef CW2017_INTERRUPT
 	int irq = 0;
 #endif
 
-#ifdef CW_PROPERTIES
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0)
 	struct power_supply_desc *psy_desc;
 	struct power_supply_config psy_cfg = {0};
-#endif
-#endif
 
 	cw_printk("\n");
-
-
-	usb_psy = power_supply_get_by_name("usb");
-	if (!usb_psy) {
-		pr_err("cw2017: USB psy not found, defer probe\n");
-		return -EPROBE_DEFER;
-	}
-
 
     cw_bat = devm_kzalloc(&client->dev, sizeof(*cw_bat), GFP_KERNEL);
     if (!cw_bat) {
@@ -986,7 +937,6 @@ static int cw2017_probe(struct i2c_client *client, const struct i2c_device_id *i
 	cw_bat->dev = &client->dev;
 	cw_bat->client = client;
 	cw_bat->volt_id = 0;
-	cw_bat->usb_psy = usb_psy;
 	cw_bat->voltage_before_change = 0;
 
 
@@ -1048,44 +998,25 @@ static int cw2017_probe(struct i2c_client *client, const struct i2c_device_id *i
         return ret;
     }
 
-#ifdef CW_PROPERTIES
-#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 1, 0)
-	cw_bat->cw_bat.name = CW_PROPERTIES;
-	cw_bat->cw_bat.type = POWER_SUPPLY_TYPE_BMS;
-	cw_bat->cw_bat.properties = cw_battery_properties;
-	cw_bat->cw_bat.num_properties = ARRAY_SIZE(cw_battery_properties);
-	cw_bat->cw_bat.get_property = cw_battery_get_property;
-	cw_bat->cw_bat.set_property = cw_battery_set_property;
-	cw_bat->cw_bat.property_is_writeable = cw_battery_prop_is_writeable;
-
-	ret = power_supply_register(&client->dev, &cw_bat->cw_bat);
-	if(ret < 0) {
-	    power_supply_unregister(&cw_bat->cw_bat);
-		pr_err(KERN_ERR"cw2017: failed to register battery: %d \n", ret);
-	    return ret;
-	}
-#else
 	psy_desc = devm_kzalloc(&client->dev, sizeof(*psy_desc), GFP_KERNEL);
 	if (!psy_desc)
 		return -ENOMEM;
 
 	psy_cfg.drv_data = cw_bat;
-	psy_desc->name = CW_PROPERTIES;
+	psy_desc->name = "bms";
 	psy_desc->type = POWER_SUPPLY_TYPE_BATTERY;
 	psy_desc->properties = cw_battery_properties;
 	psy_desc->num_properties = ARRAY_SIZE(cw_battery_properties);
 	psy_desc->get_property = cw_battery_get_property;
 	psy_desc->set_property = cw_battery_set_property;
 	psy_desc->property_is_writeable = cw_battery_prop_is_writeable;
-	cw_bat->cw_bat = power_supply_register(&client->dev, psy_desc, &psy_cfg);
+	cw_bat->cw_bat = devm_power_supply_register(&client->dev, psy_desc, &psy_cfg);
 	if(IS_ERR(cw_bat->cw_bat)) {
 		ret = PTR_ERR(cw_bat->cw_bat);
 	    pr_err(KERN_ERR"[cw2017] failed to register battery: %d\n", ret);
+	    power_supply_unregister(cw_bat->cw_bat);
 	    return ret;
 	}
-#endif
-#endif
-
 	cw_bat->cwfg_workqueue = create_singlethread_workqueue("cwfg_gauge");
 	INIT_DELAYED_WORK(&cw_bat->battery_delay_work, cw_bat_work);
 	queue_delayed_work(cw_bat->cwfg_workqueue, &cw_bat->battery_delay_work , msecs_to_jiffies(50));
@@ -1170,13 +1101,6 @@ static struct i2c_board_info __initdata fgadc_dev = {
 
 static int __init cw2017_init(void)
 {
-
-
-
-
-
-
-
     i2c_add_driver(&cw2017_driver);
     return 0;
 }
