@@ -77,3 +77,4 @@ obj-$(CONFIG_ARCH_QCOM)         += qcom/
 obj-$(CONFIG_AXP288_CHARGER)	+= axp288_charger.o
 obj-$(CONFIG_NX30P6093)		+= nx30p6093.o
 obj-$(CONFIG_BATTERY_CW2015)	+= cw2015_battery.o
+obj-$(CONFIG_GAUGE_CW2017)	+= cw2017_fuel_gauge.o
