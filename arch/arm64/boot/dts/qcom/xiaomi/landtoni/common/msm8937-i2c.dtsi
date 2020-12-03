@@ -2,55 +2,78 @@
 	aw2013@45 {
 		compatible = "awinic,aw2013";
 		reg = <0x45>;
-		rgb_led-supply = <&pm8937_l10>;
+		vdd-supply = <&pm8937_l10>; //Power supply needed to power up the device
+		vcc-supply = <&pm8937_l5>; //Power source required to power up i2c bus
 
-		red {
-			label = "red";
-			linux,default-trigger = "battery-red";
-			default-state = "off";
-			retain-state-suspended;
+		aw2013,red {
+			aw2013,name = "red";
+			aw2013,id = <0>;
+			aw2013,max-brightness = <255>;
+			aw2013,max-current = <1>;
+			aw2013,rise-time-ms = <2>;
+			aw2013,hold-time-ms = <1>;
+			aw2013,fall-time-ms = <2>;
+			aw2013,off-time-ms = <1>;
 		};
-
-		green {
-			label = "green";
-			linux,default-trigger = "battery-green";
-			default-state = "off";
-			retain-state-suspended;
+		aw2013,green {
+			aw2013,name = "green";
+			aw2013,id = <1>;
+			aw2013,max-brightness = <255>;
+			aw2013,max-current = <1>;
+			aw2013,rise-time-ms = <2>;
+			aw2013,hold-time-ms = <1>;
+			aw2013,fall-time-ms = <2>;
+			aw2013,off-time-ms = <1>;
 		};
-
-		blue {
-			label = "blue";
-			linux,default-trigger = "battery-blue";
-			default-state = "off";
-			retain-state-suspended;
+		aw2013,blue {
+			aw2013,name = "blue";
+			aw2013,id = <2>;
+			aw2013,max-brightness = <255>;
+			aw2013,max-current = <1>;
+			aw2013,rise-time-ms = <2>;
+			aw2013,hold-time-ms = <1>;
+			aw2013,fall-time-ms = <2>;
+			aw2013,off-time-ms = <1>;
 		};
-
-		white {
-			label = "white";
-			linux,default-trigger = "none";
-			default-state = "off";
-			retain-state-suspended;
+		aw2013,white {
+			aw2013,name = "white";
+			aw2013,id = <3>;
+			aw2013,max-brightness = <255>;
+			aw2013,max-current = <1>;
+			aw2013,rise-time-ms = <2>;
+			aw2013,hold-time-ms = <1>;
+			aw2013,fall-time-ms = <2>;
+			aw2013,off-time-ms = <1>;
 		};
-
-		yellow {
-			label = "yellow";
-			linux,default-trigger = "none";
-			default-state = "off";
-			retain-state-suspended;
+		aw2013,yellow {
+			aw2013,name = "yellow";
+			aw2013,id = <4>;
+			aw2013,max-brightness = <255>;
+			aw2013,max-current = <1>;
+			aw2013,rise-time-ms = <2>;
+			aw2013,hold-time-ms = <1>;
+			aw2013,fall-time-ms = <2>;
+			aw2013,off-time-ms = <1>;
 		};
-
-		cyan {
-			label = "cyan";
-			linux,default-trigger = "none";
-			default-state = "off";
-			retain-state-suspended;
+		aw2013,cyan {
+			aw2013,name = "cyan";
+			aw2013,id = <5>;
+			aw2013,max-brightness = <255>;
+			aw2013,max-current = <1>;
+			aw2013,rise-time-ms = <2>;
+			aw2013,hold-time-ms = <1>;
+			aw2013,fall-time-ms = <2>;
+			aw2013,off-time-ms = <1>;
 		};
-
-		purple {
-			label = "purple";
-			linux,default-trigger = "none";
-			default-state = "off";
-			retain-state-suspended;
+		aw2013,purple {
+			aw2013,name = "purple";
+			aw2013,id = <6>;
+			aw2013,max-brightness = <255>;
+			aw2013,max-current = <1>;
+			aw2013,rise-time-ms = <2>;
+			aw2013,hold-time-ms = <1>;
+			aw2013,fall-time-ms = <2>;
+			aw2013,off-time-ms = <1>;
 		};
 	};
 
