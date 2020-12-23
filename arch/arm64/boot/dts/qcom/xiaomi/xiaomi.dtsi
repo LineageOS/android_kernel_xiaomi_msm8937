@@ -1,0 +1,4 @@
+#include "remove.dtsi"
+
+#include "android.dtsi"
+#include "soc.dtsi"

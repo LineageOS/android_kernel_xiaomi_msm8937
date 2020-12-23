@@ -1,0 +1,22 @@
+&soc {
+	gpio_keys {
+		/delete-node/ camera_focus;
+		/delete-node/ camera_snapshot;
+	};
+
+	/delete-node/ hbtp;
+};
+
+&i2c_5 {
+	/delete-node/ nq@28;
+};
+
+&pm8937_gpios {
+	/delete-node/ nfc_clk;
+};
+
+&tlmm {
+	/delete-node/ usbc_int_default;
+	/delete-node/ fpc_reset_int;
+	/delete-node/ nfc;
+};

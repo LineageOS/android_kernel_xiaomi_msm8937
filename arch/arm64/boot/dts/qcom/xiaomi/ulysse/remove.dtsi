@@ -1,0 +1,4 @@
+&spmi_bus {
+	/delete-node/ qcom,pmi8937@2;
+	/delete-node/ qcom,pmi8937@3;
+};

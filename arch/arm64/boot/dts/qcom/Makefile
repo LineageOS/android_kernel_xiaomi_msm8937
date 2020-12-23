@@ -677,6 +677,9 @@ dtb-$(CONFIG_ARCH_SDM845_VM) += sdm845-vm.dtb
 
 endif # CONFIG_MACH_XIAOMI
 
+dtb-$(CONFIG_MACH_XIAOMI_ULYSSE) += msm8917-pmi8937-mtp-ugglite.dtb
+dtb-$(CONFIG_MACH_XIAOMI_ULYSSE) += msm8940-pmi8937-mtp-ugg.dtb
+
 always		:= $(dtb-y)
 subdir-y	:= $(dts-dirs)
 clean-files	:= *.dtb

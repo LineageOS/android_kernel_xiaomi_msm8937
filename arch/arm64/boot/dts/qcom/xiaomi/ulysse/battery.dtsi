@@ -1,0 +1,74 @@
+/*
+ * Copyright (c) 2016, The Linux Foundation. All rights reserved.
+ * Copyright (C) 2018 XiaoMi, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 and
+ * only version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+&i2c_2 {
+	status = "ok";
+	bq27426@55 {
+		compatible = "ti,bq27426";
+		reg = <0x55>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <62 2>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&bq_int_default>;
+		vdd-supply = <&pm8937_l16>;
+		ti,battery-type-b = "feimaotui_3080mah";
+		ti,battery-type-a = "guangyu_3080mah";
+		ti,batt-profile-select;
+		qcom,batt_id-vadc = <&pm8937_vadc>;
+		ti,profile-a-rid-kohm = <22>;
+		ti,profile-b-rid-kohm = <110>;
+		ti,batt-id-vref-uv = <1800000>;
+		ti,batt-id-rpullup-kohm = <68>;
+		agassiz,force-select-profile-b;
+	};
+	bq2560x_otg_supply: bq2560x@6B {
+		compatible = "ti,bq25601-charger";
+		reg = <0x6B>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <61 2>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&smb_int_default>;
+		regulator-name = "bq2560x_otg_vreg";
+		ti,bq2560x,chip-enable-gpio = <48>;
+		ti,bq2560x,usb-vlim = <4500>;
+		ti,bq2560x,usb-ilim = <500>;
+		ti,bq2560x,usb-vreg = <4400>;
+		ti,bq2560x,usb-ichg = <500>;
+		ti,bq2560x,ta-vlim = <4500>;
+		ti,bq2560x,ta-ilim = <2000>;
+		ti,bq2560x,ta-vreg = <4400>;
+		ti,bq2560x,ta-ichg = <2000>;
+		ti,bq2560x,precharge-current = <120>;
+		ti,bq2560x,termination-current = <120>;
+		ti,bq2560x,boost-voltage = <4998>;
+		ti,bq2560x,boost-current = <1200>;
+		ti,bq2560x,enable_term;
+		ti,bq2560x,stat-pin-ctrl = <3>;
+		ti,bq2560x,vac-ovp-threshold = <6200>;
+		ti,bq2560x,jeita-hot-degc = <540>;
+		ti,bq2560x,jeita-warm-degc = <450>;
+		ti,bq2560x,jeita-cool-normal-degc = <150>;
+		ti,bq2560x,jeita-cold-cool-degc = <50>;
+		ti,bq2560x,jeita-cold-degc = <0>;
+		ti,bq2560x,jeita-hot-hysteresis = <10>;
+		ti,bq2560x,jeita-cold-hysteresis = <0>;
+		ti,bq2560x,jeita-cool-normal-ma = <900>;
+		ti,bq2560x,jeita-cold-cool-ma = <300>;
+		ti,bq2560x,jeita-cool-mv = <4400>;
+		ti,bq2560x,jeita-warm-ma = <900>;
+		ti,bq2560x,jeita-warm-mv = <4112>;
+		ti,bq2560x,software-jeita-supported;
+		qcom,thermal-mitigation = <2000 1000 500 200 0>;
+	};
+};

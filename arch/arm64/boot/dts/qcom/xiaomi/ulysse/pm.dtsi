@@ -1,0 +1,96 @@
+/*
+ * Copyright (c) 2015-2016, The Linux Foundation. All rights reserved.
+ * Copyright (C) 2018 XiaoMi, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 and
+ * only version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+&pm8937_vadc {
+	chan@11 {
+		label = "batt_rid";
+		reg = <0x11>;
+		qcom,decimation = <0>;
+		qcom,pre-div-channel-scaling = <0>;
+		qcom,calibration-type = "ratiometric";
+		qcom,scale-function = <0>;
+		qcom,hw-settle-time = <2>;
+		qcom,fast-avg-setup = <0>;
+
+		/delete-property/ qcom,vadc-thermal-node;
+		status = "okay";
+	};
+};
+
+&pm8937_pwm {
+		compatible = "qcom,qpnp-pwm";
+		reg = <0xbc00 0x100>;
+		reg-names = "qpnp-lpg-channel-base";
+		qcom,channel-id = <0>;
+		qcom,supported-sizes = <6>,<9>;
+		qcom,period = <4000000>;
+		qcom,mode-select = <0>;
+		qcom,dtest-line = <2>;
+		qcom,dtest-output = <2>;
+		#pwm-cells = <2>;
+		status = "okay";
+
+		qcom,pwm {
+			qcom,duty = <2000000>;
+			label = "pwm";
+		};
+};
+
+&pm8937_l22 {
+	regulator-max-microvolt = <3300000>;
+};
+
+&spmi_bus {
+	qcom,pm8937@0 {
+		qcom,power-on@800 {
+			qcom,pon_1 {
+				qcom,support-reset = <1>;
+				qcom,s1-timer = <4480>;
+				qcom,s2-timer = <2000>;
+				qcom,s2-type = <8>;
+			};
+
+			qcom,pon_3 {
+				qcom,pon-type = <3>;
+				qcom,pull-up = <1>;
+				qcom,support-reset = <1>;
+				qcom,s1-timer = <4480>;
+				qcom,s2-timer = <1000>;
+				qcom,s2-type = <1>;
+			};
+		};
+	};
+};
+
+&pm8937_gpios {
+	interrupts = <0x0 0xc0 0 IRQ_TYPE_NONE>,
+		 <0x0 0xc1 0 IRQ_TYPE_NONE>,
+		 <0x0 0xc4 0 IRQ_TYPE_NONE>,
+		 <0x0 0xc5 0 IRQ_TYPE_NONE>,
+		 <0x0 0xc6 0 IRQ_TYPE_NONE>,
+		 <0x0 0xc7 0 IRQ_TYPE_NONE>;
+	interrupt-names = "pm8937_gpio1", "pm8937_gpio2", "pm8937_gpio5", 
+			 "pm8937_gpio6", "pmi8937_gpio7", "pm8937_gpio8";  
+	qcom,gpios-disallowed = <3 4>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pwm_ir_default>;
+	pwm_ir_default: pm8937_gpio6 {
+		pins = "gpio6";
+		function = "dtest2"; 
+		qcom,drive-strength = <2>;
+		output-low;
+		bias-disable;
+		status = "okay";
+	};
+};

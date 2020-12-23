@@ -1,0 +1,64 @@
+/*
+ * Copyright (c) 2015-2016, The Linux Foundation. All rights reserved.
+ * Copyright (C) 2018 XiaoMi, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 and
+ * only version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+&soc {
+	ant_check {
+		compatible = "ant_check";
+		ant_check_gpio = <&tlmm 46 0x0>;
+	};
+
+	vibrator_gpio {
+		compatible = "qcom,vibrator-gpio";
+		qcom,vibrator-timeout-ms = <15000>;
+		qcom,vib-gpio_one = <&tlmm 9 0x00>;
+		label = "vibrator";
+	};
+
+	pwm_ir {
+		compatible = "pwm-ir";
+		pwms = <&pm8937_pwm 0 0>;
+		qcom,test-gpios = <&pm8937_gpios 6 0>;
+		reg-id = "vdd";
+		vdd-supply = <&pm8937_l10>;
+	};
+};
+
+&i2c_5 {
+	awinic@45 { /* Breath Light-Driven */
+		compatible = "awinic,aw2013";
+		reg = <0x45>;
+		vdd-supply = <&pm8937_l10>;
+		vcc-supply = <&pm8937_l5>;
+		aw2013,red {
+			aw2013,name = "red";
+			aw2013,id = <0>;
+			aw2013,max-brightness = <255>;
+			aw2013,max-current = <1>;
+			aw2013,rise-time-ms = <2>;
+			aw2013,hold-time-ms = <1>;
+			aw2013,fall-time-ms = <2>;
+			aw2013,off-time-ms = <1>;
+		};
+		aw2013,white {
+			aw2013,name = "white";
+			aw2013,id = <1>;
+			aw2013,max-brightness = <255>;
+			aw2013,max-current = <1>;
+			aw2013,rise-time-ms = <2>;
+			aw2013,hold-time-ms = <1>;
+			aw2013,fall-time-ms = <2>;
+			aw2013,off-time-ms = <1>;
+		};
+	};
+};
