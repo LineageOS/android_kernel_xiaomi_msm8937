@@ -1546,6 +1546,7 @@ EXPORT_SYMBOL_GPL(fg_enable_sleep);
 
 static void fg_dump_registers(struct bq_fg_chip *bq)
 {
+/*
 	int i;
 	int ret;
 	u16 val;
@@ -1556,6 +1557,7 @@ static void fg_dump_registers(struct bq_fg_chip *bq)
 		if (!ret)
 			pr_err("Reg[%02X] = 0x%04X\n", fg_dump_regs[i], val);
 	}
+*/
 }
 
 static irqreturn_t fg_irq_thread(int irq, void *dev_id)
