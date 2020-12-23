@@ -1,0 +1,6 @@
+#include "riva-audio.dtsi"
+#include "riva-pinctrl.dtsi"
+#include "riva-battery.dtsi"
+#include "riva-camera.dtsi"
+#include "riva-mdss.dtsi"
+#include "riva-misc.dtsi"

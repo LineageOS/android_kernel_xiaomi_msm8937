@@ -1,0 +1,69 @@
+/* Copyright (c) 2015-2016 The Linux Foundation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 and
+ * only version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+*/
+
+#include "panel/dsi-panel-hx8394f-boe-c3a-720p-video.dtsi"
+#include "panel/dsi-panel-nt35521s-ebbg-c3a-720p-video.dtsi"
+#include "panel/dsi-panel-ili9881c-ebbg-c3a-720p-video.dtsi"
+
+&mdss_dsi0 {
+	qcom,dsi-pref-prim-pan = <&dsi_hx8394f_boe_720_vid>;
+	qcom,dsi-pref-sub-pan = <&dsi_nt35521s_ebbg_720_video>;
+
+	qcom,dsi-pref-sub1-pan = <&dsi_ili9881c_ebbg_720p_video>;
+	pinctrl-names = "mdss_default", "mdss_sleep";
+	pinctrl-0 = <&mdss_dsi_active>;
+	pinctrl-1 = <&mdss_dsi_suspend>;
+	qcom,platform-te-gpio = <&tlmm 24 0>;
+	qcom,platform-reset-gpio = <&tlmm 60 0>;
+	lab-supply = <&tps65132_pos>;
+	ibb-supply = <&tps65132_neg>;
+
+	qcom,regulator-ldo-mode;
+	qcom,platform-regulator-settings = [ 00 01 01 00 20 07 00];
+};
+
+&dsi_panel_pwr_supply {
+        qcom,panel-supply-entry@1 {
+	        qcom,supply-post-on-sleep = <12>;
+	};
+
+	qcom,panel-supply-entry@2 {
+		reg = <2>;
+		qcom,supply-name = "lab";
+		qcom,supply-min-voltage = <5000000>;
+		qcom,supply-max-voltage = <5000000>;
+		qcom,supply-enable-load = <200>;
+		qcom,supply-disable-load = <0>;
+		qcom,supply-post-on-sleep = <12>;
+		qcom,supply-pre-off-sleep = <2>;
+	};
+
+	qcom,panel-supply-entry@3 {
+		reg = <3>;
+		qcom,supply-name = "ibb";
+		qcom,supply-min-voltage = <5000000>;
+		qcom,supply-max-voltage = <5000000>;
+		qcom,supply-enable-load = <40>;
+		qcom,supply-disable-load = <0>;
+		qcom,supply-post-on-sleep = <2>;
+		qcom,supply-post-off-sleep = <3>;
+	};
+};
+&dsi_hx8394f_boe_720_vid {
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+};
+&dsi_nt35521s_ebbg_720_video {
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+};
+&dsi_ili9881c_ebbg_720p_video {
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+};

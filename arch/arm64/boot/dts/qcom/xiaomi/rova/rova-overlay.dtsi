@@ -1,0 +1,8 @@
+#include "rova-audio.dtsi"
+#include "rova-camera-pinctrl.dtsi"
+#include "rova-general.dtsi"
+#include "rova-mdss.dtsi"
+#include "rova-misc.dtsi"
+#include "rova-pinctrl.dtsi"
+#include "rova-pm.dtsi"
+#include "rova-touchscreen.dtsi"

@@ -1,0 +1,5 @@
+&int_codec {
+	status = "okay";
+	qcom,msm-spk-ext-pa = <&tlmm 124 0>;
+	qcom,msm-micbias2-ext-cap;
+};

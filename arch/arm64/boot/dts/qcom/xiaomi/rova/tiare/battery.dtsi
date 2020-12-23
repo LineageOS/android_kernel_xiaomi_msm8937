@@ -1,0 +1,30 @@
+/ {
+	qrd_batterydata: qcom,battery-data {
+		qcom,batt-id-range-pct = <10>;
+		#include "batterydata/batterydata-xwd-4v4-3000mah.dtsi"
+		#include "batterydata/batterydata-mingmei-4v4-3000mah.dtsi"
+		#include "batterydata/batterydata-default-4v4-3000mah.dtsi"
+	};
+};
+
+&i2c_5 {
+	/delete-node/ bq27426@55;
+
+	cw2017@63 {
+		compatible = "cellwise,cw2017";
+		reg = <0x63>;
+		//vdd-supply = <&pm8937_l5>;
+		vcc_i2c-supply = <&pm8937_l5>;
+		//interrupt-parent = <&tlmm>;
+		//interrupts = <46 2>;//cw2017 interrupt pin to gpio46, but not really use this interrupt
+		//pinctrl-names = "default";
+		//pinctrl-0 = <&cw_int_default>;
+		qcom,battid-vadc = <&pm8937_vadc>;
+		qcom,battery-data = <&qrd_batterydata>;
+	};
+};
+
+&bq2560x_otg_supply {
+	ti,bq2560x,ta-ichg = <1000>;
+	ti,bq2560x,termination-current = <180>;
+};

@@ -1,0 +1,143 @@
+/*
+ * Copyright (c) 2016, The Linux Foundation. All rights reserved.
+ * Copyright (C) 2018 XiaoMi, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 and
+ * only version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+&soc {
+	i2c@78b7000 {
+		status = "ok";
+		ftech@38 {
+			compatible = "focaltech,5336";
+			reg = <0x38>;
+			interrupt-parent = <&tlmm>;
+			interrupts = <65 0x2008>;
+			vdd-supply = <&pm8937_l10>;
+			vcc_i2c-supply = <&pm8937_l5>;
+			/* pins used by touchscreen */
+			pinctrl-names = "pmx_ts_active","pmx_ts_suspend",
+					"pmx_ts_release";
+			pinctrl-0 = <&ts_int_active &ts_reset_active>;
+			pinctrl-1 = <&ts_int_suspend &ts_reset_suspend>;
+			pinctrl-2 = <&ts_release>;
+			ftech,name = "ft5336";
+			ftech,family-id = <0x36>;
+			ftech,reset-gpio = <&tlmm 64 0x00>;
+			ftech,irq-gpio = <&tlmm 65 0x2008>;
+			ftech,display-coords = <0 0 720 1280>;
+			ftech,panel-coords = <0 0 720 1280>;
+			ftech,virtual-key1 = <139 140 2000>;/*menu*/
+			ftech,virtual-key2 = <172 360 2000>;/*home*/
+			ftech,virtual-key3 = <158 580 2000>;/*back*/
+			ftech,no-force-update;
+			ftech,i2c-pull-up;
+			ftech,group-id = <1>;
+			ftech,hard-reset-delay-ms = <20>;
+			ftech,soft-reset-delay-ms = <200>;
+			ftech,num-max-touches = <10>;
+			ftech,fw-delay-aa-ms = <30>;
+			ftech,fw-delay-55-ms = <30>;
+			ftech,fw-upgrade-id1 = <0x79>;
+			ftech,fw-upgrade-id2 = <0x18>;
+			ftech,fw-delay-readid-ms = <10>;
+			ftech,fw-delay-era-flsh-ms = <2000>;
+			ftech,fw-auto-cal;
+			ftech,ignore-id-check;
+		};
+		goodix_ts@5d {
+			compatible = "goodix,gt9xx";
+			status = "okay";
+			reg = <0x5d>;
+			vdd_ana-supply = <&pm8937_l10>;
+			vcc_i2c-supply = <&pm8937_l5>;
+			interrupt-parent = <&tlmm>;
+			interrupts = <13 0x2008>;
+			pinctrl-names = "gdix_ts_int_default", "gdix_ts_int_output_low",
+					"gdix_ts_int_output_high", "gdix_ts_int_input",
+					"gdix_ts_rst_default", "gdix_ts_rst_output_low",
+					"gdix_ts_rst_output_high", "gdix_ts_rst_input";
+			pinctrl-0 = <&ts_int_default>;
+			pinctrl-1 = <&ts_int_output_low>;
+			pinctrl-2 = <&ts_int_output_high>;
+			pinctrl-3 = <&ts_int_input>;
+			pinctrl-4 = <&ts_rst_default>;
+			pinctrl-5 = <&ts_rst_output_low>;
+			pinctrl-6 = <&ts_rst_output_high>;
+			pinctrl-7 = <&ts_rst_input>;
+			reset-gpios = <&tlmm 64 0x00>;
+			irq-gpios = <&tlmm 65 0x2008>;
+			irq-flags = <1>;
+			touchscreen-max-id = <10>;
+			touchscreen-size-x = <720>;
+			touchscreen-size-y = <1280>;
+			touchscreen-max-w = <1024>;
+			touchscreen-max-p = <1024>;
+			touchscreen-key-map = <139 172 158>;
+			goodix,type-a-report = <0>;
+			goodix,driver-send-cfg = <1>;
+			goodix,wakeup-with-reset = <0>;
+			goodix,resume-in-workqueue = <1>;
+			goodix,int-sync = <1>;
+			goodix,swap-x2y = <0>;
+			goodix,esd-protect = <1>;
+			goodix,pen-suppress-finger = <0>;
+			goodix,auto-update = <0>;
+			goodix,auto-update-cfg = <0>;
+			goodix,slide-wakeup = <1>;
+			goodix,power-off-sleep = <0>;
+			goodix,rst-gpio = <&tlmm 64 0x00>;
+			goodix,irq-gpio = <&tlmm 65 0x2008>;
+			goodix,cfg-group0 = [
+					41 D0 02 00 05 05 75 01 01 0F 24
+					0F 64 3C 03 05 00 00 00 02 00 00
+					00 16 19 1C 14 8C 0E 0E 24 00 31
+					0D 00 00 00 83 33 1D 00 41 00 00
+					00 00 00 08 0A 00 2B 1C 3C 94 D5
+					03 08 00 00 04 93 1E 00 82 23 00
+					74 29 00 69 2F 00 5F 37 00 5F 20
+					40 60 00 F0 40 30 55 50 27 00 00
+					00 00 00 00 00 00 00 00 00 00 00
+					00 00 00 00 00 00 00 14 19 00 00
+					50 50 02 04 06 08 0A 0C 0E 10 12
+					14 16 18 1A 1C 00 00 00 00 00 00
+					00 00 00 00 00 00 00 00 00 00 1D
+					1E 1F 20 21 22 24 26 28 29 2A 1C
+					18 16 14 13 12 10 0F 0C 0A 08 06
+					04 02 00 00 00 00 00 00 00 00 00
+					00 00 00 00 00 00 00 00 9C 01];
+		};
+
+	};
+};
+
+&soc {
+	gen-vkeys_ft {
+		compatible = "qcom,gen-vkeys";
+		label = "ft5346";
+		qcom,disp-maxx = <720>;
+		qcom,disp-maxy = <1280>;
+		qcom,panel-maxx = <720>;
+		qcom,panel-maxy = <2080>;
+		qcom,key-codes = <139 172 158>;
+		qcom,y-offset = <0>;
+	};
+	gen-vkeys_gt {
+		compatible = "qcom,gen-vkeys_gt";
+		label = "goodix-ts";
+		qcom,disp-maxx = <720>;
+		qcom,disp-maxy = <1280>;
+		qcom,panel-maxx = <720>;
+		qcom,panel-maxy = <2080>;
+		qcom,key-codes = <139 172 158>;
+		qcom,y-offset = <0>;
+	};
+
+};

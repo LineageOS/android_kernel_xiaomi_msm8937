@@ -1,0 +1,12 @@
+#include "panels/dsi-panel-ili9881c-ebbg-c3b-720p-video.dtsi"
+#include "panels/dsi-panel-hx8394f-boe-c3b-720p-video.dtsi"
+#include "panels/dsi-panel-ili9881c-ebbgDJN-c3b-720p-video.dtsi"
+#include "panels/dsi-panel-ili9881c-tianma-c3b-720p-video.dtsi"
+
+&mdss_dsi0 {
+	/delete-property/ qcom,dsi-pref-sub-pan;
+};
+
+&mdss_dsi0_pll {
+	/delete-property/ qcom,dsi-pll-ssc-en;
+};

@@ -1,0 +1,19 @@
+&usb_otg {
+	qcom,hsusb-otg-mode = <1>; /* OTG mode */
+	qcom,hsusb-otg-phy-init-seq =
+		<0x74 0x80 0x2c 0x81 0x3f 0x82 0x13 0x83 0xffffffff>;
+};
+
+&soc {
+        sn_fuse: snfuse@0xA60A8 {
+                compatible = "qcom,sn-fuse";
+                reg = <0xA60A8 0x4>;
+                reg-names = "sn-base";
+        };
+
+        sec_boot_fuse: secbootfuse@0xA01D0 {
+                compatible = "qcom,sec-boot-fuse";
+                reg = <0xA01D0 0x4>;
+                reg-names = "sec-boot-base";
+        };
+};

@@ -1,0 +1,121 @@
+/*
+ * Copyright (c) 2016, The Linux Foundation. All rights reserved.
+ * Copyright (C) 2018 XiaoMi, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 and
+ * only version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+&soc {
+	i2c@78b6000 { /* i2c 2 */
+		aw2013@45 { /*blink */
+			compatible = "awinc,aw2013";
+			reg = <0x45>;
+			rgb_led-supply = <&pm8937_l10>;
+
+			red {
+				label = "red";
+				linux,default-trigger = "battery-red";
+				default-state = "off";
+				retain-state-suspended;
+			};
+
+			green {
+				label = "green";
+				linux,default-trigger = "battery-green";
+				default-state = "off";
+				retain-state-suspended;
+			};
+
+			blue {
+				label = "blue";
+				linux,default-trigger = "battery-blue";
+				default-state = "off";
+				retain-state-suspended;
+			};
+			white {
+				label = "white";
+				linux,default-trigger = "none";
+				default-state = "off";
+				retain-state-suspended;
+			};
+
+			yellow {
+				label = "yellow";
+				linux,default-trigger = "none";
+				default-state = "off";
+				retain-state-suspended;
+			};
+
+			cyan {
+				label = "cyan";
+				linux,default-trigger = "none";
+				default-state = "off";
+				retain-state-suspended;
+			};
+			purple {
+				label = "purple";
+				linux,default-trigger = "none";
+				default-state = "off";
+				retain-state-suspended;
+			};
+		};
+	};
+
+	gpio-vib {
+		compatible = "gpio-vibrator";
+		vibrator {
+			gpios = <&tlmm 97 0>;
+			label = "vibrator";
+			max_timeout = <50000>;
+		};
+	};
+};
+&soc {
+	led_flash0: qcom,camera-flash {
+		cell-index = <0>;
+		compatible = "qcom,camera-flash";
+		qcom,flash-type = <1>;
+	};
+};
+
+&i2c_2 { /* i2c 2 */
+	tps65132@3e {
+		compatible = "ti,tps65132";
+		reg = <0x3e>;
+		i2c-pwr-supply = <&pm8937_l5>;
+		ti,en-gpio-lpm;
+		pinctrl-names = "default";
+		pinctrl-0 = <&tps65132_en_default>;
+
+		regulators {
+			tps65132_pos: pos-boost {
+				regulator-name = "tps65132-pos";
+				regulator-min-microvolt = <5000000>;
+				regulator-max-microvolt = <5000000>;
+				ti,discharge-enable;
+				ti,enable-time = <800>;
+				ti,current-limit = <200000>;
+				ti,en-gpio = <&tlmm 126 0>;
+			};
+
+			tps65132_neg: neg-boost {
+				regulator-name = "tps65132-neg";
+				regulator-min-microvolt = <5000000>;
+				regulator-max-microvolt = <5000000>;
+				ti,discharge-enable;
+				ti,enable-time = <800>;
+				ti,current-limit = <40000>;
+				ti,en-gpio = <&tlmm 127 0>;
+			};
+		};
+	};
+};
+
+
