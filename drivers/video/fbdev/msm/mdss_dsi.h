@@ -438,9 +438,17 @@ struct mdss_dsi_ctrl_pdata {
 	int rst_gpio;
 	int disp_en_gpio;
 	int bklt_en_gpio;
+#ifdef CONFIG_MACH_XIAOMI_ULYSSE
+	int ulysse_lcmio_en_gpio;
+	int ulysse_lcm_vci_en_gpio;
+#endif
 	int vdd_ext_gpio;
 	int mode_gpio;
 	int intf_mux_gpio;
+#ifdef CONFIG_MACH_XIAOMI_ULYSSE
+	int ulysse_ocp2131_enp_gpio;
+	int ulysse_ocp2131_enn_gpio;
+#endif
 	bool bklt_en_gpio_invert;
 	int lcd_mode_sel_gpio;
 	int bklt_ctrl;	/* backlight ctrl */
