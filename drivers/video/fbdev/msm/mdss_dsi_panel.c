@@ -1,5 +1,5 @@
 /* Copyright (c) 2012-2020, The Linux Foundation. All rights reserved.
- * Copyright (C) 2018 XiaoMi, Inc.
+ * Copyright (C) 2019 XiaoMi, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -39,6 +39,10 @@
 #ifdef CONFIG_MACH_XIAOMI
 #include <linux/xiaomi_series.h>
 extern int xiaomi_series_read(void);
+#endif
+
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
+extern bool rova_tiare_is_Lcm_Present;
 #endif
 
 #ifdef CONFIG_MACH_XIAOMI
@@ -465,6 +469,10 @@ disp_en_gpio_err:
 	return rc;
 }
 
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
+extern int rova_tiare_tp_gesture_onoff;
+#endif
+
 int mdss_dsi_panel_reset(struct mdss_panel_data *pdata, int enable)
 {
 	struct mdss_dsi_ctrl_pdata *ctrl_pdata = NULL;
@@ -698,6 +706,14 @@ int mdss_dsi_panel_reset(struct mdss_panel_data *pdata, int enable)
 			usleep_range(100, 110);
 			gpio_free(ctrl_pdata->disp_en_gpio);
 		}
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
+		if (xiaomi_series_read() == XIAOMI_SERIES_ROVA) {
+			if(((rova_tiare_tp_gesture_onoff) ||(pinfo->rova_tiare_pwr_off_rst_pull_high))&&pinfo->panel_dead==0)
+				gpio_set_value((ctrl_pdata->rst_gpio), 1);
+			else
+				gpio_set_value((ctrl_pdata->rst_gpio), 0);
+		} else
+#endif
 		gpio_set_value((ctrl_pdata->rst_gpio), 0);
 #ifdef CONFIG_MACH_XIAOMI_ULYSSE
 		if (xiaomi_series_read() == XIAOMI_SERIES_ULYSSE) {
@@ -2219,6 +2235,13 @@ static void mdss_dsi_parse_esd_params(struct device_node *np,
 	pinfo->esd_check_enabled = of_property_read_bool(np,
 		"qcom,esd-check-enabled");
 
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
+	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA) {
+		if ((!pinfo->esd_check_enabled)||(!rova_tiare_is_Lcm_Present))
+			return;
+	}
+#endif
+
 	if (!pinfo->esd_check_enabled)
 		return;
 
@@ -3187,6 +3210,13 @@ static int mdss_panel_parse_dt(struct device_node *np,
 	mdss_dsi_parse_reset_seq(np, pinfo->rst_seq, &(pinfo->rst_seq_len),
 		"qcom,mdss-dsi-reset-sequence");
 
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
+	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA) {
+		rc = of_property_read_u32(np, "qcom,mdss-dsi-pwr-off-rst-pull-high", &tmp);
+		pinfo->rova_tiare_pwr_off_rst_pull_high = (!rc ? tmp : 0);
+	}
+#endif
+
 	mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->off_cmds,
 		"qcom,mdss-dsi-off-command", "qcom,mdss-dsi-off-command-state");
 
@@ -3318,6 +3348,12 @@ int mdss_dsi_panel_init(struct device_node *node,
 	ctrl_pdata->post_panel_on = mdss_dsi_post_panel_on;
 	ctrl_pdata->off = mdss_dsi_panel_off;
 	ctrl_pdata->low_power_config = mdss_dsi_panel_low_power_config;
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
+	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA) {
+		if(rova_tiare_is_Lcm_Present)
+			ctrl_pdata->panel_data.set_backlight = mdss_dsi_panel_bl_ctrl;
+	} else
+#endif
 	ctrl_pdata->panel_data.set_backlight = mdss_dsi_panel_bl_ctrl;
 	ctrl_pdata->panel_data.apply_display_setting =
 			mdss_dsi_panel_apply_display_setting;

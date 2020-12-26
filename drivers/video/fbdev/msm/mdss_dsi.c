@@ -1,5 +1,5 @@
 /* Copyright (c) 2012-2019, The Linux Foundation. All rights reserved.
- * Copyright (C) 2018 XiaoMi, Inc.
+ * Copyright (C) 2019 XiaoMi, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -56,6 +56,11 @@ int ulysse_ID0_status,ulysse_ID1_status;
 #endif
 
 static struct pm_qos_request mdss_dsi_pm_qos_request;
+
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
+bool rova_tiare_is_Lcm_Present = false;
+bool rova_tiare_is_tianma_panel = false;
+#endif
 
 void mdss_dump_dsi_debug_bus(u32 bus_dump_flag,
 	u32 **dump_mem)
@@ -393,6 +398,11 @@ static int mdss_dsi_panel_power_off(struct mdss_panel_data *pdata)
 		ret = 0;
 	}
 
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
+	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA)
+		usleep(500);
+#endif
+
 	if (gpio_is_valid(ctrl_pdata->vdd_ext_gpio)) {
 		ret = gpio_direction_output(
 			ctrl_pdata->vdd_ext_gpio, 0);
@@ -414,6 +424,11 @@ static int mdss_dsi_panel_power_off(struct mdss_panel_data *pdata)
 end:
 	return ret;
 }
+
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
+int rova_tiare_tp_gesture_onoff=0;
+EXPORT_SYMBOL(rova_tiare_tp_gesture_onoff);
+#endif
 
 static int mdss_dsi_panel_power_on(struct mdss_panel_data *pdata)
 {
@@ -3007,6 +3022,12 @@ static struct device_node *mdss_dsi_find_panel_of_node(
 				panel_name[i] = *(str1 + i);
 			panel_name[i] = 0;
 		}
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
+	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA) {
+			if (!strcmp(panel_name, "qcom,mdss_dsi_ili9881c_tianma_c3b_720p_video"))
+			rova_tiare_is_tianma_panel = true;
+	}
+#endif
 		pr_info("%s: cmdline:%s panel_name:%s\n",
 			__func__, panel_cfg, panel_name);
 		if (!strcmp(panel_name, NONE_PANEL))
@@ -3045,12 +3066,20 @@ static struct device_node *mdss_dsi_find_panel_of_node(
 					cfg_np_name, MDSS_MAX_PANEL_LEN);
 			}
 		}
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
+	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA)
+		rova_tiare_is_Lcm_Present = true;
+#endif
 
 		return dsi_pan_node;
 	}
 end:
 	if (strcmp(panel_name, NONE_PANEL))
 		dsi_pan_node = mdss_dsi_pref_prim_panel(pdev);
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
+	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA)
+		rova_tiare_is_Lcm_Present = false;
+#endif
 exit:
 	return dsi_pan_node;
 }

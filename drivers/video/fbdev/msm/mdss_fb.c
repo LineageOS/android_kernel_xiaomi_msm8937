@@ -3,6 +3,7 @@
  *
  * Copyright (C) 2007 Google Incorporated
  * Copyright (c) 2008-2020, The Linux Foundation. All rights reserved.
+ * Copyright (C) 2019 XiaoMi, Inc.
  *
  * This software is licensed under the terms of the GNU General Public
  * License version 2, as published by the Free Software Foundation, and
@@ -46,6 +47,17 @@
 #include <linux/file.h>
 #include <linux/kthread.h>
 #include <linux/dma-buf.h>
+
+#ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_series.h>
+extern int xiaomi_series_read(void);
+#endif
+
+#ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_device.h>
+extern int xiaomi_device_read(void);
+#endif
+
 #include "mdss_fb.h"
 #include "mdss_mdp_splash_logo.h"
 #define CREATE_TRACE_POINTS
@@ -277,11 +289,23 @@ static int mdss_fb_notify_update(struct msm_fb_data_type *mfd,
 
 static int lcd_backlight_registered;
 
+#define ROVA_WINGTECH_MDSS_BRIGHT_TO_BL(out, v, bl_min, bl_max, min_bright, max_bright) do {\
+					if (v <= ((int)min_bright*(int)bl_max-(int)bl_min*(int)max_bright)\
+						/((int)bl_max - (int)bl_min)) out = 1; \
+					else \
+					out = (((int)bl_max - (int)bl_min)*v + \
+					((int)max_bright*(int)bl_min - (int)min_bright*(int)bl_max)) \
+					/((int)max_bright - (int)min_bright); \
+					} while (0)
+
 static void mdss_fb_set_bl_brightness(struct led_classdev *led_cdev,
 				      enum led_brightness value)
 {
 	struct msm_fb_data_type *mfd = dev_get_drvdata(led_cdev->dev->parent);
 	u64 bl_lvl;
+#ifdef CONFIG_MACH_XIAOMI_ROVA
+	int rova_brightness_min = 10;
+#endif
 
 	if (mfd->boot_notification_led) {
 		led_trigger_event(mfd->boot_notification_led, 0);
@@ -294,8 +318,28 @@ static void mdss_fb_set_bl_brightness(struct led_classdev *led_cdev,
 	/* This maps android backlight level 0 to 255 into
 	 * driver backlight level 0 to bl_max with rounding
 	 */
+#ifdef CONFIG_MACH_XIAOMI_TIARE
+	if (xiaomi_device_read() == XIAOMI_DEVICE_TIARE) {
+		if(value >= 60)
+			value = (value*90)/100 + 6;
+	}
+#endif
+
+#ifdef CONFIG_MACH_XIAOMI_ROVA
+	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA) {
+		if (mfd->panel_info->bl_min == 1)
+			mfd->panel_info->bl_min = 5;
+			ROVA_WINGTECH_MDSS_BRIGHT_TO_BL(bl_lvl, value, mfd->panel_info->bl_min, mfd->panel_info->bl_max,
+			rova_brightness_min, mfd->panel_info->brightness_max);
+			if (bl_lvl && !value)
+				bl_lvl = 0;
+	} else {
+#endif
 	MDSS_BRIGHT_TO_BL(bl_lvl, value, mfd->panel_info->bl_max,
 				mfd->panel_info->brightness_max);
+#ifdef CONFIG_MACH_XIAOMI_ROVA
+	}
+#endif
 
 	if (!bl_lvl && value)
 		bl_lvl = 1;
@@ -5209,6 +5253,10 @@ int mdss_fb_suspres_panel(struct device *dev, void *data)
  * from the panel. The function sends the PANEL_ALIVE=0 status to HAL
  * layer.
  */
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
+int rova_tiare_panel_dead2tp=0;
+EXPORT_SYMBOL(rova_tiare_panel_dead2tp);
+#endif
 void mdss_fb_report_panel_dead(struct msm_fb_data_type *mfd)
 {
 	char *envp[2] = {"PANEL_ALIVE=0", NULL};
@@ -5220,6 +5268,10 @@ void mdss_fb_report_panel_dead(struct msm_fb_data_type *mfd)
 	}
 
 	pdata->panel_info.panel_dead = true;
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
+	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA)
+		rova_tiare_panel_dead2tp=pdata->panel_info.panel_dead;
+#endif
 	kobject_uevent_env(&mfd->fbi->dev->kobj,
 		KOBJ_CHANGE, envp);
 	pr_err("Panel has gone bad, sending uevent - %s\n", envp[0]);
