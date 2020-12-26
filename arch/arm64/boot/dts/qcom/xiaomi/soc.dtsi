@@ -53,4 +53,8 @@
 				"iface_clk", "bus_clk";
 		qcom,ce-opp-freq = <100000000>;
 	};
+
+	restart@4ab000 {
+		qcom,force-warm-reboot;
+	};
 };
