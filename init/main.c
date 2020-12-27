@@ -2,6 +2,7 @@
  *  linux/init/main.c
  *
  *  Copyright (C) 1991, 1992  Linus Torvalds
+ *  Copyright (C) 2018 XiaoMi, Inc.
  *
  *  GK 2/5/95  -  Changed to support mounting root fs via NFS
  *  Added initrd & change_root: Werner Almesberger & Hans Lermen, Feb '96
@@ -479,10 +480,20 @@ static void __init mm_init(void)
 	kaiser_init();
 }
 
+#ifdef CONFIG_MACH_XIAOMI_ULYSSE
+int ulysse_fpsensor=1;
+int ulysse_tpsensor=1;
+#endif
+
 asmlinkage __visible void __init start_kernel(void)
 {
 	char *command_line;
 	char *after_dashes;
+
+#ifdef CONFIG_MACH_XIAOMI_ULYSSE
+	char *ulysse_p=NULL;
+	char *ulysse_tp=NULL;
+#endif
 
 	set_task_stack_end_magic(&init_task);
 	smp_setup_processor_id();
@@ -510,6 +521,24 @@ asmlinkage __visible void __init start_kernel(void)
 
 	build_all_zonelists(NULL, NULL, false);
 	page_alloc_init();
+
+#ifdef CONFIG_MACH_XIAOMI_ULYSSE
+	ulysse_p = NULL;
+	ulysse_p = strstr(boot_command_line,"androidboot.fpsensor=fpc");
+	if(ulysse_p) {
+		ulysse_fpsensor = 1;
+	} else{
+		ulysse_fpsensor = 2;
+	}
+
+	ulysse_tp = NULL;
+	ulysse_tp = strstr(boot_command_line,"shenchao");
+	if(ulysse_tp) {
+		ulysse_tpsensor = 1;
+	} else{
+		ulysse_tpsensor = 2;
+	}
+#endif
 
 	pr_notice("Kernel command line: %s\n", boot_command_line);
 	/* parameters may set static keys */
