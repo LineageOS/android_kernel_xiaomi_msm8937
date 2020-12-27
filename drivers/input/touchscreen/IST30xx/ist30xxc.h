@@ -100,7 +100,7 @@
 #define IST30XX_ALGORITHM_MODE		(0)	/* fixed */
 #endif
 
-#define CTP_CHARGER_DETECT           1
+#define CTP_CHARGER_DETECT           0
 #define IST30XX_TA_RESET			(0)
 #define IST30XX_USE_KEY				(1)
 #define IST30XX_DEBUG				(1)
@@ -133,9 +133,9 @@
 /* retry count */
 #define IST30XX_MAX_RETRY_CNT		(3)
 
-#define WT_ADD_CTP_INFO             1
+#define WT_ADD_CTP_INFO             0
 #define WT_CTP_OPEN_SHORT_TEST       1
-#define CTP_LOCKDOWN_INFO            1
+#define CTP_LOCKDOWN_INFO            0
 
 /* Local */
 #define TSP_LOCAL_EU				(0)

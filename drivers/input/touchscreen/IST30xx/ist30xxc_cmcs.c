@@ -41,8 +41,10 @@
 #define CTP_LOCKDOWN_INFOR_NAME          "lockdown_info"
 
 extern struct ist30xx_data *global_ts_data;
+#if CTP_LOCKDOWN_INFO
 extern lockinfoH Lockdown_Info_High;
 extern lockinfoL Lockdown_Info_LOW;
+#endif
 #endif
 
 #define TSP_CH_UNUSED               (0)
@@ -2257,6 +2259,7 @@ static ssize_t opentest_proc_read(struct file *file, char __user *buf,
 
 }
 
+#if CTP_LOCKDOWN_INFO
 static ssize_t ctp_lockdown_proc_read(struct file *file, char __user *buf,
 				      size_t count, loff_t *ppos);
 static ssize_t ctp_lockdown_proc_write(struct file *filp,
@@ -2296,12 +2299,15 @@ static ssize_t ctp_lockdown_proc_write(struct file *filp,
 {
 	return -EPERM;
 }
+#endif
 
 void create_tp_proc(void)
 {
 	struct proc_dir_entry *msg_tp_test = NULL;
 	struct proc_dir_entry *opentest = NULL;
+#if CTP_LOCKDOWN_INFO
 	struct proc_dir_entry *ctp_lockdown_proc = NULL;
+#endif
 
 	msg_tp_test = proc_mkdir(IST_PROC_MSG_ITO_TESE, NULL);
 	if (NULL == msg_tp_test) {
@@ -2315,12 +2321,14 @@ void create_tp_proc(void)
 		tsp_err("creating  /proc/ctp/openteset  failed\n");
 	}
 
+#if CTP_LOCKDOWN_INFO
 	ctp_lockdown_proc =
 	    proc_create(CTP_LOCKDOWN_INFOR_NAME, 0666, msg_tp_test,
 			&ctp_lockdown_procs_fops);
 	if (ctp_lockdown_proc == NULL) {
 		tsp_err("ft5x06: create ctp_lockdown_proc fail\n");
 	}
+#endif
 
 }
 #endif

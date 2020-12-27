@@ -382,8 +382,10 @@ int ist30xx_get_ver_info(struct ist30xx_data *data)
 		 data->fw.cur.main_ver, data->fw.cur.fw_ver,
 		 data->fw.cur.test_ver, data->fw.cur.core_ver);
 
+#if CTP_LOCKDOWN_INFO
 	Lockdown_Info_High.lockdowninfo = data->fw.cur.lockdown[0];
 	Lockdown_Info_LOW.lockdowninfo = data->fw.cur.lockdown[1];
+#endif
 	return 0;
 
 err_get_ver:
@@ -2128,6 +2130,7 @@ static int ist30xx_probe(struct i2c_client *client,
 	mod_timer(&event_timer, get_jiffies_64() + EVENT_TIMER_INTERVAL * 2);
 
 	ret = ist30xx_get_info(data);
+#if CTP_LOCKDOWN_INFO
 	tp_color = Lockdown_Info_High.lockinfo[1];
 	dev_info(&client->dev,
 		 "Lockdown info: %02X %02X %02X %02X %02X %02X %02X %02X",
@@ -2135,6 +2138,7 @@ static int ist30xx_probe(struct i2c_client *client,
 		 Lockdown_Info_High.lockinfo[1], Lockdown_Info_High.lockinfo[0],
 		 Lockdown_Info_LOW.lockinfo[3], Lockdown_Info_LOW.lockinfo[2],
 		 Lockdown_Info_LOW.lockinfo[1], Lockdown_Info_LOW.lockinfo[0]);
+#endif
 
 #if  WT_ADD_CTP_INFO
 	switch (Lockdown_Info_High.lockinfo[1]) {
