@@ -44,6 +44,11 @@
 extern int xiaomi_device_read(void);
 #endif
 
+#ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_series.h>
+extern int xiaomi_series_read(void);
+#endif
+
 /* Register offsets */
 
 /* Interrupt offsets */
@@ -256,7 +261,12 @@ static struct fg_mem_setting settings[FG_MEM_SETTING_MAX] = {
 	SETTING(CHG_TERM_CURRENT, 0x4F8,   2,      250),
 	SETTING(IRQ_VOLT_EMPTY,	 0x458,   3,      3100),
 	SETTING(CUTOFF_VOLTAGE,	 0x40C,   0,      3200),
+/* FIXME: Dynamic guard */
+#ifndef CONFIG_MACH_XIAOMI_LAND
 	SETTING(VBAT_EST_DIFF,	 0x000,   0,      30),
+#else
+	SETTING(VBAT_EST_DIFF,	 0x000,   0,      100),
+#endif
 	SETTING(DELTA_SOC,	 0x450,   3,      1),
 	SETTING(BATT_LOW,	 0x458,   0,      4200),
 	SETTING(THERM_DELAY,	 0x4AC,   3,      0),
@@ -2266,8 +2276,14 @@ static int get_prop_capacity(struct fg_chip *chip)
 
 	if (chip->battery_missing)
 		return MISSING_CAPACITY;
+#if defined(CONFIG_MACH_XIAOMI_SANTONI) || defined(CONFIG_MACH_XIAOMI_LAND)
+	if (xiaomi_series_read() != XIAOMI_SERIES_LANDTONI) {
+#endif
 	if (!chip->profile_loaded && !chip->use_otp_profile)
 		return DEFAULT_CAPACITY;
+#if defined(CONFIG_MACH_XIAOMI_SANTONI) || defined(CONFIG_MACH_XIAOMI_LAND)
+	}
+#endif
 	if (chip->charge_full)
 		return FULL_CAPACITY;
 	if (chip->soc_empty) {
@@ -4303,11 +4319,11 @@ static void fg_hysteresis_config(struct fg_chip *chip)
 	}
 }
 
-#ifdef CONFIG_MACH_XIAOMI_SANTONI
-#define SANTONI_WARNTEMP 30
-#define SANTONI_COOLTEMP 10
+#if defined(CONFIG_MACH_XIAOMI_SANTONI) || defined(CONFIG_MACH_XIAOMI_LAND)
+#define LANDTONI_WARNTEMP 30
+#define LANDTONI_COOLTEMP 10
 
-static void santoni_fg_hysteresis_config(struct fg_chip *chip)
+static void landtoni_fg_hysteresis_config(struct fg_chip *chip)
 {
 	int hard_hot = 0, hard_cold = 0;
 	int soft_hot = 0, soft_cold = 0;
@@ -4331,28 +4347,28 @@ static void santoni_fg_hysteresis_config(struct fg_chip *chip)
 		chip->batt_cool = false;
 	}  else if (chip->health == POWER_SUPPLY_HEALTH_WARM && !chip->batt_warm) {
 		/* turn down the soft hot threshold */
-		set_prop_jeita_temp(chip, FG_MEM_SOFT_HOT, soft_hot - SANTONI_WARNTEMP);
+		set_prop_jeita_temp(chip, FG_MEM_SOFT_HOT, soft_hot - LANDTONI_WARNTEMP);
 		chip->batt_hot = false;
 		chip->batt_warm = true;
 		chip->batt_cold = false;
 		chip->batt_cool = false;
 	} else if (chip->health != POWER_SUPPLY_HEALTH_WARM && chip->batt_warm) {
 		/* restore the soft hot threshold */
-		set_prop_jeita_temp(chip, FG_MEM_SOFT_HOT, soft_hot + SANTONI_WARNTEMP);
+		set_prop_jeita_temp(chip, FG_MEM_SOFT_HOT, soft_hot + LANDTONI_WARNTEMP);
 		chip->batt_warm = false;
 		chip->batt_hot = false;
 		chip->batt_cold = false;
 		chip->batt_cool = false;
 	} else if (chip->health == POWER_SUPPLY_HEALTH_COOL && !chip->batt_cool) {
 		/* turn up the soft cold threshold */
-		set_prop_jeita_temp(chip, FG_MEM_SOFT_COLD,	soft_cold + SANTONI_COOLTEMP);
+		set_prop_jeita_temp(chip, FG_MEM_SOFT_COLD,	soft_cold + LANDTONI_COOLTEMP);
 		chip->batt_hot = false;
 		chip->batt_warm = false;
 		chip->batt_cold = false;
 		chip->batt_cool = true;
 	} else if (chip->health != POWER_SUPPLY_HEALTH_COOL && chip->batt_cool) {
 		/* restore the soft cold threshold */
-		set_prop_jeita_temp(chip, FG_MEM_SOFT_COLD,	soft_cold - SANTONI_COOLTEMP);
+		set_prop_jeita_temp(chip, FG_MEM_SOFT_COLD,	soft_cold - LANDTONI_COOLTEMP);
 		chip->batt_cool = false;
 		chip->batt_hot = false;
 		chip->batt_warm = false;
@@ -4402,8 +4418,8 @@ static int fg_init_batt_temp_state(struct fg_chip *chip)
 		(batt_info_sts & JEITA_HARD_HOT_RT_STS) ? true : false;
 	chip->batt_cold =
 		(batt_info_sts & JEITA_HARD_COLD_RT_STS) ? true : false;
-#ifdef CONFIG_MACH_XIAOMI_SANTONI
-	if (xiaomi_device_read() == XIAOMI_DEVICE_SANTONI) {
+#if defined(CONFIG_MACH_XIAOMI_SANTONI) || defined(CONFIG_MACH_XIAOMI_LAND)
+	if (xiaomi_series_read() == XIAOMI_SERIES_LANDTONI) {
 		chip->batt_warm = false;
 		chip->batt_cool = false;
 	}
@@ -4904,14 +4920,14 @@ static int fg_power_set_property(struct power_supply *psy,
 			schedule_work(&chip->set_resume_soc_work);
 		}
 
-#ifdef CONFIG_MACH_XIAOMI_SANTONI
-		if (xiaomi_device_read() == XIAOMI_DEVICE_SANTONI) {
-			santoni_fg_hysteresis_config(chip);
+#if defined(CONFIG_MACH_XIAOMI_SANTONI) || defined(CONFIG_MACH_XIAOMI_LAND)
+		if (xiaomi_series_read() == XIAOMI_SERIES_LANDTONI) {
+			landtoni_fg_hysteresis_config(chip);
 		} else {
 #endif
 		if (chip->jeita_hysteresis_support)
 			fg_hysteresis_config(chip);
-#ifdef CONFIG_MACH_XIAOMI_SANTONI
+#if defined(CONFIG_MACH_XIAOMI_SANTONI) || defined(CONFIG_MACH_XIAOMI_LAND)
 		}
 #endif
 		break;
@@ -7190,6 +7206,31 @@ out:
 	return rc;
 }
 
+#ifdef CONFIG_MACH_XIAOMI_LAND
+bool land_add_india_temperature = false;
+void land_add_warm_india_temperature(struct fg_chip *chip)
+{
+	char *boardid_string = NULL;
+	char boardid_start[32] = " ";
+	int India_0;
+	int India_1;
+
+	boardid_string = strstr(saved_command_line, "board_id=");
+
+	if (boardid_string != NULL) {
+		strncpy(boardid_start, boardid_string+9, 9);
+		India_0 = strncmp(boardid_start, "S88537CA1", 9);
+		India_1 = strncmp(boardid_start, "S88537EC1", 9);
+	}
+	if ((India_0 == 0) || (India_1 == 0)) {
+		land_add_india_temperature = true;
+	} else {
+		pr_err("else add temperature\n");
+		land_add_india_temperature = false;
+	}
+}
+#endif
+
 #define DEFAULT_EVALUATION_CURRENT_MA	1000
 static int fg_of_init(struct fg_chip *chip)
 {
@@ -7198,6 +7239,16 @@ static int fg_of_init(struct fg_chip *chip)
 	struct device_node *node = chip->pdev->dev.of_node;
 	u32 temp[2] = {0};
 
+#ifdef CONFIG_MACH_XIAOMI_LAND
+	if (xiaomi_device_read() == XIAOMI_DEVICE_LAND) {
+		land_add_warm_india_temperature(chip);
+		if (land_add_india_temperature) {
+			OF_READ_SETTING(FG_MEM_SOFT_HOT, "warm-bat-india-decidegc", rc, 1);
+		} else {
+			OF_READ_SETTING(FG_MEM_SOFT_HOT, "warm-bat-decidegc", rc, 1);
+		}
+	} else
+#endif
 	OF_READ_SETTING(FG_MEM_SOFT_HOT, "warm-bat-decidegc", rc, 1);
 	OF_READ_SETTING(FG_MEM_SOFT_COLD, "cool-bat-decidegc", rc, 1);
 	OF_READ_SETTING(FG_MEM_HARD_HOT, "hot-bat-decidegc", rc, 1);
@@ -8233,6 +8284,13 @@ static int fg_common_hw_init(struct fg_chip *chip)
 		}
 	}
 
+#ifdef CONFIG_MACH_XIAOMI_LAND
+	if (xiaomi_device_read() == XIAOMI_DEVICE_LAND) {
+		rc = fg_mem_masked_write(chip, settings[FG_MEM_DELTA_SOC].address, 0xFF,
+				settings[FG_MEM_DELTA_SOC].value,
+				settings[FG_MEM_DELTA_SOC].offset);
+	} else
+#endif
 	rc = fg_mem_masked_write(chip, settings[FG_MEM_DELTA_SOC].address, 0xFF,
 			soc_to_setpoint(settings[FG_MEM_DELTA_SOC].value),
 			settings[FG_MEM_DELTA_SOC].offset);
