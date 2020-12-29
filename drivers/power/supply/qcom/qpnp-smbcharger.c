@@ -50,6 +50,11 @@
 extern int xiaomi_device_read(void);
 #endif
 
+#ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_series.h>
+extern int xiaomi_series_read(void);
+#endif
+
 /* Mask/Bit helpers */
 #define _SMB_MASK(BITS, POS) \
 	((unsigned char)(((1 << (BITS)) - 1) << (POS)))
@@ -265,6 +270,9 @@ struct smbchg_chip {
 	struct work_struct		usb_set_online_work;
 	struct delayed_work		vfloat_adjust_work;
 	struct delayed_work		hvdcp_det_work;
+#ifdef CONFIG_MACH_XIAOMI_LAND
+	struct delayed_work     land_abnormal_detect;
+#endif
 	spinlock_t			sec_access_lock;
 	struct mutex			therm_lvl_lock;
 	struct mutex			usb_set_online_lock;
@@ -490,6 +498,12 @@ module_param_named(
 	wipower_dcin_hyst_uv, wipower_dcin_hyst_uv,
 	int, 00600
 );
+
+#ifdef CONFIG_MACH_XIAOMI_LAND
+static int rerun_apsd(struct smbchg_chip *chip);
+static void land_usb_type_check_work_fn(struct smbchg_chip *chip);
+int land_rerun_usb_insertion = 0;
+#endif
 
 #define pr_smb(reason, fmt, ...)				\
 	do {							\
@@ -1083,6 +1097,20 @@ static int get_prop_batt_temp(struct smbchg_chip *chip)
 			return temp;
 	}
 #endif
+
+#ifdef CONFIG_MACH_XIAOMI_LAND
+	if (xiaomi_device_read() == XIAOMI_DEVICE_LAND) {
+		if (temp < -50) {
+			temp = temp - 55;
+			pr_err("batt_temperature =%d\n", temp);
+			return temp;
+		} else {
+			pr_err("batt_temperature =%d\n", temp);
+			return temp;
+		}
+	}
+#endif
+
 
 	return temp;
 }
@@ -2264,8 +2292,8 @@ static bool smbchg_is_parallel_usb_ok(struct smbchg_chip *chip,
 		= get_effective_client_locked(chip->fcc_votable);
 	int usb_icl_ma = get_effective_result_locked(chip->usb_icl_votable);
 
-#ifdef CONFIG_MACH_XIAOMI_SANTONI
-	if (xiaomi_device_read() == XIAOMI_DEVICE_SANTONI) {
+#if defined(CONFIG_MACH_XIAOMI_SANTONI) || defined(CONFIG_MACH_XIAOMI_LAND)
+	if (xiaomi_series_read() == XIAOMI_SERIES_LANDTONI) {
 		smbchg_parallel_en = 0;
 	}
 #endif
@@ -3808,10 +3836,70 @@ void santoni_get_version_change_current(struct smbchg_chip *chip)
 }
 #endif
 
+#ifdef CONFIG_MACH_XIAOMI_LAND
+int land_into_fastmmi_mode(struct smbchg_chip *chip)
+{
+	int ret;
+	char *cmdline_fastmmi = NULL;
+	char *temp;
+
+	cmdline_fastmmi = strstr(saved_command_line, "androidboot.mode=");
+	if (cmdline_fastmmi != NULL) {
+		temp = cmdline_fastmmi + strlen("androidboot.mode=");
+		ret = strncmp(temp, "ffbm", strlen("ffbm"));
+		if (ret == 0) {
+			pr_err("into fastmmi mode\n");
+			return 1;/* fastmmi mode*/
+		} else {
+			pr_err("others modes\n");
+			return 2;/* Others mode*/
+		}
+	}
+	pr_err("has no androidboot.mode \n");
+	return 0;
+}
+
+bool land_disable_charging = false;
+void land_get_capacity_disable_charging(struct smbchg_chip *chip)
+{
+	char *boardid_string = NULL;
+	char boardid_start[32] = " ";
+	int India_0;
+	int India_1;
+
+	boardid_string = strstr(saved_command_line, "board_id=");
+
+	if (boardid_string != NULL) {
+		strncpy(boardid_start, boardid_string+9, 9);
+		India_0 = strncmp(boardid_start, "S88537CA1", 9);
+		India_1 = strncmp(boardid_start, "S88537EC1", 9);
+	}
+	if (((India_0 == 0) || (India_1 == 0)) && (land_into_fastmmi_mode(chip) == 1)) {
+		land_disable_charging = true;
+	} else {
+		pr_err("else discharg\n");
+		land_disable_charging = false;
+	}
+}
+#endif
+
 static void smbchg_external_power_changed(struct power_supply *psy)
 {
 	struct smbchg_chip *chip = power_supply_get_drvdata(psy);
 	int rc, soc;
+
+#ifdef CONFIG_MACH_XIAOMI_LAND
+	char *usb_type_name = "null";
+	enum power_supply_type usb_supply_type;
+
+	if (xiaomi_device_read() == XIAOMI_DEVICE_LAND) {
+		read_usb_type(chip, &usb_type_name, &usb_supply_type);
+		if ((usb_supply_type == POWER_SUPPLY_TYPE_USB) && (chip->usb_present) && (land_rerun_usb_insertion < 1)) {
+			msleep(1000);
+			land_usb_type_check_work_fn(chip);
+		}
+	}
+#endif
 
 	smbchg_aicl_deglitch_wa_check(chip);
 
@@ -3907,6 +3995,7 @@ struct regulator_ops smbchg_otg_reg_ops = {
 #define USBIN_ADAPTER_9V		0x3
 #define USBIN_ADAPTER_5V_9V_CONT	0x2
 #define USBIN_ADAPTER_5V_UNREGULATED_9V	0x5
+#define LANDTONI_USBIN_ADAPTER_5V_UNREGULATED_9V	0x6
 static int smbchg_external_otg_regulator_enable(struct regulator_dev *rdev)
 {
 	int rc = 0;
@@ -4351,6 +4440,12 @@ static int smbchg_adjust_vfloat_mv_trim(struct smbchg_chip *chip,
 			return -EINVAL;
 		}
 
+#ifdef CONFIG_MACH_XIAOMI_LAND
+		if (xiaomi_device_read() == XIAOMI_DEVICE_LAND) {
+			rc = smbchg_sec_masked_write(chip, chip->misc_base + TRIM_14,
+					VF_TRIM_MASK, 1);
+		} else
+#endif
 		rc = smbchg_sec_masked_write(chip, chip->misc_base + TRIM_14,
 				VF_TRIM_MASK, new_trim);
 		if (rc < 0) {
@@ -4537,6 +4632,11 @@ static int smbchg_change_usb_supply_type(struct smbchg_chip *chip,
 	}
 #endif
 
+#ifdef CONFIG_MACH_XIAOMI_LAND
+	if (xiaomi_device_read() == XIAOMI_DEVICE_LAND)
+		smbchg_default_dcp_icl_ma = 2000;
+#endif
+
 	/*
 	 * Type-C only supports STD(900), MEDIUM(1500) and HIGH(3000) current
 	 * modes, skip all BC 1.2 current if external typec is supported.
@@ -4718,12 +4818,12 @@ static void restore_from_hvdcp_detection(struct smbchg_chip *chip)
 	if (rc < 0)
 		pr_err("Couldn't enable APSD rc=%d\n", rc);
 
-#ifdef CONFIG_MACH_XIAOMI_SANTONI
-	if (xiaomi_device_read() == XIAOMI_DEVICE_SANTONI)
+#if defined(CONFIG_MACH_XIAOMI_SANTONI) || defined(CONFIG_MACH_XIAOMI_LAND)
+	if (xiaomi_series_read() == XIAOMI_SERIES_LANDTONI)
 		/* Reset back to 5V unregulated */
 		rc = smbchg_sec_masked_write(chip,
 			chip->usb_chgpth_base + USBIN_CHGR_CFG,
-			ADAPTER_ALLOWANCE_MASK, 0x6);
+			ADAPTER_ALLOWANCE_MASK, LANDTONI_USBIN_ADAPTER_5V_UNREGULATED_9V);
 	else
 #endif
 	/* Reset back to 5V unregulated */
@@ -4801,6 +4901,10 @@ static void handle_usb_removal(struct smbchg_chip *chip)
 	extcon_set_cable_state_(chip->extcon, EXTCON_USB, chip->usb_present);
 	smbchg_request_dpdm(chip, false);
 	schedule_work(&chip->usb_set_online_work);
+#ifdef CONFIG_MACH_XIAOMI_LAND
+	if (xiaomi_device_read() == XIAOMI_DEVICE_LAND)
+		land_rerun_usb_insertion = 0;
+#endif
 
 	pr_smb(PR_MISC, "setting usb psy health UNKNOWN\n");
 	chip->usb_health = POWER_SUPPLY_HEALTH_UNKNOWN;
@@ -5459,6 +5563,13 @@ out:
 static int rerun_apsd(struct smbchg_chip *chip)
 {
 	int rc = 0;
+
+#ifdef CONFIG_MACH_XIAOMI_LAND
+	if (xiaomi_device_read() == XIAOMI_DEVICE_LAND) {
+		if (land_rerun_usb_insertion < 2)
+			land_rerun_usb_insertion++;
+	}
+#endif
 
 	chip->hvdcp_3_det_ignore_uv = true;
 
@@ -6166,7 +6277,7 @@ static int smbchg_battery_get_property(struct power_supply *psy,
 		break;
 	case POWER_SUPPLY_PROP_TECHNOLOGY:
 #ifdef CONFIG_MACH_XIAOMI_SANTONI
-		if (xiaomi_device_read() == XIAOMI_DEVICE_SANTONI) {
+		if (xiaomi_series_read() == XIAOMI_SERIES_LANDTONI) {
 			val->intval = POWER_SUPPLY_TECHNOLOGY_LIPO;
 		} else
 #endif
@@ -6357,6 +6468,10 @@ static irqreturn_t batt_hot_handler(int irq, void *_chip)
 	smbchg_read(chip, &reg, chip->bat_if_base + RT_STS, 1);
 	chip->batt_hot = !!(reg & HOT_BAT_HARD_BIT);
 	pr_smb(PR_INTERRUPT, "triggered: 0x%02x\n", reg);
+#ifdef CONFIG_MACH_XIAOMI_LAND
+	if (xiaomi_device_read() == XIAOMI_DEVICE_LAND)
+		set_property_on_fg(chip, POWER_SUPPLY_PROP_CURRENT_NOW, 0);
+#endif
 	smbchg_parallel_usb_check_ok(chip);
 	if (chip->batt_psy)
 		power_supply_changed(chip->batt_psy);
@@ -6375,6 +6490,10 @@ static irqreturn_t batt_cold_handler(int irq, void *_chip)
 	smbchg_read(chip, &reg, chip->bat_if_base + RT_STS, 1);
 	chip->batt_cold = !!(reg & COLD_BAT_HARD_BIT);
 	pr_smb(PR_INTERRUPT, "triggered: 0x%02x\n", reg);
+#ifdef CONFIG_MACH_XIAOMI_LAND
+	if (xiaomi_device_read() == XIAOMI_DEVICE_LAND)
+		set_property_on_fg(chip, POWER_SUPPLY_PROP_CURRENT_NOW, 0);
+#endif
 	smbchg_parallel_usb_check_ok(chip);
 	if (chip->batt_psy)
 		power_supply_changed(chip->batt_psy);
@@ -6385,9 +6504,9 @@ static irqreturn_t batt_cold_handler(int irq, void *_chip)
 	return IRQ_HANDLED;
 }
 
-#ifdef CONFIG_MACH_XIAOMI_SANTONI
-#define SANTONI_BATT_WARM_CURRENT		900
-#define SANTONI_BATT_WARM_VOLTAGE		15
+#if defined(CONFIG_MACH_XIAOMI_SANTONI) || defined(CONFIG_MACH_XIAOMI_LAND)
+#define LANDTONI_BATT_WARM_CURRENT		900
+#define LANDTONI_BATT_WARM_VOLTAGE		15
 #endif
 
 static irqreturn_t batt_warm_handler(int irq, void *_chip)
@@ -6398,12 +6517,12 @@ static irqreturn_t batt_warm_handler(int irq, void *_chip)
 	smbchg_read(chip, &reg, chip->bat_if_base + RT_STS, 1);
 	chip->batt_warm = !!(reg & HOT_BAT_SOFT_BIT);
 	pr_smb(PR_INTERRUPT, "triggered: 0x%02x\n", reg);
-#ifdef CONFIG_MACH_XIAOMI_SANTONI
-	if (xiaomi_device_read() == XIAOMI_DEVICE_SANTONI) {
+#if defined(CONFIG_MACH_XIAOMI_SANTONI) || defined(CONFIG_MACH_XIAOMI_LAND)
+	if (xiaomi_series_read() == XIAOMI_SERIES_LANDTONI) {
 		smbchg_fastchg_current_comp_set(chip,
-				SANTONI_BATT_WARM_CURRENT);
+				LANDTONI_BATT_WARM_CURRENT);
 		smbchg_float_voltage_comp_set(chip,
-				SANTONI_BATT_WARM_VOLTAGE);
+				LANDTONI_BATT_WARM_VOLTAGE);
 	}
 #endif
 	smbchg_parallel_usb_check_ok(chip);
@@ -6414,9 +6533,16 @@ static irqreturn_t batt_warm_handler(int irq, void *_chip)
 	return IRQ_HANDLED;
 }
 
+#if defined(CONFIG_MACH_XIAOMI_SANTONI) || defined(CONFIG_MACH_XIAOMI_LAND)
+#define LANDTONI_BATT_COOL_CURRENT		900
+#endif
+
 #ifdef CONFIG_MACH_XIAOMI_SANTONI
-#define SANTONI_BATT_COOL_CURRENT		900
 #define SANTONI_BATT_COOL_VOLTAGE		0
+#endif
+
+#ifdef CONFIG_MACH_XIAOMI_LAND
+#define LAND_BATT_COOL_VOLTAGE		5
 #endif
 
 static irqreturn_t batt_cool_handler(int irq, void *_chip)
@@ -6428,14 +6554,30 @@ static irqreturn_t batt_cool_handler(int irq, void *_chip)
 	chip->batt_cool = !!(reg & COLD_BAT_SOFT_BIT);
 	pr_smb(PR_INTERRUPT, "triggered: 0x%02x\n", reg);
 
-#ifdef CONFIG_MACH_XIAOMI_SANTONI
-	if (xiaomi_device_read() == XIAOMI_DEVICE_SANTONI) {
+#if defined(CONFIG_MACH_XIAOMI_SANTONI) || defined(CONFIG_MACH_XIAOMI_LAND)
+	if (xiaomi_series_read() == XIAOMI_SERIES_LANDTONI) {
 		pr_smb(PR_INTERRUPT, "triggered: 0x%02x, batt_cool=%d\n", reg, chip->batt_cool);
 		if (chip->batt_cool) {
 			smbchg_fastchg_current_comp_set(chip,
-					SANTONI_BATT_COOL_CURRENT);
+					LANDTONI_BATT_COOL_CURRENT);
+		}
+	}
+#endif
+
+#ifdef CONFIG_MACH_XIAOMI_SANTONI
+	if (xiaomi_device_read() == XIAOMI_DEVICE_SANTONI) {
+		if (chip->batt_cool) {
 			smbchg_float_voltage_comp_set(chip,
 					SANTONI_BATT_COOL_VOLTAGE);
+		}
+	}
+#endif
+
+#ifdef CONFIG_MACH_XIAOMI_LAND
+	if (xiaomi_device_read() == XIAOMI_DEVICE_LAND) {
+		if (chip->batt_cool) {
+			smbchg_float_voltage_comp_set(chip,
+					LAND_BATT_COOL_VOLTAGE);
 		}
 	}
 #endif
@@ -8382,6 +8524,41 @@ static void rerun_hvdcp_det_if_necessary(struct smbchg_chip *chip)
 	}
 }
 
+#ifdef CONFIG_MACH_XIAOMI_LAND
+static void land_usb_type_check_work_fn(struct smbchg_chip *chip)
+{
+	chip->hvdcp_3_det_ignore_uv = true;
+	rerun_apsd(chip);
+	chip->hvdcp_3_det_ignore_uv = false;
+}
+
+static void land_charger_abnormal_detect_work(struct work_struct *work)
+{
+	struct smbchg_chip *chip = container_of(work,
+				struct smbchg_chip,
+				land_abnormal_detect.work);
+	int rc, soc;
+	soc = get_prop_batt_capacity(chip);
+	land_get_capacity_disable_charging(chip);
+	if (land_into_fastmmi_mode(chip) == 1) {
+		if (land_disable_charging) {
+			if (soc >= 80 && soc <= 100) {
+				rc = smbchg_charging_en(chip, false);
+				if (rc < 0) {
+					dev_err(chip->dev, "Couldn't disable charging: rc = %d\n", rc);
+				}
+			} else if (soc >= 0 && soc < 80) {
+				rc = smbchg_charging_en(chip, true);
+				if (rc < 0) {
+					dev_err(chip->dev, "Couldn't enable charging: rc = %d\n", rc);
+				}
+			}
+		}
+		schedule_delayed_work(&chip->land_abnormal_detect, msecs_to_jiffies(20000));
+	}
+}
+#endif
+
 static int smbchg_probe(struct platform_device *pdev)
 {
 	int rc;
@@ -8535,6 +8712,10 @@ static int smbchg_probe(struct platform_device *pdev)
 			smbchg_parallel_usb_en_work);
 	INIT_DELAYED_WORK(&chip->vfloat_adjust_work, smbchg_vfloat_adjust_work);
 	INIT_DELAYED_WORK(&chip->hvdcp_det_work, smbchg_hvdcp_det_work);
+#ifdef CONFIG_MACH_XIAOMI_LAND
+	if (xiaomi_device_read() == XIAOMI_DEVICE_LAND)
+		INIT_DELAYED_WORK(&chip->land_abnormal_detect, land_charger_abnormal_detect_work);
+#endif
 	init_completion(&chip->src_det_lowered);
 	init_completion(&chip->src_det_raised);
 	init_completion(&chip->usbin_uv_lowered);
@@ -8724,6 +8905,10 @@ static int smbchg_probe(struct platform_device *pdev)
 			chip->revision[ANA_MAJOR], chip->revision[ANA_MINOR],
 			get_prop_batt_present(chip),
 			chip->dc_present, chip->usb_present);
+#ifdef CONFIG_MACH_XIAOMI_LAND
+	if (xiaomi_device_read() == XIAOMI_DEVICE_LAND)
+		schedule_delayed_work(&chip->land_abnormal_detect, 0);
+#endif
 	return 0;
 
 unregister_led_class:
@@ -8758,6 +8943,11 @@ votables_cleanup:
 static int smbchg_remove(struct platform_device *pdev)
 {
 	struct smbchg_chip *chip = dev_get_drvdata(&pdev->dev);
+
+#ifdef CONFIG_MACH_XIAOMI_LAND
+	if (xiaomi_device_read() == XIAOMI_DEVICE_LAND)
+		cancel_delayed_work(&chip->land_abnormal_detect);
+#endif
 
 	debugfs_remove_recursive(chip->debug_root);
 
@@ -8818,6 +9008,11 @@ static void smbchg_shutdown(struct platform_device *pdev)
 	disable_irq(chip->usbin_ov_irq);
 	disable_irq(chip->vbat_low_irq);
 	disable_irq(chip->wdog_timeout_irq);
+
+#ifdef CONFIG_MACH_XIAOMI_LAND
+	if (xiaomi_device_read() == XIAOMI_DEVICE_LAND)
+		cancel_delayed_work(&chip->land_abnormal_detect);
+#endif
 
 	/* remove all votes for short deglitch */
 	vote(chip->aicl_deglitch_short_votable,
