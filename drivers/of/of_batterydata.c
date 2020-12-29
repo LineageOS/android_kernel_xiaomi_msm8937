@@ -1,4 +1,5 @@
 /* Copyright (c) 2013-2017, The Linux Foundation. All rights reserved.
+ * Copyright (C) 2019 XiaoMi, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -19,6 +20,16 @@
 #include <linux/types.h>
 #include <linux/batterydata-lib.h>
 #include <linux/power_supply.h>
+
+#ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_device.h>
+extern int xiaomi_device_read(void);
+#endif
+
+#ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_series.h>
+extern int xiaomi_series_read(void);
+#endif
 
 static int of_batterydata_read_lut(const struct device_node *np,
 			int max_cols, int max_rows, int *ncols, int *nrows,
@@ -314,6 +325,22 @@ static int64_t of_batterydata_convert_battery_id_kohm(int batt_id_uv,
 	return resistor_value_kohm;
 }
 
+#ifdef CONFIG_MACH_XIAOMI
+static char *default_batt_type = "Generic_Battery";
+#endif
+
+#if defined(CONFIG_BATTERY_CW2015) || defined(CONFIG_SMB358_CHARGER) || defined(CONFIG_MACH_XIAOMI_ROVA)
+int battery_type_id = 0;
+#endif
+
+#if defined(CONFIG_MACH_XIAOMI_ROVA) && defined(CONFIG_SMB358_CHARGER)
+extern int battid_resister;
+#endif
+
+#if defined(CONFIG_MACH_XIAOMI_TIARE) || defined(CONFIG_GAUGE_CW2017)
+extern int cw_get_battid_for_profile_check(void);
+#endif
+
 struct device_node *of_batterydata_get_best_profile(
 		const struct device_node *batterydata_container_node,
 		int batt_id_kohm, const char *batt_type)
@@ -324,6 +351,9 @@ struct device_node *of_batterydata_get_best_profile(
 	int delta = 0, best_delta = 0, best_id_kohm = 0, id_range_pct,
 		i = 0, rc = 0, limit = 0;
 	bool in_range = false;
+#ifdef CONFIG_MACH_XIAOMI
+	bool default_id = false;
+#endif
 
 	/* read battery id range percentage for best profile */
 	rc = of_property_read_u32(batterydata_container_node,
@@ -372,13 +402,71 @@ struct device_node *of_batterydata_get_best_profile(
 					best_id_kohm = batt_ids.kohm[i];
 				}
 			}
+#ifdef CONFIG_MACH_XIAOMI_ULYSSE
+		if (xiaomi_series_read() == XIAOMI_SERIES_ULYSSE) {
+			if (best_node ==NULL) {
+				pr_err("sunxing no battery data configed,add default\n");
+				best_node = node;
+				best_id_kohm = batt_ids.kohm[i];
+				return best_node;
+			}
+		}
+#endif
 		}
 	}
 
+#if defined(CONFIG_MACH_XIAOMI_ROVA) && defined(CONFIG_SMB358_CHARGER)
+	if (xiaomi_device_read() == XIAOMI_DEVICE_ROLEX)
+		batt_id_kohm = battid_resister;
+#endif
+
+#if defined(CONFIG_MACH_XIAOMI_TIARE) && defined(CONFIG_GAUGE_CW2017)
+	if (xiaomi_device_read() == XIAOMI_DEVICE_TIARE)
+		batt_id_kohm = cw_get_battid_for_profile_check();
+#endif
+
+#ifdef CONFIG_MACH_XIAOMI
+	if (xiaomi_series_read() != XIAOMI_SERIES_ULYSSE && xiaomi_device_read() != XIAOMI_DEVICE_LAND) {
+		if (best_node == NULL) {
+			for_each_child_of_node(batterydata_container_node, node) {
+				if (default_batt_type != NULL) {
+					rc = of_property_read_string(node, "qcom,battery-type",
+							&battery_type);
+					if (!rc && strcmp(battery_type, default_batt_type) == 0) {
+						best_node = node;
+						best_id_kohm = batt_id_kohm;
+						default_id = true;
+						pr_err("No battery data found, Use default battery data\n");
+						break;
+					}
+				}
+			}
+		}
+	}
+#endif
+
+#ifdef CONFIG_MACH_XIAOMI_ULYSSE
+	if (xiaomi_series_read() != XIAOMI_SERIES_ULYSSE) {
+#endif
 	if (best_node == NULL) {
 		pr_err("No battery data found\n");
 		return best_node;
 	}
+#ifdef CONFIG_MACH_XIAOMI_ULYSSE
+	}
+#endif
+
+#ifdef CONFIG_MACH_XIAOMI
+	if (xiaomi_series_read() != XIAOMI_SERIES_ULYSSE && xiaomi_device_read() != XIAOMI_DEVICE_LAND) {
+		/* check that profile id is in range of the measured batt_id */
+		if (abs(best_id_kohm - batt_id_kohm) >
+				((best_id_kohm * id_range_pct) / 100) && !default_id) {
+			pr_err("out of range: profile id %d batt id %d pct %d",
+				best_id_kohm, batt_id_kohm, id_range_pct);
+			return NULL;
+		}
+	}
+#endif
 
 	/* check that profile id is in range of the measured batt_id */
 	if (abs(best_id_kohm - batt_id_kohm) >
@@ -394,6 +482,16 @@ struct device_node *of_batterydata_get_best_profile(
 		pr_info("%s found\n", battery_type);
 	else
 		pr_info("%s found\n", best_node->name);
+
+#ifdef CONFIG_MACH_XIAOMI_ROVA
+	if (xiaomi_device_read() == XIAOMI_DEVICE_ROLEX) {
+		if (strcmp(battery_type, "wingtech-feimaotui-4v4-3030mah") == 0) {
+			battery_type_id = 1;
+		} else if (strcmp(battery_type, "wingtech-xingwangda-4v4-3030mah") == 0) {
+			battery_type_id = 2;
+		}
+	}
+#endif
 
 	return best_node;
 }
