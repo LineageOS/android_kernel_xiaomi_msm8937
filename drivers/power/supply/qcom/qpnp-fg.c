@@ -1,4 +1,5 @@
 /* Copyright (c) 2014-2019, The Linux Foundation. All rights reserved.
+ * Copyright (C) 2018 XiaoMi, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -37,6 +38,11 @@
 #include <linux/string_helpers.h>
 #include <linux/alarmtimer.h>
 #include <linux/qpnp/qpnp-revid.h>
+
+#ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_device.h>
+extern int xiaomi_device_read(void);
+#endif
 
 /* Register offsets */
 
@@ -502,6 +508,9 @@ struct fg_chip {
 	struct work_struct	status_change_work;
 	struct work_struct	cycle_count_work;
 	struct work_struct	battery_age_work;
+#ifdef CONFIG_MACH_XIAOMI_SANTONI
+	struct work_struct	santoni_battery_age_work;
+#endif
 	struct work_struct	update_esr_work;
 	struct work_struct	set_resume_soc_work;
 	struct work_struct	rslow_comp_work;
@@ -3310,6 +3319,55 @@ static void battery_age_work(struct work_struct *work)
 	estimate_battery_age(chip, &chip->actual_cap_uah);
 }
 
+#ifdef CONFIG_MACH_XIAOMI_SANTONI
+static void santoni_battery_age_work(struct work_struct *work)
+{
+	struct fg_chip *chip = container_of(work,
+			struct fg_chip,
+			santoni_battery_age_work);
+	int rc = 0;
+	u8 reg[4], reg1[4];
+	u32 vin_error = 0, vin_error2 = 0;
+	int capacity = 0;
+	static int count_error = 0;
+
+	estimate_battery_age(chip, &chip->actual_cap_uah);
+
+	pr_info("wingtech battery_age_work count_error=%d\n", count_error);
+
+	rc = fg_mem_read(chip, reg, fg_data[8].address,
+			fg_data[8].len, fg_data[8].offset, 0);
+	if (rc) {
+		pr_err("Tmie 1 Failed to update temp data\n");
+	} else{
+		vin_error = reg[0] | (reg[1] << 8)|(reg[2] << 16) | (reg[3] << 24);
+		pr_info("REG[560]=%x %x %x %x,vin_error=%x\n",
+				reg[0], reg[1], reg[2], reg[3], vin_error);
+
+		capacity = get_prop_capacity(chip);
+		if ((chip->status == POWER_SUPPLY_STATUS_CHARGING) && ((capacity < 100) && capacity >= 85) && (vin_error == 0)) {
+			msleep(2000);
+			rc = fg_mem_read(chip, reg1, fg_data[8].address,
+					fg_data[8].len, fg_data[8].offset, 0);
+
+			if (rc) {
+				pr_err("Time 2 Failed to update temp data\n");
+				vin_error2 = 0xFF;
+			} else {
+				vin_error2 = reg1[0] | (reg1[1] << 8)|(reg1[2] << 16) | (reg1[3] << 24);
+				pr_info("REG2[560]=%x %x %x %x, vin_error=%x\n", reg1[0], reg1[1], reg1[2], reg1[3], vin_error2);
+			}
+			if (vin_error == 0 && vin_error2 == 0) {
+				pr_info("wingtech try to reset FG for error at capcity=%d\n", capacity);
+				count_error++;
+				fg_check_ima_error_handling(chip);
+				pr_info("End! wingtech try to reset FG for error\n");
+			}
+		}
+	}
+}
+#endif
+
 static int correction_times[] = {
 	1470,
 	2940,
@@ -4245,6 +4303,79 @@ static void fg_hysteresis_config(struct fg_chip *chip)
 	}
 }
 
+#ifdef CONFIG_MACH_XIAOMI_SANTONI
+#define SANTONI_WARNTEMP 30
+#define SANTONI_COOLTEMP 10
+
+static void santoni_fg_hysteresis_config(struct fg_chip *chip)
+{
+	int hard_hot = 0, hard_cold = 0;
+	int soft_hot = 0, soft_cold = 0;
+	soft_hot = get_prop_jeita_temp(chip, FG_MEM_SOFT_HOT);
+	soft_cold = get_prop_jeita_temp(chip, FG_MEM_SOFT_COLD);
+	hard_hot = get_prop_jeita_temp(chip, FG_MEM_HARD_HOT);
+	hard_cold = get_prop_jeita_temp(chip, FG_MEM_HARD_COLD);
+	if (chip->health == POWER_SUPPLY_HEALTH_OVERHEAT && !chip->batt_hot) {
+		/* turn down the hard hot threshold */
+		set_prop_jeita_temp(chip, FG_MEM_HARD_HOT, hard_hot - chip->hot_hysteresis);
+		chip->batt_hot = true;
+		chip->batt_warm = false;
+		chip->batt_cold = false;
+		chip->batt_cold = false;
+	}  else if (chip->health != POWER_SUPPLY_HEALTH_OVERHEAT && chip->batt_hot) {
+		/* restore the hard hot threshold */
+		set_prop_jeita_temp(chip, FG_MEM_HARD_HOT, hard_hot + chip->hot_hysteresis);
+		chip->batt_hot = false;
+		chip->batt_warm = true;
+		chip->batt_cold = false;
+		chip->batt_cool = false;
+	}  else if (chip->health == POWER_SUPPLY_HEALTH_WARM && !chip->batt_warm) {
+		/* turn down the soft hot threshold */
+		set_prop_jeita_temp(chip, FG_MEM_SOFT_HOT, soft_hot - SANTONI_WARNTEMP);
+		chip->batt_hot = false;
+		chip->batt_warm = true;
+		chip->batt_cold = false;
+		chip->batt_cool = false;
+	} else if (chip->health != POWER_SUPPLY_HEALTH_WARM && chip->batt_warm) {
+		/* restore the soft hot threshold */
+		set_prop_jeita_temp(chip, FG_MEM_SOFT_HOT, soft_hot + SANTONI_WARNTEMP);
+		chip->batt_warm = false;
+		chip->batt_hot = false;
+		chip->batt_cold = false;
+		chip->batt_cool = false;
+	} else if (chip->health == POWER_SUPPLY_HEALTH_COOL && !chip->batt_cool) {
+		/* turn up the soft cold threshold */
+		set_prop_jeita_temp(chip, FG_MEM_SOFT_COLD,	soft_cold + SANTONI_COOLTEMP);
+		chip->batt_hot = false;
+		chip->batt_warm = false;
+		chip->batt_cold = false;
+		chip->batt_cool = true;
+	} else if (chip->health != POWER_SUPPLY_HEALTH_COOL && chip->batt_cool) {
+		/* restore the soft cold threshold */
+		set_prop_jeita_temp(chip, FG_MEM_SOFT_COLD,	soft_cold - SANTONI_COOLTEMP);
+		chip->batt_cool = false;
+		chip->batt_hot = false;
+		chip->batt_warm = false;
+		chip->batt_cold = false;
+	}  else if (chip->health == POWER_SUPPLY_HEALTH_COLD && !chip->batt_cold) {
+		/* turn up the hard cold threshold */
+		set_prop_jeita_temp(chip, FG_MEM_HARD_COLD,	hard_cold + chip->cold_hysteresis);
+		chip->batt_hot = false;
+		chip->batt_warm = false;
+		chip->batt_cold = true;
+		chip->batt_cool = false;
+	}  else if (chip->health != POWER_SUPPLY_HEALTH_COLD &&
+		chip->batt_cold) {
+		/* restore the hard cold threshold */
+		set_prop_jeita_temp(chip, FG_MEM_HARD_COLD,	hard_cold - chip->cold_hysteresis);
+		chip->batt_cold = false;
+		chip->batt_hot = false;
+		chip->batt_warm = false;
+		chip->batt_cool = true;
+	}
+}
+#endif
+
 #define BATT_INFO_STS(base)	(base + 0x09)
 #define JEITA_HARD_HOT_RT_STS	BIT(6)
 #define JEITA_HARD_COLD_RT_STS	BIT(5)
@@ -4271,6 +4402,12 @@ static int fg_init_batt_temp_state(struct fg_chip *chip)
 		(batt_info_sts & JEITA_HARD_HOT_RT_STS) ? true : false;
 	chip->batt_cold =
 		(batt_info_sts & JEITA_HARD_COLD_RT_STS) ? true : false;
+#ifdef CONFIG_MACH_XIAOMI_SANTONI
+	if (xiaomi_device_read() == XIAOMI_DEVICE_SANTONI) {
+		chip->batt_warm = false;
+		chip->batt_cool = false;
+	}
+#endif
 	if (chip->batt_hot || chip->batt_cold) {
 		if (chip->batt_hot) {
 			chip->health = POWER_SUPPLY_HEALTH_OVERHEAT;
@@ -4767,8 +4904,16 @@ static int fg_power_set_property(struct power_supply *psy,
 			schedule_work(&chip->set_resume_soc_work);
 		}
 
+#ifdef CONFIG_MACH_XIAOMI_SANTONI
+		if (xiaomi_device_read() == XIAOMI_DEVICE_SANTONI) {
+			santoni_fg_hysteresis_config(chip);
+		} else {
+#endif
 		if (chip->jeita_hysteresis_support)
 			fg_hysteresis_config(chip);
+#ifdef CONFIG_MACH_XIAOMI_SANTONI
+		}
+#endif
 		break;
 	case POWER_SUPPLY_PROP_CHARGE_DONE:
 		chip->charge_done = val->intval;
@@ -5380,6 +5525,11 @@ static irqreturn_t fg_soc_irq_handler(int irq, void *_chip)
 		}
 	}
 
+#ifdef CONFIG_MACH_XIAOMI_SANTONI
+	if (xiaomi_device_read() == XIAOMI_DEVICE_SANTONI)
+		schedule_work(&chip->santoni_battery_age_work);
+	else
+#endif
 	schedule_work(&chip->battery_age_work);
 
 	if (chip->power_supply_registered)
@@ -6291,6 +6441,44 @@ fail:
 	return -EINVAL;
 }
 
+#ifdef CONFIG_MACH_XIAOMI_SANTONI
+#define SANTONI_REDO_BATID_DURING_FIRST_EST	BIT(4)
+static void santoni_fg_hw_restart(struct fg_chip *chip)
+{
+	u8 reg, rc;
+	int batt_id;
+	u8 data[4];
+
+	reg = 0x80;
+	fg_masked_write(chip, 0x4150, reg, reg, 1);
+	fg_masked_write(chip, chip->soc_base + SOC_RESTART, 0xFF, 0, 1);
+	mdelay(5);
+
+	reg = SANTONI_REDO_BATID_DURING_FIRST_EST|REDO_FIRST_ESTIMATE;
+	fg_masked_write(chip, chip->soc_base + SOC_RESTART, reg, reg, 1);
+	mdelay(5);
+
+	reg = SANTONI_REDO_BATID_DURING_FIRST_EST | REDO_FIRST_ESTIMATE | RESTART_GO;
+	fg_masked_write(chip, chip->soc_base + SOC_RESTART, reg, reg, 1);
+	mdelay(1000);
+
+	fg_masked_write(chip, chip->soc_base + SOC_RESTART, 0xFF, 0, 1);
+	fg_masked_write(chip, 0x4150, 0x80, 0, 1);
+
+	mdelay(2000);
+
+	rc = fg_mem_read(chip, data, fg_data[FG_DATA_BATT_ID].address,
+			fg_data[FG_DATA_BATT_ID].len, fg_data[FG_DATA_BATT_ID].offset, 0);
+	if (rc) {
+		pr_err("XJB Failed to get sram battery id data\n");
+	} else {
+		fg_data[FG_DATA_BATT_ID].value = data[0] * LSB_8B;
+	}
+	batt_id = get_sram_prop_now(chip, FG_DATA_BATT_ID);
+	pr_err("fg_hw_restart. wingtech after restart battery id = %d\n", batt_id);
+}
+#endif
+
 #define FG_PROFILE_LEN			128
 #define PROFILE_COMPARE_LEN		32
 #define THERMAL_COEFF_ADDR		0x444
@@ -6305,6 +6493,9 @@ static int fg_batt_profile_init(struct fg_chip *chip)
 	const char *data, *batt_type_str;
 	bool tried_again = false, vbat_in_range, profiles_same;
 	u8 reg = 0;
+#ifdef CONFIG_MACH_XIAOMI_SANTONI
+	int santoni_value = 0;
+#endif
 
 wait:
 	fg_stay_awake(&chip->profile_wakeup_source);
@@ -6324,6 +6515,16 @@ wait:
 	/* Check whether the charger is ready */
 	if (!is_charger_available(chip))
 		goto reschedule;
+
+#ifdef CONFIG_MACH_XIAOMI_SANTONI
+	if (xiaomi_device_read() == XIAOMI_DEVICE_SANTONI) {
+		santoni_value = get_sram_prop_now(chip, FG_DATA_BATT_ID);
+		pr_err("wingtech later init FG_DATA_BATT_ID =%d\n", santoni_value);
+		if (!(((santoni_value > 85000) && (santoni_value < 115000)) || ((santoni_value > 57000) && (santoni_value < 78000)) || ((santoni_value > 24000) && (santoni_value < 35000)))) {
+			santoni_fg_hw_restart(chip);
+		}
+	}
+#endif
 
 	/* Disable charging for a FG cycle before calculating vbat_in_range */
 	if (!chip->charging_disabled) {
@@ -8751,6 +8952,11 @@ static int fg_probe(struct platform_device *pdev)
 	INIT_WORK(&chip->dump_sram, dump_sram);
 	INIT_WORK(&chip->status_change_work, status_change_work);
 	INIT_WORK(&chip->cycle_count_work, update_cycle_count);
+#ifdef CONFIG_MACH_XIAOMI_SANTONI
+	if (xiaomi_device_read() == XIAOMI_DEVICE_SANTONI)
+		INIT_WORK(&chip->santoni_battery_age_work, santoni_battery_age_work);
+	else
+#endif
 	INIT_WORK(&chip->battery_age_work, battery_age_work);
 	INIT_WORK(&chip->update_esr_work, update_esr_value);
 	INIT_WORK(&chip->set_resume_soc_work, set_resume_soc_work);
