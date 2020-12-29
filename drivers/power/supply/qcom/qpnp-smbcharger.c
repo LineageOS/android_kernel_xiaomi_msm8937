@@ -1,4 +1,5 @@
 /* Copyright (c) 2014-2016, 2018-2019 The Linux Foundation. All rights reserved.
+ * Copyright (C) 2018 XiaoMi, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -43,6 +44,11 @@
 #include <linux/ktime.h>
 #include <linux/extcon.h>
 #include <linux/pmic-voter.h>
+
+#ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_device.h>
+extern int xiaomi_device_read(void);
+#endif
 
 /* Mask/Bit helpers */
 #define _SMB_MASK(BITS, POS) \
@@ -1064,6 +1070,20 @@ static int get_prop_batt_temp(struct smbchg_chip *chip)
 		pr_smb(PR_STATUS, "Couldn't get temperature rc = %d\n", rc);
 		temp = DEFAULT_BATT_TEMP;
 	}
+
+#ifdef CONFIG_MACH_XIAOMI_SANTONI
+	if (xiaomi_device_read() == XIAOMI_DEVICE_SANTONI) {
+		if (temp < -100) {
+			temp = temp - 55;
+			return temp;
+		} else if (temp > 450) {
+			temp = temp - 10;
+			return temp;
+		} else
+			return temp;
+	}
+#endif
+
 	return temp;
 }
 
@@ -2243,6 +2263,12 @@ static bool smbchg_is_parallel_usb_ok(struct smbchg_chip *chip,
 	const char *fcc_voter
 		= get_effective_client_locked(chip->fcc_votable);
 	int usb_icl_ma = get_effective_result_locked(chip->usb_icl_votable);
+
+#ifdef CONFIG_MACH_XIAOMI_SANTONI
+	if (xiaomi_device_read() == XIAOMI_DEVICE_SANTONI) {
+		smbchg_parallel_en = 0;
+	}
+#endif
 
 	if (!parallel_psy || !smbchg_parallel_en
 			|| !chip->parallel_charger_detected) {
@@ -3758,6 +3784,30 @@ static void check_battery_type(struct smbchg_chip *chip)
 	}
 }
 
+#ifdef CONFIG_MACH_XIAOMI_SANTONI
+static int santoni_version_flag;
+void santoni_get_version_change_current(struct smbchg_chip *chip)
+{
+	char *boardid_string = NULL;
+	char boardid_start[32] = " ";
+	int India;
+
+	boardid_string = strstr(saved_command_line, "board_id=");
+
+	if (boardid_string != NULL) {
+		strncpy(boardid_start, boardid_string+9, 9);
+		India = strncmp(boardid_start, "S88536CA2", 9);
+		if (!India) {
+			pr_err("India version!\n");
+			santoni_version_flag = 1;
+		} else {
+			pr_err("Normal version!\n");
+			santoni_version_flag = 0;
+		}
+	}
+}
+#endif
+
 static void smbchg_external_power_changed(struct power_supply *psy)
 {
 	struct smbchg_chip *chip = power_supply_get_drvdata(psy);
@@ -4475,6 +4525,18 @@ static int smbchg_change_usb_supply_type(struct smbchg_chip *chip,
 	if (type != POWER_SUPPLY_TYPE_UNKNOWN)
 		chip->usb_supply_type = type;
 
+#ifdef CONFIG_MACH_XIAOMI_SANTONI
+	if (xiaomi_device_read() == XIAOMI_DEVICE_SANTONI) {
+		smbchg_default_hvdcp_icl_ma = 1200;
+		smbchg_default_hvdcp3_icl_ma = 2000;
+		smbchg_default_dcp_icl_ma = 2000;
+		if (santoni_version_flag) {
+			smbchg_default_hvdcp3_icl_ma = 1500;
+			smbchg_default_dcp_icl_ma = 1500;
+		}
+	}
+#endif
+
 	/*
 	 * Type-C only supports STD(900), MEDIUM(1500) and HIGH(3000) current
 	 * modes, skip all BC 1.2 current if external typec is supported.
@@ -4656,6 +4718,14 @@ static void restore_from_hvdcp_detection(struct smbchg_chip *chip)
 	if (rc < 0)
 		pr_err("Couldn't enable APSD rc=%d\n", rc);
 
+#ifdef CONFIG_MACH_XIAOMI_SANTONI
+	if (xiaomi_device_read() == XIAOMI_DEVICE_SANTONI)
+		/* Reset back to 5V unregulated */
+		rc = smbchg_sec_masked_write(chip,
+			chip->usb_chgpth_base + USBIN_CHGR_CFG,
+			ADAPTER_ALLOWANCE_MASK, 0x6);
+	else
+#endif
 	/* Reset back to 5V unregulated */
 	rc = smbchg_sec_masked_write(chip,
 		chip->usb_chgpth_base + USBIN_CHGR_CFG,
@@ -5939,6 +6009,9 @@ static enum power_supply_property smbchg_battery_properties[] = {
 	POWER_SUPPLY_PROP_RESTRICTED_CHARGING,
 	POWER_SUPPLY_PROP_ALLOW_HVDCP3,
 	POWER_SUPPLY_PROP_MAX_PULSE_ALLOWED,
+#ifdef CONFIG_MACH_XIAOMI_SANTONI
+	POWER_SUPPLY_PROP_CHARGE_FULL_DESIGN,
+#endif
 };
 
 static int smbchg_battery_set_property(struct power_supply *psy,
@@ -6092,6 +6165,11 @@ static int smbchg_battery_get_property(struct power_supply *psy,
 		val->intval = get_prop_batt_health(chip);
 		break;
 	case POWER_SUPPLY_PROP_TECHNOLOGY:
+#ifdef CONFIG_MACH_XIAOMI_SANTONI
+		if (xiaomi_device_read() == XIAOMI_DEVICE_SANTONI) {
+			val->intval = POWER_SUPPLY_TECHNOLOGY_LIPO;
+		} else
+#endif
 		val->intval = POWER_SUPPLY_TECHNOLOGY_LION;
 		break;
 	case POWER_SUPPLY_PROP_FLASH_CURRENT_MAX:
@@ -6132,6 +6210,14 @@ static int smbchg_battery_get_property(struct power_supply *psy,
 	case POWER_SUPPLY_PROP_TEMP:
 		val->intval = get_prop_batt_temp(chip);
 		break;
+#ifdef CONFIG_MACH_XIAOMI_SANTONI
+	case POWER_SUPPLY_PROP_CHARGE_FULL_DESIGN:
+		if (xiaomi_device_read() == XIAOMI_DEVICE_SANTONI) {
+			val->intval = 4100000;
+		} else
+			val->intval = -ENODATA;
+		break;
+#endif
 	case POWER_SUPPLY_PROP_VOLTAGE_MAX_DESIGN:
 		val->intval = get_prop_batt_voltage_max_design(chip);
 		break;
@@ -6299,6 +6385,11 @@ static irqreturn_t batt_cold_handler(int irq, void *_chip)
 	return IRQ_HANDLED;
 }
 
+#ifdef CONFIG_MACH_XIAOMI_SANTONI
+#define SANTONI_BATT_WARM_CURRENT		900
+#define SANTONI_BATT_WARM_VOLTAGE		15
+#endif
+
 static irqreturn_t batt_warm_handler(int irq, void *_chip)
 {
 	struct smbchg_chip *chip = _chip;
@@ -6307,6 +6398,14 @@ static irqreturn_t batt_warm_handler(int irq, void *_chip)
 	smbchg_read(chip, &reg, chip->bat_if_base + RT_STS, 1);
 	chip->batt_warm = !!(reg & HOT_BAT_SOFT_BIT);
 	pr_smb(PR_INTERRUPT, "triggered: 0x%02x\n", reg);
+#ifdef CONFIG_MACH_XIAOMI_SANTONI
+	if (xiaomi_device_read() == XIAOMI_DEVICE_SANTONI) {
+		smbchg_fastchg_current_comp_set(chip,
+				SANTONI_BATT_WARM_CURRENT);
+		smbchg_float_voltage_comp_set(chip,
+				SANTONI_BATT_WARM_VOLTAGE);
+	}
+#endif
 	smbchg_parallel_usb_check_ok(chip);
 	if (chip->batt_psy)
 		power_supply_changed(chip->batt_psy);
@@ -6314,6 +6413,11 @@ static irqreturn_t batt_warm_handler(int irq, void *_chip)
 			get_prop_batt_health(chip));
 	return IRQ_HANDLED;
 }
+
+#ifdef CONFIG_MACH_XIAOMI_SANTONI
+#define SANTONI_BATT_COOL_CURRENT		900
+#define SANTONI_BATT_COOL_VOLTAGE		0
+#endif
 
 static irqreturn_t batt_cool_handler(int irq, void *_chip)
 {
@@ -6323,6 +6427,19 @@ static irqreturn_t batt_cool_handler(int irq, void *_chip)
 	smbchg_read(chip, &reg, chip->bat_if_base + RT_STS, 1);
 	chip->batt_cool = !!(reg & COLD_BAT_SOFT_BIT);
 	pr_smb(PR_INTERRUPT, "triggered: 0x%02x\n", reg);
+
+#ifdef CONFIG_MACH_XIAOMI_SANTONI
+	if (xiaomi_device_read() == XIAOMI_DEVICE_SANTONI) {
+		pr_smb(PR_INTERRUPT, "triggered: 0x%02x, batt_cool=%d\n", reg, chip->batt_cool);
+		if (chip->batt_cool) {
+			smbchg_fastchg_current_comp_set(chip,
+					SANTONI_BATT_COOL_CURRENT);
+			smbchg_float_voltage_comp_set(chip,
+					SANTONI_BATT_COOL_VOLTAGE);
+		}
+	}
+#endif
+
 	smbchg_parallel_usb_check_ok(chip);
 	if (chip->batt_psy)
 		power_supply_changed(chip->batt_psy);
@@ -6934,6 +7051,9 @@ static inline int get_bpd(const char *name)
 #define OTG_PIN_CTRL_RID_DIS		0x04
 #define OTG_CMD_CTRL_RID_EN		0x08
 #define AICL_ADC_BIT			BIT(6)
+#ifdef CONFIG_MACH_XIAOMI_SANTONI
+#define SANTONI_OTG_CURRENT_REG			SMB_MASK(1, 0)
+#endif
 static void batt_ov_wa_check(struct smbchg_chip *chip)
 {
 	int rc;
@@ -7391,6 +7511,18 @@ static int smbchg_hw_init(struct smbchg_chip *chip)
 		}
 	}
 
+#ifdef CONFIG_MACH_XIAOMI_SANTONI
+	if (xiaomi_device_read() == XIAOMI_DEVICE_SANTONI) {
+		rc = smbchg_sec_masked_write(chip, chip->otg_base + 0xF3,
+				SANTONI_OTG_CURRENT_REG, 0x2);
+		if (rc < 0) {
+			dev_err(chip->dev, "Couldn't set SANTONI OTG current config rc = %d\n",
+					rc);
+			return rc;
+		}
+	}
+#endif
+
 	if (chip->wa_flags & SMBCHG_BATT_OV_WA)
 		batt_ov_wa_check(chip);
 
@@ -7528,6 +7660,9 @@ err:
 #define DEFAULT_VLED_MAX_UV		3500000
 #define DEFAULT_FCC_MA			2000
 #define DEFAULT_NUM_OF_PULSE_ALLOWED	20
+#ifdef CONFIG_MACH_XIAOMI_SANTONI
+#define SANTONI_INDIA_DEFAULT_FCC_MA	1500
+#endif
 static int smb_parse_dt(struct smbchg_chip *chip)
 {
 	int rc = 0, ocp_thresh = -EINVAL;
@@ -7549,6 +7684,19 @@ static int smb_parse_dt(struct smbchg_chip *chip)
 			"fastchg-current-ma", rc, 1);
 	if (chip->cfg_fastchg_current_ma == -EINVAL)
 		chip->cfg_fastchg_current_ma = DEFAULT_FCC_MA;
+#ifdef CONFIG_MACH_XIAOMI_SANTONI
+	if (xiaomi_device_read() == XIAOMI_DEVICE_SANTONI) {
+		if (chip->cfg_fastchg_current_ma == -EINVAL) {
+			pr_err("santoni_version_flag\n");
+			if (santoni_version_flag)
+				chip->cfg_fastchg_current_ma = SANTONI_INDIA_DEFAULT_FCC_MA;
+			else
+				chip->cfg_fastchg_current_ma = DEFAULT_FCC_MA;
+
+			pr_err("chip->cfg_fastchg_current_ma = %d\n", chip->cfg_fastchg_current_ma);
+		}
+	}
+#endif
 	OF_PROP_READ(chip, chip->vfloat_mv, "float-voltage-mv", rc, 1);
 	OF_PROP_READ(chip, chip->safety_time, "charging-timeout-mins", rc, 1);
 	OF_PROP_READ(chip, chip->vled_max_uv, "vled-max-uv", rc, 1);
@@ -8410,6 +8558,12 @@ static int smbchg_probe(struct platform_device *pdev)
 	mutex_init(&chip->wipower_config);
 	mutex_init(&chip->usb_status_lock);
 	device_init_wakeup(chip->dev, true);
+
+#ifdef CONFIG_MACH_XIAOMI_SANTONI
+	if (xiaomi_device_read() == XIAOMI_DEVICE_SANTONI) {
+		santoni_get_version_change_current(chip);
+	}
+#endif
 
 	rc = smbchg_parse_peripherals(chip);
 	if (rc) {
