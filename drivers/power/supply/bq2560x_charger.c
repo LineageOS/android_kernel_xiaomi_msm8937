@@ -38,6 +38,11 @@
 #include <linux/math64.h>
 #include <linux/alarmtimer.h>
 
+#ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_series.h>
+extern int xiaomi_series_read(void);
+#endif
+
 #include "bq2560x_reg.h"
 #include "bq2560x.h"
 
@@ -966,6 +971,11 @@ static int bq2560x_charger_get_property(struct power_supply *psy,
 		val->intval = bq->charge_enabled;
 		break;
 	case POWER_SUPPLY_PROP_CHARGE_FULL_DESIGN:
+#ifdef CONFIG_MACH_XIAOMI_ULYSSE
+		if (xiaomi_series_read() == XIAOMI_SERIES_ULYSSE)
+			val->intval = 3080;
+		else
+#endif
 		val->intval = 3000;
 		break;
 	
