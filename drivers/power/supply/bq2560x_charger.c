@@ -112,8 +112,6 @@ struct bq2560x {
 	
 	int status;
 	
-	int call_state;
-
 	struct mutex data_lock;
 	struct mutex i2c_rw_lock;
 	struct mutex profile_change_lock;
@@ -860,7 +858,6 @@ static enum power_supply_property bq2560x_charger_props[] = {
 	POWER_SUPPLY_PROP_CHARGE_TYPE, 
 	POWER_SUPPLY_PROP_PRESENT,
 	POWER_SUPPLY_PROP_CHARGING_ENABLED,
-	POWER_SUPPLY_PROP_CHARGING_CALL_STATE,
 	POWER_SUPPLY_PROP_HEALTH,
 	POWER_SUPPLY_PROP_CAPACITY,
 	POWER_SUPPLY_PROP_VOLTAGE_NOW,
@@ -935,9 +932,6 @@ static int bq2560x_charger_get_property(struct power_supply *psy,
 		val->intval = bq2560x_get_prop_charge_type(bq);
 		pr_debug("POWER_SUPPLY_PROP_CHARGE_TYPE:%d\n", val->intval);
 		break;
-	case POWER_SUPPLY_PROP_CHARGING_CALL_STATE:
-		val->intval = bq->call_state;
-		break;
 	case POWER_SUPPLY_PROP_CHARGING_ENABLED:
 		val->intval = bq->charge_enabled;
 		break;
@@ -997,10 +991,6 @@ static int bq2560x_charger_set_property(struct power_supply *psy,
 	case POWER_SUPPLY_PROP_SYSTEM_TEMP_LEVEL:
 		bq2560x_system_temp_level_set(bq, val->intval);
 		break;
-	case POWER_SUPPLY_PROP_CHARGING_CALL_STATE:
-		bq->call_state = val->intval;
-		bq2560x_update_charging_profile(bq);
-		break;
 	default:
 		return -EINVAL;
 	}
@@ -1015,7 +1005,6 @@ static int bq2560x_charger_is_writeable(struct power_supply *psy,
 
 	switch (prop) {
 	case POWER_SUPPLY_PROP_CHARGING_ENABLED:
-	case POWER_SUPPLY_PROP_CHARGING_CALL_STATE:
 	case POWER_SUPPLY_PROP_SYSTEM_TEMP_LEVEL:
 		ret = 1;
 		break;
@@ -1026,7 +1015,6 @@ static int bq2560x_charger_is_writeable(struct power_supply *psy,
 	return ret;
 }
 
-#define calling_current_max 700
 static int bq2560x_update_charging_profile(struct bq2560x *bq)
 {
 	int ret;
@@ -1077,17 +1065,12 @@ static int bq2560x_update_charging_profile(struct bq2560x *bq)
 
 	icl = min(therm_ma, icl);
 
-	if (bq->call_state == 0) {
-		if (prop.intval == POWER_SUPPLY_TYPE_USB_DCP || prop.intval == POWER_SUPPLY_TYPE_USB_CDP) {
-			if (bq->jeita_active) {
-				icl = bq->jeita_ma;
-			} else{
-				icl = calling_current_max;
-			}
-		} else{
-			icl = bq->platform_data->usb.ichg;
+	if (prop.intval == POWER_SUPPLY_TYPE_USB_DCP || prop.intval == POWER_SUPPLY_TYPE_USB_CDP) {
+		if (bq->jeita_active) {
+			icl = bq->jeita_ma;
 		}
-		pr_err("bq2560x_set_calling_current to =%d\n", icl);
+	} else {
+		icl = bq->platform_data->usb.ichg;
 	}
 
 	pr_err("charge volt = %d, charge curr = %d, input curr limit = %d\n",
@@ -1459,7 +1442,6 @@ static struct bq2560x_platform_data* bq2560x_parse_dt(struct device *dev,
 		return NULL;
 	}
 	
-	bq->call_state = 1;
 	ret = of_property_read_u32(np, "ti,bq2560x,chip-enable-gpio", &bq->gpio_ce);
     if(ret) {
 		pr_err("Failed to read node of ti,bq2560x,chip-enable-gpio\n");
