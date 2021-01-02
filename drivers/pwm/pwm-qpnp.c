@@ -29,9 +29,14 @@
 #include <linux/of_address.h>
 #include <linux/radix-tree.h>
 #include <linux/qpnp/pwm.h>
-#ifdef CONFIG_MACH_XIAOMI_ULYSSE
+#ifdef CONFIG_IR_PWM
 #include <linux/time.h>
 #include <linux/delay.h>
+#endif
+
+#ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_series.h>
+extern int xiaomi_series_read(void);
 #endif
 
 #define QPNP_LPG_DRIVER_NAME	"qcom,qpnp-pwm"
@@ -344,12 +349,12 @@ struct qpnp_pwm_chip {
 	u32			dtest_line;
 	u32			dtest_output;
 	bool			in_test_mode;
-#ifdef CONFIG_MACH_XIAOMI_ULYSSE
+#ifdef CONFIG_IR_PWM
 	struct mutex    lock;
 #endif
 };
 
-#ifdef CONFIG_MACH_XIAOMI_ULYSSE
+#ifdef CONFIG_IR_PWM
 struct qpnp_pwm_chip	*pwm_chip;
 
 struct pwm_ir_packet {
@@ -1088,7 +1093,7 @@ static int qpnp_dtest_config(struct qpnp_pwm_chip *chip, bool enable)
 	return rc;
 }
 
-#ifdef CONFIG_MACH_XIAOMI_ULYSSE
+#ifdef CONFIG_IR_PWM
 void pull_down_dtest1(void)
 {
 
@@ -2269,15 +2274,18 @@ static int qpnp_parse_dt_config(struct platform_device *pdev,
 
 	chip->pwm_mode = mode;
 	_pwm_change_mode(chip, mode);
+#ifdef CONFIG_IR_PWM
 #ifdef CONFIG_MACH_XIAOMI_ULYSSE
-	if(chip->dtest_line!=1) {
-		_pwm_enable(chip);
-    } else {
-		pull_down_dtest1();
-    }
-#else
-	_pwm_enable(chip);
+	if (xiaomi_series_read() == XIAOMI_SERIES_ULYSSE) {
+		if(chip->dtest_line!=1) {
+			_pwm_enable(chip);
+		} else {
+			pull_down_dtest1();
+		}
+	} else
 #endif
+#endif
+	_pwm_enable(chip);
 
 read_opt_props:
 	/* Initialize optional config parameters from DT if provided */
@@ -2301,7 +2309,7 @@ static struct pwm_ops qpnp_pwm_ops = {
 
 static int qpnp_pwm_probe(struct platform_device *pdev)
 {
-#ifndef CONFIG_MACH_XIAOMI_ULYSSE
+#ifndef CONFIG_IR_PWM
 	struct qpnp_pwm_chip	*pwm_chip;
 #endif
 	int			rc;
@@ -2318,7 +2326,7 @@ static int qpnp_pwm_probe(struct platform_device *pdev)
 	}
 
 	spin_lock_init(&pwm_chip->lpg_lock);
-#ifdef CONFIG_MACH_XIAOMI_ULYSSE
+#ifdef CONFIG_IR_PWM
 	mutex_init(&pwm_chip->lock);
 #endif
 
