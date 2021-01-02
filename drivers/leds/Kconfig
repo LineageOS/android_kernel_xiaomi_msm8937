@@ -216,6 +216,17 @@ config LEDS_GPIO
 	  defined as platform devices and/or OpenFirmware platform devices.
 	  The code to use these bindings can be selected below.
 
+config LEDS_GPIO_IR
+	tristate "LED Support for GPIO connected LEDs"
+	depends on LEDS_CLASS
+	depends on GPIOLIB || COMPILE_TEST
+	help
+	  This option enables support for the LEDs connected to GPIO
+	  outputs. To be useful the particular board must have LEDs
+	  and they must be connected to the GPIO lines.  The LEDs must be
+	  defined as platform devices and/or OpenFirmware platform devices.
+	  The code to use these bindings can be selected below.
+
 config LEDS_LP3944
 	tristate "LED Support for N.S. LP3944 (Fun Light) I2C chip"
 	depends on LEDS_CLASS
