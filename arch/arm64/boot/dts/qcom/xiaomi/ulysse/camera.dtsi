@@ -16,7 +16,7 @@
 
 &soc {
 	flash_GPIO:flashlight_back {
-		compatible = "qcom,leds-back-gpio-flash;
+		compatible = "qcom,leds-back-gpio-flash_ulysse";
 		status = "okay";
 		pinctrl-names = "flash_default", "flash_sleep";
 		pinctrl-0 = <&cam_flash_front0_default>;
@@ -42,7 +42,7 @@
 	};
 
 	flash_front_GPIO:flashlight {
-		compatible = "qcom,leds-gpio-flash";
+		compatible = "qcom,leds-gpio-flash_ulysse";
 		status = "okay";
 		pinctrl-names = "flash_default", "flash_sleep";
 		pinctrl-0 = <&cam_flash_front1_default>;
