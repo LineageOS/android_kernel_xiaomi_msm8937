@@ -31,7 +31,7 @@
 #define CDBG(fmt, args...) do { } while (0)
 #endif
 
-#define LED_GPIO_FLASH_DRIVER_NAME	"qcom,leds-back-gpio-flash"
+#define LED_GPIO_FLASH_DRIVER_NAME	"qcom,leds-back-gpio-flash_ulysse"
 #define LED_TRIGGER_DEFAULT		"none"
 
 #define GPIO_OUT_LOW          (0 << 1)
