@@ -81,6 +81,9 @@ obj-$(CONFIG_LEDS_QPNP_HAPTICS)	+= leds-qpnp-haptics.o
 obj-$(CONFIG_LEDS_QPNP_VIBRATOR_LDO)	+= leds-qpnp-vibrator-ldo.o
 obj-$(CONFIG_LEDS_QPNP_VIBRATOR) 	+= leds-qpnp-vibrator.o
 
+obj-$(CONFIG_LEDS_MSM_GPIO_FLASH_ULYSSE)	+= leds-msm-gpio-flash-ulysse.o
+obj-$(CONFIG_LEDS_MSM_BACK_GPIO_FLASH_ULYSSE)	+= leds-msm-back-gpio-flash-ulysse.o
+
 # LED SPI Drivers
 obj-$(CONFIG_LEDS_DAC124S085)		+= leds-dac124s085.o
 
