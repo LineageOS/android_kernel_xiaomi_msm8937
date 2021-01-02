@@ -14,7 +14,7 @@
 
 &soc {
 	gpio-leds {
-		compatible = "gpio-leds";
+		compatible = "gpio-leds-ir";
 		status = "okay";
 		pinctrl-names = "default";
 		pinctrl-0 = <&gpio_led_off>;
