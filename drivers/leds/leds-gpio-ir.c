@@ -132,7 +132,7 @@ static void gpio_led_set(struct led_classdev *led_cdev,
 	}
 }
 
-static int gpio_blink_set(struct led_classdev *led_cdev,
+static int old_gpio_blink_set(struct led_classdev *led_cdev,
 	unsigned long *delay_on, unsigned long *delay_off)
 {
 	struct gpio_led_data *led_dat =
@@ -449,7 +449,7 @@ static int create_gpio_led(const struct gpio_led *template,
 	led_dat->blinking = 0;
 	if (blink_set) {
 		led_dat->platform_gpio_blink_set = blink_set;
-		led_dat->cdev.blink_set = gpio_blink_set;
+		led_dat->cdev.blink_set = old_gpio_blink_set;
 	}
 	led_dat->cdev.brightness_set = gpio_led_set;
 	if (template->default_state == LEDS_GPIO_DEFSTATE_KEEP)
@@ -603,7 +603,7 @@ static int gpio_led_probe(struct platform_device *pdev)
 		for (i = 0; i < priv->num_leds; i++) {
 			ret = create_gpio_led(&pdata->leds[i],
 					      &priv->leds[i],
-					      &pdev->dev, pdata->gpio_blink_set);
+					      &pdev->dev, pdata->old_gpio_blink_set);
 			if (ret < 0) {
 				/* On failure: unwind the led creations */
 				for (i = i - 1; i >= 0; i--)
