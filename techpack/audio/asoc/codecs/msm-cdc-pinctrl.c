@@ -21,6 +21,11 @@
 #include <linux/of_gpio.h>
 #include "msm-cdc-pinctrl.h"
 
+#ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_series.h>
+extern int xiaomi_series_read(void);
+#endif
+
 struct msm_cdc_pinctrl_info {
 	struct pinctrl *pinctrl;
 	struct pinctrl_state *pinctrl_active;
@@ -183,11 +188,17 @@ static int msm_cdc_pinctrl_probe(struct platform_device *pdev)
 	/* skip setting to sleep state for LPI_TLMM GPIOs */
 	if (!of_property_read_bool(pdev->dev.of_node, "qcom,lpi-gpios")) {
 		/* Set pinctrl state to aud_sleep by default */
+#ifdef CONFIG_MACH_XIAOMI_ULYSSE
+	if (xiaomi_series_read() != XIAOMI_SERIES_ULYSSE) {
+#endif
 		ret = pinctrl_select_state(gpio_data->pinctrl,
 					   gpio_data->pinctrl_sleep);
 		if (ret)
 			dev_err(&pdev->dev, "%s: set cdc gpio sleep state fail: %d\n",
 				__func__, ret);
+#ifdef CONFIG_MACH_XIAOMI_ULYSSE
+	}
+#endif
 	}
 
 	gpio_data->gpio = of_get_named_gpio(pdev->dev.of_node,
