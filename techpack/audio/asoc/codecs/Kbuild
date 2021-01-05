@@ -131,6 +131,10 @@ ifdef CONFIG_SND_SOC_AW87319
         AW87319_OBJS += aw87319.o
 endif
 
+ifdef CONFIG_SND_SOC_AW87329
+        AW87329_OBJS += aw87329.o
+endif
+
 ifdef CONFIG_SND_SOC_MSM_STUB
 	STUB_OBJS += msm_stub.o
 endif
@@ -223,6 +227,9 @@ wsa881x_analog_dlkm-y := $(WSA881X_ANALOG_OBJS)
 
 obj-$(CONFIG_SND_SOC_AW87319) += aw87319_dlkm.o
 aw87319_dlkm-y := $(AW87319_OBJS)
+
+obj-$(CONFIG_SND_SOC_AW87329) += aw87329_dlkm.o
+aw87329_dlkm-y := $(AW87329_OBJS)
 
 obj-$(CONFIG_SND_SOC_MSM_STUB) += stub_dlkm.o
 stub_dlkm-y := $(STUB_OBJS)
