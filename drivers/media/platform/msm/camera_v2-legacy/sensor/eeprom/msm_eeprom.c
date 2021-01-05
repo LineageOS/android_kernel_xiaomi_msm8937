@@ -1,4 +1,5 @@
 /* Copyright (c) 2011-2016, The Linux Foundation. All rights reserved.
+ * Copyright (C) 2018 XiaoMi, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -18,12 +19,26 @@
 #include "msm_cci.h"
 #include "msm_eeprom.h"
 
+#ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_series.h>
+extern int xiaomi_series_read(void);
+#endif
+
 #undef CDBG
 #define CDBG(fmt, args...) pr_debug(fmt, ##args)
+
+#ifdef CONFIG_MACH_XIAOMI_ULYSSE
+#define ULYSSE_BUFFER_NUM              359
+uint16_t ulysse_otp_ois[19]={0};
+#endif
 
 DEFINE_MSM_MUTEX(msm_eeprom_mutex);
 #ifdef CONFIG_COMPAT
 static struct v4l2_file_operations msm_eeprom_v4l2_subdev_fops;
+#endif
+
+#ifdef CONFIG_MACH_XIAOMI_ULYSSE
+struct ulysse_vendor_eeprom ulysse_s_vendor_eeprom[ULYSSE_CAMERA_VENDOR_EEPROM_COUNT_MAX];
 #endif
 
 /**
@@ -658,6 +673,10 @@ static int msm_eeprom_config(struct msm_eeprom_ctrl_t *e_ctrl,
 			pr_err("%s:%d Eeprom already probed at kernel boot",
 				__func__, __LINE__);
 			rc = -EINVAL;
+#ifdef CONFIG_MACH_XIAOMI_ULYSSE
+			if (xiaomi_series_read() == XIAOMI_SERIES_ULYSSE)
+				rc = 0;
+#endif
 			break;
 		}
 		if (e_ctrl->cal_data.num_data == 0) {
@@ -1517,6 +1536,10 @@ static int msm_eeprom_config32(struct msm_eeprom_ctrl_t *e_ctrl,
 			pr_err("%s:%d Eeprom already probed at kernel boot",
 				__func__, __LINE__);
 			rc = -EINVAL;
+#ifdef CONFIG_MACH_XIAOMI_ULYSSE
+			if (xiaomi_series_read() == XIAOMI_SERIES_ULYSSE)
+				rc = 0;
+#endif
 			break;
 		}
 		if (e_ctrl->cal_data.num_data == 0) {
@@ -1574,10 +1597,306 @@ static long msm_eeprom_subdev_fops_ioctl32(struct file *file, unsigned int cmd,
 
 #endif
 
+#ifdef CONFIG_MACH_XIAOMI_ULYSSE
+static ulysse_camera_vendor_module_id ulysse_s5k2p7_ulysse_brcg064_get_otp_vendor_module_id
+	(struct msm_eeprom_ctrl_t *e_ctrl)
+{
+	uint8_t MODULE_INFO_OFFSET = 0x0E;
+	uint8_t LENS_INFO_OFFSET = 0x09;
+	uint8_t MID_FLAG_OFFSET = 0x00;
+	uint8_t mid=0;
+	uint8_t lensid=0;
+	uint8_t flag=0;
+	uint8_t *buffer = e_ctrl->cal_data.mapdata;
+	bool rc = false;
+
+	lensid = buffer[LENS_INFO_OFFSET];
+	mid = buffer[MODULE_INFO_OFFSET];
+	flag = buffer[MID_FLAG_OFFSET];
+	pr_err("%s mid=0x%x, flag=0x%x ,lensid = 0x%x \n", __func__, mid, flag,lensid);
+	rc = (mid==ULYSSE_MID_D3 && flag==0x01) ? true : false;
+	if(rc==false) mid = ULYSSE_MID_NULL;
+
+
+	pr_err("%s mid=0x%x \n", __func__, mid);
+	return mid;
+
+}
+static ulysse_camera_vendor_module_id ulysse_sunny_gt24p64a_s5k3p8_get_otp_vendor_module_id
+	(struct msm_eeprom_ctrl_t *e_ctrl)
+{
+	uint8_t MODULE_INFO_OFFSET = 0x01;
+	uint8_t LENS_INFO_OFFSET = 0x08;
+	uint8_t MID_FLAG_OFFSET = 0x00;
+	uint8_t mid=0;
+	uint8_t flag=0;
+	uint8_t lensid=0;
+	uint8_t *buffer = e_ctrl->cal_data.mapdata;
+	bool rc = false;
+
+	lensid = buffer[LENS_INFO_OFFSET];
+	mid = buffer[MODULE_INFO_OFFSET];
+	flag = buffer[MID_FLAG_OFFSET];
+
+	pr_err("hjl %s mid=0x%x, flag=0x%x ,lensid = 0x%x \n", __func__, mid, flag,lensid);
+	rc = (mid==ULYSSE_MID_SUNNY && flag==0x01) ? true : false;
+	if(rc==false) mid = ULYSSE_MID_NULL;
+	rc = (lensid==0x0e && flag==0x01) ? true : false;
+	if(rc==false) mid = ULYSSE_MID_NULL;
+	pr_err("hdj %s mid=0x%x, flag=0x%x ,lensid = 0x%x \n", __func__, mid, flag,lensid);
+	return mid;
+
+}
+static ulysse_camera_vendor_module_id ulysse_s5k3p8_ulysse_ofilm_gt24c64ass_get_otp_vendro_module_id(
+	struct msm_eeprom_ctrl_t *e_ctrl)
+{
+	uint8_t MODULE_INFO_OFFSET = 0x01;
+	uint8_t LENS_INFO_OFFSET = 0x08;
+	uint8_t MID_FLAG_OFFSET = 0x00;
+	uint8_t mid=0;
+	uint8_t flag=0;
+	uint8_t lensid=0;
+	uint8_t *buffer = e_ctrl->cal_data.mapdata;
+	bool rc = false;
+
+	lensid = buffer[LENS_INFO_OFFSET];
+	mid = buffer[MODULE_INFO_OFFSET];
+	flag = buffer[MID_FLAG_OFFSET];
+
+	pr_err("hjl %s mid=0x%x, flag=0x%x ,lensid = 0x%x \n", __func__, mid, flag,lensid);
+	rc = (mid==ULYSSE_MID_OFILM && flag==0x01) ? true : false;
+	if(rc==false) mid = ULYSSE_MID_NULL;
+	rc = (lensid==0x15 && flag==0x01) ? true : false;
+	if(rc==false) mid = ULYSSE_MID_NULL;
+	pr_err("hjl %s mid=0x%x, flag=0x%x ,lensid = 0x%x \n", __func__, mid, flag,lensid);
+	return mid;
+
+}
+
+static ulysse_camera_vendor_module_id ulysse_s5k5e8_oef0501_ofilm_get_otp_vendor_module_id(
+	struct msm_eeprom_ctrl_t *e_ctrl)
+{
+	uint32_t MODULE_INFO_OFFSET;
+	uint8_t mid=0;
+	uint8_t tempflag;
+	uint8_t *buffer = e_ctrl->cal_data.mapdata;
+	bool rc = false;
+
+	printk("enter %s\n",__func__);
+	tempflag = buffer[ULYSSE_BUFFER_NUM + 103];
+	printk("hjl %s tempflag=%d\n", __func__, tempflag);
+	if(tempflag) {
+		if(buffer[ULYSSE_BUFFER_NUM + 1]) {
+			MODULE_INFO_OFFSET = ULYSSE_BUFFER_NUM + 3;
+		} else if(buffer[ULYSSE_BUFFER_NUM + 35]) {
+			MODULE_INFO_OFFSET = ULYSSE_BUFFER_NUM + 37;
+		} else if(buffer[ULYSSE_BUFFER_NUM + 69]) {
+			MODULE_INFO_OFFSET = ULYSSE_BUFFER_NUM + 71;
+		} else{
+			pr_err("hjl %s %d invalid flag1 ,flag2 and flag3 of module\n",
+			__func__, __LINE__);
+		}
+	} else{
+		if(buffer[ULYSSE_BUFFER_NUM + 1]) {
+			MODULE_INFO_OFFSET = ULYSSE_BUFFER_NUM + 3;
+		} else if(buffer[ULYSSE_BUFFER_NUM + 27]) {
+			MODULE_INFO_OFFSET = ULYSSE_BUFFER_NUM + 29;
+		} else if(buffer[ULYSSE_BUFFER_NUM + 53]) {
+			MODULE_INFO_OFFSET = ULYSSE_BUFFER_NUM +55;
+		} else{
+			pr_err("hjl %s %d invalid flag1 ,flag2 and flag3 of module\n",
+			__func__, __LINE__);
+		}
+	}
+
+	mid = buffer[MODULE_INFO_OFFSET];
+
+	pr_err("hjl %s mid_vendor=0x%x\n", __func__, mid);
+	rc = (mid == ULYSSE_MID_OFILM) ? true : false;
+	if(rc==false) mid = ULYSSE_MID_NULL;
+	return mid;
+
+}
+static ulysse_camera_vendor_module_id ulysse_s5k5e8_f5e8ybf_qtech_get_otp_vendor_module_id(
+	struct msm_eeprom_ctrl_t *e_ctrl)
+{
+	uint32_t MODULE_INFO_OFFSET;
+	uint8_t mid=0;
+
+	uint8_t *buffer = e_ctrl->cal_data.mapdata;
+	bool rc = false;
+
+		 printk("enter %s\n",__func__);
+
+
+
+		if(buffer[ULYSSE_BUFFER_NUM + 1]) {
+			MODULE_INFO_OFFSET = ULYSSE_BUFFER_NUM + 3;
+		} else if(buffer[ULYSSE_BUFFER_NUM + 27]) {
+			MODULE_INFO_OFFSET = ULYSSE_BUFFER_NUM + 29;
+
+		} else{
+			pr_err("hjl %s %d invalid flag1 and flag2 of module\n",
+				__func__, __LINE__);
+		}
+
+	mid = buffer[MODULE_INFO_OFFSET];
+
+	pr_err("hjl %s mid_vendor=0x%x\n", __func__, mid);
+	rc = (mid == ULYSSE_MID_QTECH) ? true : false;
+	if(rc==false) mid = ULYSSE_MID_NULL;
+	return mid;
+
+}
+
+static ulysse_camera_vendor_module_id ulysse_s5k3p8sp_d16s01n_sunny_d6s_get_otp_vendro_module_id
+	(struct msm_eeprom_ctrl_t *e_ctrl)
+{
+	uint8_t MODULE_INFO_OFFSET = 0x01;
+	uint8_t LENS_INFO_OFFSET = 0x08;
+	uint8_t MID_FLAG_OFFSET = 0x00;
+	uint8_t mid=0;
+	uint8_t flag=0;
+	uint8_t lensid=0;
+	uint8_t *buffer = e_ctrl->cal_data.mapdata;
+	bool rc = false;
+
+	lensid = buffer[LENS_INFO_OFFSET];
+	mid = buffer[MODULE_INFO_OFFSET];
+	flag = buffer[MID_FLAG_OFFSET];
+
+	pr_err("hjl %s mid=0x%x, flag=0x%x ,lensid = 0x%x \n", __func__, mid, flag,lensid);
+	rc = (mid==ULYSSE_MID_SUNNY && flag==0x01) ? true : false;
+	if(rc==false) mid = ULYSSE_MID_NULL;
+	rc = (lensid==0x0e && flag==0x01) ? true : false;
+	if(rc==false) mid = ULYSSE_MID_NULL;
+	pr_err("hjl %s mid=0x%x, flag=0x%x ,lensid = 0x%x \n", __func__, mid, flag,lensid);
+	return mid;
+
+}
+static ulysse_camera_vendor_module_id ulysse_ov16885_ojf0541_ofilm_d6s_get_otp_vendor_module_id
+	(struct msm_eeprom_ctrl_t *e_ctrl )
+{
+	uint8_t MODULE_INFO_OFFSET = 0x01;
+	uint8_t SENSOR_INFO_OFFSET = 0x0C;
+	uint8_t MID_FLAG_OFFSET = 0x00;
+	uint8_t mid=0;
+	uint8_t flag=0;
+	uint8_t sensorid=0;
+	uint8_t *buffer = e_ctrl->cal_data.mapdata;
+	bool rc = false;
+
+	sensorid = buffer[SENSOR_INFO_OFFSET];
+	mid = buffer[MODULE_INFO_OFFSET];
+	flag = buffer[MID_FLAG_OFFSET];
+
+	printk("hjl %s mid=0x%x, flag=0x%x ,sensorid = 0x%x \n", __func__, mid, flag, sensorid);
+	rc = ( mid==ULYSSE_MID_OFILM && flag==0x01 ) ? true : false;
+	if(rc==false) mid = ULYSSE_MID_NULL;
+	rc = ( sensorid ==0x14 && flag==0x01) ? true : false;
+	if(rc==false) mid = ULYSSE_MID_NULL;
+	pr_err("hjl %s mid=0x%x, flag=0x%x ,sensorid = 0x%x \n", __func__, mid, flag,sensorid);
+	return mid;
+}
+
+static ulysse_camera_vendor_module_id ulysse_s5k3l8_ohp0502_ofilm_get_otp_vendor_module_id(
+	struct msm_eeprom_ctrl_t *e_ctrl)
+{
+	uint8_t MODULE_INFO_OFFSET = 0x07;
+	uint8_t LENS_INFO_OFFSET = 0x08;
+	uint8_t MID_FLAG_OFFSET = 0x00;
+	uint8_t mid=0;
+	uint8_t flag=0;
+	uint8_t lensid=0;
+	uint8_t *buffer = e_ctrl->cal_data.mapdata;
+	bool rc = false;
+
+	lensid = buffer[LENS_INFO_OFFSET];
+	mid = buffer[MODULE_INFO_OFFSET];
+	flag = buffer[MID_FLAG_OFFSET];
+
+	printk("Lct %s mid=0x%x, flag=0x%x ,lensid = 0x%x \n", __func__, mid, flag,lensid);
+	rc = (mid == ULYSSE_MID_OFILM && flag == 0x01) ? true : false;
+	if(rc==false) mid = ULYSSE_MID_NULL;
+	rc = (lensid == 0x13 && flag == 0x01) ? true : false;
+	if(rc==false) mid = ULYSSE_MID_NULL;
+	pr_err("Lct %s mid=0x%x, flag=0x%x ,lensid = 0x%x \n", __func__, mid, flag,lensid);
+	return mid;
+
+}
+static ulysse_camera_vendor_module_id ulysse_ov13855_f13855bd_qtech_get_otp_vendor_module_id(
+	struct msm_eeprom_ctrl_t *e_ctrl)
+{
+	uint8_t MODULE_INFO_OFFSET = 0x07;
+	uint8_t LENS_INFO_OFFSET = 0x08;
+	uint8_t MID_FLAG_OFFSET = 0x00;
+	uint8_t mid=0;
+	uint8_t flag=0;
+	uint8_t lensid=0;
+	uint8_t *buffer = e_ctrl->cal_data.mapdata;
+	bool rc = false;
+
+	lensid = buffer[LENS_INFO_OFFSET];
+	mid = buffer[MODULE_INFO_OFFSET];
+	flag = buffer[MID_FLAG_OFFSET];
+
+	printk("Lct %s mid=0x%x, flag=0x%x, lensid = 0x%x\n", __func__, mid, flag, lensid);
+	rc = (mid == ULYSSE_MID_QTECH && flag == 0x01) ? true : false;
+	if(rc==false) mid = ULYSSE_MID_NULL;
+	rc = (lensid == 0x10 && flag == 0x01) ? true : false;
+	if(rc==false) mid = ULYSSE_MID_NULL;
+	pr_err("Lct %s mid=0x%x, flag=0x%x, lensid = 0x%x \n", __func__, mid, flag, lensid);
+	return mid;
+
+}
+
+static uint8_t ulysse_get_otp_vendor_module_id(struct msm_eeprom_ctrl_t *e_ctrl, const char *eeprom_name)
+{
+	ulysse_camera_vendor_module_id ulysse_module_id=ULYSSE_MID_NULL;
+
+	if(strcmp(eeprom_name, "s5k2p7_ulysse_brcg064") == 0) {
+		ulysse_module_id = ulysse_s5k2p7_ulysse_brcg064_get_otp_vendor_module_id(e_ctrl);
+	} else if(strcmp(eeprom_name,"sunny_gt24p64a_s5k3p8") == 0) {
+		ulysse_module_id = ulysse_sunny_gt24p64a_s5k3p8_get_otp_vendor_module_id(e_ctrl);
+		 } else if(strcmp(eeprom_name,"ofilm_gt24c64ass_s5k3p8") == 0) {
+		ulysse_module_id = ulysse_s5k3p8_ulysse_ofilm_gt24c64ass_get_otp_vendro_module_id(e_ctrl);
+	}
+
+	printk("hjl enter D6 front camera\n");
+	if(strcmp(eeprom_name,"s5k5e8_oef0501_ofilm") == 0) {
+		ulysse_module_id = ulysse_s5k5e8_oef0501_ofilm_get_otp_vendor_module_id(e_ctrl);
+	} else if(strcmp(eeprom_name,"s5k5e8_f5e8ybf_qtech") == 0) {
+		ulysse_module_id = ulysse_s5k5e8_f5e8ybf_qtech_get_otp_vendor_module_id(e_ctrl);
+	}
+
+	printk("hjl enter D6s front camera\n");
+	if(strcmp(eeprom_name,"s5k3p8sp_d16s01n_sunny_d6s") == 0) {
+		ulysse_module_id = ulysse_s5k3p8sp_d16s01n_sunny_d6s_get_otp_vendro_module_id(e_ctrl);
+	} else if(strcmp(eeprom_name,"ov16885_ojf0541_ofilm_d6s") == 0) {
+		ulysse_module_id = ulysse_ov16885_ojf0541_ofilm_d6s_get_otp_vendor_module_id(e_ctrl);
+	}
+
+	printk("hjl enter D6 and D6's back camera\n");
+	if(strcmp(eeprom_name,"s5k3l8_ohp0502_ofilm") == 0) {
+		ulysse_module_id = ulysse_s5k3l8_ohp0502_ofilm_get_otp_vendor_module_id(e_ctrl);
+		 } else if(strcmp(eeprom_name, "ov13855_f13855bd_qtech") == 0) {
+		ulysse_module_id = ulysse_ov13855_f13855bd_qtech_get_otp_vendor_module_id(e_ctrl);
+	}
+
+	printk("hjl %s %d ulysse_eeprom_name=%s, ulysse_module_id=0x%x\n",__func__,__LINE__,eeprom_name, ulysse_module_id);
+	if(ulysse_module_id>=ULYSSE_MID_MAX) ulysse_module_id = ULYSSE_MID_NULL;
+
+	return ((uint8_t)ulysse_module_id);
+}
+#endif
+
 static int msm_eeprom_platform_probe(struct platform_device *pdev)
 {
 	int rc = 0;
 	int j = 0;
+#ifdef CONFIG_MACH_XIAOMI_ULYSSE
+	int ulysse_i = 0;
+#endif
 	uint32_t temp;
 
 	struct msm_camera_cci_client *cci_client = NULL;
@@ -1723,6 +2042,15 @@ static int msm_eeprom_platform_probe(struct platform_device *pdev)
 			CDBG("memory_data[%d] = 0x%X\n", j,
 				e_ctrl->cal_data.mapdata[j]);
 
+#ifdef CONFIG_MACH_XIAOMI_ULYSSE
+		if (xiaomi_series_read() == XIAOMI_SERIES_ULYSSE) {
+			if(eb_info->eeprom_name != NULL) {
+				ulysse_s_vendor_eeprom[pdev->id].ulysse_module_id = ulysse_get_otp_vendor_module_id(e_ctrl, eb_info->eeprom_name);
+				strcpy(ulysse_s_vendor_eeprom[pdev->id].ulysse_eeprom_name, eb_info->eeprom_name);
+			}
+		}
+#endif
+
 		e_ctrl->is_supported |= msm_eeprom_match_crc(&e_ctrl->cal_data);
 
 		rc = msm_camera_power_down(power_info,
@@ -1733,6 +2061,19 @@ static int msm_eeprom_platform_probe(struct platform_device *pdev)
 		}
 	} else
 		e_ctrl->is_supported = 1;
+
+#ifdef CONFIG_MACH_XIAOMI_ULYSSE
+	if (xiaomi_series_read() == XIAOMI_SERIES_ULYSSE) {
+		if(strcmp(eb_info->eeprom_name, "s5k2p7_ulysse_brcg064") == 0) {
+			for (j = 2900,ulysse_i=0; j < 2938; j=j+2,ulysse_i++) {
+				if(ulysse_i<19) {
+					ulysse_otp_ois[ulysse_i] = (e_ctrl->cal_data.mapdata[j +1 ] & 0xff) << 8 |( e_ctrl->cal_data.mapdata[j] & 0xff);
+				} else
+				pr_err("otp ois data fail");
+			}
+		}
+	}
+#endif
 
 	v4l2_subdev_init(&e_ctrl->msm_sd.sd,
 		e_ctrl->eeprom_v4l2_subdev_ops);

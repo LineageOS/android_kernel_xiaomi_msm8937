@@ -1592,6 +1592,9 @@ enum msm_camera_vreg_name_t {
 	CAM_VANA,
 	CAM_VAF,
 	CAM_VREG_MAX,
+#ifdef CONFIG_MACH_XIAOMI_ULYSSE
+	ULYSSE_CAM_DRV,
+#endif
 };
 
 struct msm_camera_csi_lane_params {

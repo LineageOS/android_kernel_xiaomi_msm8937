@@ -16,6 +16,10 @@
 #include "msm_isp_axi_util.h"
 #include "trace/events/msm_cam-legacy.h"
 
+#ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_series.h>
+extern int xiaomi_series_read(void);
+#endif
 
 #define ISP_SOF_DEBUG_COUNT 0
 #ifdef CONFIG_MSM_AVTIMER
@@ -526,8 +530,14 @@ static void msm_isp_cfg_framedrop_reg(struct vfe_device *vfe_dev,
 	if (!runtime_init_frame_drop)
 		framedrop_period = stream_info->current_framedrop_period;
 
-	if (MSM_VFE_STREAM_STOP_PERIOD != framedrop_period)
+	if (MSM_VFE_STREAM_STOP_PERIOD != framedrop_period) {
 		framedrop_pattern = 0x1;
+#ifdef CONFIG_MACH_XIAOMI_ULYSSE
+		if (xiaomi_series_read() == XIAOMI_SERIES_ULYSSE) {
+			framedrop_pattern = framedrop_pattern << (framedrop_period-1);
+		}
+#endif
+	}
 
 	ISP_DBG("%s: stream %x framedrop pattern %x period %u\n", __func__,
 		stream_info->stream_handle, framedrop_pattern,

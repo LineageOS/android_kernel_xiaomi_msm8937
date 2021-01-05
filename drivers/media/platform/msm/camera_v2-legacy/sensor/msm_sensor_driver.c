@@ -1,4 +1,5 @@
 /* Copyright (c) 2013-2017, The Linux Foundation. All rights reserved.
+ * Copyright (C) 2018 XiaoMi, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -17,6 +18,16 @@
 #include "camera.h"
 #include "msm_cci.h"
 #include "msm_camera_dt_util.h"
+
+#ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_series.h>
+extern int xiaomi_series_read(void);
+#endif
+
+#ifdef CONFIG_MACH_XIAOMI_ULYSSE
+#include <soc/qcom/camera2-legacy.h>
+extern struct ulysse_vendor_eeprom ulysse_s_vendor_eeprom[ULYSSE_CAMERA_VENDOR_EEPROM_COUNT_MAX];
+#endif
 
 /* Logging macro */
 #undef CDBG
@@ -647,6 +658,9 @@ int32_t msm_sensor_driver_probe(void *setting,
 
 	unsigned long                        mount_pos = 0;
 	uint32_t                             is_yuv;
+#ifdef CONFIG_MACH_XIAOMI_ULYSSE
+	uint32_t	ulysse_i = 0;
+#endif
 
 	/* Validate input parameters */
 	if (!setting) {
@@ -745,6 +759,87 @@ int32_t msm_sensor_driver_probe(void *setting,
 		rc = -EINVAL;
 		goto free_slave_info;
 	}
+
+#ifdef CONFIG_MACH_XIAOMI_ULYSSE
+	if (xiaomi_series_read() == XIAOMI_SERIES_ULYSSE) {
+		printk("lct enter CONFIG_KERNEL_CUSTOM_CM895!\n");
+		if(ulysse_s_vendor_eeprom[ulysse_i].ulysse_eeprom_name != NULL) {
+			for(ulysse_i=0; ulysse_i<ULYSSE_CAMERA_VENDOR_EEPROM_COUNT_MAX; ulysse_i++) {
+				if(strcmp(slave_info->eeprom_name,ulysse_s_vendor_eeprom[ulysse_i].ulysse_eeprom_name) == 0) {
+
+					printk("lct slave_info->sensor_name =%s, module_id=%d\n", slave_info->sensor_name, ulysse_s_vendor_eeprom[ulysse_i].ulysse_module_id);
+					if(((strcmp(slave_info->sensor_name,"s5k3p8_ulysse_sunny") == 0) && (ulysse_s_vendor_eeprom[ulysse_i].ulysse_module_id == ULYSSE_MID_SUNNY))
+						|| ((strcmp(slave_info->sensor_name,"s5k3p8_ulysse_ofilm") == 0) && (ulysse_s_vendor_eeprom[ulysse_i].ulysse_module_id == ULYSSE_MID_OFILM))
+						|| ((strcmp(slave_info->sensor_name,"s5k2p7_ulysse_semco") == 0) && (ulysse_s_vendor_eeprom[ulysse_i].ulysse_module_id == ULYSSE_MID_D3))) {
+							printk("lct module found!probe continue!\n");
+							break;
+					}
+				}
+			}
+	/*
+			if(i >= CAMERA_VENDOR_EEPROM_COUNT_MAX) {
+				pr_err("lct module not found!probe break failed!\n");
+				rc = -EFAULT;
+				goto free_slave_info;
+			}
+	*/
+		}
+
+		printk("hjl reading to enter L6200\n");
+		printk("lct entered CONFIG_KERNEL_CUSTOM_L6200!\n");
+		printk("slave_info->eeprom_name=%s, ulysse_s_vendor_eeprom=%s\n",
+				slave_info->eeprom_name, ulysse_s_vendor_eeprom[ulysse_i].ulysse_eeprom_name);
+		if(ulysse_s_vendor_eeprom[ulysse_i].ulysse_eeprom_name != NULL) {
+			for(ulysse_i=0; ulysse_i<ULYSSE_CAMERA_VENDOR_EEPROM_COUNT_MAX; ulysse_i++) {
+				if(strcmp(slave_info->eeprom_name, ulysse_s_vendor_eeprom[ulysse_i].ulysse_eeprom_name) == 0) {
+
+				printk("lct slave_info->sensor_name =%s, module_id=%d\n", slave_info->sensor_name, ulysse_s_vendor_eeprom[ulysse_i].ulysse_module_id);
+					if(((strcmp(slave_info->sensor_name,"s5k5e8_oef0501_d6") == 0) && (ulysse_s_vendor_eeprom[ulysse_i].ulysse_module_id == ULYSSE_MID_OFILM))
+						|| ((strcmp(slave_info->sensor_name,"s5k5e8_f5e8ybf_d6") == 0) && (ulysse_s_vendor_eeprom[ulysse_i].ulysse_module_id == ULYSSE_MID_QTECH))
+						|| ((strcmp(slave_info->sensor_name,"s5k3l8_ohp0502_d6") == 0) && (ulysse_s_vendor_eeprom[ulysse_i].ulysse_module_id == ULYSSE_MID_OFILM))
+						|| ((strcmp(slave_info->sensor_name,"ov13855_f13855bd_d6") == 0) && (ulysse_s_vendor_eeprom[ulysse_i].ulysse_module_id == ULYSSE_MID_QTECH))) {
+							printk("lct module found!probe continue!\n");
+							break;
+					}
+				}
+			}
+	/*
+			if(i >= CAMERA_VENDOR_EEPROM_COUNT_MAX) {
+			pr_err("lct module not found!probe break failed!\n");
+			rc = -EFAULT;
+			goto free_slave_info;
+			}
+	*/
+		}
+
+		printk("lct enter CONFIG_KERNEL_CUSTOM_L6210!\n");
+		if(ulysse_s_vendor_eeprom[ulysse_i].ulysse_eeprom_name != NULL) {
+			for(ulysse_i=0; ulysse_i<ULYSSE_CAMERA_VENDOR_EEPROM_COUNT_MAX; ulysse_i++) {
+				printk("slave_info->eeprom_name=%s, ulysse_s_vendor_eeprom=%s\n",
+				slave_info->eeprom_name, ulysse_s_vendor_eeprom[ulysse_i].ulysse_eeprom_name);
+				printk("slave_info->sensor_name=%s\n", slave_info->sensor_name);
+				if(strcmp(slave_info->eeprom_name, ulysse_s_vendor_eeprom[ulysse_i].ulysse_eeprom_name) == 0) {
+
+					printk("lct slave_info->sensor_name =%s, module_id=%d\n", slave_info->sensor_name, ulysse_s_vendor_eeprom[ulysse_i].ulysse_module_id);
+					if(((strcmp(slave_info->sensor_name,"s5k3p8sp_d16s01n_d6s") == 0) && (ulysse_s_vendor_eeprom[ulysse_i].ulysse_module_id == ULYSSE_MID_SUNNY))
+						|| ((strcmp(slave_info->sensor_name,"ov16885_ojf0541_d6") == 0) && (ulysse_s_vendor_eeprom[ulysse_i].ulysse_module_id == ULYSSE_MID_OFILM))
+						|| ((strcmp(slave_info->sensor_name,"s5k3l8_ohp0502_d6") == 0) && (ulysse_s_vendor_eeprom[ulysse_i].ulysse_module_id == ULYSSE_MID_OFILM))
+						|| ((strcmp(slave_info->sensor_name,"ov13855_f13855bd_d6") == 0) && (ulysse_s_vendor_eeprom[ulysse_i].ulysse_module_id == ULYSSE_MID_QTECH))) {
+							printk("lct module found!probe continue!\n");
+							break;
+					}
+				}
+			}
+	/*
+			if(i >= CAMERA_VENDOR_EEPROM_COUNT_MAX) {
+				pr_err("lct module not found!probe break failed!\n");
+				rc = -EFAULT;
+				goto free_slave_info;
+			}
+	*/
+		}
+	}
+#endif
 
 	/* Print slave info */
 	CDBG("camera id %d Slave addr 0x%X addr_type %d\n",
