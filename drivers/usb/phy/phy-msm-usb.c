@@ -52,6 +52,11 @@
 
 #include <linux/msm-bus.h>
 
+#ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_series.h>
+extern int xiaomi_series_read(void);
+#endif
+
 /**
  * Requested USB votes for BUS bandwidth
  *
@@ -117,6 +122,7 @@ enum msm_usb_phy_type {
 };
 
 #define IDEV_CHG_MAX	1500
+static int idev_chg_max = IDEV_CHG_MAX;
 #define IUNIT		100
 #define IDEV_HVDCP_CHG_MAX	1800
 
@@ -2650,7 +2656,7 @@ static void msm_chg_detect_work(struct work_struct *w)
 			msm_otg_notify_charger(motg, dcp_max_current);
 		else if (motg->chg_type == USB_FLOATED_CHARGER ||
 					motg->chg_type == USB_CDP_CHARGER)
-			msm_otg_notify_charger(motg, IDEV_CHG_MAX);
+			msm_otg_notify_charger(motg, idev_chg_max);
 
 		msm_otg_dbg_log_event(phy, "CHG WORK PUT: CHG_TYPE",
 			motg->chg_type, get_pm_runtime_counter(phy->dev));
@@ -3950,6 +3956,13 @@ static int msm_otg_probe(struct platform_device *pdev)
 	struct msm_otg_platform_data *pdata;
 	void __iomem *tcsr;
 	int id_irq = 0;
+
+#ifdef CONFIG_MACH_XIAOMI_ULYSSE
+	if (xiaomi_series_read() == XIAOMI_SERIES_ULYSSE) {
+		idev_chg_max = 2000;
+		dcp_max_current = idev_chg_max;
+	}
+#endif
 
 	dev_info(&pdev->dev, "msm_otg probe\n");
 
