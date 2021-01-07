@@ -65,11 +65,11 @@ static int select_pin_ctl(struct gf_dev *gf_dev, const char *name)
 
 
 
-int gf_parse_dts(struct gf_dev *gf_dev)
+int xiaomi_santoni_gf_parse_dts(struct gf_dev *gf_dev)
 {
 	int rc = 0;
 	int i = 0;
-	pr_warn("--------gf_parse_dts start.--------\n");
+	pr_warn("--------xiaomi_santoni_gf_parse_dts start.--------\n");
 
 
 	rc = gf3208_request_named_gpio(gf_dev, "goodix, gpio_reset",  &gf_dev->reset_gpio);
@@ -108,13 +108,13 @@ int gf_parse_dts(struct gf_dev *gf_dev)
 	rc = select_pin_ctl(gf_dev, "goodixfp_irq_active");
 	if (rc)
 		goto exit;
-		pr_warn("--------gf_parse_dts end---OK.--------\n");
+		pr_warn("--------xiaomi_santoni_gf_parse_dts end---OK.--------\n");
 
 	exit:
 	return rc;
 }
 
-void gf_cleanup(struct gf_dev	*gf_dev)
+void xiaomi_santoni_gf_cleanup(struct gf_dev	*gf_dev)
 {
 	gf_dbg("[info]  enter%s\n", __func__);
 
@@ -139,7 +139,7 @@ void gf_cleanup(struct gf_dev	*gf_dev)
 
 }
 
-int gf_power_on(struct gf_dev *gf_dev)
+int xiaomi_santoni_gf_power_on(struct gf_dev *gf_dev)
 {
 	int rc = 0;
 
@@ -149,7 +149,7 @@ int gf_power_on(struct gf_dev *gf_dev)
 	return rc;
 }
 
-int gf_power_off(struct gf_dev*gf_dev)
+int xiaomi_santoni_gf_power_off(struct gf_dev*gf_dev)
 {
 	int rc = 0;
 
@@ -181,7 +181,7 @@ static int hw_reset(struct  gf_dev *gf_dev)
  *CPU output low level in RST pin to reset GF. This is the MUST action for GF.
  *Take care of this function. IO Pin driver strength / glitch and so on.
  ********************************************************************/
-int gf_hw_reset(struct gf_dev *gf_dev, unsigned int delay_ms)
+int xiaomi_santoni_gf_hw_reset(struct gf_dev *gf_dev, unsigned int delay_ms)
 {
 	if (gf_dev == NULL) {
 		pr_info("Input buff is NULL.\n");
@@ -192,7 +192,7 @@ int gf_hw_reset(struct gf_dev *gf_dev, unsigned int delay_ms)
 	return 0;
 }
 
-int gf_irq_num(struct gf_dev *gf_dev)
+int xiaomi_santoni_gf_irq_num(struct gf_dev *gf_dev)
 {
 	if (gf_dev == NULL) {
 		pr_info("Input buff is NULL.\n");
