@@ -90,16 +90,16 @@ struct gf_dev {
 	struct wakeup_source ttw_wl;
 };
 
-int gf_parse_dts(struct gf_dev *gf_dev);
-void gf_cleanup(struct gf_dev *gf_dev);
+int landtoni_gf_parse_dts(struct gf_dev *gf_dev);
+void landtoni_gf_cleanup(struct gf_dev *gf_dev);
 
-int gf_power_on(struct gf_dev *gf_dev);
-int gf_power_off(struct gf_dev *gf_dev);
+int landtoni_gf_power_on(struct gf_dev *gf_dev);
+int landtoni_gf_power_off(struct gf_dev *gf_dev);
 
-int gf_hw_reset(struct gf_dev *gf_dev, unsigned int delay_ms);
-int gf_irq_num(struct gf_dev *gf_dev);
+int landtoni_gf_hw_reset(struct gf_dev *gf_dev, unsigned int delay_ms);
+int landtoni_gf_irq_num(struct gf_dev *gf_dev);
 
-void sendnlmsg(char *message);
-int netlink_init(void);
-void netlink_exit(void);
+void landtoni_sendnlmsg(char *message);
+int landtoni_netlink_init(void);
+void landtoni_netlink_exit(void);
 #endif /*__GF_SPI_H*/
