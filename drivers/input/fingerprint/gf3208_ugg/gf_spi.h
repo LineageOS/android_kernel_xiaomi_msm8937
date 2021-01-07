@@ -136,16 +136,16 @@ struct gf_dev {
 	char fb_black;
 };
 
-int gf_parse_dts(struct gf_dev* gf_dev);
-void gf_cleanup(struct gf_dev *gf_dev);
+int ugg_gf_parse_dts(struct gf_dev* gf_dev);
+void ugg_gf_cleanup(struct gf_dev *gf_dev);
 
-int gf_power_on(struct gf_dev *gf_dev);
-int gf_power_off(struct gf_dev *gf_dev);
+int ugg_gf_power_on(struct gf_dev *gf_dev);
+int ugg_gf_power_off(struct gf_dev *gf_dev);
 
-int gf_hw_reset(struct gf_dev *gf_dev, unsigned int delay_ms);
-int gf_irq_num(struct gf_dev *gf_dev);
+int ugg_gf_hw_reset(struct gf_dev *gf_dev, unsigned int delay_ms);
+int ugg_gf_irq_num(struct gf_dev *gf_dev);
 
-void sendnlmsg(char *message);
-int netlink_init(void);
-void netlink_exit(void);
+void ugg_sendnlmsg(char *message);
+int ugg_netlink_init(void);
+void ugg_netlink_exit(void);
 #endif

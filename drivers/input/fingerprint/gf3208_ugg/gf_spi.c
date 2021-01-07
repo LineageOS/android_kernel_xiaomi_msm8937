@@ -397,7 +397,7 @@ static long gf_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		break;
 	case GF_IOC_RESET:
 		pr_info("%s GF_IOC_RESET. \n", __func__);
-		gf_hw_reset(gf_dev, 3);
+		ugg_gf_hw_reset(gf_dev, 3);
 		break;
 	case GF_IOC_INPUT_KEY_EVENT:
 		if (copy_from_user(&gf_key, (struct gf_key *)arg, sizeof(struct gf_key))) {
@@ -442,7 +442,7 @@ static long gf_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		if (gf_dev->device_available == 1)
 			pr_info("Sensor has already powered-on.\n");
 		else
-			gf_power_on(gf_dev);
+			ugg_gf_power_on(gf_dev);
 		gf_dev->device_available = 1;
 		break;
 	case GF_IOC_DISABLE_POWER:
@@ -450,7 +450,7 @@ static long gf_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		if (gf_dev->device_available == 0)
 			pr_info("Sensor has already powered-off.\n");
 		else
-			gf_power_off(gf_dev);
+			ugg_gf_power_off(gf_dev);
 		gf_dev->device_available = 0;
 		break;
 	case GF_IOC_ENTER_SLEEP_MODE:
@@ -492,7 +492,7 @@ static irqreturn_t gf_irq(int irq, void *handle)
 #if defined(GF_NETLINK_ENABLE)
 	char temp = GF_NET_EVENT_IRQ;
 	__pm_wakeup_event(&fp_wakelock, WAKELOCK_HOLD_TIME);
-	sendnlmsg(&temp);
+	ugg_sendnlmsg(&temp);
 #elif defined (GF_FASYNC)
 	struct gf_dev *gf_dev = &gf;
 	if (gf_dev->async)
@@ -526,7 +526,7 @@ static int gf_open(struct inode *inode, struct file *filp)
 					gf_dev->irq);
 			if (gf_dev->users == 1)
 				gf_enable_irq(gf_dev);
-			gf_hw_reset(gf_dev, 3);
+			ugg_gf_hw_reset(gf_dev, 3);
 			gf_dev->device_available = 1;
 		}
 	} else {
@@ -576,7 +576,7 @@ static int gf_release(struct inode *inode, struct file *filp)
 		pr_info("disble_irq. irq = %d\n", gf_dev->irq);
 		gf_disable_irq(gf_dev);
 		gf_dev->device_available = 0;
-		gf_power_off(gf_dev);
+		ugg_gf_power_off(gf_dev);
 	}
 	mutex_unlock(&device_list_lock);
 	return status;
@@ -683,7 +683,7 @@ static int gf_probe(struct platform_device *pdev)
 
 
     printk("gf3208,msleep 11 ms");
-	if (gf_parse_dts(gf_dev))
+	if (ugg_gf_parse_dts(gf_dev))
 		goto error_hw;
 
 	mutex_lock(&device_list_lock);
@@ -741,7 +741,7 @@ static int gf_probe(struct platform_device *pdev)
 	gf_dev->notifier = goodix_noti_block;
 	fb_register_client(&gf_dev->notifier);
 
-	gf_dev->irq = gf_irq_num(gf_dev);
+	gf_dev->irq = ugg_gf_irq_num(gf_dev);
 
 	wakeup_source_init(&fp_wakelock, "fp_wakelock");
 	status = request_threaded_irq(gf_dev->irq, NULL, gf_irq,
@@ -790,7 +790,7 @@ error_dev:
 		mutex_unlock(&device_list_lock);
 	}
 error_hw:
-	gf_cleanup(gf_dev);
+	ugg_gf_cleanup(gf_dev);
 	gf_dev->device_available = 0;
 
 	return status;
@@ -817,7 +817,7 @@ static int gf_remove(struct platform_device *pdev)
 	device_destroy(gf_class, gf_dev->devt);
 	clear_bit(MINOR(gf_dev->devt), minors);
 	if (gf_dev->users == 0)
-		gf_cleanup(gf_dev);
+		ugg_gf_cleanup(gf_dev);
 	remove_proc_entry(PROC_NAME, NULL);
 
 	fb_unregister_client(&gf_dev->notifier);
@@ -882,7 +882,7 @@ static int __init gf_init(void)
 	}
 
 #ifdef GF_NETLINK_ENABLE
-	netlink_init();
+	ugg_netlink_init();
 #endif
 	pr_info("status = 0x%x\n", status);
 	return 0;
@@ -892,7 +892,7 @@ module_init(gf_init);
 static void __exit gf_exit(void)
 {
 #ifdef GF_NETLINK_ENABLE
-	netlink_exit();
+	ugg_netlink_exit();
 #endif
 #if defined(USE_PLATFORM_BUS)
 	platform_driver_unregister(&gf_driver);
