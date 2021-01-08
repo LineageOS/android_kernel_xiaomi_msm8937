@@ -37,7 +37,7 @@
             pinctrl-7 = <&ts_rst_input>;
             reset-gpios = <&tlmm 64 0x00>;
             irq-gpios = <&tlmm 65 0x2008>;
-            irq-flags = <2>;
+            irq-flags = <1>;
             touchscreen-max-id = <10>;
             touchscreen-size-x = <720>;
             touchscreen-size-y = <1280>;
