@@ -45,6 +45,11 @@
 #include <soc/qcom/scm.h>
 #include <linux/platform_device.h>
 
+#ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_series.h>
+extern int xiaomi_series_read(void);
+#endif
+
 #define FPC1020_RESET_LOW_US 1000
 #define FPC1020_RESET_HIGH1_US 100
 #define FPC1020_RESET_HIGH2_US 1250
@@ -637,7 +642,14 @@ static struct platform_driver fpc1020_driver = {
 
 static int __init fpc1020_init(void)
 {
-	int rc = platform_driver_register(&fpc1020_driver);
+	int rc;
+
+#ifdef CONFIG_MACH_XIAOMI
+	if (xiaomi_series_read() != XIAOMI_SERIES_LANDTONI)
+		return -ENODEV;
+#endif
+
+	rc = platform_driver_register(&fpc1020_driver);
 	if (!rc)
 		pr_info("%s OK\n", __func__);
 	else

@@ -46,6 +46,11 @@
 #include <linux/pm_qos.h>
 #include <linux/cpufreq.h>
 
+#ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_series.h>
+extern int xiaomi_series_read(void);
+#endif
+
 #include "gf_spi.h"
 
 #if defined(USE_SPI_BUS)
@@ -844,6 +849,11 @@ static int __init gf_init(void)
 {
 	int status;
 	FUNC_ENTRY();
+
+#ifdef CONFIG_MACH_XIAOMI
+	if (xiaomi_series_read() != XIAOMI_SERIES_LANDTONI)
+		return -ENODEV;
+#endif
 
 	pr_warn("--------gf_init start.--------\n");
 	/* Claim our 256 reserved device numbers.  Then register a class
