@@ -50,6 +50,11 @@
 #include <linux/platform_device.h>
 #endif
 
+#ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_device.h>
+extern int xiaomi_device_read(void);
+#endif
+
 #define VER_MAJOR   1
 #define VER_MINOR   2
 #define PATCH_LEVEL 1
@@ -851,6 +856,11 @@ static struct platform_driver gf_driver = {
 static int __init gf_init(void)
 {
 	int status;
+
+#ifdef CONFIG_MACH_XIAOMI
+	if (xiaomi_device_read() != XIAOMI_DEVICE_UGG)
+		return -ENODEV;
+#endif
 
 #ifdef CONFIG_MACH_XIAOMI_ULYSSE
 	   if(ulysse_fpsensor != 2) {
