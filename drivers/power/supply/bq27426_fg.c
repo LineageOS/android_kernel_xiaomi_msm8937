@@ -1057,7 +1057,8 @@ static int fg_read_tte(struct bq_fg_chip *bq)
 static int fg_get_batt_status(struct bq_fg_chip *bq)
 {
 
-	fg_read_status(bq);
+	if (bq->resume_completed)
+		fg_read_status(bq);
 
 	if (!bq->batt_present)
 		return POWER_SUPPLY_STATUS_UNKNOWN;
