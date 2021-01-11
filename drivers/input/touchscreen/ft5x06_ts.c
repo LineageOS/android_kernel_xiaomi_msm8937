@@ -2247,6 +2247,10 @@ static int ft5x06_parse_dt(struct device *dev,
 }
 #endif
 
+#ifdef CONFIG_MACH_XIAOMI
+extern bool xiaomi_ts_probed;
+#endif
+
 static int ft5x06_ts_probe(struct i2c_client *client,
 			   const struct i2c_device_id *id)
 {
@@ -2258,6 +2262,11 @@ static int ft5x06_ts_probe(struct i2c_client *client,
 	u8 reg_value = 0;
 	u8 reg_addr;
 	int err, len, retval, attr_count;
+
+#ifdef CONFIG_MACH_XIAOMI
+	if (xiaomi_ts_probed)
+		return -ENODEV;
+#endif
 
 	if (client->dev.of_node) {
 		pdata = devm_kzalloc(&client->dev,
@@ -2605,6 +2614,11 @@ static int ft5x06_ts_probe(struct i2c_client *client,
 	data->early_suspend.resume = ft5x06_ts_late_resume;
 	register_early_suspend(&data->early_suspend);
 #endif
+
+#ifdef CONFIG_MACH_XIAOMI
+	xiaomi_ts_probed = true;
+#endif
+
 	return 0;
 
 free_secure_touch_sysfs:
@@ -2732,6 +2746,11 @@ static int ft5x06_ts_remove(struct i2c_client *client)
 
 	input_unregister_device(data->input_dev);
 	kobject_put(data->ts_info_kobj);
+
+#ifdef CONFIG_MACH_XIAOMI
+	xiaomi_ts_probed = false;
+#endif
+
 	return 0;
 }
 

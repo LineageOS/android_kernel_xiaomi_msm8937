@@ -1003,6 +1003,9 @@ int fts_pinctrl_init(struct i2c_client *client, struct pctrl_data *pin_data)
 }
 #endif
 
+#ifdef CONFIG_MACH_XIAOMI
+extern bool xiaomi_ts_probed;
+#endif
 
 static int fts_ts_probe(struct i2c_client *client, const struct i2c_device_id *id)
 {
@@ -1010,6 +1013,11 @@ static int fts_ts_probe(struct i2c_client *client, const struct i2c_device_id *i
 	struct fts_ts_data *data;
 	struct input_dev *input_dev;
 	int err;
+
+#ifdef CONFIG_MACH_XIAOMI
+	if (xiaomi_ts_probed)
+		return -ENODEV;
+#endif
 
 	FTS_FUNC_ENTER();
 	if (strstr(g_lcd_id, "shenchao") == NULL) {
@@ -1192,6 +1200,10 @@ static int fts_ts_probe(struct i2c_client *client, const struct i2c_device_id *i
 	INIT_WORK(&g_resume_work, do_ts_resume_work);
 	mutex_init(&ft5435_resume_mutex);
 
+#ifdef CONFIG_MACH_XIAOMI
+	xiaomi_ts_probed = true;
+#endif
+
 	FTS_FUNC_EXIT();
 	return 0;
 
@@ -1263,6 +1275,10 @@ static int fts_ts_remove(struct i2c_client *client)
 
 #if FTS_ESDCHECK_EN
 	fts_esdcheck_exit();
+#endif
+
+#ifdef CONFIG_MACH_XIAOMI
+	xiaomi_ts_probed = false;
 #endif
 
 	FTS_FUNC_EXIT();

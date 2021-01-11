@@ -1915,6 +1915,10 @@ static int ist30xx_proc_init(struct ist30xx_data *data)
        return ret;
 }
 
+#ifdef CONFIG_MACH_XIAOMI
+extern bool xiaomi_ts_probed;
+#endif
+
 static int ist30xx_probe(struct i2c_client *client,
 			 const struct i2c_device_id *id)
 {
@@ -1927,6 +1931,11 @@ static int ist30xx_probe(struct i2c_client *client,
 	struct input_dev *input_dev;
 #if  WT_ADD_CTP_INFO
 	char ic_color[64];
+#endif
+
+#ifdef CONFIG_MACH_XIAOMI
+	if (xiaomi_ts_probed)
+		return -ENODEV;
 #endif
 
 	tsp_info("### IMAGIS probe(ver:%s, protocol:%X, addr:0x%02X) ###\n",
@@ -2268,6 +2277,10 @@ static int ist30xx_probe(struct i2c_client *client,
 			      CHECK_CHARGER_INTERVAL);
 #endif
 
+#ifdef CONFIG_MACH_XIAOMI
+	xiaomi_ts_probed = true;
+#endif
+
 	return 0;
 
 err_sysfs:
@@ -2311,6 +2324,10 @@ static int ist30xx_remove(struct i2c_client *client)
 	input_unregister_device(data->input_dev);
 	input_free_device(data->input_dev);
 	kfree(data);
+
+#ifdef CONFIG_MACH_XIAOMI
+	xiaomi_ts_probed = false;
+#endif
 
 	return 0;
 }

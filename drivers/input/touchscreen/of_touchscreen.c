@@ -14,6 +14,10 @@
 #include <linux/input/mt.h>
 #include <linux/input/touchscreen.h>
 
+#ifdef CONFIG_MACH_XIAOMI
+bool xiaomi_ts_probed = false;
+#endif
+
 static bool touchscreen_get_prop_u32(struct device *dev,
 				     const char *property,
 				     unsigned int default_value,

@@ -2028,11 +2028,20 @@ static void gtp_shutdown(struct i2c_client *client)
 	gtp_power_off(data);
 }
 
+#ifdef CONFIG_MACH_XIAOMI
+extern bool xiaomi_ts_probed;
+#endif
+
 static int gtp_probe(struct i2c_client *client, const struct i2c_device_id *id)
 {
 	int ret = -1;
 	struct goodix_ts_data *ts;
 	struct goodix_ts_platform_data *pdata;
+
+#ifdef CONFIG_MACH_XIAOMI
+	if (xiaomi_ts_probed)
+		return -ENODEV;
+#endif
 
 	/* do NOT remove these logs */
 	dev_info(&client->dev, "GTP Driver Version: %s\n", GTP_DRIVER_VERSION);
@@ -2188,6 +2197,10 @@ static int gtp_probe(struct i2c_client *client, const struct i2c_device_id *id)
 	ts->init_done = true;
 	gtp_work_control_enable(ts, true);
 
+#ifdef CONFIG_MACH_XIAOMI
+	xiaomi_ts_probed = true;
+#endif
+
 	return 0;
 
 exit_powermanager:
@@ -2253,6 +2266,10 @@ static int gtp_drv_remove(struct i2c_client *client)
 
 	devm_kfree(&client->dev, ts->pdata);
 	devm_kfree(&client->dev, ts);
+
+#ifdef CONFIG_MACH_XIAOMI
+	xiaomi_ts_probed = false;
+#endif
 
 	return 0;
 }
