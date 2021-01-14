@@ -3964,6 +3964,13 @@ static int msm_otg_probe(struct platform_device *pdev)
 	}
 #endif
 
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
+	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA) {
+		idev_chg_max = 1000;
+		dcp_max_current = idev_chg_max;
+	}
+#endif
+
 	dev_info(&pdev->dev, "msm_otg probe\n");
 
 	motg = kzalloc(sizeof(struct msm_otg), GFP_KERNEL);
