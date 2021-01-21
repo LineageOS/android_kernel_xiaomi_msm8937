@@ -1400,6 +1400,18 @@ config TOUCHSCREEN_GEN_VKEYS
 	 To compile this driver as a module, choose M here: the
 	 module will be called gen_vkeys.
 
+config TOUCHSCREEN_GEN_VKEYS_IST
+	tristate "Touchscreen Virtual Keys Driver for IST touchscreen"
+	depends on TOUCHSCREEN_GEN_VKEYS
+	help
+         Say Y here if you want to generate a sysfs entry for virtual
+	 keys on Android.
+
+	 If unsure, say N.
+
+	 To compile this driver as a module, choose M here: the
+	 module will be called gen_vkeys_ist.
+
 config FT_SECURE_TOUCH
 	bool "Secure Touch support for Focaltech Touchscreen"
 	depends on TOUCHSCREEN_FT5X06

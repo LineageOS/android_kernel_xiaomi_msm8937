@@ -30,7 +30,7 @@
 #define BORDER_ADJUST_NUM 3
 #define BORDER_ADJUST_DENOM 4
 
-struct kobject *vkey_obj;
+extern struct kobject *vkey_obj;
 static char *vkey_buf;
 
 static ssize_t vkey_show(struct kobject  *obj,
@@ -126,6 +126,9 @@ static int vkeys_probe(struct platform_device *pdev)
 	int x1 = 0, x2 = 0, i, c = 0, ret, border;
 	char *name;
 
+	if (!vkey_obj)
+		return -EPROBE_DEFER;
+
 	vkey_buf = devm_kzalloc(&pdev->dev, MAX_BUF_SIZE, GFP_KERNEL);
 	if (!vkey_buf)
 		return -ENOMEM;
@@ -180,12 +183,6 @@ static int vkeys_probe(struct platform_device *pdev)
 				"virtualkeys.%s", pdata->name);
 	vkey_obj_attr.attr.name = name;
 
-	vkey_obj = kobject_create_and_add("board_properties", NULL);
-	if (!vkey_obj) {
-		dev_err(&pdev->dev, "unable to create kobject\n");
-		return -ENOMEM;
-	}
-
 	ret = sysfs_create_group(vkey_obj, &vkey_grp);
 	if (ret) {
 		dev_err(&pdev->dev, "failed to create attributes\n");
@@ -194,7 +191,6 @@ static int vkeys_probe(struct platform_device *pdev)
 	return 0;
 
 destroy_kobj:
-	kobject_put(vkey_obj);
 
 	return ret;
 }
@@ -202,13 +198,12 @@ destroy_kobj:
 static int vkeys_remove(struct platform_device *pdev)
 {
 	sysfs_remove_group(vkey_obj, &vkey_grp);
-	kobject_put(vkey_obj);
 
 	return 0;
 }
 
 static const struct of_device_id vkey_match_table[] = {
-	{ .compatible = "qcom,gen-vkeys",},
+	{ .compatible = "qcom,gen-vkeys_ist",},
 	{ },
 };
 
@@ -217,7 +212,7 @@ static struct platform_driver vkeys_driver = {
 	.remove = vkeys_remove,
 	.driver = {
 		.owner = THIS_MODULE,
-		.name = "gen_vkeys",
+		.name = "gen_vkeys_ist",
 		.of_match_table = vkey_match_table,
 	},
 };
