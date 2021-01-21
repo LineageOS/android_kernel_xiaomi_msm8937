@@ -1472,4 +1472,6 @@ source "drivers/input/touchscreen/IST30xx/Kconfig"
 
 source "drivers/input/touchscreen/ft5435/Kconfig"
 
+source "drivers/input/touchscreen/FT5346/Kconfig"
+
 endif
