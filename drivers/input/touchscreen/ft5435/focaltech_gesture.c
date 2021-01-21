@@ -420,7 +420,7 @@ int fts_gesture_init(struct input_dev *input_dev, struct i2c_client *client)
 		__set_bit(KEY_GESTURE_Z, input_dev->keybit);
 
 		fts_create_gesture_sysfs(client);
-		fts_gesture_data.mode = 0;
+		fts_gesture_data.mode = 1;
 		fts_gesture_data.active = 0;
 	data->gesture_data = &fts_gesture_data;
 		FTS_FUNC_EXIT();
