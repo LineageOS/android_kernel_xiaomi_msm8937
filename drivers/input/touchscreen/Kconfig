@@ -1469,4 +1469,7 @@ config TOUCHSCREEN_IST30XX
 	depends on I2C
 
 source "drivers/input/touchscreen/IST30xx/Kconfig"
+
+source "drivers/input/touchscreen/ft5435/Kconfig"
+
 endif

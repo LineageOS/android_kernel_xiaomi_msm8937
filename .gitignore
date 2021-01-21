@@ -123,3 +123,6 @@ kernel/configs/android-*.cfg
 #Ignoring Android.bp link file
 #
 Android.bp
+
+# ft5435 firmware
+!drivers/input/touchscreen/ft5435/include/firmware/*.i
