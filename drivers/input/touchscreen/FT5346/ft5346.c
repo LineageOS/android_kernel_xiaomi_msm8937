@@ -45,7 +45,7 @@
 
 static void Ctp_Gesture_Fucntion_Proc_File(void);
 static char gtp_gesture_value;
-static char gtp_gesture_onoff = '0';
+static char gtp_gesture_onoff = '1';
 unsigned short coordinate_x[150] = {0};
 unsigned short coordinate_y[150] = {0};
 #endif
