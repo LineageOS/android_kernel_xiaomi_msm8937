@@ -745,16 +745,14 @@ static int bq2560x_get_batt_property(struct bq2560x *bq,
 }
 
 static inline bool is_device_suspended(struct bq2560x *bq);
+
+static int bq2560x_get_prop_charge_status(struct bq2560x *bq);
+
 static int bq2560x_get_prop_charge_type(struct bq2560x *bq)
 {
-	u8 val = 0;
-	if (is_device_suspended(bq))
-		return POWER_SUPPLY_CHARGE_TYPE_UNKNOWN;
+	bq2560x_get_prop_charge_status(bq);
 
-	bq2560x_read_byte(bq, &val, BQ2560X_REG_08);
-	val &= REG08_CHRG_STAT_MASK;
-	val >>= REG08_CHRG_STAT_SHIFT;
-	switch (val) {
+	switch (bq->charge_state) {
 	case CHARGE_STATE_FASTCHG:
 		return POWER_SUPPLY_CHARGE_TYPE_FAST;
 	case CHARGE_STATE_PRECHG:
