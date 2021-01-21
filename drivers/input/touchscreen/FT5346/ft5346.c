@@ -64,6 +64,10 @@ unsigned short coordinate_y[150] = {0};
 #define FT_SUSPEND_LEVEL 1
 #endif
 
+#ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_series.h>
+extern int xiaomi_series_read(void);
+#endif
 
 static u8 lockdown_info[FT_LOCKDOWN_SIZE];
 
@@ -3294,6 +3298,10 @@ static struct i2c_driver ft5x06_ts_driver = {
 
 static int __init ft5x06_ts_init(void)
 {
+#ifdef CONFIG_MACH_XIAOMI
+	if (xiaomi_series_read() != XIAOMI_SERIES_ROVA)
+		return -ENODEV;
+#endif
 	return i2c_add_driver(&ft5x06_ts_driver);
 }
 module_init(ft5x06_ts_init);

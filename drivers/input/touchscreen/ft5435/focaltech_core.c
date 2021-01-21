@@ -25,6 +25,11 @@
 #define FTS_SUSPEND_LEVEL 1     /* Early-suspend level */
 #endif
 
+#ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_series.h>
+extern int xiaomi_series_read(void);
+#endif
+
 #define FTS_DRIVER_NAME                     "ft5435_ts"
 #define FTS_INPUT_DEV_NAME                  "fts_ts"
 #define INTERVAL_READ_REG                   20
@@ -1457,6 +1462,10 @@ static int __init fts_ts_init(void)
 	int ret = 0;
 
 	FTS_FUNC_ENTER();
+#ifdef CONFIG_MACH_XIAOMI
+	if (xiaomi_series_read() != XIAOMI_SERIES_ULYSSE)
+		return -ENODEV;
+#endif
 	ret = i2c_add_driver(&fts_ts_driver);
 	if ( ret != 0 ) {
 		FTS_ERROR("Focaltech touch screen driver init failed!");

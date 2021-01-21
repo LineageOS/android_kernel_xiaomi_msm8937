@@ -22,6 +22,11 @@
 #include <linux/input/mt.h>
 #include "gt9xx.h"
 
+#ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_series.h>
+extern int xiaomi_series_read(void);
+#endif
+
 #define GOODIX_VTG_MIN_UV	2600000
 #define GOODIX_VTG_MAX_UV	3300000
 #define GOODIX_I2C_VTG_MIN_UV	1800000
@@ -2679,6 +2684,11 @@ static struct i2c_driver goodix_ts_driver = {
 static int __init gtp_init(void)
 {
 	s32 ret;
+
+#ifdef CONFIG_MACH_XIAOMI
+	if (xiaomi_series_read() == XIAOMI_SERIES_LANDTONI)
+		return -ENODEV;
+#endif
 
 	pr_info("Gt9xx driver installing..\n");
 	ret = i2c_add_driver(&goodix_ts_driver);

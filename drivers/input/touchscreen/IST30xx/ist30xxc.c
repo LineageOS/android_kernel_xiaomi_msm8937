@@ -91,6 +91,11 @@ extern u8 tp_color;
 #include <linux/power_supply.h>
 #endif
 
+#ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_device.h>
+extern int xiaomi_device_read(void);
+#endif
+
 #define FT_VTG_MIN_UV       2600000
 #define FT_VTG_MAX_UV       3300000
 #define FT_I2C_VTG_MIN_UV   1800000
@@ -2406,6 +2411,10 @@ static struct i2c_driver ist30xx_i2c_driver = {
 
 static int __init ist30xx_init(void)
 {
+#ifdef CONFIG_MACH_XIAOMI
+	if (xiaomi_device_read() != XIAOMI_DEVICE_LAND)
+		return -ENODEV;
+#endif
 	tsp_info("%s()\n", __func__);
 	return i2c_add_driver(&ist30xx_i2c_driver);
 }
