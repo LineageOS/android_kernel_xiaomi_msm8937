@@ -534,7 +534,7 @@ static int msm_jpegdma_open(struct file *file)
 		ret = PTR_ERR(ctx->m2m_ctx);
 		goto error_m2m_init;
 	}
-	ret = cam_config_ahb_clk(NULL, 0, CAM_AHB_CLIENT_JPEG,
+	ret = land_cam_config_ahb_clk(NULL, 0, CAM_AHB_CLIENT_JPEG,
 			CAM_AHB_SVS_VOTE);
 	if (ret < 0) {
 		pr_err("%s: failed to vote for AHB\n", __func__);
@@ -574,7 +574,7 @@ static int msm_jpegdma_release(struct file *file)
 	v4l2_fh_exit(&ctx->fh);
 	kfree(ctx);
 
-	if (cam_config_ahb_clk(NULL, 0, CAM_AHB_CLIENT_JPEG,
+	if (land_cam_config_ahb_clk(NULL, 0, CAM_AHB_CLIENT_JPEG,
 		CAM_AHB_SUSPEND_VOTE) < 0)
 		pr_err("%s: failed to remove vote for AHB\n", __func__);
 
@@ -1254,13 +1254,13 @@ static int jpegdma_probe(struct platform_device *pdev)
 		goto error_mem_resources;
 
 	/* get all the regulators */
-	ret = msm_camera_get_regulator_info(pdev, &jpegdma->vdd,
+	ret = land_msm_camera_get_regulator_info(pdev, &jpegdma->vdd,
 		&jpegdma->num_reg);
 	if (ret < 0)
 		goto error_get_regulators;
 
 	/* get all the clocks */
-	ret = msm_camera_get_clk_info(pdev, &jpegdma->jpeg_clk_info,
+	ret = land_msm_camera_get_clk_info(pdev, &jpegdma->jpeg_clk_info,
 		&jpegdma->clk, &jpegdma->num_clk);
 	if (ret < 0)
 		goto error_get_clocks;
@@ -1278,7 +1278,7 @@ static int jpegdma_probe(struct platform_device *pdev)
 		goto error_prefetch_get;
 
 	/* get the irq resource */
-	jpegdma->irq = msm_camera_get_irq(pdev, "jpeg");
+	jpegdma->irq = land_msm_camera_get_irq(pdev, "jpeg");
 	if (!jpegdma->irq)
 		goto error_hw_get_irq;
 
@@ -1293,7 +1293,7 @@ static int jpegdma_probe(struct platform_device *pdev)
 	}
 
 	/* register bus client */
-	ret = msm_camera_register_bus_client(pdev,
+	ret = land_msm_camera_register_bus_client(pdev,
 			jpegdma->bus_client);
 	if (ret < 0) {
 		pr_err("Fail to register bus client\n");
@@ -1349,7 +1349,7 @@ error_v4l2_register:
 	v4l2_m2m_release(jpegdma->m2m_dev);
 error_m2m_init:
 error_hw_get_cap:
-	msm_camera_unregister_bus_client(jpegdma->bus_client);
+	land_msm_camera_unregister_bus_client(jpegdma->bus_client);
 error_reg_bus:
 error_hw_get_irq:
 	msm_jpegdma_hw_put_prefetch(jpegdma);
@@ -1358,10 +1358,10 @@ error_prefetch_get:
 error_vbif_get:
 	msm_jpegdma_hw_put_qos(jpegdma);
 error_qos_get:
-	msm_camera_put_clk_info(pdev, &jpegdma->jpeg_clk_info,
+	land_msm_camera_put_clk_info(pdev, &jpegdma->jpeg_clk_info,
 		&jpegdma->clk, jpegdma->num_clk);
 error_get_clocks:
-	msm_camera_put_regulators(pdev, &jpegdma->vdd,
+	land_msm_camera_put_regulators(pdev, &jpegdma->vdd,
 		jpegdma->num_reg);
 error_get_regulators:
 	msm_jpegdma_hw_release_mem_resources(jpegdma);
@@ -1387,12 +1387,12 @@ static int jpegdma_device_remove(struct platform_device *pdev)
 	v4l2_device_unregister(&dma->v4l2_dev);
 	v4l2_m2m_release(dma->m2m_dev);
 	/* unregister bus client */
-	msm_camera_unregister_bus_client(dma->bus_client);
+	land_msm_camera_unregister_bus_client(dma->bus_client);
 	/* release all the regulators */
-	msm_camera_put_regulators(dma->pdev, &dma->vdd,
+	land_msm_camera_put_regulators(dma->pdev, &dma->vdd,
 		dma->num_reg);
 	/* release all the clocks */
-	msm_camera_put_clk_info(dma->pdev, &dma->jpeg_clk_info,
+	land_msm_camera_put_clk_info(dma->pdev, &dma->jpeg_clk_info,
 		&dma->clk, dma->num_clk);
 	msm_jpegdma_hw_release_mem_resources(dma);
 	kfree(dma);

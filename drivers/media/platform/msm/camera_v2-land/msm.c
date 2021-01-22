@@ -30,7 +30,7 @@
 #include "msm_vb2.h"
 #include "msm_sd.h"
 #include "cam_hw_ops.h"
-#include <media/msmb_generic_buf_mgr.h>
+#include <media/msmb_generic_buf_mgr-land.h>
 
 
 static struct v4l2_device *msm_v4l2_dev;
@@ -42,10 +42,10 @@ static struct msm_queue_head *msm_session_q;
 
 /* config node envent queue */
 static struct v4l2_fh  *msm_eventq;
-spinlock_t msm_eventq_lock;
+spinlock_t land_msm_eventq_lock;
 
 static struct pid *msm_pid;
-spinlock_t msm_pid_lock;
+spinlock_t land_msm_pid_lock;
 
 /*
  * It takes 20 bytes + NULL character to write the
@@ -178,11 +178,11 @@ static void msm_enqueue(struct msm_queue_head *qhead,
 	spin_unlock_irqrestore(&qhead->lock, flags);
 }
 
-void msm_cam_copy_v4l2_subdev_fops(struct v4l2_file_operations *d1)
+void land_msm_cam_copy_v4l2_subdev_fops(struct v4l2_file_operations *d1)
 {
 	*d1 = v4l2_subdev_fops;
 }
-EXPORT_SYMBOL(msm_cam_copy_v4l2_subdev_fops);
+EXPORT_SYMBOL(land_msm_cam_copy_v4l2_subdev_fops);
 
 static const struct v4l2_file_operations *msm_cam_get_v4l2_subdev_fops_ptr(
 	void)
@@ -222,13 +222,13 @@ static void msm_pm_qos_remove_request(void)
 	pm_qos_remove_request(&msm_v4l2_pm_qos_request);
 }
 
-void msm_pm_qos_update_request(int val)
+void land_msm_pm_qos_update_request(int val)
 {
 	pr_info("%s: update request %d", __func__, val);
 	pm_qos_update_request(&msm_v4l2_pm_qos_request, val);
 }
 
-struct msm_session *msm_session_find(unsigned int session_id)
+struct msm_session *land_msm_session_find(unsigned int session_id)
 {
 	struct msm_session *session;
 	session = msm_queue_find(msm_session_q, struct msm_session,
@@ -237,9 +237,9 @@ struct msm_session *msm_session_find(unsigned int session_id)
 		return NULL;
 	return session;
 }
-EXPORT_SYMBOL(msm_session_find);
+EXPORT_SYMBOL(land_msm_session_find);
 
-int msm_create_stream(unsigned int session_id,
+int land_msm_create_stream(unsigned int session_id,
 	unsigned int stream_id, struct vb2_queue *q)
 {
 	struct msm_session *session;
@@ -264,9 +264,9 @@ int msm_create_stream(unsigned int session_id,
 
 	return 0;
 }
-EXPORT_SYMBOL(msm_create_stream);
+EXPORT_SYMBOL(land_msm_create_stream);
 
-void msm_delete_stream(unsigned int session_id, unsigned int stream_id)
+void land_msm_delete_stream(unsigned int session_id, unsigned int stream_id)
 {
 	struct msm_session *session = NULL;
 	struct msm_stream  *stream = NULL;
@@ -288,7 +288,7 @@ void msm_delete_stream(unsigned int session_id, unsigned int stream_id)
 	stream = NULL;
 	spin_unlock_irqrestore(&(session->stream_q.lock), flags);
 }
-EXPORT_SYMBOL(msm_delete_stream);
+EXPORT_SYMBOL(land_msm_delete_stream);
 
 static void msm_sd_unregister_subdev(struct video_device *vdev)
 {
@@ -361,7 +361,7 @@ static void msm_add_sd_in_position(struct msm_sd_subdev *msm_subdev,
 	list_add_tail(&msm_subdev->list, sd_list);
 }
 
-int msm_sd_register(struct msm_sd_subdev *msm_subdev)
+int land_msm_sd_register(struct msm_sd_subdev *msm_subdev)
 {
 	if (WARN_ON(!msm_subdev))
 		return -EINVAL;
@@ -372,9 +372,9 @@ int msm_sd_register(struct msm_sd_subdev *msm_subdev)
 	msm_add_sd_in_position(msm_subdev, &ordered_sd_list);
 	return __msm_sd_register_subdev(&msm_subdev->sd);
 }
-EXPORT_SYMBOL(msm_sd_register);
+EXPORT_SYMBOL(land_msm_sd_register);
 
-int msm_sd_unregister(struct msm_sd_subdev *msm_subdev)
+int land_msm_sd_unregister(struct msm_sd_subdev *msm_subdev)
 {
 	if (WARN_ON(!msm_subdev))
 		return -EINVAL;
@@ -382,7 +382,7 @@ int msm_sd_unregister(struct msm_sd_subdev *msm_subdev)
 	v4l2_device_unregister_subdev(&msm_subdev->sd);
 	return 0;
 }
-EXPORT_SYMBOL(msm_sd_unregister);
+EXPORT_SYMBOL(land_msm_sd_unregister);
 
 static struct v4l2_subdev *msm_sd_find(const char *name)
 {
@@ -403,7 +403,7 @@ static struct v4l2_subdev *msm_sd_find(const char *name)
 	return subdev_out;
 }
 
-int msm_create_session(unsigned int session_id, struct video_device *vdev)
+int land_msm_create_session(unsigned int session_id, struct video_device *vdev)
 {
 	struct msm_session *session = NULL;
 
@@ -438,9 +438,9 @@ int msm_create_session(unsigned int session_id, struct video_device *vdev)
 	mutex_init(&session->close_lock);
 	return 0;
 }
-EXPORT_SYMBOL(msm_create_session);
+EXPORT_SYMBOL(land_msm_create_session);
 
-int msm_create_command_ack_q(unsigned int session_id, unsigned int stream_id)
+int land_msm_create_command_ack_q(unsigned int session_id, unsigned int stream_id)
 {
 	struct msm_session *session;
 	struct msm_command_ack *cmd_ack;
@@ -477,9 +477,9 @@ int msm_create_command_ack_q(unsigned int session_id, unsigned int stream_id)
 	mutex_unlock(&session->lock);
 	return 0;
 }
-EXPORT_SYMBOL(msm_create_command_ack_q);
+EXPORT_SYMBOL(land_msm_create_command_ack_q);
 
-void msm_delete_command_ack_q(unsigned int session_id, unsigned int stream_id)
+void land_msm_delete_command_ack_q(unsigned int session_id, unsigned int stream_id)
 {
 	struct msm_session *session;
 	struct msm_command_ack *cmd_ack;
@@ -508,7 +508,7 @@ void msm_delete_command_ack_q(unsigned int session_id, unsigned int stream_id)
 	spin_unlock_irqrestore(&(session->command_ack_q.lock), flags);
 	mutex_unlock(&session->lock);
 }
-EXPORT_SYMBOL(msm_delete_command_ack_q);
+EXPORT_SYMBOL(land_msm_delete_command_ack_q);
 
 static inline int __msm_sd_close_subdevs(struct msm_sd_subdev *msm_sd,
 	struct msm_sd_close_ioctl *sd_close)
@@ -590,7 +590,7 @@ static void msm_remove_session_cmd_ack_q(struct msm_session *session)
 	mutex_unlock(&session->lock);
 }
 
-int msm_destroy_session(unsigned int session_id)
+int land_msm_destroy_session(unsigned int session_id)
 {
 	struct msm_session *session;
 	struct v4l2_subdev *buf_mgr_subdev;
@@ -620,7 +620,7 @@ int msm_destroy_session(unsigned int session_id)
 
 	return 0;
 }
-EXPORT_SYMBOL(msm_destroy_session);
+EXPORT_SYMBOL(land_msm_destroy_session);
 
 static int __msm_close_destry_session_notify_apps(void *d1, void *d2)
 {
@@ -821,7 +821,7 @@ static void msm_print_event_error(struct v4l2_event *event)
 /* something seriously wrong if msm_close is triggered
  *   !!! user space imaging server is shutdown !!!
  */
-int msm_post_event(struct v4l2_event *event, int timeout)
+int land_msm_post_event(struct v4l2_event *event, int timeout)
 {
 	int rc = 0;
 	struct video_device *vdev;
@@ -836,14 +836,14 @@ int msm_post_event(struct v4l2_event *event, int timeout)
 	session_id = event_data->session_id;
 	stream_id = event_data->stream_id;
 
-	spin_lock_irqsave(&msm_eventq_lock, flags);
+	spin_lock_irqsave(&land_msm_eventq_lock, flags);
 	if (!msm_eventq) {
-		spin_unlock_irqrestore(&msm_eventq_lock, flags);
+		spin_unlock_irqrestore(&land_msm_eventq_lock, flags);
 		pr_err("%s : msm event queue not available Line %d\n",
 				__func__, __LINE__);
 		return -ENODEV;
 	}
-	spin_unlock_irqrestore(&msm_eventq_lock, flags);
+	spin_unlock_irqrestore(&land_msm_eventq_lock, flags);
 
 	vdev = msm_eventq->vdev;
 
@@ -927,7 +927,7 @@ int msm_post_event(struct v4l2_event *event, int timeout)
 	mutex_unlock(&session->lock);
 	return rc;
 }
-EXPORT_SYMBOL(msm_post_event);
+EXPORT_SYMBOL(land_msm_post_event);
 
 static int msm_close(struct file *filep)
 {
@@ -952,15 +952,15 @@ static int msm_close(struct file *filep)
 	msm_queue_traverse_action(msm_session_q, struct msm_session, list,
 		__msm_close_wakeup_all_cmdack_session, NULL);
 
-	spin_lock_irqsave(&msm_eventq_lock, flags);
+	spin_lock_irqsave(&land_msm_eventq_lock, flags);
 	msm_eventq = NULL;
-	spin_unlock_irqrestore(&msm_eventq_lock, flags);
+	spin_unlock_irqrestore(&land_msm_eventq_lock, flags);
 	v4l2_fh_release(filep);
 
-	spin_lock_irqsave(&msm_pid_lock, flags);
+	spin_lock_irqsave(&land_msm_pid_lock, flags);
 	put_pid(msm_pid);
 	msm_pid = NULL;
-	spin_unlock_irqrestore(&msm_pid_lock, flags);
+	spin_unlock_irqrestore(&land_msm_pid_lock, flags);
 
 	atomic_set(&pvdev->opened, 0);
 
@@ -991,18 +991,18 @@ static int msm_open(struct file *filep)
 
 	atomic_set(&pvdev->opened, 1);
 
-	spin_lock_irqsave(&msm_pid_lock, flags);
+	spin_lock_irqsave(&land_msm_pid_lock, flags);
 	msm_pid = get_pid(task_pid(current));
-	spin_unlock_irqrestore(&msm_pid_lock, flags);
+	spin_unlock_irqrestore(&land_msm_pid_lock, flags);
 
 	/* create event queue */
 	rc = v4l2_fh_open(filep);
 	if (rc  < 0)
 		return rc;
 
-	spin_lock_irqsave(&msm_eventq_lock, flags);
+	spin_lock_irqsave(&land_msm_eventq_lock, flags);
 	msm_eventq = filep->private_data;
-	spin_unlock_irqrestore(&msm_eventq_lock, flags);
+	spin_unlock_irqrestore(&land_msm_eventq_lock, flags);
 
 	/* register msm_v4l2_pm_qos_request */
 	msm_pm_qos_add_request();
@@ -1021,7 +1021,7 @@ static struct v4l2_file_operations msm_fops = {
 #endif
 };
 
-struct msm_stream *msm_get_stream(unsigned int session_id,
+struct msm_stream *land_msm_get_stream(unsigned int session_id,
 	unsigned int stream_id)
 {
 	struct msm_session *session;
@@ -1040,9 +1040,9 @@ struct msm_stream *msm_get_stream(unsigned int session_id,
 
 	return stream;
 }
-EXPORT_SYMBOL(msm_get_stream);
+EXPORT_SYMBOL(land_msm_get_stream);
 
-struct vb2_queue *msm_get_stream_vb2q(unsigned int session_id,
+struct vb2_queue *land_msm_get_stream_vb2q(unsigned int session_id,
 	unsigned int stream_id)
 {
 	struct msm_session *session;
@@ -1060,9 +1060,9 @@ struct vb2_queue *msm_get_stream_vb2q(unsigned int session_id,
 
 	return stream->vb2_q;
 }
-EXPORT_SYMBOL(msm_get_stream_vb2q);
+EXPORT_SYMBOL(land_msm_get_stream_vb2q);
 
-struct msm_stream *msm_get_stream_from_vb2q(struct vb2_queue *q)
+struct msm_stream *land_msm_get_stream_from_vb2q(struct vb2_queue *q)
 {
 	struct msm_session *session;
 	struct msm_stream *stream;
@@ -1086,7 +1086,7 @@ struct msm_stream *msm_get_stream_from_vb2q(struct vb2_queue *q)
 	spin_unlock_irqrestore(&msm_session_q->lock, flags1);
 	return NULL;
 }
-EXPORT_SYMBOL(msm_get_stream_from_vb2q);
+EXPORT_SYMBOL(land_msm_get_stream_from_vb2q);
 
 static void msm_sd_notify(struct v4l2_subdev *sd,
 	unsigned int notification, void *arg)
@@ -1118,7 +1118,7 @@ static void msm_sd_notify(struct v4l2_subdev *sd,
 
 	case MSM_SD_NOTIFY_REQ_CB: {
 		struct msm_sd_req_vb2_q *req_sd = arg;
-		rc = msm_vb2_request_cb(req_sd);
+		rc = land_msm_vb2_request_cb(req_sd);
 		if (rc < 0)
 			return;
 	}
@@ -1234,8 +1234,8 @@ static int msm_probe(struct platform_device *pdev)
 		goto v4l2_fail;
 
 	msm_init_queue(msm_session_q);
-	spin_lock_init(&msm_eventq_lock);
-	spin_lock_init(&msm_pid_lock);
+	spin_lock_init(&land_msm_eventq_lock);
+	spin_lock_init(&land_msm_pid_lock);
 	INIT_LIST_HEAD(&ordered_sd_list);
 
 	cam_debugfs_root = debugfs_create_dir(MSM_CAM_LOGSYNC_FILE_BASEDIR,
@@ -1251,7 +1251,7 @@ static int msm_probe(struct platform_device *pdev)
 			pr_warn("NON-FATAL: failed to create logsync debugfs file\n");
 	}
 
-	rc = cam_ahb_clk_init(pdev);
+	rc = land_cam_ahb_clk_init(pdev);
 	if (rc < 0) {
 		pr_err("%s: failed to register ahb clocks\n", __func__);
 		goto v4l2_fail;

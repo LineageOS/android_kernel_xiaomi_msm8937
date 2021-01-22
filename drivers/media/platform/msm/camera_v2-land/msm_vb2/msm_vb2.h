@@ -61,8 +61,8 @@ struct msm_stream {
 	struct list_head queued_list;
 };
 
-struct vb2_ops *msm_vb2_get_q_ops(void);
-struct vb2_mem_ops *msm_vb2_get_q_mem_ops(void);
-int msm_vb2_request_cb(struct msm_sd_req_vb2_q *req_sd);
+struct vb2_ops *land_msm_vb2_get_q_ops(void);
+struct vb2_mem_ops *land_msm_vb2_get_q_mem_ops(void);
+int land_msm_vb2_request_cb(struct msm_sd_req_vb2_q *req_sd);
 
 #endif /*_MSM_VB_H */

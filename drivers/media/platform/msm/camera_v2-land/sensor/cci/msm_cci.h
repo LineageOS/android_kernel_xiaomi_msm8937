@@ -224,9 +224,9 @@ struct cci_write_async {
 };
 
 #ifdef CONFIG_MSM_CCI
-struct v4l2_subdev *msm_cci_get_subdev(void);
+struct v4l2_subdev *land_msm_cci_get_subdev(void);
 #else
-static inline struct v4l2_subdev *msm_cci_get_subdev(void)
+static inline struct v4l2_subdev *land_msm_cci_get_subdev(void)
 {
 	return NULL;
 }

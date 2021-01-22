@@ -38,19 +38,19 @@ struct msm_jpeg_hw_pingpong {
 	int     buf_active_index;
 };
 
-int msm_jpeg_hw_pingpong_update(struct msm_jpeg_hw_pingpong *pingpong_hw,
+int land_msm_jpeg_hw_pingpong_update(struct msm_jpeg_hw_pingpong *pingpong_hw,
 	struct msm_jpeg_hw_buf *buf, void *);
-int msm_jpegdma_hw_pingpong_update(struct msm_jpeg_hw_pingpong *pingpong_hw,
+int land_msm_jpegdma_hw_pingpong_update(struct msm_jpeg_hw_pingpong *pingpong_hw,
 	struct msm_jpeg_hw_buf *buf, void *);
-void *msm_jpeg_hw_pingpong_irq(struct msm_jpeg_hw_pingpong *pingpong_hw);
-void *msm_jpeg_hw_pingpong_active_buffer(struct msm_jpeg_hw_pingpong
+void *land_msm_jpeg_hw_pingpong_irq(struct msm_jpeg_hw_pingpong *pingpong_hw);
+void *land_msm_jpeg_hw_pingpong_active_buffer(struct msm_jpeg_hw_pingpong
 	*pingpong_hw);
 
-void msm_jpeg_hw_irq_clear(uint32_t, uint32_t, void *);
-void msm_jpegdma_hw_irq_clear(uint32_t, uint32_t, void *);
-int msm_jpeg_hw_irq_get_status(void *);
-int msm_jpegdma_hw_irq_get_status(void *);
-long msm_jpeg_hw_encode_output_size(void *);
+void land_msm_jpeg_hw_irq_clear(uint32_t, uint32_t, void *);
+void land_msm_jpegdma_hw_irq_clear(uint32_t, uint32_t, void *);
+int land_msm_jpeg_hw_irq_get_status(void *);
+int land_msm_jpegdma_hw_irq_get_status(void *);
+long land_msm_jpeg_hw_encode_output_size(void *);
 #define MSM_JPEG_HW_MASK_COMP_FRAMEDONE \
 		MSM_JPEG_HW_IRQ_STATUS_FRAMEDONE_MASK
 #define MSM_JPEG_HW_MASK_COMP_FE \
@@ -103,40 +103,40 @@ long msm_jpeg_hw_encode_output_size(void *);
 	(jpeg_irq_status & MSM_JPEGDMA_HW_MASK_COMP_RESET_ACK)
 
 
-void msm_jpeg_hw_fe_buffer_update(struct msm_jpeg_hw_buf *p_input,
+void land_msm_jpeg_hw_fe_buffer_update(struct msm_jpeg_hw_buf *p_input,
 	uint8_t pingpong_index, void *);
-void msm_jpeg_hw_we_buffer_update(struct msm_jpeg_hw_buf *p_input,
+void land_msm_jpeg_hw_we_buffer_update(struct msm_jpeg_hw_buf *p_input,
 	uint8_t pingpong_index, void *);
-void msm_jpegdma_hw_fe_buffer_update(struct msm_jpeg_hw_buf *p_input,
+void land_msm_jpegdma_hw_fe_buffer_update(struct msm_jpeg_hw_buf *p_input,
 	uint8_t pingpong_index, void *);
-void msm_jpegdma_hw_we_buffer_update(struct msm_jpeg_hw_buf *p_input,
+void land_msm_jpegdma_hw_we_buffer_update(struct msm_jpeg_hw_buf *p_input,
 	uint8_t pingpong_index, void *);
 
 
 void msm_jpeg_hw_we_buffer_cfg(uint8_t is_realtime);
 
-void msm_jpeg_hw_fe_mmu_prefetch(struct msm_jpeg_hw_buf *buf, void *,
+void land_msm_jpeg_hw_fe_mmu_prefetch(struct msm_jpeg_hw_buf *buf, void *,
 	uint8_t decode_flag);
-void msm_jpeg_hw_we_mmu_prefetch(struct msm_jpeg_hw_buf *buf, void *,
+void land_msm_jpeg_hw_we_mmu_prefetch(struct msm_jpeg_hw_buf *buf, void *,
 	uint8_t decode_flag);
-void msm_jpegdma_hw_fe_mmu_prefetch(struct msm_jpeg_hw_buf *buf, void *);
-void msm_jpegdma_hw_we_mmu_prefetch(struct msm_jpeg_hw_buf *buf, void *);
+void land_msm_jpegdma_hw_fe_mmu_prefetch(struct msm_jpeg_hw_buf *buf, void *);
+void land_msm_jpegdma_hw_we_mmu_prefetch(struct msm_jpeg_hw_buf *buf, void *);
 
-void msm_jpeg_hw_fe_start(void *);
+void land_msm_jpeg_hw_fe_start(void *);
 void msm_jpeg_hw_clk_cfg(void);
 
-void msm_jpeg_hw_reset(void *base, int size);
+void land_msm_jpeg_hw_reset(void *base, int size);
 void msm_jpeg_hw_irq_cfg(void);
 
-uint32_t msm_jpeg_hw_read(struct msm_jpeg_hw_cmd *, void *);
-void msm_jpeg_hw_write(struct msm_jpeg_hw_cmd *, void *);
-int msm_jpeg_hw_wait(struct msm_jpeg_hw_cmd *, int, void *);
-void msm_jpeg_hw_delay(struct msm_jpeg_hw_cmd *, int);
-int msm_jpeg_hw_exec_cmds(struct msm_jpeg_hw_cmd *, uint32_t ,
+uint32_t land_msm_jpeg_hw_read(struct msm_jpeg_hw_cmd *, void *);
+void land_msm_jpeg_hw_write(struct msm_jpeg_hw_cmd *, void *);
+int land_msm_jpeg_hw_wait(struct msm_jpeg_hw_cmd *, int, void *);
+void land_msm_jpeg_hw_delay(struct msm_jpeg_hw_cmd *, int);
+int land_msm_jpeg_hw_exec_cmds(struct msm_jpeg_hw_cmd *, uint32_t ,
 	uint32_t , void *);
 void msm_jpeg_hw_region_dump(int size);
-void msm_jpeg_io_dump(void *base, int size);
-void msm_jpeg_decode_status(void *base);
-void msm_jpeg_hw_reset_dma(void *base, int size);
+void land_msm_jpeg_io_dump(void *base, int size);
+void land_msm_jpeg_decode_status(void *base);
+void land_msm_jpeg_hw_reset_dma(void *base, int size);
 
 #endif /* MSM_JPEG_HW_H */

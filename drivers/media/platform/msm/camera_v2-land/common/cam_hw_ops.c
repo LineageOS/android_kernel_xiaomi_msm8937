@@ -50,7 +50,7 @@ struct cam_ahb_client_data {
 
 static struct cam_ahb_client_data data;
 
-int get_vector_index(char *name)
+int land_get_vector_index(char *name)
 {
 	int i = 0, rc = -1;
 
@@ -62,7 +62,7 @@ int get_vector_index(char *name)
 	return rc;
 }
 
-int cam_ahb_clk_init(struct platform_device *pdev)
+int land_cam_ahb_clk_init(struct platform_device *pdev)
 {
 	int i = 0, cnt = 0, rc = 0, index = 0;
 	struct device_node *of_node;
@@ -173,7 +173,7 @@ int cam_ahb_clk_init(struct platform_device *pdev)
 		goto err5;
 	}
 
-	index = get_vector_index("suspend");
+	index = land_get_vector_index("suspend");
 	if (index < 0) {
 		pr_err("svs vector not supported\n");
 		rc = -EINVAL;
@@ -211,9 +211,9 @@ err1:
 	data.vectors = NULL;
 	return rc;
 }
-EXPORT_SYMBOL(cam_ahb_clk_init);
+EXPORT_SYMBOL(land_cam_ahb_clk_init);
 
-int cam_consolidate_ahb_vote(enum cam_ahb_clk_client id,
+int land_cam_consolidate_ahb_vote(enum cam_ahb_clk_client id,
 	enum cam_ahb_clk_vote vote)
 {
 	int i = 0;
@@ -275,7 +275,7 @@ static int cam_ahb_get_voltage_level(unsigned int corner)
 	}
 }
 
-int cam_config_ahb_clk(struct device *dev, unsigned long freq,
+int land_cam_config_ahb_clk(struct device *dev, unsigned long freq,
 	enum cam_ahb_clk_client id, enum cam_ahb_clk_vote vote)
 {
 	struct dev_pm_opp *opp;
@@ -326,7 +326,7 @@ int cam_config_ahb_clk(struct device *dev, unsigned long freq,
 		return -EINVAL;
 	}
 
-	rc = cam_consolidate_ahb_vote(id, dyn_vote);
+	rc = land_cam_consolidate_ahb_vote(id, dyn_vote);
 	if (rc < 0) {
 		pr_err("%s: failed to vote for AHB\n", __func__);
 		goto end;
@@ -335,4 +335,4 @@ int cam_config_ahb_clk(struct device *dev, unsigned long freq,
 end:
 	return rc;
 }
-EXPORT_SYMBOL(cam_config_ahb_clk);
+EXPORT_SYMBOL(land_cam_config_ahb_clk);

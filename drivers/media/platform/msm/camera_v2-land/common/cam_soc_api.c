@@ -36,11 +36,11 @@ struct msm_cam_bus_pscale_data {
 	struct mutex lock;
 };
 
-struct msm_cam_bus_pscale_data g_cv[CAM_BUS_CLIENT_MAX];
+struct msm_cam_bus_pscale_data land_g_cv[CAM_BUS_CLIENT_MAX];
 
 
 /* Get all clocks from DT */
-int msm_camera_get_clk_info(struct platform_device *pdev,
+int land_msm_camera_get_clk_info(struct platform_device *pdev,
 			struct msm_cam_clk_info **clk_info,
 			struct clk ***clk_ptr,
 			size_t *num_clk)
@@ -182,10 +182,10 @@ err1:
 	devm_kfree(&pdev->dev, *clk_info);
 	return rc;
 }
-EXPORT_SYMBOL(msm_camera_get_clk_info);
+EXPORT_SYMBOL(land_msm_camera_get_clk_info);
 
 /* Get all clocks and multiple rates from DT */
-int msm_camera_get_clk_info_and_rates(
+int land_msm_camera_get_clk_info_and_rates(
 			struct platform_device *pdev,
 			struct msm_cam_clk_info **pclk_info,
 			struct clk ***pclks,
@@ -311,10 +311,10 @@ err1:
 	devm_kfree(&pdev->dev, clk_info);
 	return rc;
 }
-EXPORT_SYMBOL(msm_camera_get_clk_info_and_rates);
+EXPORT_SYMBOL(land_msm_camera_get_clk_info_and_rates);
 
 /* Enable/Disable all clocks */
-int msm_camera_clk_enable(struct device *dev,
+int land_msm_camera_clk_enable(struct device *dev,
 		struct msm_cam_clk_info *clk_info,
 		struct clk **clk_ptr, int num_clk, int enable)
 {
@@ -392,10 +392,10 @@ cam_clk_set_err:
 	}
 	return rc;
 }
-EXPORT_SYMBOL(msm_camera_clk_enable);
+EXPORT_SYMBOL(land_msm_camera_clk_enable);
 
 /* Set rate on a specific clock */
-int msm_camera_clk_set_rate(struct device *dev,
+int land_msm_camera_clk_set_rate(struct device *dev,
 			struct clk *clk,
 			long clk_rate)
 {
@@ -422,10 +422,10 @@ int msm_camera_clk_set_rate(struct device *dev,
 
 	return 0;
 }
-EXPORT_SYMBOL(msm_camera_clk_set_rate);
+EXPORT_SYMBOL(land_msm_camera_clk_set_rate);
 
 /* release memory allocated for clocks */
-int msm_camera_put_clk_info(struct platform_device *pdev,
+int land_msm_camera_put_clk_info(struct platform_device *pdev,
 				struct msm_cam_clk_info **clk_info,
 				struct clk ***clk_ptr, int cnt)
 {
@@ -443,9 +443,9 @@ int msm_camera_put_clk_info(struct platform_device *pdev,
 	*clk_ptr = NULL;
 	return 0;
 }
-EXPORT_SYMBOL(msm_camera_put_clk_info);
+EXPORT_SYMBOL(land_msm_camera_put_clk_info);
 
-int msm_camera_put_clk_info_and_rates(struct platform_device *pdev,
+int land_msm_camera_put_clk_info_and_rates(struct platform_device *pdev,
 		struct msm_cam_clk_info **clk_info,
 		struct clk ***clk_ptr, uint32_t ***clk_rates,
 		size_t set, size_t cnt)
@@ -468,10 +468,10 @@ int msm_camera_put_clk_info_and_rates(struct platform_device *pdev,
 	*clk_rates = NULL;
 	return 0;
 }
-EXPORT_SYMBOL(msm_camera_put_clk_info_and_rates);
+EXPORT_SYMBOL(land_msm_camera_put_clk_info_and_rates);
 
 /* Get regulators from DT */
-int msm_camera_get_regulator_info(struct platform_device *pdev,
+int land_msm_camera_get_regulator_info(struct platform_device *pdev,
 				struct regulator ***vdd,
 				int *num_reg)
 {
@@ -539,11 +539,11 @@ err1:
 	devm_kfree(&pdev->dev, *vdd);
 	return rc;
 }
-EXPORT_SYMBOL(msm_camera_get_regulator_info);
+EXPORT_SYMBOL(land_msm_camera_get_regulator_info);
 
 
 /* Enable/Disable regulators */
-int msm_camera_regulator_enable(struct regulator **vdd,
+int land_msm_camera_regulator_enable(struct regulator **vdd,
 				int cnt, int enable)
 {
 	int i;
@@ -577,10 +577,10 @@ error:
 	}
 	return rc;
 }
-EXPORT_SYMBOL(msm_camera_regulator_enable);
+EXPORT_SYMBOL(land_msm_camera_regulator_enable);
 
 /* Put regulators regulators */
-void msm_camera_put_regulators(struct platform_device *pdev,
+void land_msm_camera_put_regulators(struct platform_device *pdev,
 							struct regulator ***vdd,
 							int cnt)
 {
@@ -600,9 +600,9 @@ void msm_camera_put_regulators(struct platform_device *pdev,
 	devm_kfree(&pdev->dev, *vdd);
 	*vdd = NULL;
 }
-EXPORT_SYMBOL(msm_camera_put_regulators);
+EXPORT_SYMBOL(land_msm_camera_put_regulators);
 
-struct resource *msm_camera_get_irq(struct platform_device *pdev,
+struct resource *land_msm_camera_get_irq(struct platform_device *pdev,
 							char *irq_name)
 {
 	if (!pdev || !irq_name) {
@@ -613,9 +613,9 @@ struct resource *msm_camera_get_irq(struct platform_device *pdev,
 	CDBG("Get irq for %s\n", irq_name);
 	return platform_get_resource_byname(pdev, IORESOURCE_IRQ, irq_name);
 }
-EXPORT_SYMBOL(msm_camera_get_irq);
+EXPORT_SYMBOL(land_msm_camera_get_irq);
 
-int msm_camera_register_irq(struct platform_device *pdev,
+int land_msm_camera_register_irq(struct platform_device *pdev,
 			struct resource *irq, irq_handler_t handler,
 			unsigned long irqflags, char *irq_name, void *dev_id)
 {
@@ -637,9 +637,9 @@ int msm_camera_register_irq(struct platform_device *pdev,
 
 	return rc;
 }
-EXPORT_SYMBOL(msm_camera_register_irq);
+EXPORT_SYMBOL(land_msm_camera_register_irq);
 
-int msm_camera_register_threaded_irq(struct platform_device *pdev,
+int land_msm_camera_register_threaded_irq(struct platform_device *pdev,
 			struct resource *irq, irq_handler_t handler_fn,
 			irq_handler_t thread_fn, unsigned long irqflags,
 			char *irq_name, void *dev_id)
@@ -663,9 +663,9 @@ int msm_camera_register_threaded_irq(struct platform_device *pdev,
 
 	return rc;
 }
-EXPORT_SYMBOL(msm_camera_register_threaded_irq);
+EXPORT_SYMBOL(land_msm_camera_register_threaded_irq);
 
-int msm_camera_enable_irq(struct resource *irq, int enable)
+int land_msm_camera_enable_irq(struct resource *irq, int enable)
 {
 	if (!irq) {
 		pr_err("Invalid params\n");
@@ -680,9 +680,9 @@ int msm_camera_enable_irq(struct resource *irq, int enable)
 
 	return 0;
 }
-EXPORT_SYMBOL(msm_camera_enable_irq);
+EXPORT_SYMBOL(land_msm_camera_enable_irq);
 
-int msm_camera_unregister_irq(struct platform_device *pdev,
+int land_msm_camera_unregister_irq(struct platform_device *pdev,
 	struct resource *irq, void *dev_id)
 {
 
@@ -696,9 +696,9 @@ int msm_camera_unregister_irq(struct platform_device *pdev,
 
 	return 0;
 }
-EXPORT_SYMBOL(msm_camera_unregister_irq);
+EXPORT_SYMBOL(land_msm_camera_unregister_irq);
 
-void __iomem *msm_camera_get_reg_base(struct platform_device *pdev,
+void __iomem *land_msm_camera_get_reg_base(struct platform_device *pdev,
 		char *device_name, int reserve_mem)
 {
 	struct resource *mem;
@@ -740,9 +740,9 @@ void __iomem *msm_camera_get_reg_base(struct platform_device *pdev,
 	CDBG("base : %p\n", base);
 	return base;
 }
-EXPORT_SYMBOL(msm_camera_get_reg_base);
+EXPORT_SYMBOL(land_msm_camera_get_reg_base);
 
-uint32_t msm_camera_get_res_size(struct platform_device *pdev,
+uint32_t land_msm_camera_get_res_size(struct platform_device *pdev,
 	char *device_name)
 {
 	struct resource *mem;
@@ -761,10 +761,10 @@ uint32_t msm_camera_get_res_size(struct platform_device *pdev,
 	}
 	return resource_size(mem);
 }
-EXPORT_SYMBOL(msm_camera_get_res_size);
+EXPORT_SYMBOL(land_msm_camera_get_res_size);
 
 
-int msm_camera_put_reg_base(struct platform_device *pdev,
+int land_msm_camera_put_reg_base(struct platform_device *pdev,
 	void __iomem *base,	char *device_name, int reserve_mem)
 {
 	struct resource *mem;
@@ -790,10 +790,10 @@ int msm_camera_put_reg_base(struct platform_device *pdev,
 
 	return 0;
 }
-EXPORT_SYMBOL(msm_camera_put_reg_base);
+EXPORT_SYMBOL(land_msm_camera_put_reg_base);
 
 /* Register the bus client */
-uint32_t msm_camera_register_bus_client(struct platform_device *pdev,
+uint32_t land_msm_camera_register_bus_client(struct platform_device *pdev,
 	enum cam_bus_client id)
 {
 	int rc = 0;
@@ -810,7 +810,7 @@ uint32_t msm_camera_register_bus_client(struct platform_device *pdev,
 
 	of_node = pdev->dev.of_node;
 
-	if (!g_cv[id].pdata) {
+	if (!land_g_cv[id].pdata) {
 		rc = of_property_read_u32(of_node, "qcom,msm-bus,num-cases",
 				&num_usecases);
 		if (rc) {
@@ -835,7 +835,7 @@ uint32_t msm_camera_register_bus_client(struct platform_device *pdev,
 				pr_err("Excess or less vectors\n");
 				return -EINVAL;
 			}
-			g_cv[id].dyn_vote = true;
+			land_g_cv[id].dyn_vote = true;
 		}
 
 		pdata = msm_bus_cl_get_pdata(pdev);
@@ -853,19 +853,19 @@ uint32_t msm_camera_register_bus_client(struct platform_device *pdev,
 		return -EINVAL;
 	}
 
-	g_cv[id].pdata = pdata;
-	g_cv[id].bus_client = bus_client;
-	g_cv[id].vector_index = 0;
-	g_cv[id].num_usecases = num_usecases;
-	g_cv[id].num_paths = num_paths;
-	mutex_init(&g_cv[id].lock);
+	land_g_cv[id].pdata = pdata;
+	land_g_cv[id].bus_client = bus_client;
+	land_g_cv[id].vector_index = 0;
+	land_g_cv[id].num_usecases = num_usecases;
+	land_g_cv[id].num_paths = num_paths;
+	mutex_init(&land_g_cv[id].lock);
 	CDBG("Exit Client ID: %d\n", id);
 	return 0;
 }
-EXPORT_SYMBOL(msm_camera_register_bus_client);
+EXPORT_SYMBOL(land_msm_camera_register_bus_client);
 
 /* Update the bus bandwidth */
-uint32_t msm_camera_update_bus_bw(int id, uint64_t ab, uint64_t ib)
+uint32_t land_msm_camera_update_bus_bw(int id, uint64_t ab, uint64_t ib)
 {
 	struct msm_bus_paths *path;
 	struct msm_bus_scale_pdata *pdata;
@@ -875,56 +875,56 @@ uint32_t msm_camera_update_bus_bw(int id, uint64_t ab, uint64_t ib)
 		pr_err("Invalid params");
 		return -EINVAL;
 	}
-	if (g_cv[id].num_usecases != 2 ||
-		g_cv[id].num_paths != 1 ||
-		g_cv[id].dyn_vote != true) {
+	if (land_g_cv[id].num_usecases != 2 ||
+		land_g_cv[id].num_paths != 1 ||
+		land_g_cv[id].dyn_vote != true) {
 		pr_err("dynamic update not allowed\n");
 		return -EINVAL;
 	}
 
-	mutex_lock(&g_cv[id].lock);
-	idx = g_cv[id].vector_index;
+	mutex_lock(&land_g_cv[id].lock);
+	idx = land_g_cv[id].vector_index;
 	idx = 1 - idx;
-	g_cv[id].vector_index = idx;
-	mutex_unlock(&g_cv[id].lock);
+	land_g_cv[id].vector_index = idx;
+	mutex_unlock(&land_g_cv[id].lock);
 
-	pdata = g_cv[id].pdata;
+	pdata = land_g_cv[id].pdata;
 	path = &(pdata->usecase[idx]);
 	path->vectors[0].ab = ab;
 	path->vectors[0].ib = ib;
 
 	CDBG("Register client ID : %d [ab : %llx, ib : %llx], update :%d\n",
 		id, ab, ib, idx);
-	msm_bus_scale_client_update_request(g_cv[id].bus_client, idx);
+	msm_bus_scale_client_update_request(land_g_cv[id].bus_client, idx);
 
 	return 0;
 }
-EXPORT_SYMBOL(msm_camera_update_bus_bw);
+EXPORT_SYMBOL(land_msm_camera_update_bus_bw);
 
 /* Update the bus vector */
-uint32_t msm_camera_update_bus_vector(enum cam_bus_client id,
+uint32_t land_msm_camera_update_bus_vector(enum cam_bus_client id,
 	int vector_index)
 {
-	if (id >= CAM_BUS_CLIENT_MAX || g_cv[id].dyn_vote == true) {
+	if (id >= CAM_BUS_CLIENT_MAX || land_g_cv[id].dyn_vote == true) {
 		pr_err("Invalid params");
 		return -EINVAL;
 	}
 
-	if (vector_index < 0 || vector_index > g_cv[id].num_usecases) {
+	if (vector_index < 0 || vector_index > land_g_cv[id].num_usecases) {
 		pr_err("Invalid params");
 		return -EINVAL;
 	}
 
 	CDBG("Register client ID : %d vector idx: %d,\n", id, vector_index);
-	msm_bus_scale_client_update_request(g_cv[id].bus_client,
+	msm_bus_scale_client_update_request(land_g_cv[id].bus_client,
 		vector_index);
 
 	return 0;
 }
-EXPORT_SYMBOL(msm_camera_update_bus_vector);
+EXPORT_SYMBOL(land_msm_camera_update_bus_vector);
 
 /* Unregister the bus client */
-uint32_t msm_camera_unregister_bus_client(enum cam_bus_client id)
+uint32_t land_msm_camera_unregister_bus_client(enum cam_bus_client id)
 {
 	if (id >= CAM_BUS_CLIENT_MAX) {
 		pr_err("Invalid params");
@@ -933,11 +933,11 @@ uint32_t msm_camera_unregister_bus_client(enum cam_bus_client id)
 
 	CDBG("UnRegister client ID: %d\n", id);
 
-	mutex_destroy(&g_cv[id].lock);
-	msm_bus_scale_unregister_client(g_cv[id].bus_client);
-	msm_bus_cl_clear_pdata(g_cv[id].pdata);
-	memset(&g_cv[id], 0, sizeof(struct msm_cam_bus_pscale_data));
+	mutex_destroy(&land_g_cv[id].lock);
+	msm_bus_scale_unregister_client(land_g_cv[id].bus_client);
+	msm_bus_cl_clear_pdata(land_g_cv[id].pdata);
+	memset(&land_g_cv[id], 0, sizeof(struct msm_cam_bus_pscale_data));
 
 	return 0;
 }
-EXPORT_SYMBOL(msm_camera_unregister_bus_client);
+EXPORT_SYMBOL(land_msm_camera_unregister_bus_client);

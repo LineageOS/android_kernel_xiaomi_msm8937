@@ -90,21 +90,21 @@ struct msm_sensor_ctrl_t {
 	uint8_t is_csid_tg_mode;
 };
 
-int msm_sensor_config(struct msm_sensor_ctrl_t *s_ctrl, void __user *argp);
+int land_msm_sensor_config(struct msm_sensor_ctrl_t *s_ctrl, void __user *argp);
 
-int msm_sensor_power_up(struct msm_sensor_ctrl_t *s_ctrl);
+int land_msm_sensor_power_up(struct msm_sensor_ctrl_t *s_ctrl);
 
-int msm_sensor_power_down(struct msm_sensor_ctrl_t *s_ctrl);
+int land_msm_sensor_power_down(struct msm_sensor_ctrl_t *s_ctrl);
 
-int msm_sensor_check_id(struct msm_sensor_ctrl_t *s_ctrl);
+int land_msm_sensor_check_id(struct msm_sensor_ctrl_t *s_ctrl);
 
-int msm_sensor_match_id(struct msm_sensor_ctrl_t *s_ctrl);
+int land_msm_sensor_match_id(struct msm_sensor_ctrl_t *s_ctrl);
 
 int msm_sensor_update_cfg(struct msm_sensor_ctrl_t *s_ctrl);
 
-int msm_sensor_free_sensor_data(struct msm_sensor_ctrl_t *s_ctrl);
+int land_msm_sensor_free_sensor_data(struct msm_sensor_ctrl_t *s_ctrl);
 
-int32_t msm_sensor_init_default_params(struct msm_sensor_ctrl_t *s_ctrl);
+int32_t land_msm_sensor_init_default_params(struct msm_sensor_ctrl_t *s_ctrl);
 
 int32_t msm_sensor_get_dt_gpio_req_tbl(struct device_node *of_node,
 	struct msm_camera_gpio_conf *gconf, uint16_t *gpio_array,
@@ -118,7 +118,7 @@ int32_t msm_sensor_init_gpio_pin_tbl(struct device_node *of_node,
 	struct msm_camera_gpio_conf *gconf, uint16_t *gpio_array,
 	uint16_t gpio_array_size);
 #ifdef CONFIG_COMPAT
-long msm_sensor_subdev_fops_ioctl(struct file *file,
+long land_msm_sensor_subdev_fops_ioctl(struct file *file,
 	unsigned int cmd,
 	unsigned long arg);
 #endif

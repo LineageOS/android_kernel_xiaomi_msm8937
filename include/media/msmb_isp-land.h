@@ -50,6 +50,6 @@ struct avtimer_fptr_t {
 	int (*fptr_avtimer_enable)(int enable);
 	int (*fptr_avtimer_get_time)(uint64_t *avtimer_tick);
 };
-void msm_isp_set_avtimer_fptr(struct avtimer_fptr_t avtimer_func);
+void land_msm_isp_set_avtimer_fptr(struct avtimer_fptr_t avtimer_func);
 #endif
 #endif

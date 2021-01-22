@@ -84,11 +84,11 @@ struct msm_sd_req_vb2_q {
 #define MSM_SD_NOTIFY_PUT_SD 0x00000002
 #define MSM_SD_NOTIFY_REQ_CB 0x00000003
 
-int msm_sd_register(struct msm_sd_subdev *msm_subdev);
-int msm_sd_unregister(struct msm_sd_subdev *sd);
+int land_msm_sd_register(struct msm_sd_subdev *msm_subdev);
+int land_msm_sd_unregister(struct msm_sd_subdev *sd);
 struct v4l2_subdev *msm_sd_get_subdev(struct v4l2_subdev *sd,
 	const char *get_name);
 void msm_sd_put_subdev(struct v4l2_subdev *sd, struct v4l2_subdev *put);
-void msm_cam_copy_v4l2_subdev_fops(struct v4l2_file_operations *d1);
+void land_msm_cam_copy_v4l2_subdev_fops(struct v4l2_file_operations *d1);
 
 #endif /*_MSM_SD_H */

@@ -76,7 +76,7 @@ static void msm_sensor_misc_regulator(
 	}
 }
 
-int32_t msm_sensor_free_sensor_data(struct msm_sensor_ctrl_t *s_ctrl)
+int32_t land_msm_sensor_free_sensor_data(struct msm_sensor_ctrl_t *s_ctrl)
 {
 	if (!s_ctrl->pdev && !s_ctrl->sensor_i2c_client->client)
 		return 0;
@@ -101,7 +101,7 @@ static struct msm_cam_clk_info cam_8974_clk_info[] = {
 	[SENSOR_CAM_CLK] = {"cam_clk", 0},
 };
 
-int msm_sensor_power_down(struct msm_sensor_ctrl_t *s_ctrl)
+int land_msm_sensor_power_down(struct msm_sensor_ctrl_t *s_ctrl)
 {
 	struct msm_camera_power_ctrl_t *power_info;
 	enum msm_camera_device_type_t sensor_device_type;
@@ -125,11 +125,11 @@ int msm_sensor_power_down(struct msm_sensor_ctrl_t *s_ctrl)
 			__func__, __LINE__, power_info, sensor_i2c_client);
 		return -EINVAL;
 	}
-	return msm_camera_power_down(power_info, sensor_device_type,
+	return land_msm_camera_power_down(power_info, sensor_device_type,
 		sensor_i2c_client);
 }
 
-int msm_sensor_power_up(struct msm_sensor_ctrl_t *s_ctrl)
+int land_msm_sensor_power_up(struct msm_sensor_ctrl_t *s_ctrl)
 {
 	int rc;
 	struct msm_camera_power_ctrl_t *power_info;
@@ -164,13 +164,13 @@ int msm_sensor_power_up(struct msm_sensor_ctrl_t *s_ctrl)
 		msm_sensor_adjust_mclk(power_info);
 
 	for (retry = 0; retry < 3; retry++) {
-		rc = msm_camera_power_up(power_info, s_ctrl->sensor_device_type,
+		rc = land_msm_camera_power_up(power_info, s_ctrl->sensor_device_type,
 			sensor_i2c_client);
 		if (rc < 0)
 			return rc;
-		rc = msm_sensor_check_id(s_ctrl);
+		rc = land_msm_sensor_check_id(s_ctrl);
 		if (rc < 0) {
-			msm_camera_power_down(power_info,
+			land_msm_camera_power_down(power_info,
 				s_ctrl->sensor_device_type, sensor_i2c_client);
 			msleep(20);
 			continue;
@@ -201,7 +201,7 @@ static uint16_t msm_sensor_id_by_mask(struct msm_sensor_ctrl_t *s_ctrl,
 	return sensor_id;
 }
 
-int msm_sensor_match_id(struct msm_sensor_ctrl_t *s_ctrl)
+int land_msm_sensor_match_id(struct msm_sensor_ctrl_t *s_ctrl)
 {
 	int rc = 0;
 	uint16_t chipid = 0;
@@ -337,7 +337,7 @@ static long msm_sensor_subdev_do_ioctl(
 	}
 }
 
-long msm_sensor_subdev_fops_ioctl(struct file *file,
+long land_msm_sensor_subdev_fops_ioctl(struct file *file,
 	unsigned int cmd, unsigned long arg)
 {
 	return video_usercopy(file, cmd, arg, msm_sensor_subdev_do_ioctl);
@@ -872,7 +872,7 @@ DONE:
 }
 #endif
 
-int msm_sensor_config(struct msm_sensor_ctrl_t *s_ctrl, void __user *argp)
+int land_msm_sensor_config(struct msm_sensor_ctrl_t *s_ctrl, void __user *argp)
 {
 	struct sensorb_cfg_data *cdata = (struct sensorb_cfg_data *)argp;
 	int32_t rc = 0;
@@ -1353,14 +1353,14 @@ DONE:
 	return rc;
 }
 
-int msm_sensor_check_id(struct msm_sensor_ctrl_t *s_ctrl)
+int land_msm_sensor_check_id(struct msm_sensor_ctrl_t *s_ctrl)
 {
 	int rc;
 
 	if (s_ctrl->func_tbl->sensor_match_id)
 		rc = s_ctrl->func_tbl->sensor_match_id(s_ctrl);
 	else
-		rc = msm_sensor_match_id(s_ctrl);
+		rc = land_msm_sensor_match_id(s_ctrl);
 	if (rc < 0)
 		pr_err("%s:%d match id failed rc %d\n", __func__, __LINE__, rc);
 	return rc;
@@ -1389,46 +1389,46 @@ static struct v4l2_subdev_ops msm_sensor_subdev_ops = {
 };
 
 static struct msm_sensor_fn_t msm_sensor_func_tbl = {
-	.sensor_config = msm_sensor_config,
+	.sensor_config = land_msm_sensor_config,
 #ifdef CONFIG_COMPAT
 	.sensor_config32 = msm_sensor_config32,
 #endif
-	.sensor_power_up = msm_sensor_power_up,
-	.sensor_power_down = msm_sensor_power_down,
-	.sensor_match_id = msm_sensor_match_id,
+	.sensor_power_up = land_msm_sensor_power_up,
+	.sensor_power_down = land_msm_sensor_power_down,
+	.sensor_match_id = land_msm_sensor_match_id,
 };
 
 static struct msm_camera_i2c_fn_t msm_sensor_cci_func_tbl = {
-	.i2c_read = msm_camera_cci_i2c_read,
-	.i2c_read_seq = msm_camera_cci_i2c_read_seq,
-	.i2c_write = msm_camera_cci_i2c_write,
-	.i2c_write_table = msm_camera_cci_i2c_write_table,
-	.i2c_write_seq_table = msm_camera_cci_i2c_write_seq_table,
+	.i2c_read = land_msm_camera_cci_i2c_read,
+	.i2c_read_seq = land_msm_camera_cci_i2c_read_seq,
+	.i2c_write = land_msm_camera_cci_i2c_write,
+	.i2c_write_table = land_msm_camera_cci_i2c_write_table,
+	.i2c_write_seq_table = land_msm_camera_cci_i2c_write_seq_table,
 	.i2c_write_table_w_microdelay =
-		msm_camera_cci_i2c_write_table_w_microdelay,
-	.i2c_util = msm_sensor_cci_i2c_util,
-	.i2c_write_conf_tbl = msm_camera_cci_i2c_write_conf_tbl,
-	.i2c_write_table_async = msm_camera_cci_i2c_write_table_async,
-	.i2c_write_table_sync = msm_camera_cci_i2c_write_table_sync,
-	.i2c_write_table_sync_block = msm_camera_cci_i2c_write_table_sync_block,
+		land_msm_camera_cci_i2c_write_table_w_microdelay,
+	.i2c_util = land_msm_sensor_cci_i2c_util,
+	.i2c_write_conf_tbl = land_msm_camera_cci_i2c_write_conf_tbl,
+	.i2c_write_table_async = land_msm_camera_cci_i2c_write_table_async,
+	.i2c_write_table_sync = land_msm_camera_cci_i2c_write_table_sync,
+	.i2c_write_table_sync_block = land_msm_camera_cci_i2c_write_table_sync_block,
 
 };
 
 static struct msm_camera_i2c_fn_t msm_sensor_qup_func_tbl = {
-	.i2c_read = msm_camera_qup_i2c_read,
-	.i2c_read_seq = msm_camera_qup_i2c_read_seq,
-	.i2c_write = msm_camera_qup_i2c_write,
-	.i2c_write_table = msm_camera_qup_i2c_write_table,
-	.i2c_write_seq_table = msm_camera_qup_i2c_write_seq_table,
+	.i2c_read = land_msm_camera_qup_i2c_read,
+	.i2c_read_seq = land_msm_camera_qup_i2c_read_seq,
+	.i2c_write = land_msm_camera_qup_i2c_write,
+	.i2c_write_table = land_msm_camera_qup_i2c_write_table,
+	.i2c_write_seq_table = land_msm_camera_qup_i2c_write_seq_table,
 	.i2c_write_table_w_microdelay =
-		msm_camera_qup_i2c_write_table_w_microdelay,
-	.i2c_write_conf_tbl = msm_camera_qup_i2c_write_conf_tbl,
-	.i2c_write_table_async = msm_camera_qup_i2c_write_table,
-	.i2c_write_table_sync = msm_camera_qup_i2c_write_table,
-	.i2c_write_table_sync_block = msm_camera_qup_i2c_write_table,
+		land_msm_camera_qup_i2c_write_table_w_microdelay,
+	.i2c_write_conf_tbl = land_msm_camera_qup_i2c_write_conf_tbl,
+	.i2c_write_table_async = land_msm_camera_qup_i2c_write_table,
+	.i2c_write_table_sync = land_msm_camera_qup_i2c_write_table,
+	.i2c_write_table_sync_block = land_msm_camera_qup_i2c_write_table,
 };
 
-int32_t msm_sensor_init_default_params(struct msm_sensor_ctrl_t *s_ctrl)
+int32_t land_msm_sensor_init_default_params(struct msm_sensor_ctrl_t *s_ctrl)
 {
 	int32_t                       rc = -ENOMEM;
 	struct msm_camera_cci_client *cci_client = NULL;
@@ -1461,7 +1461,7 @@ int32_t msm_sensor_init_default_params(struct msm_sensor_ctrl_t *s_ctrl)
 		cci_client = s_ctrl->sensor_i2c_client->cci_client;
 
 		/* Get CCI subdev */
-		cci_client->cci_subdev = msm_cci_get_subdev();
+		cci_client->cci_subdev = land_msm_cci_get_subdev();
 
 		/* Update CCI / I2C function table */
 		if (!s_ctrl->sensor_i2c_client->i2c_func_tbl)

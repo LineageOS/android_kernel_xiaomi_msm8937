@@ -54,8 +54,7 @@ MODULE_DEVICE_TABLE(of, msm_vfe_dt_match);
 #define OVERFLOW_BUFFER_LENGTH 64
 static char stat_line[OVERFLOW_LENGTH];
 
-struct msm_isp_statistics stats;
-struct msm_isp_ub_info ub_info;
+struct msm_isp_ub_info land_ub_info;
 
 static int msm_isp_enable_debugfs(struct vfe_device *vfe_dev,
 	  struct msm_isp_bw_req_info *isp_req_hist);
@@ -123,7 +122,7 @@ static ssize_t vfe_debugfs_statistics_read(struct file *t_file, char *t_char,
 	struct msm_isp_statistics *stats = vfe_dev->stats;
 
 	memset(stat_line, 0, sizeof(stat_line));
-	msm_isp_util_get_bandwidth_stats(vfe_dev, stats);
+	land_msm_isp_util_get_bandwidth_stats(vfe_dev, stats);
 	ptr = (uint64_t *)(stats);
 	for (i = 0; i < MAX_OVERFLOW_COUNTERS; i++) {
 		strlcat(stat_line, stats_str[i], sizeof(stat_line));
@@ -222,20 +221,20 @@ static ssize_t ub_info_read(struct file *t_file, char *t_char,
 	char line_buffer[MAX_UB_INFO_LINE_BUFF_LEN] = {0};
 	struct vfe_device *vfe_dev =
 		(struct vfe_device *) t_file->private_data;
-	struct msm_isp_ub_info *ub_info = vfe_dev->ub_info;
+	struct msm_isp_ub_info *land_ub_info = vfe_dev->land_ub_info;
 
 	memset(out_buffer, 0, MAX_UB_INFO_LINE_BUFF_LEN);
 	snprintf(line_buffer, sizeof(line_buffer),
 		"wm_ub_policy_type = %d\n"
 		"num_wm = %d\n"
 		"wm_ub = %d\n",
-		ub_info->policy, ub_info->num_wm, ub_info->wm_ub);
+		land_ub_info->policy, land_ub_info->num_wm, land_ub_info->wm_ub);
 	strlcat(out_buffer, line_buffer,
 	    sizeof(ub_info_buffer));
-	for (i = 0; i < ub_info->num_wm; i++) {
+	for (i = 0; i < land_ub_info->num_wm; i++) {
 		snprintf(line_buffer, sizeof(line_buffer),
 			"data[%d] = 0x%x, addr[%d] = 0x%llx\n",
-			i, ub_info->data[i], i, ub_info->addr[i]);
+			i, land_ub_info->data[i], i, land_ub_info->addr[i]);
 		strlcat(out_buffer, line_buffer,
 			sizeof(ub_info_buffer));
 	}
@@ -249,9 +248,9 @@ static ssize_t ub_info_write(struct file *t_file,
 {
 	struct vfe_device *vfe_dev =
 		(struct vfe_device *) t_file->private_data;
-	struct msm_isp_ub_info *ub_info = vfe_dev->ub_info;
+	struct msm_isp_ub_info *land_ub_info = vfe_dev->land_ub_info;
 
-	memset(ub_info, 0, sizeof(struct msm_isp_ub_info));
+	memset(land_ub_info, 0, sizeof(struct msm_isp_ub_info));
 
 	return sizeof(struct msm_isp_ub_info);
 }
@@ -292,14 +291,14 @@ static int msm_isp_enable_debugfs(struct vfe_device *vfe_dev,
 		debugfs_base, isp_req_hist, &bw_history_ops))
 		return -ENOMEM;
 
-	if (!debugfs_create_file("ub_info", S_IRUGO | S_IWUSR,
+	if (!debugfs_create_file("land_ub_info", S_IRUGO | S_IWUSR,
 		debugfs_base, vfe_dev, &ub_info_ops))
 		return -ENOMEM;
 
 	return 0;
 }
 
-void msm_isp_update_req_history(uint32_t client, uint64_t ab,
+void land_msm_isp_update_req_history(uint32_t client, uint64_t ab,
 				 uint64_t ib,
 				 struct msm_isp_bandwidth_info *client_info,
 				 unsigned long long ts)
@@ -405,9 +404,9 @@ static long msm_isp_subdev_do_ioctl(
 }
 
 static struct v4l2_subdev_core_ops msm_vfe_v4l2_subdev_core_ops = {
-	.ioctl = msm_isp_ioctl,
-	.subscribe_event = msm_isp_subscribe_event,
-	.unsubscribe_event = msm_isp_unsubscribe_event,
+	.ioctl = land_msm_isp_ioctl,
+	.subscribe_event = land_msm_isp_subscribe_event,
+	.unsubscribe_event = land_msm_isp_unsubscribe_event,
 };
 
 static struct v4l2_subdev_ops msm_vfe_v4l2_subdev_ops = {
@@ -415,8 +414,8 @@ static struct v4l2_subdev_ops msm_vfe_v4l2_subdev_ops = {
 };
 
 static struct v4l2_subdev_internal_ops msm_vfe_subdev_internal_ops = {
-	.open = msm_isp_open_node,
-	.close = msm_isp_close_node,
+	.open = land_msm_isp_open_node,
+	.close = land_msm_isp_close_node,
 };
 
 static long msm_isp_v4l2_fops_ioctl(struct file *file, unsigned int cmd,
@@ -500,7 +499,7 @@ end:
 	return rc;
 }
 
-int vfe_hw_probe(struct platform_device *pdev)
+int land_vfe_hw_probe(struct platform_device *pdev)
 {
 	struct vfe_device *vfe_dev;
 	/*struct msm_cam_subdev_info sd_info;*/
@@ -520,8 +519,8 @@ int vfe_hw_probe(struct platform_device *pdev)
 		goto probe_fail1;
 	}
 
-	vfe_dev->ub_info = kzalloc(sizeof(struct msm_isp_ub_info), GFP_KERNEL);
-	if (!vfe_dev->ub_info) {
+	vfe_dev->land_ub_info = kzalloc(sizeof(struct msm_isp_ub_info), GFP_KERNEL);
+	if (!vfe_dev->land_ub_info) {
 		pr_err("%s: no enough memory\n", __func__);
 		rc = -ENOMEM;
 		goto probe_fail2;
@@ -564,7 +563,7 @@ int vfe_hw_probe(struct platform_device *pdev)
 
 	INIT_LIST_HEAD(&vfe_dev->tasklet_q);
 	tasklet_init(&vfe_dev->vfe_tasklet,
-		msm_isp_do_tasklet, (unsigned long)vfe_dev);
+		land_msm_isp_do_tasklet, (unsigned long)vfe_dev);
 
 	v4l2_subdev_init(&vfe_dev->subdev.sd, &msm_vfe_v4l2_subdev_ops);
 	vfe_dev->subdev.sd.internal_ops =
@@ -587,12 +586,12 @@ int vfe_hw_probe(struct platform_device *pdev)
 	//vfe_dev->subdev.sd.entity.group_id = MSM_CAMERA_SUBDEV_VFE;
 	vfe_dev->subdev.sd.entity.name = pdev->name;
 	vfe_dev->subdev.close_seq = MSM_SD_CLOSE_1ST_CATEGORY | 0x2;
-	rc = msm_sd_register(&vfe_dev->subdev);
+	rc = land_msm_sd_register(&vfe_dev->subdev);
 	if (rc != 0) {
 		pr_err("%s: msm_sd_register error = %d\n", __func__, rc);
 		goto probe_fail3;
 	}
-	msm_cam_copy_v4l2_subdev_fops(&msm_isp_v4l2_fops);
+	land_msm_cam_copy_v4l2_subdev_fops(&msm_isp_v4l2_fops);
 	msm_isp_v4l2_fops.unlocked_ioctl = msm_isp_v4l2_fops_ioctl;
 #ifdef CONFIG_COMPAT
 	msm_isp_v4l2_fops.compat_ioctl32 =
@@ -603,7 +602,7 @@ int vfe_hw_probe(struct platform_device *pdev)
 	vfe_dev->buf_mgr = &vfe_buf_mgr;
 	v4l2_subdev_notify(&vfe_dev->subdev.sd,
 		MSM_SD_NOTIFY_REQ_CB, &vfe_vb2_ops);
-	rc = msm_isp_create_isp_buf_mgr(vfe_dev->buf_mgr,
+	rc = land_msm_isp_create_isp_buf_mgr(vfe_dev->buf_mgr,
 		&vfe_vb2_ops, &pdev->dev,
 		vfe_dev->hw_info->axi_hw_info->scratch_buf_range);
 	if (rc < 0) {
@@ -619,7 +618,7 @@ int vfe_hw_probe(struct platform_device *pdev)
 	return rc;
 
 probe_fail3:
-	kfree(vfe_dev->ub_info);
+	kfree(vfe_dev->land_ub_info);
 probe_fail2:
 	kfree(vfe_dev->stats);
 probe_fail1:

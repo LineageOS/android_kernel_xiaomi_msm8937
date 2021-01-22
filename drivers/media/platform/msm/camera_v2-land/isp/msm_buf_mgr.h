@@ -206,14 +206,14 @@ struct msm_isp_buf_mgr {
 	uint32_t scratch_buf_range;
 };
 
-int msm_isp_create_isp_buf_mgr(struct msm_isp_buf_mgr *buf_mgr,
+int land_msm_isp_create_isp_buf_mgr(struct msm_isp_buf_mgr *buf_mgr,
 	struct msm_sd_req_vb2_q *vb2_ops, struct device *dev,
 	uint32_t scratch_addr_range);
 
-int msm_isp_proc_buf_cmd(struct msm_isp_buf_mgr *buf_mgr,
+int land_msm_isp_proc_buf_cmd(struct msm_isp_buf_mgr *buf_mgr,
 	unsigned int cmd, void *arg);
 
-int msm_isp_smmu_attach(struct msm_isp_buf_mgr *buf_mgr,
+int land_msm_isp_smmu_attach(struct msm_isp_buf_mgr *buf_mgr,
 	void *arg);
 
 #endif /* _MSM_ISP_BUF_H_ */

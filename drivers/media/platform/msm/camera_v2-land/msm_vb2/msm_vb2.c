@@ -47,7 +47,7 @@ int msm_vb2_buf_init(struct vb2_buffer *vb)
 	struct msm_vb2_buffer *msm_vb2_buf;
 	struct vb2_v4l2_buffer *vbuf = to_vb2_v4l2_buffer(vb);
 
-	stream = msm_get_stream_from_vb2q(vb->vb2_queue);
+	stream = land_msm_get_stream_from_vb2q(vb->vb2_queue);
 	if (!stream) {
 		pr_err("%s: Couldn't find stream\n", __func__);
 		return -EINVAL;
@@ -72,7 +72,7 @@ static void msm_vb2_buf_queue(struct vb2_buffer *vb)
 		return;
 	}
 
-	stream = msm_get_stream_from_vb2q(vb->vb2_queue);
+	stream = land_msm_get_stream_from_vb2q(vb->vb2_queue);
 	if (!stream) {
 		pr_err("%s:%d] NULL stream", __func__, __LINE__);
 		return;
@@ -98,7 +98,7 @@ static void msm_vb2_buf_finish(struct vb2_buffer *vb)
 		return; 
 	}
 
-	stream = msm_get_stream_from_vb2q(vb->vb2_queue);
+	stream = land_msm_get_stream_from_vb2q(vb->vb2_queue);
 	if (!stream) {
 		pr_err("%s:%d] NULL stream", __func__, __LINE__);
 		return;
@@ -123,7 +123,7 @@ static void msm_vb2_stop_stream(struct vb2_queue *q)
 	unsigned long flags;
 	struct vb2_v4l2_buffer *vb2_v4l2_buf;
 
-	stream = msm_get_stream_from_vb2q(q);
+	stream = land_msm_get_stream_from_vb2q(q);
 	if (!stream) {
 		pr_err_ratelimited("%s:%d] NULL stream", __func__, __LINE__);
 		return;
@@ -155,7 +155,7 @@ static struct vb2_ops msm_vb2_get_q_op = {
 };
 
 
-struct vb2_ops *msm_vb2_get_q_ops(void)
+struct vb2_ops *land_msm_vb2_get_q_ops(void)
 {
 	return &msm_vb2_get_q_op;
 }
@@ -185,7 +185,7 @@ static struct vb2_mem_ops msm_vb2_get_q_mem_op = {
 	.put_userptr		= msm_vb2_dma_contig_put_userptr,
 };
 
-struct vb2_mem_ops *msm_vb2_get_q_mem_ops(void)
+struct vb2_mem_ops *land_msm_vb2_get_q_mem_ops(void)
 {
 	return &msm_vb2_get_q_mem_op;
 }
@@ -193,7 +193,7 @@ struct vb2_mem_ops *msm_vb2_get_q_mem_ops(void)
 static struct vb2_queue *msm_vb2_get_queue(int session_id,
 	unsigned int stream_id)
 {
-	return msm_get_stream_vb2q(session_id, stream_id);
+	return land_msm_get_stream_vb2q(session_id, stream_id);
 }
 
 static struct vb2_v4l2_buffer *msm_vb2_get_buf(int session_id,
@@ -204,7 +204,7 @@ static struct vb2_v4l2_buffer *msm_vb2_get_buf(int session_id,
 	struct msm_vb2_buffer *msm_vb2 = NULL;
 	unsigned long flags;
 
-	stream = msm_get_stream(session_id, stream_id);
+	stream = land_msm_get_stream(session_id, stream_id);
 	if (IS_ERR_OR_NULL(stream))
 		return NULL;
 
@@ -241,7 +241,7 @@ static int msm_vb2_put_buf(struct vb2_v4l2_buffer *vb, int session_id,
 	struct vb2_v4l2_buffer *vb2_v4l2_buf = NULL;
 	int rc = 0;
 	unsigned long flags;
-	stream = msm_get_stream(session_id, stream_id);
+	stream = land_msm_get_stream(session_id, stream_id);
 	if (IS_ERR_OR_NULL(stream))
 		return -EINVAL;
 
@@ -284,7 +284,7 @@ static int msm_vb2_buf_done(struct vb2_v4l2_buffer *vb, int session_id,
 	struct vb2_v4l2_buffer *vb2_v4l2_buf = NULL;
 	int rc = 0;
 
-	stream = msm_get_stream(session_id, stream_id);
+	stream = land_msm_get_stream(session_id, stream_id);
 	if (IS_ERR_OR_NULL(stream))
 		return -EINVAL;
 	spin_lock_irqsave(&stream->stream_lock, flags);
@@ -331,7 +331,7 @@ static int msm_vb2_flush_buf(int session_id, unsigned int stream_id)
 	struct msm_stream *stream;
 	struct vb2_v4l2_buffer *vb2_v4l2_buf = NULL;
 
-	stream = msm_get_stream(session_id, stream_id);
+	stream = land_msm_get_stream(session_id, stream_id);
 	if (IS_ERR_OR_NULL(stream))
 		return -EINVAL;
 	spin_lock_irqsave(&stream->stream_lock, flags);
@@ -346,7 +346,7 @@ static int msm_vb2_flush_buf(int session_id, unsigned int stream_id)
 }
 
 
-int msm_vb2_request_cb(struct msm_sd_req_vb2_q *req)
+int land_msm_vb2_request_cb(struct msm_sd_req_vb2_q *req)
 {
 	if (!req) {
 		pr_err("%s: suddev is null\n", __func__);

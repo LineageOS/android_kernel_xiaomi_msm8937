@@ -42,7 +42,7 @@ static int msm_jpeg_open(struct inode *inode, struct file *filp)
 
 	JPEG_DBG("%s:%d]\n", __func__, __LINE__);
 
-	rc = __msm_jpeg_open(pgmn_dev);
+	rc = land___msm_jpeg_open(pgmn_dev);
 
 	JPEG_DBG(KERN_INFO "%s:%d] %s open_count = %d\n", __func__, __LINE__,
 		filp->f_path.dentry->d_name.name, pgmn_dev->open_count);
@@ -58,7 +58,7 @@ static int msm_jpeg_release(struct inode *inode, struct file *filp)
 
 	JPEG_DBG(KERN_INFO "%s:%d]\n", __func__, __LINE__);
 
-	rc = __msm_jpeg_release(pgmn_dev);
+	rc = land___msm_jpeg_release(pgmn_dev);
 
 	JPEG_DBG(KERN_INFO "%s:%d] %s open_count = %d\n", __func__, __LINE__,
 		filp->f_path.dentry->d_name.name, pgmn_dev->open_count);
@@ -75,7 +75,7 @@ static long msm_jpeg_compat_ioctl(struct file *filp, unsigned int cmd,
 		__LINE__, _IOC_NR(cmd), pgmn_dev,
 	(unsigned long)arg);
 
-	rc = __msm_jpeg_compat_ioctl(pgmn_dev, cmd, arg);
+	rc = land___msm_jpeg_compat_ioctl(pgmn_dev, cmd, arg);
 
 	JPEG_DBG("%s:%d]\n", __func__, __LINE__);
 	return rc;
@@ -91,7 +91,7 @@ static long msm_jpeg_ioctl(struct file *filp, unsigned int cmd,
 		__LINE__, _IOC_NR(cmd), pgmn_dev,
 	(unsigned long)arg);
 
-	rc = __msm_jpeg_ioctl(pgmn_dev, cmd, arg);
+	rc = land___msm_jpeg_ioctl(pgmn_dev, cmd, arg);
 
 	JPEG_DBG("%s:%d]\n", __func__, __LINE__);
 	return rc;
@@ -108,7 +108,7 @@ static const struct file_operations msm_jpeg_fops = {
 };
 
 
-int msm_jpeg_subdev_init(struct v4l2_subdev *jpeg_sd)
+int land_msm_jpeg_subdev_init(struct v4l2_subdev *jpeg_sd)
 {
 	int rc;
 	struct msm_jpeg_device *pgmn_dev =
@@ -117,7 +117,7 @@ int msm_jpeg_subdev_init(struct v4l2_subdev *jpeg_sd)
 	JPEG_DBG("%s:%d: jpeg_sd=0x%lx pgmn_dev=0x%pK\n",
 		__func__, __LINE__, (unsigned long)jpeg_sd,
 		pgmn_dev);
-	rc = __msm_jpeg_open(pgmn_dev);
+	rc = land___msm_jpeg_open(pgmn_dev);
 	JPEG_DBG("%s:%d: rc=%d\n",
 		__func__, __LINE__, rc);
 	return rc;
@@ -136,18 +136,18 @@ static long msm_jpeg_subdev_ioctl(struct v4l2_subdev *sd,
 
 	JPEG_DBG("%s: Calling __msm_jpeg_ioctl\n", __func__);
 
-	rc = __msm_jpeg_ioctl(pgmn_dev, cmd, (unsigned long)arg);
+	rc = land___msm_jpeg_ioctl(pgmn_dev, cmd, (unsigned long)arg);
 	pr_debug("%s: X\n", __func__);
 	return rc;
 }
 
-void msm_jpeg_subdev_release(struct v4l2_subdev *jpeg_sd)
+void land_msm_jpeg_subdev_release(struct v4l2_subdev *jpeg_sd)
 {
 	int rc;
 	struct msm_jpeg_device *pgmn_dev =
 		(struct msm_jpeg_device *)jpeg_sd->host_priv;
 	JPEG_DBG("%s:pgmn_dev=0x%pK", __func__, pgmn_dev);
-	rc = __msm_jpeg_release(pgmn_dev);
+	rc = land___msm_jpeg_release(pgmn_dev);
 	JPEG_DBG("%s:rc=%d", __func__, rc);
 }
 
@@ -210,7 +210,7 @@ static int msm_jpeg_init_dev(struct platform_device *pdev)
 
 	snprintf(devname, sizeof(devname), "%s%d", MSM_JPEG_NAME, pdev->id);
 
-	rc = __msm_jpeg_init(msm_jpeg_device_p);
+	rc = land___msm_jpeg_init(msm_jpeg_device_p);
 	if (rc < -1) {
 		JPEG_PR_ERR("%s: initialization failed\n", __func__);
 		goto fail;
@@ -278,7 +278,7 @@ fail_2:
 	unregister_chrdev_region(msm_jpeg_device_p->msm_jpeg_devno, 1);
 
 fail_1:
-	__msm_jpeg_exit(msm_jpeg_device_p);
+	land___msm_jpeg_exit(msm_jpeg_device_p);
 	return rc;
 
 fail:
@@ -294,9 +294,9 @@ static void msm_jpeg_exit(struct msm_jpeg_device *msm_jpeg_device_p)
 			msm_jpeg_device_p->msm_jpeg_devno);
 	class_destroy(msm_jpeg_device_p->msm_jpeg_class);
 	unregister_chrdev_region(msm_jpeg_device_p->msm_jpeg_devno, 1);
-	cam_smmu_destroy_handle(msm_jpeg_device_p->iommu_hdl);
+	land_cam_smmu_destroy_handle(msm_jpeg_device_p->iommu_hdl);
 
-	__msm_jpeg_exit(msm_jpeg_device_p);
+	land___msm_jpeg_exit(msm_jpeg_device_p);
 }
 
 static int __msm_jpeg_probe(struct platform_device *pdev)

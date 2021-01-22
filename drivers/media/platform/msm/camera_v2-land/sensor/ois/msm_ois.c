@@ -142,7 +142,7 @@ static int32_t msm_ois_vreg_control(struct msm_ois_ctrl_t *o_ctrl,
 	}
 
 	for (i = 0; i < cnt; i++) {
-		rc = msm_camera_config_single_vreg(&(o_ctrl->pdev->dev),
+		rc = land_msm_camera_config_single_vreg(&(o_ctrl->pdev->dev),
 			&vreg_cfg->cam_vreg[i],
 			(struct regulator **)&vreg_cfg->data[i],
 			config);
@@ -355,28 +355,28 @@ static int32_t msm_ois_get_subdev_id(struct msm_ois_ctrl_t *o_ctrl,
 }
 
 static struct msm_camera_i2c_fn_t msm_sensor_cci_func_tbl = {
-	.i2c_read = msm_camera_cci_i2c_read,
-	.i2c_read_seq = msm_camera_cci_i2c_read_seq,
-	.i2c_write = msm_camera_cci_i2c_write,
-	.i2c_write_table = msm_camera_cci_i2c_write_table,
-	.i2c_write_seq = msm_camera_cci_i2c_write_seq,
-	.i2c_write_seq_table = msm_camera_cci_i2c_write_seq_table,
+	.i2c_read = land_msm_camera_cci_i2c_read,
+	.i2c_read_seq = land_msm_camera_cci_i2c_read_seq,
+	.i2c_write = land_msm_camera_cci_i2c_write,
+	.i2c_write_table = land_msm_camera_cci_i2c_write_table,
+	.i2c_write_seq = land_msm_camera_cci_i2c_write_seq,
+	.i2c_write_seq_table = land_msm_camera_cci_i2c_write_seq_table,
 	.i2c_write_table_w_microdelay =
-		msm_camera_cci_i2c_write_table_w_microdelay,
-	.i2c_util = msm_sensor_cci_i2c_util,
-	.i2c_poll =  msm_camera_cci_i2c_poll,
+		land_msm_camera_cci_i2c_write_table_w_microdelay,
+	.i2c_util = land_msm_sensor_cci_i2c_util,
+	.i2c_poll =  land_msm_camera_cci_i2c_poll,
 };
 
 static struct msm_camera_i2c_fn_t msm_sensor_qup_func_tbl = {
-	.i2c_read = msm_camera_qup_i2c_read,
-	.i2c_read_seq = msm_camera_qup_i2c_read_seq,
-	.i2c_write = msm_camera_qup_i2c_write,
-	.i2c_write_table = msm_camera_qup_i2c_write_table,
-	.i2c_write_seq = msm_camera_qup_i2c_write_seq,
-	.i2c_write_seq_table = msm_camera_qup_i2c_write_seq_table,
+	.i2c_read = land_msm_camera_qup_i2c_read,
+	.i2c_read_seq = land_msm_camera_qup_i2c_read_seq,
+	.i2c_write = land_msm_camera_qup_i2c_write,
+	.i2c_write_table = land_msm_camera_qup_i2c_write_table,
+	.i2c_write_seq = land_msm_camera_qup_i2c_write_seq,
+	.i2c_write_seq_table = land_msm_camera_qup_i2c_write_seq_table,
 	.i2c_write_table_w_microdelay =
-		msm_camera_qup_i2c_write_table_w_microdelay,
-	.i2c_poll = msm_camera_qup_i2c_poll,
+		land_msm_camera_qup_i2c_write_table_w_microdelay,
+	.i2c_poll = land_msm_camera_qup_i2c_poll,
 };
 
 static int msm_ois_close(struct v4l2_subdev *sd,
@@ -521,7 +521,7 @@ static int32_t msm_ois_i2c_probe(struct i2c_client *client,
 	media_entity_pads_init(&ois_ctrl_t->msm_sd.sd.entity, 0, NULL);
 	ois_ctrl_t->msm_sd.sd.entity.group_id = MSM_CAMERA_SUBDEV_OIS;
 	ois_ctrl_t->msm_sd.close_seq = MSM_SD_CLOSE_2ND_CATEGORY | 0x2;
-	msm_sd_register(&ois_ctrl_t->msm_sd);
+	land_msm_sd_register(&ois_ctrl_t->msm_sd);
 	ois_ctrl_t->ois_state = OIS_DISABLE_STATE;
 	pr_info("msm_ois_i2c_probe: succeeded\n");
 	CDBG("Exit\n");
@@ -652,7 +652,7 @@ static int32_t msm_ois_platform_probe(struct platform_device *pdev)
 	if (of_find_property((&pdev->dev)->of_node,
 			"qcom,cam-vreg-name", NULL)) {
 		vreg_cfg = &msm_ois_t->vreg_cfg;
-		rc = msm_camera_get_dt_vreg_data((&pdev->dev)->of_node,
+		rc = land_msm_camera_get_dt_vreg_data((&pdev->dev)->of_node,
 			&vreg_cfg->cam_vreg, &vreg_cfg->num_vreg);
 		if (rc < 0) {
 			kfree(msm_ois_t);
@@ -679,7 +679,7 @@ static int32_t msm_ois_platform_probe(struct platform_device *pdev)
 	}
 
 	cci_client = msm_ois_t->i2c_client.cci_client;
-	cci_client->cci_subdev = msm_cci_get_subdev();
+	cci_client->cci_subdev = land_msm_cci_get_subdev();
 	cci_client->cci_i2c_master = msm_ois_t->cci_master;
 	v4l2_subdev_init(&msm_ois_t->msm_sd.sd,
 		msm_ois_t->ois_v4l2_subdev_ops);
@@ -691,9 +691,9 @@ static int32_t msm_ois_platform_probe(struct platform_device *pdev)
 	media_entity_pads_init(&msm_ois_t->msm_sd.sd.entity, 0, NULL);
 	msm_ois_t->msm_sd.sd.entity.group_id = MSM_CAMERA_SUBDEV_OIS;
 	msm_ois_t->msm_sd.close_seq = MSM_SD_CLOSE_2ND_CATEGORY | 0x2;
-	msm_sd_register(&msm_ois_t->msm_sd);
+	land_msm_sd_register(&msm_ois_t->msm_sd);
 	msm_ois_t->ois_state = OIS_DISABLE_STATE;
-	msm_cam_copy_v4l2_subdev_fops(&msm_ois_v4l2_subdev_fops);
+	land_msm_cam_copy_v4l2_subdev_fops(&msm_ois_v4l2_subdev_fops);
 #ifdef CONFIG_COMPAT
 	msm_ois_v4l2_subdev_fops.compat_ioctl32 =
 		msm_ois_subdev_fops_ioctl;

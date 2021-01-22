@@ -52,7 +52,7 @@ enum cam_smmu_map_dir {
  *		      fill the handle pointed by handle_ptr
  * @return Status of operation. Negative in case of error. Zero otherwise.
  */
-int cam_smmu_get_handle(char *identifier, int *handle_ptr);
+int land_cam_smmu_get_handle(char *identifier, int *handle_ptr);
 
 /**
  * @param handle: Handle to identify the CAM SMMU client (VFE, CPP, FD etc.)
@@ -61,7 +61,7 @@ int cam_smmu_get_handle(char *identifier, int *handle_ptr);
  *
  * @return Status of operation. Negative in case of error. Zero otherwise.
  */
-int cam_smmu_ops(int handle, enum cam_smmu_ops_param op);
+int land_cam_smmu_ops(int handle, enum cam_smmu_ops_param op);
 
 /**
  * @param handle: Handle to identify the CAM SMMU client (VFE, CPP, FD etc.)
@@ -73,7 +73,7 @@ int cam_smmu_ops(int handle, enum cam_smmu_ops_param op);
  * @len         : Length of buffer mapped returned by CAM SMMU driver.
  * @return Status of operation. Negative in case of error. Zero otherwise.
  */
-int cam_smmu_get_phy_addr(int handle,
+int land_cam_smmu_get_phy_addr(int handle,
 				int ion_fd, enum cam_smmu_map_dir dir,
 				dma_addr_t *dma_addr, size_t *len_ptr);
 
@@ -83,7 +83,7 @@ int cam_smmu_get_phy_addr(int handle,
  *
  * @return Status of operation. Negative in case of error. Zero otherwise.
  */
-int cam_smmu_put_phy_addr(int handle, int ion_fd);
+int land_cam_smmu_put_phy_addr(int handle, int ion_fd);
 
 /**
  * @brief	   : Allocates a scratch buffer
@@ -111,7 +111,7 @@ int cam_smmu_put_phy_addr(int handle, int ion_fd);
  * @return Status of operation. Negative in case of error. Zero otherwise.
  */
 
-int cam_smmu_get_phy_addr_scratch(int handle,
+int land_cam_smmu_get_phy_addr_scratch(int handle,
 				  enum cam_smmu_map_dir dir,
 				  dma_addr_t *paddr_ptr,
 				  size_t virt_len,
@@ -131,7 +131,7 @@ int cam_smmu_get_phy_addr_scratch(int handle,
  * @return Status of operation. Negative in case of error. Zero otherwise.
  */
 
-int cam_smmu_put_phy_addr_scratch(int handle,
+int land_cam_smmu_put_phy_addr_scratch(int handle,
 				  dma_addr_t paddr);
 
 /**
@@ -139,12 +139,12 @@ int cam_smmu_put_phy_addr_scratch(int handle,
  *
  * @return Status of operation. Negative in case of error. Zero otherwise.
  */
-int cam_smmu_destroy_handle(int handle);
+int land_cam_smmu_destroy_handle(int handle);
 
 /**
  * @return numger of client. Zero in case of error.
  */
-int cam_smmu_get_num_of_clients(void);
+int land_cam_smmu_get_num_of_clients(void);
 
 /**
  * @param handle: Handle to identify the CAM SMMU client (VFE, CPP, FD etc.)
@@ -157,7 +157,7 @@ int cam_smmu_find_index_by_handle(int hdl);
  * @param client_page_fault_handler: It is triggered in IOMMU page fault
  * @param token: It is input param when trigger page fault handler
  */
-void cam_smmu_reg_client_page_fault_handler(int handle,
+void land_cam_smmu_reg_client_page_fault_handler(int handle,
 		void (*client_page_fault_handler)(struct iommu_domain *,
 		struct device *, unsigned long,
 		int, void*), void *token);

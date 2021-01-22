@@ -124,18 +124,18 @@ struct msm_jpeg_device {
 	enum cam_bus_client bus_client;
 };
 
-int __msm_jpeg_open(struct msm_jpeg_device *pgmn_dev);
-int __msm_jpeg_release(struct msm_jpeg_device *pgmn_dev);
+int land___msm_jpeg_open(struct msm_jpeg_device *pgmn_dev);
+int land___msm_jpeg_release(struct msm_jpeg_device *pgmn_dev);
 
-long __msm_jpeg_ioctl(struct msm_jpeg_device *pgmn_dev,
+long land___msm_jpeg_ioctl(struct msm_jpeg_device *pgmn_dev,
 	unsigned int cmd, unsigned long arg);
 
 #ifdef CONFIG_COMPAT
-long __msm_jpeg_compat_ioctl(struct msm_jpeg_device *pgmn_dev,
+long land___msm_jpeg_compat_ioctl(struct msm_jpeg_device *pgmn_dev,
 	unsigned int cmd, unsigned long arg);
 #endif
 
-int __msm_jpeg_init(struct msm_jpeg_device *pgmn_dev);
-int __msm_jpeg_exit(struct msm_jpeg_device *pgmn_dev);
+int land___msm_jpeg_init(struct msm_jpeg_device *pgmn_dev);
+int land___msm_jpeg_exit(struct msm_jpeg_device *pgmn_dev);
 
 #endif /* MSM_JPEG_SYNC_H */

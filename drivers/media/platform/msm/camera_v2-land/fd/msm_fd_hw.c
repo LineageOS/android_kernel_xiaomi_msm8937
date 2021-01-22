@@ -66,7 +66,7 @@ enum msm_fd_dt_reg_setting_index {
 static inline u32 msm_fd_hw_read_reg(struct msm_fd_device *fd,
 	enum msm_fd_mem_resources base_idx, u32 reg)
 {
-	return msm_camera_io_r(fd->iomem_base[base_idx] + reg);
+	return land_msm_camera_io_r(fd->iomem_base[base_idx] + reg);
 }
 
 /*
@@ -79,7 +79,7 @@ static inline u32 msm_fd_hw_read_reg(struct msm_fd_device *fd,
 static inline void msm_fd_hw_write_reg(struct msm_fd_device *fd,
 	enum msm_fd_mem_resources base_idx, u32 reg, u32 value)
 {
-	msm_camera_io_w(value, fd->iomem_base[base_idx] + reg);
+	land_msm_camera_io_w(value, fd->iomem_base[base_idx] + reg);
 }
 
 /*
@@ -244,7 +244,7 @@ static inline void msm_fd_hw_srst(struct msm_fd_device *fd)
  * msm_fd_hw_get_face_count - Fd read face count register.
  * @fd: Pointer to fd device.
  */
-int msm_fd_hw_get_face_count(struct msm_fd_device *fd)
+int land_msm_fd_hw_get_face_count(struct msm_fd_device *fd)
 {
 	u32 reg;
 	u32 value;
@@ -364,7 +364,7 @@ static void msm_fd_hw_misc_irq_disable(struct msm_fd_device *fd)
  * msm_fd_hw_get_revision - Get hw revision and store in to device.
  * @fd: Pointer to fd device.
  */
-int msm_fd_hw_get_revision(struct msm_fd_device *fd)
+int land_msm_fd_hw_get_revision(struct msm_fd_device *fd)
 {
 	u32 reg;
 
@@ -381,7 +381,7 @@ int msm_fd_hw_get_revision(struct msm_fd_device *fd)
  * @fd: Pointer to fd device.
  * @idx: Result face index
  */
-int msm_fd_hw_get_result_x(struct msm_fd_device *fd, int idx)
+int land_msm_fd_hw_get_result_x(struct msm_fd_device *fd, int idx)
 {
 	u32 reg;
 
@@ -396,7 +396,7 @@ int msm_fd_hw_get_result_x(struct msm_fd_device *fd, int idx)
  * @fd: Pointer to fd device.
  * @idx: Result face index
  */
-int msm_fd_hw_get_result_y(struct msm_fd_device *fd, int idx)
+int land_msm_fd_hw_get_result_y(struct msm_fd_device *fd, int idx)
 {
 	u32 reg;
 
@@ -413,7 +413,7 @@ int msm_fd_hw_get_result_y(struct msm_fd_device *fd, int idx)
  * @conf: Pointer to confident value need to be filled.
  * @size: Pointer to size value need to be filled.
  */
-void msm_fd_hw_get_result_conf_size(struct msm_fd_device *fd,
+void land_msm_fd_hw_get_result_conf_size(struct msm_fd_device *fd,
 	int idx, u32 *conf, u32 *size)
 {
 	u32 reg;
@@ -432,7 +432,7 @@ void msm_fd_hw_get_result_conf_size(struct msm_fd_device *fd,
  * @angle: Pointer to angle value need to be filled.
  * @pose: Pointer to pose value need to be filled.
  */
-void msm_fd_hw_get_result_angle_pose(struct msm_fd_device *fd, int idx,
+void land_msm_fd_hw_get_result_angle_pose(struct msm_fd_device *fd, int idx,
 	u32 *angle, u32 *pose)
 {
 	u32 reg;
@@ -539,12 +539,12 @@ static irqreturn_t msm_fd_hw_misc_irq(int irq, void *dev_id)
  * @fd: Pointer to fd device.
  * @work_func: Pointer to work func used for irq bottom half.
  */
-int msm_fd_hw_request_irq(struct platform_device *pdev,
+int land_msm_fd_hw_request_irq(struct platform_device *pdev,
 	struct msm_fd_device *fd, work_func_t work_func)
 {
 	int ret;
 
-	fd->irq = msm_camera_get_irq(pdev, "fd");
+	fd->irq = land_msm_camera_get_irq(pdev, "fd");
 	if (fd->irq_num < 0) {
 		dev_err(fd->dev, "Can not get fd core irq resource\n");
 		ret = -ENODEV;
@@ -553,7 +553,7 @@ int msm_fd_hw_request_irq(struct platform_device *pdev,
 
 	/* If vbif is shared we will need wrapper irq for releasing vbif */
 	if (msm_fd_hw_misc_irq_supported(fd)) {
-		ret = msm_camera_register_irq(pdev,
+		ret = land_msm_camera_register_irq(pdev,
 				fd->irq, msm_fd_hw_misc_irq,
 				IRQF_TRIGGER_RISING, "fd", fd);
 		if (ret) {
@@ -561,7 +561,7 @@ int msm_fd_hw_request_irq(struct platform_device *pdev,
 			goto error_irq;
 		}
 	} else {
-		ret = msm_camera_register_irq(pdev,
+		ret = land_msm_camera_register_irq(pdev,
 				fd->irq, msm_fd_hw_core_irq,
 				IRQF_TRIGGER_RISING, "fd", fd);
 		if (ret) {
@@ -583,7 +583,7 @@ int msm_fd_hw_request_irq(struct platform_device *pdev,
 	return 0;
 
 error_alloc_workqueue:
-	msm_camera_unregister_irq(pdev, fd->irq, fd);
+	land_msm_camera_unregister_irq(pdev, fd->irq, fd);
 error_irq:
 	return ret;
 }
@@ -592,10 +592,10 @@ error_irq:
  * msm_fd_hw_release_irq - Free core and wrap irq.
  * @fd: Pointer to fd device.
  */
-void msm_fd_hw_release_irq(struct msm_fd_device *fd)
+void land_msm_fd_hw_release_irq(struct msm_fd_device *fd)
 {
 	if (fd->irq)
-		msm_camera_unregister_irq(fd->pdev, fd->irq, fd);
+		land_msm_camera_unregister_irq(fd->pdev, fd->irq, fd);
 
 	if (fd->work_queue) {
 		destroy_workqueue(fd->work_queue);
@@ -604,7 +604,7 @@ void msm_fd_hw_release_irq(struct msm_fd_device *fd)
 }
 
 /*
- * msm_fd_hw_set_dt_parms_by_name() - read DT params and write to registers.
+ * land_msm_fd_hw_set_dt_parms_by_name() - read DT params and write to registers.
  * @fd: Pointer to fd device.
  * @dt_prop_name: Name of the device tree property to read.
  * @base_idx: Fd memory resource index.
@@ -614,7 +614,7 @@ void msm_fd_hw_release_irq(struct msm_fd_device *fd)
  *
  * Return: 0 on success and negative error on failure.
  */
-int32_t msm_fd_hw_set_dt_parms_by_name(struct msm_fd_device *fd,
+int32_t land_msm_fd_hw_set_dt_parms_by_name(struct msm_fd_device *fd,
 			const char *dt_prop_name,
 			enum msm_fd_mem_resources base_idx)
 {
@@ -673,15 +673,15 @@ int32_t msm_fd_hw_set_dt_parms_by_name(struct msm_fd_device *fd,
 }
 
 /*
- * msm_fd_hw_set_dt_parms() - set FD device tree configuration.
+ * land_msm_fd_hw_set_dt_parms() - set FD device tree configuration.
  * @fd: Pointer to fd device.
  *
  * This function holds an array of device tree property names and calls
- * msm_fd_hw_set_dt_parms_by_name() for each property.
+ * land_msm_fd_hw_set_dt_parms_by_name() for each property.
  *
  * Return: 0 on success and negative error on failure.
  */
-int msm_fd_hw_set_dt_parms(struct msm_fd_device *fd)
+int land_msm_fd_hw_set_dt_parms(struct msm_fd_device *fd)
 {
 	int rc = 0;
 	uint8_t dt_prop_cnt = MSM_FD_IOMEM_LAST;
@@ -690,7 +690,7 @@ int msm_fd_hw_set_dt_parms(struct msm_fd_device *fd)
 
 	while (dt_prop_cnt) {
 		dt_prop_cnt--;
-		rc = msm_fd_hw_set_dt_parms_by_name(fd,
+		rc = land_msm_fd_hw_set_dt_parms_by_name(fd,
 			dt_prop_name[dt_prop_cnt],
 			dt_prop_cnt);
 		if (rc == -ENOENT) {
@@ -710,13 +710,13 @@ int msm_fd_hw_set_dt_parms(struct msm_fd_device *fd)
  * msm_fd_hw_release_mem_resources - Releases memory resources.
  * @fd: Pointer to fd device.
  */
-void msm_fd_hw_release_mem_resources(struct msm_fd_device *fd)
+void land_msm_fd_hw_release_mem_resources(struct msm_fd_device *fd)
 {
-	msm_camera_put_reg_base(fd->pdev,
+	land_msm_camera_put_reg_base(fd->pdev,
 		fd->iomem_base[MSM_FD_IOMEM_MISC], "fd_misc", true);
-	msm_camera_put_reg_base(fd->pdev,
+	land_msm_camera_put_reg_base(fd->pdev,
 		fd->iomem_base[MSM_FD_IOMEM_CORE], "fd_core", true);
-	msm_camera_put_reg_base(fd->pdev,
+	land_msm_camera_put_reg_base(fd->pdev,
 		fd->iomem_base[MSM_FD_IOMEM_VBIF], "fd_vbif", false);
 }
 
@@ -727,14 +727,14 @@ void msm_fd_hw_release_mem_resources(struct msm_fd_device *fd)
  *
  * Get and ioremap platform memory resources.
  */
-int msm_fd_hw_get_mem_resources(struct platform_device *pdev,
+int land_msm_fd_hw_get_mem_resources(struct platform_device *pdev,
 	struct msm_fd_device *fd)
 {
 	int ret = 0;
 
 	/* Prepare memory resources */
 	fd->iomem_base[MSM_FD_IOMEM_CORE] =
-		msm_camera_get_reg_base(pdev, "fd_core", true);
+		land_msm_camera_get_reg_base(pdev, "fd_core", true);
 	if (!fd->iomem_base[MSM_FD_IOMEM_CORE]) {
 		dev_err(fd->dev, "%s can not map fd_core region\n", __func__);
 		ret = -ENODEV;
@@ -742,7 +742,7 @@ int msm_fd_hw_get_mem_resources(struct platform_device *pdev,
 	}
 
 	fd->iomem_base[MSM_FD_IOMEM_MISC] =
-		msm_camera_get_reg_base(pdev, "fd_misc", true);
+		land_msm_camera_get_reg_base(pdev, "fd_misc", true);
 	if (!fd->iomem_base[MSM_FD_IOMEM_MISC]) {
 		dev_err(fd->dev, "%s can not map fd_misc region\n", __func__);
 		ret = -ENODEV;
@@ -750,7 +750,7 @@ int msm_fd_hw_get_mem_resources(struct platform_device *pdev,
 	}
 
 	fd->iomem_base[MSM_FD_IOMEM_VBIF] =
-		msm_camera_get_reg_base(pdev, "fd_vbif", false);
+		land_msm_camera_get_reg_base(pdev, "fd_vbif", false);
 	if (!fd->iomem_base[MSM_FD_IOMEM_VBIF]) {
 		dev_err(fd->dev, "%s can not map fd_vbif region\n", __func__);
 		ret = -ENODEV;
@@ -759,10 +759,10 @@ int msm_fd_hw_get_mem_resources(struct platform_device *pdev,
 
 	return ret;
 fd_vbif_base_failed:
-	msm_camera_put_reg_base(pdev,
+	land_msm_camera_put_reg_base(pdev,
 		fd->iomem_base[MSM_FD_IOMEM_MISC], "fd_misc", true);
 fd_misc_base_failed:
-	msm_camera_put_reg_base(pdev,
+	land_msm_camera_put_reg_base(pdev,
 		fd->iomem_base[MSM_FD_IOMEM_CORE], "fd_core", true);
 fd_core_base_failed:
 	return ret;
@@ -777,7 +777,7 @@ static int msm_fd_hw_bus_request(struct msm_fd_device *fd, unsigned int idx)
 {
 	int ret;
 
-	ret = msm_camera_update_bus_vector(CAM_BUS_CLIENT_FD, idx);
+	ret = land_msm_camera_update_bus_vector(CAM_BUS_CLIENT_FD, idx);
 	if (ret < 0) {
 		dev_err(fd->dev, "Fail bus scale update %d\n", ret);
 		return -EINVAL;
@@ -803,7 +803,7 @@ static int msm_fd_hw_set_clock_rate_idx(struct msm_fd_device *fd,
 	}
 
 	for (i = 0; i < fd->clk_num; i++) {
-		ret = msm_camera_clk_set_rate(&fd->pdev->dev,
+		ret = land_msm_camera_clk_set_rate(&fd->pdev->dev,
 			fd->clk[i], fd->clk_rates[idx][i]);
 		if (ret < 0) {
 			dev_err(fd->dev, "fail set rate on idx[%u][%u]\n",
@@ -822,7 +822,7 @@ static int msm_fd_hw_set_clock_rate_idx(struct msm_fd_device *fd,
  * Prepare fd hw for operation. Have reference count protected by
  * fd device mutex.
  */
-int msm_fd_hw_get(struct msm_fd_device *fd, unsigned int clock_rate_idx)
+int land_msm_fd_hw_get(struct msm_fd_device *fd, unsigned int clock_rate_idx)
 {
 	int ret;
 
@@ -830,7 +830,7 @@ int msm_fd_hw_get(struct msm_fd_device *fd, unsigned int clock_rate_idx)
 
 	if (fd->ref_count == 0) {
 		ret =
-			msm_camera_regulator_enable(fd->vdd, fd->num_reg, true);
+			land_msm_camera_regulator_enable(fd->vdd, fd->num_reg, true);
 		if (ret < 0) {
 			dev_err(fd->dev, "Fail to enable vdd\n");
 			goto error;
@@ -846,7 +846,7 @@ int msm_fd_hw_get(struct msm_fd_device *fd, unsigned int clock_rate_idx)
 			dev_err(fd->dev, "Fail to set clock rate idx\n");
 			goto error_clocks;
 		}
-		ret = msm_camera_clk_enable(&fd->pdev->dev, fd->clk_info,
+		ret = land_msm_camera_clk_enable(&fd->pdev->dev, fd->clk_info,
 				fd->clk, fd->clk_num, true);
 		if (ret < 0) {
 			dev_err(fd->dev, "Fail clk enable request\n");
@@ -856,7 +856,7 @@ int msm_fd_hw_get(struct msm_fd_device *fd, unsigned int clock_rate_idx)
 		if (msm_fd_hw_misc_irq_supported(fd))
 			msm_fd_hw_misc_irq_enable(fd);
 
-		ret = msm_fd_hw_set_dt_parms(fd);
+		ret = land_msm_fd_hw_set_dt_parms(fd);
 		if (ret < 0)
 			goto error_set_dt;
 	}
@@ -869,11 +869,11 @@ int msm_fd_hw_get(struct msm_fd_device *fd, unsigned int clock_rate_idx)
 error_set_dt:
 	if (msm_fd_hw_misc_irq_supported(fd))
 		msm_fd_hw_misc_irq_disable(fd);
-	msm_camera_clk_enable(&fd->pdev->dev, fd->clk_info,
+	land_msm_camera_clk_enable(&fd->pdev->dev, fd->clk_info,
 		fd->clk, fd->clk_num, false);
 error_clocks:
 error_bus_request:
-	msm_camera_regulator_enable(fd->vdd, fd->num_reg, false);
+	land_msm_camera_regulator_enable(fd->vdd, fd->num_reg, false);
 error:
 	mutex_unlock(&fd->lock);
 	return ret;
@@ -886,7 +886,7 @@ error:
  * Release fd hw. Have reference count protected by
  * fd device mutex.
  */
-void msm_fd_hw_put(struct msm_fd_device *fd)
+void land_msm_fd_hw_put(struct msm_fd_device *fd)
 {
 	mutex_lock(&fd->lock);
 	BUG_ON(fd->ref_count == 0);
@@ -899,9 +899,9 @@ void msm_fd_hw_put(struct msm_fd_device *fd)
 
 		/* vector index 0 is 0 ab and 0 ib */
 		msm_fd_hw_bus_request(fd, 0);
-		msm_camera_clk_enable(&fd->pdev->dev, fd->clk_info,
+		land_msm_camera_clk_enable(&fd->pdev->dev, fd->clk_info,
 				fd->clk, fd->clk_num, false);
-		msm_camera_regulator_enable(fd->vdd, fd->num_reg, false);
+		land_msm_camera_regulator_enable(fd->vdd, fd->num_reg, false);
 	}
 	mutex_unlock(&fd->lock);
 }
@@ -925,13 +925,13 @@ static int msm_fd_hw_attach_iommu(struct msm_fd_device *fd)
 	}
 
 	if (fd->iommu_attached_cnt == 0) {
-		ret = cam_smmu_get_handle(MSM_FD_SMMU_CB_NAME, &fd->iommu_hdl);
+		ret = land_cam_smmu_get_handle(MSM_FD_SMMU_CB_NAME, &fd->iommu_hdl);
 		if (ret < 0) {
 			dev_err(fd->dev, "get handle failed\n");
 			ret = -ENOMEM;
 			goto error;
 		}
-		ret = cam_smmu_ops(fd->iommu_hdl, CAM_SMMU_ATTACH);
+		ret = land_cam_smmu_ops(fd->iommu_hdl, CAM_SMMU_ATTACH);
 		if (ret < 0) {
 			dev_err(fd->dev, "Can not attach iommu domain.\n");
 			goto error_attach;
@@ -943,7 +943,7 @@ static int msm_fd_hw_attach_iommu(struct msm_fd_device *fd)
 	return 0;
 
 error_attach:
-	cam_smmu_destroy_handle(fd->iommu_hdl);
+	land_cam_smmu_destroy_handle(fd->iommu_hdl);
 error:
 	mutex_unlock(&fd->lock);
 	return ret;
@@ -965,8 +965,8 @@ static void msm_fd_hw_detach_iommu(struct msm_fd_device *fd)
 		return;
 	}
 	if (--fd->iommu_attached_cnt == 0) {
-		cam_smmu_ops(fd->iommu_hdl, CAM_SMMU_DETACH);
-		cam_smmu_destroy_handle(fd->iommu_hdl);
+		land_cam_smmu_ops(fd->iommu_hdl, CAM_SMMU_DETACH);
+		land_cam_smmu_destroy_handle(fd->iommu_hdl);
 	}
 	mutex_unlock(&fd->lock);
 }
@@ -979,7 +979,7 @@ static void msm_fd_hw_detach_iommu(struct msm_fd_device *fd)
  *
  * It will map ion fd to fd hw mmu.
  */
-int msm_fd_hw_map_buffer(struct msm_fd_mem_pool *pool, int fd,
+int land_msm_fd_hw_map_buffer(struct msm_fd_mem_pool *pool, int fd,
 	struct msm_fd_buf_handle *buf)
 {
 	int ret;
@@ -993,7 +993,7 @@ int msm_fd_hw_map_buffer(struct msm_fd_mem_pool *pool, int fd,
 
 	buf->pool = pool;
 	buf->fd = fd;
-	ret = cam_smmu_get_phy_addr(pool->fd_device->iommu_hdl,
+	ret = land_cam_smmu_get_phy_addr(pool->fd_device->iommu_hdl,
 			buf->fd, CAM_SMMU_MAP_RW,
 			&buf->addr, &buf->size);
 	if (ret < 0) {
@@ -1007,10 +1007,10 @@ int msm_fd_hw_map_buffer(struct msm_fd_mem_pool *pool, int fd,
  * msm_fd_hw_unmap_buffer - Unmap buffer from fd hw mmu.
  * @buf: Fd buffer handle, for storing mapped buffer information.
  */
-void msm_fd_hw_unmap_buffer(struct msm_fd_buf_handle *buf)
+void land_msm_fd_hw_unmap_buffer(struct msm_fd_buf_handle *buf)
 {
 	if (buf->size) {
-		cam_smmu_put_phy_addr(buf->pool->fd_device->iommu_hdl,
+		land_cam_smmu_put_phy_addr(buf->pool->fd_device->iommu_hdl,
 			buf->fd);
 		msm_fd_hw_detach_iommu(buf->pool->fd_device);
 	}
@@ -1095,7 +1095,7 @@ static struct msm_fd_buffer *msm_fd_hw_next_buffer(struct msm_fd_device *fd)
  * msm_fd_hw_add_buffer - Add buffer to fd device processing queue.
  * @fd: Fd device.
  */
-void msm_fd_hw_add_buffer(struct msm_fd_device *fd,
+void land_msm_fd_hw_add_buffer(struct msm_fd_device *fd,
 	struct msm_fd_buffer *buffer)
 {
 	spin_lock(&fd->slock);
@@ -1113,7 +1113,7 @@ void msm_fd_hw_add_buffer(struct msm_fd_device *fd,
  *  fd device processing queue.
  * @fd: Fd device.
  */
-void msm_fd_hw_remove_buffers_from_queue(struct msm_fd_device *fd,
+void land_msm_fd_hw_remove_buffers_from_queue(struct msm_fd_device *fd,
 	struct vb2_queue *vb2_q)
 {
 	struct msm_fd_buffer *curr_buff;
@@ -1145,9 +1145,9 @@ void msm_fd_hw_remove_buffers_from_queue(struct msm_fd_device *fd,
 			msecs_to_jiffies(MSM_FD_PROCESSING_TIMEOUT_MS));
 		if (!time) {
 			/* Remove active buffer */
-			msm_fd_hw_get_active_buffer(fd);
+			land_msm_fd_hw_get_active_buffer(fd);
 			/* Schedule if other buffers are present in device */
-			msm_fd_hw_schedule_next_buffer(fd);
+			land_msm_fd_hw_schedule_next_buffer(fd);
 		}
 	}
 
@@ -1159,7 +1159,7 @@ void msm_fd_hw_remove_buffers_from_queue(struct msm_fd_device *fd,
  * @fd: Fd device.
  * @buffer: Fd buffer.
  */
-int msm_fd_hw_buffer_done(struct msm_fd_device *fd,
+int land_msm_fd_hw_buffer_done(struct msm_fd_device *fd,
 	struct msm_fd_buffer *buffer)
 {
 	int ret = 0;
@@ -1183,7 +1183,7 @@ int msm_fd_hw_buffer_done(struct msm_fd_device *fd,
  * msm_fd_hw_get_active_buffer - Get active buffer from fd processing queue.
  * @fd: Fd device.
  */
-struct msm_fd_buffer *msm_fd_hw_get_active_buffer(struct msm_fd_device *fd)
+struct msm_fd_buffer *land_msm_fd_hw_get_active_buffer(struct msm_fd_device *fd)
 {
 	struct msm_fd_buffer *buffer = NULL;
 
@@ -1204,7 +1204,7 @@ struct msm_fd_buffer *msm_fd_hw_get_active_buffer(struct msm_fd_device *fd)
  *
  * This can be executed only when device is in idle state.
  */
-int msm_fd_hw_schedule_and_start(struct msm_fd_device *fd)
+int land_msm_fd_hw_schedule_and_start(struct msm_fd_device *fd)
 {
 	struct msm_fd_buffer *buf;
 
@@ -1224,7 +1224,7 @@ int msm_fd_hw_schedule_and_start(struct msm_fd_device *fd)
  *
  * NOTE: This can be executed only when device is in running state.
  */
-int msm_fd_hw_schedule_next_buffer(struct msm_fd_device *fd)
+int land_msm_fd_hw_schedule_next_buffer(struct msm_fd_device *fd)
 {
 	struct msm_fd_buffer *buf;
 	int ret;

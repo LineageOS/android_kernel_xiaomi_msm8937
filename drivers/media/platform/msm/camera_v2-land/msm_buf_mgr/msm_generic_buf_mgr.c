@@ -15,7 +15,7 @@
 
 static struct msm_buf_mngr_device *msm_buf_mngr_dev;
 
-struct v4l2_subdev *msm_buf_mngr_get_subdev(void)
+struct v4l2_subdev *land_msm_buf_mngr_get_subdev(void)
 {
 	return &msm_buf_mngr_dev->subdev.sd;
 }
@@ -619,7 +619,7 @@ static int32_t __init msm_buf_mngr_init(void)
 	/* Sub-dev */
 	v4l2_subdev_init(&msm_buf_mngr_dev->subdev.sd,
 		&msm_buf_mngr_subdev_ops);
-	msm_cam_copy_v4l2_subdev_fops(&msm_buf_v4l2_subdev_fops);
+	land_msm_cam_copy_v4l2_subdev_fops(&msm_buf_v4l2_subdev_fops);
 	msm_buf_v4l2_subdev_fops.unlocked_ioctl = msm_buf_subdev_fops_ioctl;
 #ifdef CONFIG_COMPAT
 	msm_buf_v4l2_subdev_fops.compat_ioctl32 =
@@ -638,7 +638,7 @@ static int32_t __init msm_buf_mngr_init(void)
 	msm_buf_mngr_dev->subdev.sd.internal_ops =
 		&msm_generic_buf_mngr_subdev_internal_ops;
 	msm_buf_mngr_dev->subdev.close_seq = MSM_SD_CLOSE_4TH_CATEGORY;
-	rc = msm_sd_register(&msm_buf_mngr_dev->subdev);
+	rc = land_msm_sd_register(&msm_buf_mngr_dev->subdev);
 	if (rc != 0) {
 		pr_err("%s: msm_sd_register error = %d\n", __func__, rc);
 		goto end;
@@ -667,7 +667,7 @@ end:
 
 static void __exit msm_buf_mngr_exit(void)
 {
-	msm_sd_unregister(&msm_buf_mngr_dev->subdev);
+	land_msm_sd_unregister(&msm_buf_mngr_dev->subdev);
 	mutex_destroy(&msm_buf_mngr_dev->cont_mutex);
 	kfree(msm_buf_mngr_dev);
 }

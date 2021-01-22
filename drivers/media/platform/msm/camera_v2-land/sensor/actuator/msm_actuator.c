@@ -1061,13 +1061,13 @@ static int32_t msm_actuator_vreg_control(struct msm_actuator_ctrl_t *a_ctrl,
 
 	for (i = 0; i < cnt; i++) {
 		if (a_ctrl->act_device_type == MSM_CAMERA_PLATFORM_DEVICE) {
-			rc = msm_camera_config_single_vreg(&(a_ctrl->pdev->dev),
+			rc = land_msm_camera_config_single_vreg(&(a_ctrl->pdev->dev),
 				&vreg_cfg->cam_vreg[i],
 				(struct regulator **)&vreg_cfg->data[i],
 				config);
 		} else if (a_ctrl->act_device_type ==
 			MSM_CAMERA_I2C_DEVICE) {
-			rc = msm_camera_config_single_vreg(
+			rc = land_msm_camera_config_single_vreg(
 				&(a_ctrl->i2c_client.client->dev),
 				&vreg_cfg->cam_vreg[i],
 				(struct regulator **)&vreg_cfg->data[i],
@@ -1460,26 +1460,26 @@ static int32_t msm_actuator_get_subdev_id(struct msm_actuator_ctrl_t *a_ctrl,
 }
 
 static struct msm_camera_i2c_fn_t msm_sensor_cci_func_tbl = {
-	.i2c_read = msm_camera_cci_i2c_read,
-	.i2c_read_seq = msm_camera_cci_i2c_read_seq,
-	.i2c_write = msm_camera_cci_i2c_write,
-	.i2c_write_table = msm_camera_cci_i2c_write_table,
-	.i2c_write_seq_table = msm_camera_cci_i2c_write_seq_table,
+	.i2c_read = land_msm_camera_cci_i2c_read,
+	.i2c_read_seq = land_msm_camera_cci_i2c_read_seq,
+	.i2c_write = land_msm_camera_cci_i2c_write,
+	.i2c_write_table = land_msm_camera_cci_i2c_write_table,
+	.i2c_write_seq_table = land_msm_camera_cci_i2c_write_seq_table,
 	.i2c_write_table_w_microdelay =
-		msm_camera_cci_i2c_write_table_w_microdelay,
-	.i2c_util = msm_sensor_cci_i2c_util,
-	.i2c_poll =  msm_camera_cci_i2c_poll,
+		land_msm_camera_cci_i2c_write_table_w_microdelay,
+	.i2c_util = land_msm_sensor_cci_i2c_util,
+	.i2c_poll =  land_msm_camera_cci_i2c_poll,
 };
 
 static struct msm_camera_i2c_fn_t msm_sensor_qup_func_tbl = {
-	.i2c_read = msm_camera_qup_i2c_read,
-	.i2c_read_seq = msm_camera_qup_i2c_read_seq,
-	.i2c_write = msm_camera_qup_i2c_write,
-	.i2c_write_table = msm_camera_qup_i2c_write_table,
-	.i2c_write_seq_table = msm_camera_qup_i2c_write_seq_table,
+	.i2c_read = land_msm_camera_qup_i2c_read,
+	.i2c_read_seq = land_msm_camera_qup_i2c_read_seq,
+	.i2c_write = land_msm_camera_qup_i2c_write,
+	.i2c_write_table = land_msm_camera_qup_i2c_write_table,
+	.i2c_write_seq_table = land_msm_camera_qup_i2c_write_seq_table,
 	.i2c_write_table_w_microdelay =
-		msm_camera_qup_i2c_write_table_w_microdelay,
-	.i2c_poll = msm_camera_qup_i2c_poll,
+		land_msm_camera_qup_i2c_write_table_w_microdelay,
+	.i2c_poll = land_msm_camera_qup_i2c_poll,
 };
 
 static int msm_actuator_close(struct v4l2_subdev *sd,
@@ -1771,7 +1771,7 @@ static int32_t msm_actuator_i2c_probe(struct i2c_client *client,
 	if (of_find_property(client->dev.of_node,
 		"qcom,cam-vreg-name", NULL)) {
 		vreg_cfg = &act_ctrl_t->vreg_cfg;
-		rc = msm_camera_get_dt_vreg_data(client->dev.of_node,
+		rc = land_msm_camera_get_dt_vreg_data(client->dev.of_node,
 			&vreg_cfg->cam_vreg, &vreg_cfg->num_vreg);
 		if (rc < 0) {
 			pr_err("failed rc %d\n", rc);
@@ -1804,8 +1804,8 @@ static int32_t msm_actuator_i2c_probe(struct i2c_client *client,
 	media_entity_pads_init(&act_ctrl_t->msm_sd.sd.entity, 0, NULL);
 	act_ctrl_t->msm_sd.sd.entity.group_id = MSM_CAMERA_SUBDEV_ACTUATOR;
 	act_ctrl_t->msm_sd.close_seq = MSM_SD_CLOSE_2ND_CATEGORY | 0x2;
-	msm_sd_register(&act_ctrl_t->msm_sd);
-	msm_cam_copy_v4l2_subdev_fops(&msm_actuator_v4l2_subdev_fops);
+	land_msm_sd_register(&act_ctrl_t->msm_sd);
+	land_msm_cam_copy_v4l2_subdev_fops(&msm_actuator_v4l2_subdev_fops);
 #ifdef CONFIG_COMPAT
 	msm_actuator_v4l2_subdev_fops.compat_ioctl32 =
 		msm_actuator_subdev_fops_ioctl;
@@ -1862,7 +1862,7 @@ static int32_t msm_actuator_platform_probe(struct platform_device *pdev)
 	if (of_find_property((&pdev->dev)->of_node,
 			"qcom,cam-vreg-name", NULL)) {
 		vreg_cfg = &msm_actuator_t->vreg_cfg;
-		rc = msm_camera_get_dt_vreg_data((&pdev->dev)->of_node,
+		rc = land_msm_camera_get_dt_vreg_data((&pdev->dev)->of_node,
 			&vreg_cfg->cam_vreg, &vreg_cfg->num_vreg);
 		if (rc < 0) {
 			kfree(msm_actuator_t);
@@ -1890,7 +1890,7 @@ static int32_t msm_actuator_platform_probe(struct platform_device *pdev)
 	}
 
 	cci_client = msm_actuator_t->i2c_client.cci_client;
-	cci_client->cci_subdev = msm_cci_get_subdev();
+	cci_client->cci_subdev = land_msm_cci_get_subdev();
 	cci_client->cci_i2c_master = msm_actuator_t->cci_master;
 	v4l2_subdev_init(&msm_actuator_t->msm_sd.sd,
 		msm_actuator_t->act_v4l2_subdev_ops);
@@ -1902,9 +1902,9 @@ static int32_t msm_actuator_platform_probe(struct platform_device *pdev)
 	media_entity_pads_init(&msm_actuator_t->msm_sd.sd.entity, 0, NULL);
 	msm_actuator_t->msm_sd.sd.entity.group_id = MSM_CAMERA_SUBDEV_ACTUATOR;
 	msm_actuator_t->msm_sd.close_seq = MSM_SD_CLOSE_2ND_CATEGORY | 0x2;
-	msm_sd_register(&msm_actuator_t->msm_sd);
+	land_msm_sd_register(&msm_actuator_t->msm_sd);
 	msm_actuator_t->actuator_state = ACT_DISABLE_STATE;
-	msm_cam_copy_v4l2_subdev_fops(&msm_actuator_v4l2_subdev_fops);
+	land_msm_cam_copy_v4l2_subdev_fops(&msm_actuator_v4l2_subdev_fops);
 #ifdef CONFIG_COMPAT
 	msm_actuator_v4l2_subdev_fops.compat_ioctl32 =
 		msm_actuator_subdev_fops_ioctl;

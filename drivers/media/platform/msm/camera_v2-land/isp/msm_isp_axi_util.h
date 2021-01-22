@@ -18,81 +18,81 @@
 	((src < RDI_INTF_0 || src == VFE_AXI_SRC_MAX) ? VFE_PIX_0 : \
 	(VFE_RAW_0 + src - RDI_INTF_0))
 
-int msm_isp_axi_create_stream(struct vfe_device *vfe_dev,
+int land_msm_isp_axi_create_stream(struct vfe_device *vfe_dev,
 	struct msm_vfe_axi_shared_data *axi_data,
 	struct msm_vfe_axi_stream_request_cmd *stream_cfg_cmd);
 
-void msm_isp_axi_destroy_stream(
+void land_msm_isp_axi_destroy_stream(
 	struct msm_vfe_axi_shared_data *axi_data, int stream_idx);
 
-int msm_isp_validate_axi_request(
+int land_msm_isp_validate_axi_request(
 	struct msm_vfe_axi_shared_data *axi_data,
 	struct msm_vfe_axi_stream_request_cmd *stream_cfg_cmd);
 
-void msm_isp_axi_reserve_wm(
+void land_msm_isp_axi_reserve_wm(
 	struct vfe_device *vfe_dev,
 	struct msm_vfe_axi_shared_data *axi_data,
 	struct msm_vfe_axi_stream *stream_info);
 
-void msm_isp_axi_reserve_comp_mask(
+void land_msm_isp_axi_reserve_comp_mask(
 	struct msm_vfe_axi_shared_data *axi_data,
 	struct msm_vfe_axi_stream *stream_info);
 
-int msm_isp_axi_check_stream_state(
+int land_msm_isp_axi_check_stream_state(
 	struct vfe_device *vfe_dev,
 	struct msm_vfe_axi_stream_cfg_cmd *stream_cfg_cmd);
 
-int msm_isp_calculate_framedrop(
+int land_msm_isp_calculate_framedrop(
 	struct msm_vfe_axi_shared_data *axi_data,
 	struct msm_vfe_axi_stream_request_cmd *stream_cfg_cmd);
-void msm_isp_reset_framedrop(struct vfe_device *vfe_dev,
+void land_msm_isp_reset_framedrop(struct vfe_device *vfe_dev,
 	struct msm_vfe_axi_stream *stream_info);
 
-int msm_isp_request_axi_stream(struct vfe_device *vfe_dev, void *arg);
-void msm_isp_start_avtimer(void);
-void msm_isp_stop_avtimer(void);
-void msm_isp_get_avtimer_ts(struct msm_isp_timestamp *time_stamp);
-int msm_isp_cfg_axi_stream(struct vfe_device *vfe_dev, void *arg);
-int msm_isp_release_axi_stream(struct vfe_device *vfe_dev, void *arg);
-int msm_isp_update_axi_stream(struct vfe_device *vfe_dev, void *arg);
-void msm_isp_axi_cfg_update(struct vfe_device *vfe_dev,
+int land_msm_isp_request_axi_stream(struct vfe_device *vfe_dev, void *arg);
+void land_msm_isp_start_avtimer(void);
+void land_msm_isp_stop_avtimer(void);
+void land_msm_isp_get_avtimer_ts(struct msm_isp_timestamp *time_stamp);
+int land_msm_isp_cfg_axi_stream(struct vfe_device *vfe_dev, void *arg);
+int land_msm_isp_release_axi_stream(struct vfe_device *vfe_dev, void *arg);
+int land_msm_isp_update_axi_stream(struct vfe_device *vfe_dev, void *arg);
+void land_msm_isp_axi_cfg_update(struct vfe_device *vfe_dev,
 	enum msm_vfe_input_src frame_src);
-int msm_isp_axi_halt(struct vfe_device *vfe_dev,
+int land_msm_isp_axi_halt(struct vfe_device *vfe_dev,
 	struct msm_vfe_axi_halt_cmd *halt_cmd);
-int msm_isp_axi_reset(struct vfe_device *vfe_dev,
+int land_msm_isp_axi_reset(struct vfe_device *vfe_dev,
 	struct msm_vfe_axi_reset_cmd *reset_cmd);
-int msm_isp_axi_restart(struct vfe_device *vfe_dev,
+int land_msm_isp_axi_restart(struct vfe_device *vfe_dev,
 	struct msm_vfe_axi_restart_cmd *restart_cmd);
 
-void msm_isp_axi_stream_update(struct vfe_device *vfe_dev,
+void land_msm_isp_axi_stream_update(struct vfe_device *vfe_dev,
 	enum msm_vfe_input_src frame_src);
 
-void msm_isp_update_framedrop_reg(struct vfe_device *vfe_dev,
+void land_msm_isp_update_framedrop_reg(struct vfe_device *vfe_dev,
 	enum msm_vfe_input_src frame_src);
 
-void msm_isp_notify(struct vfe_device *vfe_dev, uint32_t event_type,
+void land_msm_isp_notify(struct vfe_device *vfe_dev, uint32_t event_type,
 	enum msm_vfe_input_src frame_src, struct msm_isp_timestamp *ts);
 
-void msm_isp_process_axi_irq(struct vfe_device *vfe_dev,
+void land_msm_isp_process_axi_irq(struct vfe_device *vfe_dev,
 	uint32_t irq_status0, uint32_t irq_status1,
 	uint32_t pingpong_status, struct msm_isp_timestamp *ts);
 
-void msm_isp_axi_disable_all_wm(struct vfe_device *vfe_dev);
+void land_msm_isp_axi_disable_all_wm(struct vfe_device *vfe_dev);
 
-int msm_isp_print_ping_pong_address(struct vfe_device *vfe_dev,
+int land_msm_isp_print_ping_pong_address(struct vfe_device *vfe_dev,
 	unsigned long fault_addr);
 
-void msm_isp_increment_frame_id(struct vfe_device *vfe_dev,
+void land_msm_isp_increment_frame_id(struct vfe_device *vfe_dev,
 	enum msm_vfe_input_src frame_src, struct msm_isp_timestamp *ts);
 
-int msm_isp_drop_frame(struct vfe_device *vfe_dev,
+int land_msm_isp_drop_frame(struct vfe_device *vfe_dev,
 	struct msm_vfe_axi_stream *stream_info, struct msm_isp_timestamp *ts,
 	struct msm_isp_sof_info *sof_info);
 
 void msm_isp_halt(struct vfe_device *vfe_dev);
-void msm_isp_halt_send_error(struct vfe_device *vfe_dev, uint32_t event);
+void land_msm_isp_halt_send_error(struct vfe_device *vfe_dev, uint32_t event);
 
-void msm_isp_process_axi_irq_stream(struct vfe_device *vfe_dev,
+void land_msm_isp_process_axi_irq_stream(struct vfe_device *vfe_dev,
 	struct msm_vfe_axi_stream *stream_info,
 	uint32_t pingpong_status,
 	struct msm_isp_timestamp *ts);

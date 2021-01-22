@@ -44,18 +44,18 @@ static struct msm_flash_table *flash_table[] = {
 };
 
 static struct msm_camera_i2c_fn_t msm_sensor_cci_func_tbl = {
-	.i2c_read = msm_camera_cci_i2c_read,
-	.i2c_read_seq = msm_camera_cci_i2c_read_seq,
-	.i2c_write = msm_camera_cci_i2c_write,
-	.i2c_write_table = msm_camera_cci_i2c_write_table,
-	.i2c_write_seq_table = msm_camera_cci_i2c_write_seq_table,
+	.i2c_read = land_msm_camera_cci_i2c_read,
+	.i2c_read_seq = land_msm_camera_cci_i2c_read_seq,
+	.i2c_write = land_msm_camera_cci_i2c_write,
+	.i2c_write_table = land_msm_camera_cci_i2c_write_table,
+	.i2c_write_seq_table = land_msm_camera_cci_i2c_write_seq_table,
 	.i2c_write_table_w_microdelay =
-		msm_camera_cci_i2c_write_table_w_microdelay,
-	.i2c_util = msm_sensor_cci_i2c_util,
-	.i2c_poll =  msm_camera_cci_i2c_poll,
+		land_msm_camera_cci_i2c_write_table_w_microdelay,
+	.i2c_util = land_msm_sensor_cci_i2c_util,
+	.i2c_poll =  land_msm_camera_cci_i2c_poll,
 };
 
-void msm_torch_brightness_set(struct led_classdev *led_cdev,
+void land_msm_torch_brightness_set(struct led_classdev *led_cdev,
 				enum led_brightness value)
 {
 	if (!torch_trigger) {
@@ -69,17 +69,17 @@ void msm_torch_brightness_set(struct led_classdev *led_cdev,
 static struct led_classdev msm_torch_led[MAX_LED_TRIGGERS] = {
 	{
 		.name		= "torch-light0",
-		.brightness_set	= msm_torch_brightness_set,
+		.brightness_set	= land_msm_torch_brightness_set,
 		.brightness	= LED_OFF,
 	},
 	{
 		.name		= "torch-light1",
-		.brightness_set	= msm_torch_brightness_set,
+		.brightness_set	= land_msm_torch_brightness_set,
 		.brightness	= LED_OFF,
 	},
 	{
 		.name		= "torch-light2",
-		.brightness_set	= msm_torch_brightness_set,
+		.brightness_set	= land_msm_torch_brightness_set,
 		.brightness	= LED_OFF,
 	},
 };
@@ -102,7 +102,7 @@ static int32_t msm_torch_create_classdev(struct platform_device *pdev,
 			torch_trigger = fctrl->torch_trigger[i];
 			CDBG("%s:%d msm_torch_brightness_set for torch %d",
 				__func__, __LINE__, i);
-			msm_torch_brightness_set(&msm_torch_led[i],
+			land_msm_torch_brightness_set(&msm_torch_led[i],
 				LED_OFF);
 
 			rc = led_classdev_register(&pdev->dev,
@@ -269,7 +269,7 @@ static int32_t msm_flash_i2c_init(
 	flash_ctrl->power_info.power_down_setting_size =
 		flash_ctrl->power_setting_array.size_down;
 
-	rc = msm_camera_power_up(&flash_ctrl->power_info,
+	rc = land_msm_camera_power_up(&flash_ctrl->power_info,
 		flash_ctrl->flash_device_type,
 		&flash_ctrl->flash_i2c_client);
 	if (rc < 0) {
@@ -354,7 +354,7 @@ static int32_t msm_flash_i2c_release(
 		return -EINVAL;
 	}
 
-	rc = msm_camera_power_down(&flash_ctrl->power_info,
+	rc = land_msm_camera_power_down(&flash_ctrl->power_info,
 		flash_ctrl->flash_device_type,
 		&flash_ctrl->flash_i2c_client);
 	if (rc < 0) {
@@ -753,14 +753,14 @@ static int32_t msm_flash_get_gpio_dt_data(struct device_node *of_node,
 				gpio_array[i]);
 		}
 
-		rc = msm_camera_get_dt_gpio_req_tbl(of_node, gconf,
+		rc = land_msm_camera_get_dt_gpio_req_tbl(of_node, gconf,
 			gpio_array, gpio_array_size);
 		if (rc < 0) {
 			pr_err("%s failed %d\n", __func__, __LINE__);
 			goto free_gpio_array;
 		}
 
-		rc = msm_camera_init_gpio_pin_tbl(of_node, gconf,
+		rc = land_msm_camera_init_gpio_pin_tbl(of_node, gconf,
 			gpio_array, gpio_array_size);
 		if (rc < 0) {
 			pr_err("%s failed %d\n", __func__, __LINE__);
@@ -1152,7 +1152,7 @@ static int32_t msm_flash_platform_probe(struct platform_device *pdev)
 	}
 
 	cci_client = flash_ctrl->flash_i2c_client.cci_client;
-	cci_client->cci_subdev = msm_cci_get_subdev();
+	cci_client->cci_subdev = land_msm_cci_get_subdev();
 	cci_client->cci_i2c_master = flash_ctrl->cci_i2c_master;
 
 	/* Initialize sub device */
@@ -1167,11 +1167,11 @@ static int32_t msm_flash_platform_probe(struct platform_device *pdev)
 	media_entity_pads_init(&flash_ctrl->msm_sd.sd.entity, 0, NULL);
 	flash_ctrl->msm_sd.sd.entity.group_id = MSM_CAMERA_SUBDEV_FLASH;
 	flash_ctrl->msm_sd.close_seq = MSM_SD_CLOSE_2ND_CATEGORY | 0x1;
-	msm_sd_register(&flash_ctrl->msm_sd);
+	land_msm_sd_register(&flash_ctrl->msm_sd);
 
 	CDBG("%s:%d flash sd name = %s", __func__, __LINE__,
 		flash_ctrl->msm_sd.sd.entity.name);
-	msm_cam_copy_v4l2_subdev_fops(&msm_flash_v4l2_subdev_fops);
+	land_msm_cam_copy_v4l2_subdev_fops(&msm_flash_v4l2_subdev_fops);
 #ifdef CONFIG_COMPAT
 	msm_flash_v4l2_subdev_fops.compat_ioctl32 =
 		msm_flash_subdev_fops_ioctl;

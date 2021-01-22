@@ -80,7 +80,7 @@ static const struct msm_jpegdma_block msm_jpegdma_block_sel[] = {
 static inline u32 msm_jpegdma_hw_read_reg(struct msm_jpegdma_device *dma,
 	enum msm_jpegdma_mem_resources base_idx, u32 reg)
 {
-	return msm_camera_io_r(dma->iomem_base[base_idx] + reg);
+	return land_msm_camera_io_r(dma->iomem_base[base_idx] + reg);
 }
 
 /*
@@ -96,7 +96,7 @@ static inline void msm_jpegdma_hw_write_reg(struct msm_jpegdma_device *dma,
 	pr_debug("%s:%d]%p %08x\n", __func__, __LINE__,
 		dma->iomem_base[base_idx] + reg,
 		value);
-	msm_camera_io_w(value, dma->iomem_base[base_idx] + reg);
+	land_msm_camera_io_w(value, dma->iomem_base[base_idx] + reg);
 }
 
 /*
@@ -1311,7 +1311,7 @@ void msm_jpegdma_hw_release_mem_resources(struct msm_jpegdma_device *dma)
 			return;
 		}
 		/* release the device address */
-		msm_camera_put_reg_base(dma->pdev, dma->iomem_base[i], dev_name,
+		land_msm_camera_put_reg_base(dma->pdev, dma->iomem_base[i], dev_name,
 			reserve_mem_flag);
 	}
 }
@@ -1349,7 +1349,7 @@ int msm_jpegdma_hw_get_mem_resources(struct platform_device *pdev,
 		}
 		/* get the device address base */
 		dma->iomem_base[i] =
-			msm_camera_get_reg_base(pdev, dev_name,
+			land_msm_camera_get_reg_base(pdev, dev_name,
 				reserve_mem_flag);
 		if (!dma->iomem_base[i]) {
 			dev_err(dma->dev, "%s can not remap region\n",
@@ -1580,7 +1580,7 @@ int msm_jpegdma_hw_get_capabilities(struct msm_jpegdma_device *dma)
 	mutex_lock(&dma->lock);
 
 	/* enable all the regulators */
-	ret = msm_camera_regulator_enable(dma->vdd,
+	ret = land_msm_camera_regulator_enable(dma->vdd,
 			dma->num_reg, true);
 	if (ret < 0) {
 		dev_err(dma->dev, "Fail to enable regulators\n");
@@ -1588,7 +1588,7 @@ int msm_jpegdma_hw_get_capabilities(struct msm_jpegdma_device *dma)
 	}
 
 	/* enable all the clocks */
-	ret = msm_camera_clk_enable(&dma->pdev->dev,
+	ret = land_msm_camera_clk_enable(&dma->pdev->dev,
 			dma->jpeg_clk_info, dma->clk,
 			dma->num_clk, true);
 	if (ret < 0) {
@@ -1599,18 +1599,18 @@ int msm_jpegdma_hw_get_capabilities(struct msm_jpegdma_device *dma)
 	dma->hw_num_pipes = msm_jpegdma_hw_get_num_pipes(dma);
 
 	/* disable all the clocks */
-	msm_camera_clk_enable(&dma->pdev->dev,
+	land_msm_camera_clk_enable(&dma->pdev->dev,
 		dma->jpeg_clk_info, dma->clk,
 		dma->num_clk, false);
 	/* disable all the regulators */
-	msm_camera_regulator_enable(dma->vdd, dma->num_reg, false);
+	land_msm_camera_regulator_enable(dma->vdd, dma->num_reg, false);
 
 	mutex_unlock(&dma->lock);
 
 	return 0;
 
 error_clocks:
-	msm_camera_regulator_enable(dma->vdd, dma->num_reg, false);
+	land_msm_camera_regulator_enable(dma->vdd, dma->num_reg, false);
 error_regulators_get:
 	mutex_unlock(&dma->lock);
 	return ret;
@@ -1633,7 +1633,7 @@ int msm_jpegdma_hw_get(struct msm_jpegdma_device *dma)
 
 		dev_dbg(dma->dev, "msm_jpegdma_hw_get E\n");
 		/* enable all the regulators */
-		ret = msm_camera_regulator_enable(dma->vdd,
+		ret = land_msm_camera_regulator_enable(dma->vdd,
 				dma->num_reg, true);
 		if (ret < 0) {
 			dev_err(dma->dev, "Fail to enable regulators\n");
@@ -1641,7 +1641,7 @@ int msm_jpegdma_hw_get(struct msm_jpegdma_device *dma)
 		}
 
 		/* enable all the clocks */
-		ret = msm_camera_clk_enable(&dma->pdev->dev,
+		ret = land_msm_camera_clk_enable(&dma->pdev->dev,
 			dma->jpeg_clk_info, dma->clk,
 			dma->num_clk, true);
 		if (ret < 0) {
@@ -1650,11 +1650,11 @@ int msm_jpegdma_hw_get(struct msm_jpegdma_device *dma)
 		}
 
 		/* update the bus vector with valid bw */
-		msm_camera_update_bus_vector(dma->bus_client, 1);
+		land_msm_camera_update_bus_vector(dma->bus_client, 1);
 		msm_jpegdma_hw_config_qos(dma);
 		msm_jpegdma_hw_config_vbif(dma);
 
-		msm_camera_register_threaded_irq(dma->pdev, dma->irq, NULL,
+		land_msm_camera_register_threaded_irq(dma->pdev, dma->irq, NULL,
 			msm_jpegdma_hw_irq, IRQF_ONESHOT | IRQF_TRIGGER_RISING,
 			dev_name(&dma->pdev->dev), dma);
 		msm_jpegdma_hw_enable_irq(dma);
@@ -1676,10 +1676,10 @@ int msm_jpegdma_hw_get(struct msm_jpegdma_device *dma)
 
 error_hw_reset:
 	msm_jpegdma_hw_disable_irq(dma);
-	msm_camera_clk_enable(&dma->pdev->dev, dma->jpeg_clk_info,
+	land_msm_camera_clk_enable(&dma->pdev->dev, dma->jpeg_clk_info,
 		dma->clk, dma->num_clk, false);
 error_clocks:
-	msm_camera_regulator_enable(dma->vdd, dma->num_reg, false);
+	land_msm_camera_regulator_enable(dma->vdd, dma->num_reg, false);
 error_regulators_get:
 	mutex_unlock(&dma->lock);
 	return ret;
@@ -1701,15 +1701,15 @@ void msm_jpegdma_hw_put(struct msm_jpegdma_device *dma)
 		msm_jpegdma_hw_halt(dma);
 		msm_jpegdma_hw_disable_irq(dma);
 		/* release the irq */
-		msm_camera_unregister_irq(dma->pdev,
+		land_msm_camera_unregister_irq(dma->pdev,
 			dma->irq, dma);
 		/* update the bus vector with zeroth vector */
-		msm_camera_update_bus_vector(dma->bus_client, 0);
+		land_msm_camera_update_bus_vector(dma->bus_client, 0);
 		/* disable all the clocks */
-		msm_camera_clk_enable(&dma->pdev->dev, dma->jpeg_clk_info,
+		land_msm_camera_clk_enable(&dma->pdev->dev, dma->jpeg_clk_info,
 			dma->clk, dma->num_clk, false);
 		/* disable all the regulators */
-		msm_camera_regulator_enable(dma->vdd, dma->num_reg, false);
+		land_msm_camera_regulator_enable(dma->vdd, dma->num_reg, false);
 	}
 	/* Reset clock rate, need to be updated on next processing */
 	dma->active_clock_rate = -1;
@@ -1735,14 +1735,14 @@ static int msm_jpegdma_hw_attach_iommu(struct msm_jpegdma_device *dma)
 	}
 
 	if (dma->iommu_attached_cnt == 0) {
-		ret = cam_smmu_get_handle(MSM_JPEGDMA_SMMU_NAME,
+		ret = land_cam_smmu_get_handle(MSM_JPEGDMA_SMMU_NAME,
 			&dma->iommu_hndl);
 		if (ret < 0) {
 			dev_err(dma->dev, "Smmu get handle failed\n");
 			ret = -ENOMEM;
 			goto error;
 		}
-		ret = cam_smmu_ops(dma->iommu_hndl, CAM_SMMU_ATTACH);
+		ret = land_cam_smmu_ops(dma->iommu_hndl, CAM_SMMU_ATTACH);
 		if (ret < 0) {
 			dev_err(dma->dev, "Can not attach smmu.\n");
 			goto error_attach;
@@ -1753,7 +1753,7 @@ static int msm_jpegdma_hw_attach_iommu(struct msm_jpegdma_device *dma)
 
 	return 0;
 error_attach:
-	cam_smmu_destroy_handle(dma->iommu_hndl);
+	land_cam_smmu_destroy_handle(dma->iommu_hndl);
 error:
 	mutex_unlock(&dma->lock);
 	return ret;
@@ -1776,8 +1776,8 @@ static void msm_jpegdma_hw_detach_iommu(struct msm_jpegdma_device *dma)
 	}
 
 	if (--dma->iommu_attached_cnt == 0) {
-		cam_smmu_ops(dma->iommu_hndl, CAM_SMMU_DETACH);
-		cam_smmu_destroy_handle(dma->iommu_hndl);
+		land_cam_smmu_ops(dma->iommu_hndl, CAM_SMMU_DETACH);
+		land_cam_smmu_destroy_handle(dma->iommu_hndl);
 	}
 	mutex_unlock(&dma->lock);
 }
@@ -1805,7 +1805,7 @@ int msm_jpegdma_hw_map_buffer(struct msm_jpegdma_device *dma, int fd,
 	buf->dma = dma;
 	buf->fd = fd;
 
-	ret = cam_smmu_get_phy_addr(dma->iommu_hndl, buf->fd,
+	ret = land_cam_smmu_get_phy_addr(dma->iommu_hndl, buf->fd,
 		CAM_SMMU_MAP_RW, &buf->addr, &buf->size);
 	if (ret < 0) {
 		dev_err(dma->dev, "Can not get physical address\n");
@@ -1827,7 +1827,7 @@ error:
 void msm_jpegdma_hw_unmap_buffer(struct msm_jpegdma_buf_handle *buf)
 {
 	if (buf->size && buf->dma) {
-		cam_smmu_put_phy_addr(buf->dma->iommu_hndl,
+		land_cam_smmu_put_phy_addr(buf->dma->iommu_hndl,
 			buf->fd);
 		msm_jpegdma_hw_detach_iommu(buf->dma);
 		buf->size = 0;

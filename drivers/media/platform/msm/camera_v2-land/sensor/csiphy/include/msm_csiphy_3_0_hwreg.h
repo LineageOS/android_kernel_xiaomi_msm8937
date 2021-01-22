@@ -15,7 +15,7 @@
 
 #include <sensor/csiphy/msm_csiphy.h>
 
-struct csiphy_reg_parms_t csiphy_v3_0 = {
+struct csiphy_reg_parms_t land_csiphy_v3_0 = {
 	/*MIPI CSI PHY registers*/
 	0x0,
 	0x4,

@@ -49,7 +49,7 @@ enum cam_bus_client {
  * @return Status of operation. Negative in case of error. Zero otherwise.
  */
 
-int msm_camera_get_clk_info(struct platform_device *pdev,
+int land_msm_camera_get_clk_info(struct platform_device *pdev,
 			struct msm_cam_clk_info **clk_info,
 			struct clk ***clk_ptr,
 			size_t *num_clk);
@@ -69,7 +69,7 @@ int msm_camera_get_clk_info(struct platform_device *pdev,
  *
  * @return Status of operation. Negative in case of error. Zero otherwise.
  */
-int msm_camera_get_clk_info_and_rates(
+int land_msm_camera_get_clk_info_and_rates(
 			struct platform_device *pdev,
 			struct msm_cam_clk_info **clk_info,
 			struct clk ***clk_ptr,
@@ -89,7 +89,7 @@ int msm_camera_get_clk_info_and_rates(
  *
  * @return Status of operation. Negative in case of error. Zero otherwise.
  */
-int msm_camera_put_clk_info(struct platform_device *pdev,
+int land_msm_camera_put_clk_info(struct platform_device *pdev,
 				struct msm_cam_clk_info **clk_info,
 				struct clk ***clk_ptr, int cnt);
 /**
@@ -107,7 +107,7 @@ int msm_camera_put_clk_info(struct platform_device *pdev,
  * @return Status of operation. Negative in case of error. Zero otherwise.
  */
 
-int msm_camera_put_clk_info_and_rates(struct platform_device *pdev,
+int land_msm_camera_put_clk_info_and_rates(struct platform_device *pdev,
 		struct msm_cam_clk_info **clk_info,
 		struct clk ***clk_ptr, uint32_t ***clk_rates,
 		size_t set, size_t cnt);
@@ -126,7 +126,7 @@ int msm_camera_put_clk_info_and_rates(struct platform_device *pdev,
  * @return Status of operation. Negative in case of error. Zero otherwise.
  */
 
-int msm_camera_clk_enable(struct device *dev,
+int land_msm_camera_clk_enable(struct device *dev,
 					struct msm_cam_clk_info *clk_info,
 					struct clk **clk_ptr,
 					int num_clk,
@@ -143,7 +143,7 @@ int msm_camera_clk_enable(struct device *dev,
  * @return Status of operation. Negative in case of error. Zero otherwise.
  */
 
-int msm_camera_clk_set_rate(struct device *dev,
+int land_msm_camera_clk_set_rate(struct device *dev,
 				struct clk *clk,
 				long clk_rate);
 
@@ -160,7 +160,7 @@ int msm_camera_clk_set_rate(struct device *dev,
  *
  * @return Status of operation. Negative in case of error. Zero otherwise.
  */
-int msm_camera_get_regulator_info(struct platform_device *pdev,
+int land_msm_camera_get_regulator_info(struct platform_device *pdev,
 		struct regulator ***vddd, int *num_reg);
 /**
  * @brief      : Enable/Disable the regultors
@@ -175,7 +175,7 @@ int msm_camera_get_regulator_info(struct platform_device *pdev,
  * @return Status of operation. Negative in case of error. Zero otherwise.
  */
 
-int msm_camera_regulator_enable(struct regulator **vdd,
+int land_msm_camera_regulator_enable(struct regulator **vdd,
 				int cnt, int enable);
 
 /**
@@ -188,7 +188,7 @@ int msm_camera_regulator_enable(struct regulator **vdd,
  * @param cnt: Number of regulators to release
  */
 
-void msm_camera_put_regulators(struct platform_device *pdev,
+void land_msm_camera_put_regulators(struct platform_device *pdev,
 							struct regulator ***vdd,
 							int cnt);
 /**
@@ -203,7 +203,7 @@ void msm_camera_put_regulators(struct platform_device *pdev,
  * @return Pointer to resource if success else null
  */
 
-struct resource *msm_camera_get_irq(struct platform_device *pdev,
+struct resource *land_msm_camera_get_irq(struct platform_device *pdev,
 							char *irq_name);
 /**
  * @brief      : Register the IRQ
@@ -220,7 +220,7 @@ struct resource *msm_camera_get_irq(struct platform_device *pdev,
  * @return Status of operation. Negative in case of error. Zero otherwise.
  */
 
-int msm_camera_register_irq(struct platform_device *pdev,
+int land_msm_camera_register_irq(struct platform_device *pdev,
 						struct resource *irq,
 						irq_handler_t handler,
 						unsigned long irqflags,
@@ -243,7 +243,7 @@ int msm_camera_register_irq(struct platform_device *pdev,
  * @return Status of operation. Negative in case of error. Zero otherwise.
  */
 
-int msm_camera_register_threaded_irq(struct platform_device *pdev,
+int land_msm_camera_register_threaded_irq(struct platform_device *pdev,
 						struct resource *irq,
 						irq_handler_t handler_fn,
 						irq_handler_t thread_fn,
@@ -262,7 +262,7 @@ int msm_camera_register_threaded_irq(struct platform_device *pdev,
  * @return Status of operation. Negative in case of error. Zero otherwise.
  */
 
-int msm_camera_enable_irq(struct resource *irq, int flag);
+int land_msm_camera_enable_irq(struct resource *irq, int flag);
 
 /**
  * @brief      : UnRegister the IRQ
@@ -276,7 +276,7 @@ int msm_camera_enable_irq(struct resource *irq, int flag);
  * @return Status of operation. Negative in case of error. Zero otherwise.
  */
 
-int msm_camera_unregister_irq(struct platform_device *pdev,
+int land_msm_camera_unregister_irq(struct platform_device *pdev,
 	struct resource *irq, void *dev_id);
 
 /**
@@ -293,7 +293,7 @@ int msm_camera_unregister_irq(struct platform_device *pdev,
  * @return Pointer to resource if success else null
  */
 
-void __iomem *msm_camera_get_reg_base(struct platform_device *pdev,
+void __iomem *land_msm_camera_get_reg_base(struct platform_device *pdev,
 		char *device_name, int reserve_mem);
 
 /**
@@ -311,7 +311,7 @@ void __iomem *msm_camera_get_reg_base(struct platform_device *pdev,
  * @return Status of operation. Negative in case of error. Zero otherwise.
  */
 
-int msm_camera_put_reg_base(struct platform_device *pdev, void __iomem *base,
+int land_msm_camera_put_reg_base(struct platform_device *pdev, void __iomem *base,
 		char *device_name, int reserve_mem);
 
 /**
@@ -325,7 +325,7 @@ int msm_camera_put_reg_base(struct platform_device *pdev, void __iomem *base,
  * @return Status of operation. Negative in case of error. Zero otherwise.
  */
 
-uint32_t msm_camera_register_bus_client(struct platform_device *pdev,
+uint32_t land_msm_camera_register_bus_client(struct platform_device *pdev,
 	enum cam_bus_client id);
 
 /**
@@ -339,7 +339,7 @@ uint32_t msm_camera_register_bus_client(struct platform_device *pdev,
  * @return Status of operation. Negative in case of error. Zero otherwise.
  */
 
-uint32_t msm_camera_update_bus_vector(enum cam_bus_client id,
+uint32_t land_msm_camera_update_bus_vector(enum cam_bus_client id,
 	int vector_index);
 
 /**
@@ -354,7 +354,7 @@ uint32_t msm_camera_update_bus_vector(enum cam_bus_client id,
  * @return non-zero as client id if success else fail
  */
 
-uint32_t msm_camera_update_bus_bw(int id, uint64_t ab, uint64_t ib);
+uint32_t land_msm_camera_update_bus_bw(int id, uint64_t ab, uint64_t ib);
 
 /**
  * @brief      : UnRegister the bus client
@@ -366,7 +366,7 @@ uint32_t msm_camera_update_bus_bw(int id, uint64_t ab, uint64_t ib);
  * @return Status of operation. Negative in case of error. Zero otherwise.
  */
 
-uint32_t msm_camera_unregister_bus_client(enum cam_bus_client id);
+uint32_t land_msm_camera_unregister_bus_client(enum cam_bus_client id);
 
 /**
  * @brief      : Gets resource size
@@ -380,7 +380,7 @@ uint32_t msm_camera_unregister_bus_client(enum cam_bus_client id);
  * @return size of the resource
  */
 
-uint32_t msm_camera_get_res_size(struct platform_device *pdev,
+uint32_t land_msm_camera_get_res_size(struct platform_device *pdev,
 	char *device_name);
 
 #endif

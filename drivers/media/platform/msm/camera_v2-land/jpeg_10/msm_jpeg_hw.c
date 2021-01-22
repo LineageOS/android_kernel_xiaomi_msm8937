@@ -18,7 +18,7 @@
 
 #include <linux/io.h>
 
-int msm_jpeg_hw_pingpong_update(struct msm_jpeg_hw_pingpong *pingpong_hw,
+int land_msm_jpeg_hw_pingpong_update(struct msm_jpeg_hw_pingpong *pingpong_hw,
 	struct msm_jpeg_hw_buf *buf, void *base)
 {
 	int buf_free_index = -1;
@@ -38,19 +38,19 @@ int msm_jpeg_hw_pingpong_update(struct msm_jpeg_hw_pingpong *pingpong_hw,
 
 	if (pingpong_hw->is_fe) {
 		/* it is fe */
-		msm_jpeg_hw_fe_buffer_update(
+		land_msm_jpeg_hw_fe_buffer_update(
 			&pingpong_hw->buf[buf_free_index], buf_free_index,
 			base);
 	} else {
 		/* it is we */
-		msm_jpeg_hw_we_buffer_update(
+		land_msm_jpeg_hw_we_buffer_update(
 			&pingpong_hw->buf[buf_free_index], buf_free_index,
 			base);
 	}
 	return 0;
 }
 
-int msm_jpegdma_hw_pingpong_update(struct msm_jpeg_hw_pingpong *pingpong_hw,
+int land_msm_jpegdma_hw_pingpong_update(struct msm_jpeg_hw_pingpong *pingpong_hw,
 	struct msm_jpeg_hw_buf *buf, void *base)
 {
 	int buf_free_index = -1;
@@ -70,18 +70,18 @@ int msm_jpegdma_hw_pingpong_update(struct msm_jpeg_hw_pingpong *pingpong_hw,
 
 	if (pingpong_hw->is_fe) {
 		/* it is fe */
-		msm_jpegdma_hw_fe_buffer_update(
+		land_msm_jpegdma_hw_fe_buffer_update(
 			&pingpong_hw->buf[buf_free_index], buf_free_index,
 			base);
 	} else {
 		/* it is we */
-		msm_jpegdma_hw_we_buffer_update(
+		land_msm_jpegdma_hw_we_buffer_update(
 			&pingpong_hw->buf[buf_free_index], buf_free_index,
 			base);
 	}
 	return 0;
 }
-void *msm_jpeg_hw_pingpong_irq(struct msm_jpeg_hw_pingpong *pingpong_hw)
+void *land_msm_jpeg_hw_pingpong_irq(struct msm_jpeg_hw_pingpong *pingpong_hw)
 {
 	struct msm_jpeg_hw_buf *buf_p = NULL;
 
@@ -95,7 +95,7 @@ void *msm_jpeg_hw_pingpong_irq(struct msm_jpeg_hw_pingpong *pingpong_hw)
 	return (void *) buf_p;
 }
 
-void *msm_jpeg_hw_pingpong_active_buffer(
+void *land_msm_jpeg_hw_pingpong_active_buffer(
 	struct msm_jpeg_hw_pingpong *pingpong_hw)
 {
 	struct msm_jpeg_hw_buf *buf_p = NULL;
@@ -106,50 +106,50 @@ void *msm_jpeg_hw_pingpong_active_buffer(
 	return (void *) buf_p;
 }
 
-struct msm_jpeg_hw_cmd hw_cmd_irq_get_status[] = {
+struct msm_jpeg_hw_cmd land_hw_cmd_irq_get_status[] = {
 	/* type, repeat n times, offset, mask, data or pdata */
 	{MSM_JPEG_HW_CMD_TYPE_READ, 1, JPEG_IRQ_STATUS_ADDR,
 		JPEG_IRQ_STATUS_BMSK, {0} },
 };
 
-int msm_jpeg_hw_irq_get_status(void *base)
+int land_msm_jpeg_hw_irq_get_status(void *base)
 {
 	uint32_t n_irq_status = 0;
-	n_irq_status = msm_jpeg_hw_read(&hw_cmd_irq_get_status[0], base);
+	n_irq_status = land_msm_jpeg_hw_read(&land_hw_cmd_irq_get_status[0], base);
 	return n_irq_status;
 }
 
-struct msm_jpeg_hw_cmd hw_cmd_irq_get_dmastatus[] = {
+struct msm_jpeg_hw_cmd land_hw_cmd_irq_get_dmastatus[] = {
 	/* type, repeat n times, offset, mask, data or pdata */
 	{MSM_JPEG_HW_CMD_TYPE_READ, 1, JPEGDMA_IRQ_STATUS_ADDR,
 		JPEGDMA_IRQ_STATUS_BMSK, {0} },
 };
 
-int msm_jpegdma_hw_irq_get_status(void *base)
+int land_msm_jpegdma_hw_irq_get_status(void *base)
 {
 	uint32_t n_irq_status = 0;
-	n_irq_status = msm_jpeg_hw_read(&hw_cmd_irq_get_dmastatus[0], base);
+	n_irq_status = land_msm_jpeg_hw_read(&land_hw_cmd_irq_get_dmastatus[0], base);
 	return n_irq_status;
 }
 
-struct msm_jpeg_hw_cmd hw_cmd_encode_output_size[] = {
+struct msm_jpeg_hw_cmd land_hw_cmd_encode_output_size[] = {
 	/* type, repeat n times, offset, mask, data or pdata */
 	{MSM_JPEG_HW_CMD_TYPE_READ, 1,
 	JPEG_ENCODE_OUTPUT_SIZE_STATUS_ADDR,
 	JPEG_ENCODE_OUTPUT_SIZE_STATUS_BMSK, {0} } ,
 };
 
-long msm_jpeg_hw_encode_output_size(void *base)
+long land_msm_jpeg_hw_encode_output_size(void *base)
 {
 	uint32_t encode_output_size = 0;
 
-	encode_output_size = msm_jpeg_hw_read(&hw_cmd_encode_output_size[0],
+	encode_output_size = land_msm_jpeg_hw_read(&land_hw_cmd_encode_output_size[0],
 		base);
 
 	return encode_output_size;
 }
 
-void msm_jpeg_hw_irq_clear(uint32_t mask, uint32_t data, void *base)
+void land_msm_jpeg_hw_irq_clear(uint32_t mask, uint32_t data, void *base)
 {
 	struct msm_jpeg_hw_cmd cmd_irq_clear;
 
@@ -159,10 +159,10 @@ void msm_jpeg_hw_irq_clear(uint32_t mask, uint32_t data, void *base)
 	cmd_irq_clear.mask = mask;
 	cmd_irq_clear.data = data;
 	JPEG_DBG("%s:%d] mask %0x data %0x", __func__, __LINE__, mask, data);
-	msm_jpeg_hw_write(&cmd_irq_clear, base);
+	land_msm_jpeg_hw_write(&cmd_irq_clear, base);
 }
 
-void msm_jpegdma_hw_irq_clear(uint32_t mask, uint32_t data, void *base)
+void land_msm_jpegdma_hw_irq_clear(uint32_t mask, uint32_t data, void *base)
 {
 	struct msm_jpeg_hw_cmd cmd_irq_clear;
 
@@ -172,10 +172,10 @@ void msm_jpegdma_hw_irq_clear(uint32_t mask, uint32_t data, void *base)
 	cmd_irq_clear.mask = mask;
 	cmd_irq_clear.data = data;
 	JPEG_DBG("%s:%d] mask %0x data %0x", __func__, __LINE__, mask, data);
-	msm_jpeg_hw_write(&cmd_irq_clear, base);
+	land_msm_jpeg_hw_write(&cmd_irq_clear, base);
 }
 
-struct msm_jpeg_hw_cmd hw_cmd_fe_ping_update[] = {
+struct msm_jpeg_hw_cmd land_hw_cmd_fe_ping_update[] = {
 	/* type, repeat n times, offset, mask, data or pdata */
 	{MSM_JPEG_HW_CMD_TYPE_WRITE, 1, JPEG_IRQ_MASK_ADDR,
 		JPEG_IRQ_MASK_BMSK, {JPEG_IRQ_ALLSOURCES_ENABLE} },
@@ -195,51 +195,51 @@ struct msm_jpeg_hw_cmd hw_cmd_fe_ping_update[] = {
 		JPEG_PLN2_RD_PNTR_BMSK, {0} },
 };
 
-void msm_jpeg_hw_fe_buffer_update(struct msm_jpeg_hw_buf *p_input,
+void land_msm_jpeg_hw_fe_buffer_update(struct msm_jpeg_hw_buf *p_input,
 	uint8_t pingpong_index, void *base)
 {
 	struct msm_jpeg_hw_cmd *hw_cmd_p;
 	struct msm_jpeg_hw_cmd tmp_hw_cmd;
 
 	if (pingpong_index == 0) {
-		hw_cmd_p = &hw_cmd_fe_ping_update[0];
+		hw_cmd_p = &land_hw_cmd_fe_ping_update[0];
 		/* ensure write is done */
 		wmb();
-		msm_jpeg_hw_write(hw_cmd_p++, base);
+		land_msm_jpeg_hw_write(hw_cmd_p++, base);
 		/* ensure write is done */
 		wmb();
-		msm_jpeg_hw_write(hw_cmd_p++, base);
+		land_msm_jpeg_hw_write(hw_cmd_p++, base);
 		/* ensure write is done */
 		wmb();
-		msm_jpeg_hw_write(hw_cmd_p++, base);
+		land_msm_jpeg_hw_write(hw_cmd_p++, base);
 		/* ensure write is done */
 		wmb();
 		tmp_hw_cmd = *hw_cmd_p++;
 		tmp_hw_cmd.data = p_input->y_buffer_addr;
-		msm_jpeg_hw_write(&tmp_hw_cmd, base);
+		land_msm_jpeg_hw_write(&tmp_hw_cmd, base);
 		/* ensure write is done */
 		wmb();
-		msm_jpeg_hw_write(hw_cmd_p++, base);
+		land_msm_jpeg_hw_write(hw_cmd_p++, base);
 		/* ensure write is done */
 		wmb();
 		tmp_hw_cmd = *hw_cmd_p++;
 		tmp_hw_cmd.data = p_input->cbcr_buffer_addr;
-		msm_jpeg_hw_write(&tmp_hw_cmd, base);
+		land_msm_jpeg_hw_write(&tmp_hw_cmd, base);
 		/* ensure write is done */
 		wmb();
-		msm_jpeg_hw_write(hw_cmd_p++, base);
+		land_msm_jpeg_hw_write(hw_cmd_p++, base);
 		/* ensure write is done */
 		wmb();
 		tmp_hw_cmd = *hw_cmd_p++;
 		tmp_hw_cmd.data = p_input->pln2_addr;
-		msm_jpeg_hw_write(&tmp_hw_cmd, base);
+		land_msm_jpeg_hw_write(&tmp_hw_cmd, base);
 		/* ensure write is done */
 		wmb();
 	}
 	return;
 }
 
-struct msm_jpeg_hw_cmd hw_dma_cmd_fe_ping_update[] = {
+struct msm_jpeg_hw_cmd land_hw_dma_cmd_fe_ping_update[] = {
 	/* type, repeat n times, offset, mask, data or pdata */
 	{MSM_JPEG_HW_CMD_TYPE_WRITE, 1, JPEGDMA_IRQ_MASK_ADDR,
 		JPEGDMA_IRQ_MASK_BMSK, {JPEG_IRQ_ALLSOURCES_ENABLE} },
@@ -251,7 +251,7 @@ struct msm_jpeg_hw_cmd hw_dma_cmd_fe_ping_update[] = {
 		JPEG_PLN1_RD_PNTR_BMSK, {0} },
 };
 
-void msm_jpegdma_hw_fe_buffer_update(struct msm_jpeg_hw_buf *p_input,
+void land_msm_jpegdma_hw_fe_buffer_update(struct msm_jpeg_hw_buf *p_input,
 	uint8_t pingpong_index, void *base)
 {
 	struct msm_jpeg_hw_cmd *hw_cmd_p;
@@ -260,41 +260,41 @@ void msm_jpegdma_hw_fe_buffer_update(struct msm_jpeg_hw_buf *p_input,
 	if (pingpong_index != 0)
 		return;
 
-	hw_cmd_p = &hw_dma_cmd_fe_ping_update[0];
+	hw_cmd_p = &land_hw_dma_cmd_fe_ping_update[0];
 	/* ensure write is done */
 	wmb();
-	msm_jpeg_hw_write(hw_cmd_p++, base);
+	land_msm_jpeg_hw_write(hw_cmd_p++, base);
 	/* ensure write is done */
 	wmb();
-	msm_jpeg_hw_write(hw_cmd_p++, base);
+	land_msm_jpeg_hw_write(hw_cmd_p++, base);
 	/* ensure write is done */
 	wmb();
 	tmp_hw_cmd = *hw_cmd_p++;
 	tmp_hw_cmd.data = p_input->y_buffer_addr;
-	msm_jpeg_hw_write(&tmp_hw_cmd, base);
+	land_msm_jpeg_hw_write(&tmp_hw_cmd, base);
 	/* ensure write is done */
 	wmb();
 	tmp_hw_cmd = *hw_cmd_p++;
 	tmp_hw_cmd.data = p_input->cbcr_buffer_addr;
-	msm_jpeg_hw_write(&tmp_hw_cmd, base);
+	land_msm_jpeg_hw_write(&tmp_hw_cmd, base);
 	/* ensure write is done */
 	wmb();
 }
 
-struct msm_jpeg_hw_cmd hw_cmd_fe_start[] = {
+struct msm_jpeg_hw_cmd land_hw_cmd_fe_start[] = {
 	/* type, repeat n times, offset, mask, data or pdata */
 	{MSM_JPEG_HW_CMD_TYPE_WRITE, 1, JPEG_CMD_ADDR,
 		JPEG_CMD_BMSK, {JPEG_OFFLINE_CMD_START} },
 };
 
-void msm_jpeg_hw_fe_start(void *base)
+void land_msm_jpeg_hw_fe_start(void *base)
 {
-	msm_jpeg_hw_write(&hw_cmd_fe_start[0], base);
+	land_msm_jpeg_hw_write(&land_hw_cmd_fe_start[0], base);
 
 	return;
 }
 
-struct msm_jpeg_hw_cmd hw_cmd_we_ping_update[] = {
+struct msm_jpeg_hw_cmd land_hw_cmd_we_ping_update[] = {
 	/* type, repeat n times, offset, mask, data or pdata */
 	{MSM_JPEG_HW_CMD_TYPE_WRITE, 1, JPEG_PLN0_WR_PNTR_ADDR,
 		JPEG_PLN0_WR_PNTR_BMSK, {0} },
@@ -304,52 +304,52 @@ struct msm_jpeg_hw_cmd hw_cmd_we_ping_update[] = {
 		JPEG_PLN0_WR_PNTR_BMSK, {0} },
 };
 
-void msm_jpeg_decode_status(void *base)
+void land_msm_jpeg_decode_status(void *base)
 {
 	uint32_t data;
-	data = msm_camera_io_r(base + JPEG_DECODE_MCUS_DECODED_STATUS);
+	data = land_msm_camera_io_r(base + JPEG_DECODE_MCUS_DECODED_STATUS);
 	JPEG_DBG_HIGH("Decode MCUs decode status %u", data);
-	data = msm_camera_io_r(base + JPEG_DECODE_BITS_CONSUMED_STATUS);
+	data = land_msm_camera_io_r(base + JPEG_DECODE_BITS_CONSUMED_STATUS);
 	JPEG_DBG_HIGH("Decode bits consumed status %u", data);
-	data = msm_camera_io_r(base + JPEG_DECODE_PRED_Y_STATE);
+	data = land_msm_camera_io_r(base + JPEG_DECODE_PRED_Y_STATE);
 	JPEG_DBG_HIGH("Decode prediction Y state %u", data);
-	data = msm_camera_io_r(base + JPEG_DECODE_PRED_C_STATE);
+	data = land_msm_camera_io_r(base + JPEG_DECODE_PRED_C_STATE);
 	JPEG_DBG_HIGH("Decode prediction C state %u", data);
-	data = msm_camera_io_r(base + JPEG_DECODE_RSM_STATE);
+	data = land_msm_camera_io_r(base + JPEG_DECODE_RSM_STATE);
 	JPEG_DBG_HIGH("Decode prediction RSM state %u", data);
 }
 
 
-void msm_jpeg_hw_we_buffer_update(struct msm_jpeg_hw_buf *p_input,
+void land_msm_jpeg_hw_we_buffer_update(struct msm_jpeg_hw_buf *p_input,
 	uint8_t pingpong_index, void *base)
 {
 	struct msm_jpeg_hw_cmd *hw_cmd_p;
 	struct msm_jpeg_hw_cmd tmp_hw_cmd;
 
 	if (pingpong_index == 0) {
-		hw_cmd_p = &hw_cmd_we_ping_update[0];
+		hw_cmd_p = &land_hw_cmd_we_ping_update[0];
 		tmp_hw_cmd = *hw_cmd_p++;
 		tmp_hw_cmd.data = p_input->y_buffer_addr;
 		JPEG_DBG_HIGH("%s Output pln0 buffer address is %x\n", __func__,
 			p_input->y_buffer_addr);
-		msm_jpeg_hw_write(&tmp_hw_cmd, base);
+		land_msm_jpeg_hw_write(&tmp_hw_cmd, base);
 
 		tmp_hw_cmd = *hw_cmd_p++;
 		tmp_hw_cmd.data = p_input->cbcr_buffer_addr;
 		JPEG_DBG_HIGH("%s Output pln1 buffer address is %x\n", __func__,
 			p_input->cbcr_buffer_addr);
-		msm_jpeg_hw_write(&tmp_hw_cmd, base);
+		land_msm_jpeg_hw_write(&tmp_hw_cmd, base);
 
 		tmp_hw_cmd = *hw_cmd_p++;
 		tmp_hw_cmd.data = p_input->pln2_addr;
 		JPEG_DBG_HIGH("%s Output pln2 buffer address is %x\n", __func__,
 			p_input->pln2_addr);
-		msm_jpeg_hw_write(&tmp_hw_cmd, base);
+		land_msm_jpeg_hw_write(&tmp_hw_cmd, base);
 	}
 	return;
 }
 
-struct msm_jpeg_hw_cmd hw_dma_cmd_we_ping_update[] = {
+struct msm_jpeg_hw_cmd land_hw_dma_cmd_we_ping_update[] = {
 	/* type, repeat n times, offset, mask, data or pdata */
 	{MSM_JPEG_HW_CMD_TYPE_WRITE, 1, JPEGDMA_CMD_ADDR,
 		JPEGDMA_CMD_BMSK, {JPEGDMA_CMD_CLEAR_WRITE_PLN_QUEUES} },
@@ -358,7 +358,7 @@ struct msm_jpeg_hw_cmd hw_dma_cmd_we_ping_update[] = {
 	{MSM_JPEG_HW_CMD_TYPE_WRITE, 1, MSM_JPEGDMA_WE_1_WR_PNTR,
 		JPEG_PLN0_WR_PNTR_BMSK, {0} },
 };
-void msm_jpegdma_hw_we_buffer_update(struct msm_jpeg_hw_buf *p_input,
+void land_msm_jpegdma_hw_we_buffer_update(struct msm_jpeg_hw_buf *p_input,
 	uint8_t pingpong_index, void *base)
 {
 	struct msm_jpeg_hw_cmd *hw_cmd_p;
@@ -367,8 +367,8 @@ void msm_jpegdma_hw_we_buffer_update(struct msm_jpeg_hw_buf *p_input,
 	if (pingpong_index != 0)
 		return;
 
-	hw_cmd_p = &hw_dma_cmd_we_ping_update[0];
-	msm_jpeg_hw_write(hw_cmd_p++, base);
+	hw_cmd_p = &land_hw_dma_cmd_we_ping_update[0];
+	land_msm_jpeg_hw_write(hw_cmd_p++, base);
 
 	/* ensure write is done */
 	wmb();
@@ -376,7 +376,7 @@ void msm_jpegdma_hw_we_buffer_update(struct msm_jpeg_hw_buf *p_input,
 	tmp_hw_cmd.data = p_input->y_buffer_addr;
 	JPEG_DBG_HIGH("%s Output we 0 buffer address is %x\n", __func__,
 			p_input->y_buffer_addr);
-	msm_jpeg_hw_write(&tmp_hw_cmd, base);
+	land_msm_jpeg_hw_write(&tmp_hw_cmd, base);
 	/* ensure write is done */
 	wmb();
 
@@ -384,12 +384,12 @@ void msm_jpegdma_hw_we_buffer_update(struct msm_jpeg_hw_buf *p_input,
 	tmp_hw_cmd.data = p_input->cbcr_buffer_addr;
 	JPEG_DBG_HIGH("%s Output we 1 buffer address is %x\n", __func__,
 			p_input->cbcr_buffer_addr);
-	msm_jpeg_hw_write(&tmp_hw_cmd, base);
+	land_msm_jpeg_hw_write(&tmp_hw_cmd, base);
 	/* ensure write is done */
 	wmb();
 }
 
-struct msm_jpeg_hw_cmd hw_cmd_fe_mmu_prefetch[] = {
+struct msm_jpeg_hw_cmd land_hw_cmd_fe_mmu_prefetch[] = {
 	/* type, repeat n times, offset, mask, data or pdata */
 	{MSM_JPEG_HW_CMD_TYPE_WRITE, 1, MSM_JPEG_S0_MMU_PF_ADDR_MIN,
 		MSM_JPEG_S0_MMU_PF_ADDR_MIN_BMSK, {0} },
@@ -406,7 +406,7 @@ struct msm_jpeg_hw_cmd hw_cmd_fe_mmu_prefetch[] = {
 };
 
 /*
- * msm_jpeg_hw_fe_mmu_prefetch() - writes fe min/max addrs for each plane to
+ * land_msm_jpeg_hw_fe_mmu_prefetch() - writes fe min/max addrs for each plane to
  * MMU prefetch registers.
  * @buf: Pointer to jpeg hw buffer.
  * @base: Pointer to base address.
@@ -418,13 +418,13 @@ struct msm_jpeg_hw_cmd hw_cmd_fe_mmu_prefetch[] = {
  *
  * Return: None.
  */
-void msm_jpeg_hw_fe_mmu_prefetch(struct msm_jpeg_hw_buf *buf, void *base,
+void land_msm_jpeg_hw_fe_mmu_prefetch(struct msm_jpeg_hw_buf *buf, void *base,
 	uint8_t decode_flag)
 {
 	struct msm_jpeg_hw_cmd *hw_cmd_p;
 	struct msm_jpeg_hw_cmd tmp_hw_cmd;
 
-	hw_cmd_p = &hw_cmd_fe_mmu_prefetch[0];
+	hw_cmd_p = &land_hw_cmd_fe_mmu_prefetch[0];
 	tmp_hw_cmd = *hw_cmd_p++;
 	tmp_hw_cmd.data = buf->y_buffer_addr;
 
@@ -433,7 +433,7 @@ void msm_jpeg_hw_fe_mmu_prefetch(struct msm_jpeg_hw_buf *buf, void *base,
 
 	/* ensure write is done */
 	wmb();
-	msm_jpeg_hw_write(&tmp_hw_cmd, base);
+	land_msm_jpeg_hw_write(&tmp_hw_cmd, base);
 
 	tmp_hw_cmd = *hw_cmd_p++;
 	tmp_hw_cmd.data = buf->y_buffer_addr;
@@ -443,7 +443,7 @@ void msm_jpeg_hw_fe_mmu_prefetch(struct msm_jpeg_hw_buf *buf, void *base,
 	JPEG_DBG("%s:%d: MAX y_buf_addr %08x, y_len %d\n",
 		__func__, __LINE__, tmp_hw_cmd.data, buf->y_len);
 
-	msm_jpeg_hw_write(&tmp_hw_cmd, base);
+	land_msm_jpeg_hw_write(&tmp_hw_cmd, base);
 
 	if (!decode_flag) {
 		tmp_hw_cmd = *hw_cmd_p++;
@@ -452,7 +452,7 @@ void msm_jpeg_hw_fe_mmu_prefetch(struct msm_jpeg_hw_buf *buf, void *base,
 		JPEG_DBG("%s:%d: MIN cbcr_buf_addr %08x\n",
 			__func__, __LINE__, tmp_hw_cmd.data);
 
-		msm_jpeg_hw_write(&tmp_hw_cmd, base);
+		land_msm_jpeg_hw_write(&tmp_hw_cmd, base);
 
 		tmp_hw_cmd = *hw_cmd_p++;
 		tmp_hw_cmd.data = buf->cbcr_buffer_addr;
@@ -462,7 +462,7 @@ void msm_jpeg_hw_fe_mmu_prefetch(struct msm_jpeg_hw_buf *buf, void *base,
 		JPEG_DBG("%s:%d: MAX cbcr_buf_addr %08x, cbcr_len %d\n"
 			, __func__, __LINE__, tmp_hw_cmd.data, buf->cbcr_len);
 
-		msm_jpeg_hw_write(&tmp_hw_cmd, base);
+		land_msm_jpeg_hw_write(&tmp_hw_cmd, base);
 
 		tmp_hw_cmd = *hw_cmd_p++;
 		tmp_hw_cmd.data = buf->pln2_addr;
@@ -470,7 +470,7 @@ void msm_jpeg_hw_fe_mmu_prefetch(struct msm_jpeg_hw_buf *buf, void *base,
 		JPEG_DBG("%s:%d: MIN pln2_buf_addr %08x\n",
 			__func__, __LINE__, tmp_hw_cmd.data);
 
-		msm_jpeg_hw_write(&tmp_hw_cmd, base);
+		land_msm_jpeg_hw_write(&tmp_hw_cmd, base);
 
 		tmp_hw_cmd = *hw_cmd_p++;
 		tmp_hw_cmd.data = buf->pln2_addr;
@@ -480,13 +480,13 @@ void msm_jpeg_hw_fe_mmu_prefetch(struct msm_jpeg_hw_buf *buf, void *base,
 		JPEG_DBG("%s:%d: MAX pln2_buf_addr %08x, pln2_len %d\n"
 			, __func__, __LINE__, tmp_hw_cmd.data, buf->pln2_len);
 
-		msm_jpeg_hw_write(&tmp_hw_cmd, base);
+		land_msm_jpeg_hw_write(&tmp_hw_cmd, base);
 	}
 	/* ensure write is done */
 	wmb();
 }
 
-struct msm_jpeg_hw_cmd hw_cmd_we_mmu_prefetch[] = {
+struct msm_jpeg_hw_cmd land_hw_cmd_we_mmu_prefetch[] = {
 	/* type, repeat n times, offset, mask, data or pdata */
 	{MSM_JPEG_HW_CMD_TYPE_WRITE, 1, MSM_JPEG_S1_MMU_PF_ADDR_MIN,
 		MSM_JPEG_S1_MMU_PF_ADDR_MIN_BMSK, {0} },
@@ -503,7 +503,7 @@ struct msm_jpeg_hw_cmd hw_cmd_we_mmu_prefetch[] = {
 };
 
 /*
- * msm_jpeg_hw_we_mmu_prefetch() - write we min/max addrs for each plane to
+ * land_msm_jpeg_hw_we_mmu_prefetch() - write we min/max addrs for each plane to
  * MMU prefetch registers.
  * @buf: Pointer to jpeg hw buffer.
  * @base: Pointer to base address.
@@ -515,13 +515,13 @@ struct msm_jpeg_hw_cmd hw_cmd_we_mmu_prefetch[] = {
  *
  * Return: None.
  */
-void msm_jpeg_hw_we_mmu_prefetch(struct msm_jpeg_hw_buf *buf, void *base,
+void land_msm_jpeg_hw_we_mmu_prefetch(struct msm_jpeg_hw_buf *buf, void *base,
 	uint8_t decode_flag)
 {
 	struct msm_jpeg_hw_cmd *hw_cmd_p;
 	struct msm_jpeg_hw_cmd tmp_hw_cmd;
 
-	hw_cmd_p = &hw_cmd_we_mmu_prefetch[0];
+	hw_cmd_p = &land_hw_cmd_we_mmu_prefetch[0];
 
 	/* ensure write is done */
 	wmb();
@@ -532,7 +532,7 @@ void msm_jpeg_hw_we_mmu_prefetch(struct msm_jpeg_hw_buf *buf, void *base,
 		JPEG_DBG("%s:%d: MIN y_buf_addr %08x\n",
 			__func__, __LINE__, tmp_hw_cmd.data);
 
-		msm_jpeg_hw_write(&tmp_hw_cmd, base);
+		land_msm_jpeg_hw_write(&tmp_hw_cmd, base);
 
 		tmp_hw_cmd = *hw_cmd_p++;
 		tmp_hw_cmd.data = buf->y_buffer_addr;
@@ -542,7 +542,7 @@ void msm_jpeg_hw_we_mmu_prefetch(struct msm_jpeg_hw_buf *buf, void *base,
 		JPEG_DBG("%s:%d: MAX y_buf_addr %08x, y_len %d\n",
 			__func__, __LINE__, tmp_hw_cmd.data, buf->y_len);
 
-		msm_jpeg_hw_write(&tmp_hw_cmd, base);
+		land_msm_jpeg_hw_write(&tmp_hw_cmd, base);
 
 		tmp_hw_cmd = *hw_cmd_p++;
 		tmp_hw_cmd.data = buf->cbcr_buffer_addr;
@@ -550,7 +550,7 @@ void msm_jpeg_hw_we_mmu_prefetch(struct msm_jpeg_hw_buf *buf, void *base,
 		JPEG_DBG("%s:%d: MIN cbcr_buf_addr %08x\n",
 			__func__, __LINE__, tmp_hw_cmd.data);
 
-		msm_jpeg_hw_write(&tmp_hw_cmd, base);
+		land_msm_jpeg_hw_write(&tmp_hw_cmd, base);
 
 		tmp_hw_cmd = *hw_cmd_p++;
 		tmp_hw_cmd.data = buf->cbcr_buffer_addr;
@@ -560,7 +560,7 @@ void msm_jpeg_hw_we_mmu_prefetch(struct msm_jpeg_hw_buf *buf, void *base,
 		JPEG_DBG("%s:%d: MAX cbcr_buf_addr %08x, cbcr_len %d\n"
 			, __func__, __LINE__, tmp_hw_cmd.data, buf->cbcr_len);
 
-		msm_jpeg_hw_write(&tmp_hw_cmd, base);
+		land_msm_jpeg_hw_write(&tmp_hw_cmd, base);
 
 		tmp_hw_cmd = *hw_cmd_p++;
 		tmp_hw_cmd.data = buf->pln2_addr;
@@ -568,7 +568,7 @@ void msm_jpeg_hw_we_mmu_prefetch(struct msm_jpeg_hw_buf *buf, void *base,
 		JPEG_DBG("%s:%d: MIN pln2_buf_addr %08x\n",
 			__func__, __LINE__, tmp_hw_cmd.data);
 
-		msm_jpeg_hw_write(&tmp_hw_cmd, base);
+		land_msm_jpeg_hw_write(&tmp_hw_cmd, base);
 
 		tmp_hw_cmd = *hw_cmd_p++;
 		tmp_hw_cmd.data = buf->pln2_addr;
@@ -578,7 +578,7 @@ void msm_jpeg_hw_we_mmu_prefetch(struct msm_jpeg_hw_buf *buf, void *base,
 		JPEG_DBG("%s:%d: MIN pln2_buf_addr %08x, pln2_len %d\n"
 			, __func__, __LINE__, tmp_hw_cmd.data, buf->pln2_len);
 
-		msm_jpeg_hw_write(&tmp_hw_cmd, base);
+		land_msm_jpeg_hw_write(&tmp_hw_cmd, base);
 	} else {
 		hw_cmd_p += 4;
 		tmp_hw_cmd = *hw_cmd_p++;
@@ -587,7 +587,7 @@ void msm_jpeg_hw_we_mmu_prefetch(struct msm_jpeg_hw_buf *buf, void *base,
 		JPEG_DBG("%s:%d: MIN y_buf_addr %08x\n",
 			__func__, __LINE__, tmp_hw_cmd.data);
 
-		msm_jpeg_hw_write(&tmp_hw_cmd, base);
+		land_msm_jpeg_hw_write(&tmp_hw_cmd, base);
 
 		tmp_hw_cmd = *hw_cmd_p++;
 		tmp_hw_cmd.data = buf->y_buffer_addr;
@@ -597,13 +597,13 @@ void msm_jpeg_hw_we_mmu_prefetch(struct msm_jpeg_hw_buf *buf, void *base,
 		JPEG_DBG("%s:%d: MAX y_buf_addr %08x, y_len %d\n",
 			__func__, __LINE__, tmp_hw_cmd.data, buf->y_len);
 
-		msm_jpeg_hw_write(&tmp_hw_cmd, base);
+		land_msm_jpeg_hw_write(&tmp_hw_cmd, base);
 	}
 	/* ensure write is done */
 	wmb();
 }
 
-struct msm_jpeg_hw_cmd hw_dma_cmd_fe_mmu_prefetch[] = {
+struct msm_jpeg_hw_cmd land_hw_dma_cmd_fe_mmu_prefetch[] = {
 	/* type, repeat n times, offset, mask, data or pdata */
 	{MSM_JPEG_HW_CMD_TYPE_WRITE, 1, MSM_JPEGDMA_S0_MMU_PF_ADDR_MIN,
 		MSM_JPEGDMA_S0_MMU_PF_ADDR_MIN_BMSK, {0} },
@@ -612,7 +612,7 @@ struct msm_jpeg_hw_cmd hw_dma_cmd_fe_mmu_prefetch[] = {
 };
 
 /*
- * msm_jpegdma_hw_fe_mmu_prefetch() - write DMA fe min/max addrs to
+ * land_msm_jpegdma_hw_fe_mmu_prefetch() - write DMA fe min/max addrs to
  * MMU prefetch registers.
  * @buf: Pointer to jpeg hw buffer.
  * @base: Pointer to base address.
@@ -623,12 +623,12 @@ struct msm_jpeg_hw_cmd hw_dma_cmd_fe_mmu_prefetch[] = {
  *
  * Return: None.
  */
-void msm_jpegdma_hw_fe_mmu_prefetch(struct msm_jpeg_hw_buf *buf, void *base)
+void land_msm_jpegdma_hw_fe_mmu_prefetch(struct msm_jpeg_hw_buf *buf, void *base)
 {
 	struct msm_jpeg_hw_cmd *hw_cmd_p;
 	struct msm_jpeg_hw_cmd tmp_hw_cmd;
 
-	hw_cmd_p = &hw_dma_cmd_fe_mmu_prefetch[0];
+	hw_cmd_p = &land_hw_dma_cmd_fe_mmu_prefetch[0];
 
 	tmp_hw_cmd = *hw_cmd_p++;
 	tmp_hw_cmd.data = buf->y_buffer_addr;
@@ -638,7 +638,7 @@ void msm_jpegdma_hw_fe_mmu_prefetch(struct msm_jpeg_hw_buf *buf, void *base)
 
 	/* ensure write is done */
 	wmb();
-	msm_jpeg_hw_write(&tmp_hw_cmd, base);
+	land_msm_jpeg_hw_write(&tmp_hw_cmd, base);
 
 	tmp_hw_cmd = *hw_cmd_p++;
 	tmp_hw_cmd.data = buf->y_buffer_addr;
@@ -649,12 +649,12 @@ void msm_jpegdma_hw_fe_mmu_prefetch(struct msm_jpeg_hw_buf *buf, void *base)
 		__func__, __LINE__, tmp_hw_cmd.data, tmp_hw_cmd.offset,
 		buf->y_len);
 
-	msm_jpeg_hw_write(&tmp_hw_cmd, base);
+	land_msm_jpeg_hw_write(&tmp_hw_cmd, base);
 	/* ensure write is done */
 	wmb();
 }
 
-struct msm_jpeg_hw_cmd hw_dma_cmd_we_mmu_prefetch[] = {
+struct msm_jpeg_hw_cmd land_hw_dma_cmd_we_mmu_prefetch[] = {
 	/* type, repeat n times, offset, mask, data or pdata */
 	{MSM_JPEG_HW_CMD_TYPE_WRITE, 1, MSM_JPEGDMA_S1_MMU_PF_ADDR_MIN,
 		MSM_JPEGDMA_S1_MMU_PF_ADDR_MIN_BMSK, {0} },
@@ -663,7 +663,7 @@ struct msm_jpeg_hw_cmd hw_dma_cmd_we_mmu_prefetch[] = {
 };
 
 /*
- * msm_jpegdma_hw_we_mmu_prefetch() - write DMA we min/max addrs to
+ * land_msm_jpegdma_hw_we_mmu_prefetch() - write DMA we min/max addrs to
  * MMU prefetch registers.
  * @buf: Pointer to jpeg hw buffer.
  * @base: Pointer to base address.
@@ -674,12 +674,12 @@ struct msm_jpeg_hw_cmd hw_dma_cmd_we_mmu_prefetch[] = {
  *
  * Return: None.
  */
-void msm_jpegdma_hw_we_mmu_prefetch(struct msm_jpeg_hw_buf *buf, void *base)
+void land_msm_jpegdma_hw_we_mmu_prefetch(struct msm_jpeg_hw_buf *buf, void *base)
 {
 	struct msm_jpeg_hw_cmd *hw_cmd_p;
 	struct msm_jpeg_hw_cmd tmp_hw_cmd;
 
-	hw_cmd_p = &hw_dma_cmd_we_mmu_prefetch[0];
+	hw_cmd_p = &land_hw_dma_cmd_we_mmu_prefetch[0];
 
 	tmp_hw_cmd = *hw_cmd_p++;
 	tmp_hw_cmd.data = buf->y_buffer_addr;
@@ -689,7 +689,7 @@ void msm_jpegdma_hw_we_mmu_prefetch(struct msm_jpeg_hw_buf *buf, void *base)
 
 	/* ensure write is done */
 	wmb();
-	msm_jpeg_hw_write(&tmp_hw_cmd, base);
+	land_msm_jpeg_hw_write(&tmp_hw_cmd, base);
 
 	tmp_hw_cmd = *hw_cmd_p++;
 	tmp_hw_cmd.data = buf->y_buffer_addr;
@@ -700,12 +700,12 @@ void msm_jpegdma_hw_we_mmu_prefetch(struct msm_jpeg_hw_buf *buf, void *base)
 		__func__, __LINE__, tmp_hw_cmd.data, tmp_hw_cmd.offset,
 		buf->y_len);
 
-	msm_jpeg_hw_write(&tmp_hw_cmd, base);
+	land_msm_jpeg_hw_write(&tmp_hw_cmd, base);
 	/* ensure write is done */
 	wmb();
 }
 
-struct msm_jpeg_hw_cmd hw_cmd_reset[] = {
+struct msm_jpeg_hw_cmd land_hw_cmd_reset[] = {
 	/* type, repeat n times, offset, mask, data or pdata */
 	{MSM_JPEG_HW_CMD_TYPE_WRITE, 1, JPEG_IRQ_MASK_ADDR,
 		JPEG_IRQ_MASK_BMSK, {JPEG_IRQ_DISABLE_ALL} },
@@ -717,29 +717,29 @@ struct msm_jpeg_hw_cmd hw_cmd_reset[] = {
 		JPEG_RESET_CMD_RMSK, {JPEG_RESET_DEFAULT} },
 };
 
-void msm_jpeg_hw_reset(void *base, int size)
+void land_msm_jpeg_hw_reset(void *base, int size)
 {
 	struct msm_jpeg_hw_cmd *hw_cmd_p;
 
-	hw_cmd_p = &hw_cmd_reset[0];
+	hw_cmd_p = &land_hw_cmd_reset[0];
 	/* ensure write is done */
 	wmb();
-	msm_jpeg_hw_write(hw_cmd_p++, base);
+	land_msm_jpeg_hw_write(hw_cmd_p++, base);
 	/* ensure write is done */
 	wmb();
-	msm_jpeg_hw_write(hw_cmd_p++, base);
+	land_msm_jpeg_hw_write(hw_cmd_p++, base);
 	/* ensure write is done */
 	wmb();
-	msm_jpeg_hw_write(hw_cmd_p++, base);
+	land_msm_jpeg_hw_write(hw_cmd_p++, base);
 	/* ensure write is done */
 	wmb();
-	msm_jpeg_hw_write(hw_cmd_p, base);
+	land_msm_jpeg_hw_write(hw_cmd_p, base);
 	/* ensure write is done */
 	wmb();
 
 	return;
 }
-struct msm_jpeg_hw_cmd hw_cmd_reset_dma[] = {
+struct msm_jpeg_hw_cmd land_hw_cmd_reset_dma[] = {
 	/* type, repeat n times, offset, mask, data or pdata */
 	{MSM_JPEG_HW_CMD_TYPE_WRITE, 1, JPEGDMA_IRQ_MASK_ADDR,
 		JPEGDMA_IRQ_MASK_BMSK, {JPEGDMA_IRQ_DISABLE_ALL} },
@@ -751,30 +751,30 @@ struct msm_jpeg_hw_cmd hw_cmd_reset_dma[] = {
 		JPEGDMA_RESET_CMD_BMSK, {JPEGDMA_RESET_DEFAULT} },
 };
 
-void msm_jpeg_hw_reset_dma(void *base, int size)
+void land_msm_jpeg_hw_reset_dma(void *base, int size)
 {
 	struct msm_jpeg_hw_cmd *hw_cmd_p;
 
-	hw_cmd_p = &hw_cmd_reset_dma[0];
+	hw_cmd_p = &land_hw_cmd_reset_dma[0];
 	/* ensure write is done */
 	wmb();
-	msm_jpeg_hw_write(hw_cmd_p++, base);
+	land_msm_jpeg_hw_write(hw_cmd_p++, base);
 	/* ensure write is done */
 	wmb();
-	msm_jpeg_hw_write(hw_cmd_p++, base);
+	land_msm_jpeg_hw_write(hw_cmd_p++, base);
 	/* ensure write is done */
 	wmb();
-	msm_jpeg_hw_write(hw_cmd_p++, base);
+	land_msm_jpeg_hw_write(hw_cmd_p++, base);
 	/* ensure write is done */
 	wmb();
-	msm_jpeg_hw_write(hw_cmd_p, base);
+	land_msm_jpeg_hw_write(hw_cmd_p, base);
 	/* ensure write is done */
 	wmb();
 
 	return;
 }
 
-uint32_t msm_jpeg_hw_read(struct msm_jpeg_hw_cmd *hw_cmd_p,
+uint32_t land_msm_jpeg_hw_read(struct msm_jpeg_hw_cmd *hw_cmd_p,
 	 void *jpeg_region_base)
 {
 	uint32_t *paddr;
@@ -782,13 +782,13 @@ uint32_t msm_jpeg_hw_read(struct msm_jpeg_hw_cmd *hw_cmd_p,
 
 	paddr = jpeg_region_base + hw_cmd_p->offset;
 
-	data = msm_camera_io_r(paddr);
+	data = land_msm_camera_io_r(paddr);
 	data &= hw_cmd_p->mask;
 
 	return data;
 }
 
-void msm_jpeg_hw_write(struct msm_jpeg_hw_cmd *hw_cmd_p,
+void land_msm_jpeg_hw_write(struct msm_jpeg_hw_cmd *hw_cmd_p,
 	void *jpeg_region_base)
 {
 	uint32_t *paddr;
@@ -799,7 +799,7 @@ void msm_jpeg_hw_write(struct msm_jpeg_hw_cmd *hw_cmd_p,
 	if (hw_cmd_p->mask == 0xffffffff) {
 		old_data = 0;
 	} else {
-		old_data = msm_camera_io_r(paddr);
+		old_data = land_msm_camera_io_r(paddr);
 		old_data &= ~hw_cmd_p->mask;
 	}
 
@@ -807,21 +807,21 @@ void msm_jpeg_hw_write(struct msm_jpeg_hw_cmd *hw_cmd_p,
 	new_data |= old_data;
 	JPEG_DBG("%s:%d] %p %08x\n", __func__, __LINE__,
 		paddr, new_data);
-	msm_camera_io_w(new_data, paddr);
+	land_msm_camera_io_w(new_data, paddr);
 }
 
-int msm_jpeg_hw_wait(struct msm_jpeg_hw_cmd *hw_cmd_p, int m_us,
+int land_msm_jpeg_hw_wait(struct msm_jpeg_hw_cmd *hw_cmd_p, int m_us,
 	void *base)
 {
 	int tm = hw_cmd_p->n;
 	uint32_t data;
 	uint32_t wait_data = hw_cmd_p->data & hw_cmd_p->mask;
 
-	data = msm_jpeg_hw_read(hw_cmd_p, base);
+	data = land_msm_jpeg_hw_read(hw_cmd_p, base);
 	if (data != wait_data) {
 		while (tm) {
 			udelay(m_us);
-			data = msm_jpeg_hw_read(hw_cmd_p, base);
+			data = land_msm_jpeg_hw_read(hw_cmd_p, base);
 			if (data == wait_data)
 				break;
 			tm--;
@@ -831,7 +831,7 @@ int msm_jpeg_hw_wait(struct msm_jpeg_hw_cmd *hw_cmd_p, int m_us,
 	return tm;
 }
 
-void msm_jpeg_hw_delay(struct msm_jpeg_hw_cmd *hw_cmd_p, int m_us)
+void land_msm_jpeg_hw_delay(struct msm_jpeg_hw_cmd *hw_cmd_p, int m_us)
 {
 	int tm = hw_cmd_p->n;
 	while (tm) {
@@ -840,7 +840,7 @@ void msm_jpeg_hw_delay(struct msm_jpeg_hw_cmd *hw_cmd_p, int m_us)
 	}
 }
 
-int msm_jpeg_hw_exec_cmds(struct msm_jpeg_hw_cmd *hw_cmd_p, uint32_t m_cmds,
+int land_msm_jpeg_hw_exec_cmds(struct msm_jpeg_hw_cmd *hw_cmd_p, uint32_t m_cmds,
 	uint32_t max_size, void *base)
 {
 	int is_copy_to_user = 0;
@@ -860,35 +860,35 @@ int msm_jpeg_hw_exec_cmds(struct msm_jpeg_hw_cmd *hw_cmd_p, uint32_t m_cmds,
 
 		switch (hw_cmd_p->type) {
 		case MSM_JPEG_HW_CMD_TYPE_READ:
-			hw_cmd_p->data = msm_jpeg_hw_read(hw_cmd_p, base);
+			hw_cmd_p->data = land_msm_jpeg_hw_read(hw_cmd_p, base);
 			is_copy_to_user = 1;
 			break;
 
 		case MSM_JPEG_HW_CMD_TYPE_WRITE:
-			msm_jpeg_hw_write(hw_cmd_p, base);
+			land_msm_jpeg_hw_write(hw_cmd_p, base);
 			break;
 
 		case MSM_JPEG_HW_CMD_TYPE_WRITE_OR:
-			data = msm_jpeg_hw_read(hw_cmd_p, base);
+			data = land_msm_jpeg_hw_read(hw_cmd_p, base);
 			hw_cmd_p->data = (hw_cmd_p->data & hw_cmd_p->mask) |
 				data;
-			msm_jpeg_hw_write(hw_cmd_p, base);
+			land_msm_jpeg_hw_write(hw_cmd_p, base);
 			break;
 
 		case MSM_JPEG_HW_CMD_TYPE_UWAIT:
-			msm_jpeg_hw_wait(hw_cmd_p, 1, base);
+			land_msm_jpeg_hw_wait(hw_cmd_p, 1, base);
 			break;
 
 		case MSM_JPEG_HW_CMD_TYPE_MWAIT:
-			msm_jpeg_hw_wait(hw_cmd_p, 1000, base);
+			land_msm_jpeg_hw_wait(hw_cmd_p, 1000, base);
 			break;
 
 		case MSM_JPEG_HW_CMD_TYPE_UDELAY:
-			msm_jpeg_hw_delay(hw_cmd_p, 1);
+			land_msm_jpeg_hw_delay(hw_cmd_p, 1);
 			break;
 
 		case MSM_JPEG_HW_CMD_TYPE_MDELAY:
-			msm_jpeg_hw_delay(hw_cmd_p, 1000);
+			land_msm_jpeg_hw_delay(hw_cmd_p, 1000);
 			break;
 
 		default:
@@ -901,7 +901,7 @@ int msm_jpeg_hw_exec_cmds(struct msm_jpeg_hw_cmd *hw_cmd_p, uint32_t m_cmds,
 	return is_copy_to_user;
 }
 
-void msm_jpeg_io_dump(void *base, int size)
+void land_msm_jpeg_io_dump(void *base, int size)
 {
 	char line_str[128], *p_str;
 	void __iomem *addr = (void __iomem *)base;
@@ -916,7 +916,7 @@ void msm_jpeg_io_dump(void *base, int size)
 			snprintf(p_str, 12, "%08lx: ", (unsigned long)p);
 			p_str += 10;
 		}
-		data = msm_camera_io_r(p++);
+		data = land_msm_camera_io_r(p++);
 		snprintf(p_str, 12, "%08x ", data);
 		p_str += 9;
 		if ((i + 1) % 4 == 0) {

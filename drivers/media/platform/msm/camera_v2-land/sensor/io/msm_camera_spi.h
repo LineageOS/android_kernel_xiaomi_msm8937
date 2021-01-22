@@ -83,37 +83,37 @@ uint16_t msm_camera_spi_get_hlen(struct msm_camera_spi_inst *inst)
 	return sizeof(inst->opcode) + inst->addr_len + inst->dummy_len;
 }
 
-int32_t msm_camera_spi_read(struct msm_camera_i2c_client *client,
+int32_t land_msm_camera_spi_read(struct msm_camera_i2c_client *client,
 	uint32_t addr, uint16_t *data,
 	enum msm_camera_i2c_data_type data_type);
 
-int32_t msm_camera_spi_read_seq(struct msm_camera_i2c_client *client,
+int32_t land_msm_camera_spi_read_seq(struct msm_camera_i2c_client *client,
 	uint32_t addr, uint8_t *data, uint32_t num_byte);
 
-int32_t msm_camera_spi_read_seq_l(struct msm_camera_i2c_client *client,
+int32_t land_msm_camera_spi_read_seq_l(struct msm_camera_i2c_client *client,
 	uint32_t addr, uint32_t num_byte, char *tx, char *rx);
 
-int32_t msm_camera_spi_query_id(struct msm_camera_i2c_client *client,
+int32_t land_msm_camera_spi_query_id(struct msm_camera_i2c_client *client,
 	uint32_t addr, uint8_t *data, uint32_t num_byte);
 
-int32_t msm_camera_spi_write_seq(struct msm_camera_i2c_client *client,
+int32_t land_msm_camera_spi_write_seq(struct msm_camera_i2c_client *client,
 	uint32_t addr, uint8_t *data, uint32_t num_byte);
 
-int32_t msm_camera_spi_erase(struct msm_camera_i2c_client *client,
+int32_t land_msm_camera_spi_erase(struct msm_camera_i2c_client *client,
 	uint32_t addr, uint32_t size);
 
-int32_t msm_camera_spi_write(struct msm_camera_i2c_client *client,
+int32_t land_msm_camera_spi_write(struct msm_camera_i2c_client *client,
 	uint32_t addr, uint16_t data, enum msm_camera_i2c_data_type data_type);
 
-int32_t msm_camera_spi_write_table(struct msm_camera_i2c_client *client,
+int32_t land_msm_camera_spi_write_table(struct msm_camera_i2c_client *client,
 	struct msm_camera_i2c_reg_setting *write_setting);
 
-int32_t msm_camera_spi_write_burst(struct msm_camera_i2c_client *client,
+int32_t land_msm_camera_spi_write_burst(struct msm_camera_i2c_client *client,
 	struct msm_camera_i2c_reg_array *reg_setting, uint32_t reg_size,
 	uint32_t buf_len, uint32_t addr,
 	enum msm_camera_i2c_data_type data_type);
 
-int32_t msm_camera_spi_read_burst(struct msm_camera_i2c_client *client,
+int32_t land_msm_camera_spi_read_burst(struct msm_camera_i2c_client *client,
 	uint32_t read_byte, uint8_t *buffer, uint32_t addr,
 	enum msm_camera_i2c_data_type data_type);
 

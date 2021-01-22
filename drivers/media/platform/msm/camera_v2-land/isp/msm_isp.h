@@ -711,7 +711,7 @@ struct vfe_device {
 	uint64_t msm_isp_last_overflow_ab;
 	uint64_t msm_isp_last_overflow_ib;
 	uint64_t msm_isp_vfe_clk_rate;
-	struct msm_isp_ub_info *ub_info;
+	struct msm_isp_ub_info *land_ub_info;
 	uint32_t isp_sof_debug;
 	uint32_t isp_raw0_debug;
 	uint32_t isp_raw1_debug;
@@ -727,6 +727,6 @@ struct vfe_parent_device {
 	struct msm_vfe_common_subdev *common_sd;
 };
 
-int vfe_hw_probe(struct platform_device *pdev);
+int land_vfe_hw_probe(struct platform_device *pdev);
 
 #endif

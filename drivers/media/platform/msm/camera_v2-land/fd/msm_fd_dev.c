@@ -197,7 +197,7 @@ static int msm_fd_queue_setup(struct vb2_queue *q,
  * msm_fd_buf_init - vb2_ops buf_init callback.
  * @vb: Pointer to vb2 buffer struct.
  */
-int msm_fd_buf_init(struct vb2_buffer *vb)
+int land_msm_fd_buf_init(struct vb2_buffer *vb)
 {
 	struct msm_fd_buffer *fd_buffer =
 		(struct msm_fd_buffer *)vb;
@@ -221,10 +221,10 @@ static void msm_fd_buf_queue(struct vb2_buffer *vb)
 	fd_buffer->format = ctx->format;
 	fd_buffer->settings = ctx->settings;
 	fd_buffer->work_addr = ctx->work_buf.addr;
-	msm_fd_hw_add_buffer(ctx->fd_device, fd_buffer);
+	land_msm_fd_hw_add_buffer(ctx->fd_device, fd_buffer);
 
 	if (vb->vb2_queue->streaming)
-		msm_fd_hw_schedule_and_start(ctx->fd_device);
+		land_msm_fd_hw_schedule_and_start(ctx->fd_device);
 
 	return;
 }
@@ -244,13 +244,13 @@ static int msm_fd_start_streaming(struct vb2_queue *q, unsigned int count)
 		return -EINVAL;
 	}
 
-	ret = msm_fd_hw_get(ctx->fd_device, ctx->settings.speed);
+	ret = land_msm_fd_hw_get(ctx->fd_device, ctx->settings.speed);
 	if (ret < 0) {
 		dev_err(ctx->fd_device->dev, "Can not acquire fd hw\n");
 		goto out;
 	}
 
-	ret = msm_fd_hw_schedule_and_start(ctx->fd_device);
+	ret = land_msm_fd_hw_schedule_and_start(ctx->fd_device);
 	if (ret < 0)
 		dev_err(ctx->fd_device->dev, "Can not start fd hw\n");
 
@@ -266,14 +266,14 @@ static void msm_fd_stop_streaming(struct vb2_queue *q)
 {
 	struct fd_ctx *ctx = vb2_get_drv_priv(q);
 
-	msm_fd_hw_remove_buffers_from_queue(ctx->fd_device, q);
-	msm_fd_hw_put(ctx->fd_device);
+	land_msm_fd_hw_remove_buffers_from_queue(ctx->fd_device, q);
+	land_msm_fd_hw_put(ctx->fd_device);
 }
 
 /* Videobuf2 queue callbacks. */
 static struct vb2_ops msm_fd_vb2_q_ops = {
 	.queue_setup     = msm_fd_queue_setup,
-	.buf_init        = msm_fd_buf_init,
+	.buf_init        = land_msm_fd_buf_init,
 	.buf_queue       = msm_fd_buf_queue,
 	.start_streaming = msm_fd_start_streaming,
 	.stop_streaming  = msm_fd_stop_streaming,
@@ -298,7 +298,7 @@ static void *msm_fd_get_userptr(struct device *alloc_ctx,
 	if (!buf)
 		return ERR_PTR(-ENOMEM);
 
-	ret = msm_fd_hw_map_buffer(pool, vaddr, buf);
+	ret = land_msm_fd_hw_map_buffer(pool, vaddr, buf);
 	if (ret < 0 || buf->size < size)
 		goto error;
 
@@ -317,7 +317,7 @@ static void msm_fd_put_userptr(void *buf_priv)
 	if (IS_ERR_OR_NULL(buf_priv))
 		return;
 
-	msm_fd_hw_unmap_buffer(buf_priv);
+	land_msm_fd_hw_unmap_buffer(buf_priv);
 
 	kzfree(buf_priv);
 }
@@ -384,7 +384,7 @@ static int msm_fd_open(struct file *file)
 		goto error_stats_vmalloc;
 	}
 
-	ret = cam_config_ahb_clk(NULL, 0, CAM_AHB_CLIENT_FD,
+	ret = land_cam_config_ahb_clk(NULL, 0, CAM_AHB_CLIENT_FD,
 			CAM_AHB_SVS_VOTE);
 	if (ret < 0) {
 		pr_err("%s: failed to vote for AHB\n", __func__);
@@ -417,14 +417,14 @@ static int msm_fd_release(struct file *file)
 	vfree(ctx->stats);
 
 	if (ctx->work_buf.fd != -1)
-		msm_fd_hw_unmap_buffer(&ctx->work_buf);
+		land_msm_fd_hw_unmap_buffer(&ctx->work_buf);
 
 	v4l2_fh_del(&ctx->fh);
 	v4l2_fh_exit(&ctx->fh);
 
 	kfree(ctx);
 
-	if (cam_config_ahb_clk(NULL, 0, CAM_AHB_CLIENT_FD,
+	if (land_cam_config_ahb_clk(NULL, 0, CAM_AHB_CLIENT_FD,
 		CAM_AHB_SUSPEND_VOTE) < 0)
 		pr_err("%s: failed to remove vote for AHB\n", __func__);
 
@@ -973,9 +973,9 @@ static int msm_fd_s_ctrl(struct file *file, void *fh, struct v4l2_control *a)
 		break;
 	case V4L2_CID_FD_WORK_MEMORY_FD:
 		if (ctx->work_buf.fd != -1)
-			msm_fd_hw_unmap_buffer(&ctx->work_buf);
+			land_msm_fd_hw_unmap_buffer(&ctx->work_buf);
 		if (a->value >= 0) {
-			ret = msm_fd_hw_map_buffer(&ctx->mem_pool,
+			ret = land_msm_fd_hw_map_buffer(&ctx->mem_pool,
 				a->value, &ctx->work_buf);
 			if (ret < 0)
 				return ret;
@@ -1104,14 +1104,14 @@ static void msm_fd_fill_results(struct msm_fd_device *fd,
 {
 	int half_face_size;
 
-	msm_fd_hw_get_result_angle_pose(fd, idx, &face->angle, &face->pose);
+	land_msm_fd_hw_get_result_angle_pose(fd, idx, &face->angle, &face->pose);
 
-	msm_fd_hw_get_result_conf_size(fd, idx, &face->confidence,
+	land_msm_fd_hw_get_result_conf_size(fd, idx, &face->confidence,
 		&face->face.width);
 	face->face.height = face->face.width;
 
-	face->face.left = msm_fd_hw_get_result_x(fd, idx);
-	face->face.top = msm_fd_hw_get_result_y(fd, idx);
+	face->face.left = land_msm_fd_hw_get_result_x(fd, idx);
+	face->face.top = land_msm_fd_hw_get_result_y(fd, idx);
 
 	half_face_size = (face->face.width >> 1);
 	if (face->face.left > half_face_size)
@@ -1150,7 +1150,7 @@ static void msm_fd_wq_handler(struct work_struct *work)
 
 	fd = container_of(work, struct msm_fd_device, work);
 
-	active_buf = msm_fd_hw_get_active_buffer(fd);
+	active_buf = land_msm_fd_hw_get_active_buffer(fd);
 	if (!active_buf) {
 		/* This should never happen, something completely wrong */
 		dev_err(fd->dev, "Oops no active buffer empty queue\n");
@@ -1169,7 +1169,7 @@ static void msm_fd_wq_handler(struct work_struct *work)
 	/* First mark stats as invalid */
 	atomic_set(&stats->frame_id, 0);
 
-	stats->face_cnt = msm_fd_hw_get_face_count(fd);
+	stats->face_cnt = land_msm_fd_hw_get_face_count(fd);
 	for (i = 0; i < stats->face_cnt; i++)
 		msm_fd_fill_results(fd, &stats->face_data[i], i);
 
@@ -1177,7 +1177,7 @@ static void msm_fd_wq_handler(struct work_struct *work)
 	atomic_set(&stats->frame_id, ctx->sequence);
 
 	/* We have the data from fd hw, we can start next processing */
-	msm_fd_hw_schedule_next_buffer(fd);
+	land_msm_fd_hw_schedule_next_buffer(fd);
 
 	/* Return buffer to vb queue */
 	active_buf->vb_v4l2_buf.sequence = ctx->fh.sequence;
@@ -1193,7 +1193,7 @@ static void msm_fd_wq_handler(struct work_struct *work)
 	v4l2_event_queue_fh(&ctx->fh, &event);
 
 	/* Release buffer from the device */
-	msm_fd_hw_buffer_done(fd, active_buf);
+	land_msm_fd_hw_buffer_done(fd, active_buf);
 }
 
 /*
@@ -1218,43 +1218,43 @@ static int fd_probe(struct platform_device *pdev)
 	fd->dev = &pdev->dev;
 
 	/* Get resources */
-	ret = msm_fd_hw_get_mem_resources(pdev, fd);
+	ret = land_msm_fd_hw_get_mem_resources(pdev, fd);
 	if (ret < 0) {
 		dev_err(&pdev->dev, "Fail get resources\n");
 		ret = -ENODEV;
 		goto error_mem_resources;
 	}
 
-	ret = msm_camera_get_regulator_info(pdev, &fd->vdd,
+	ret = land_msm_camera_get_regulator_info(pdev, &fd->vdd,
 		&fd->num_reg);
 	if (ret < 0) {
 		dev_err(&pdev->dev, "Fail to get regulators\n");
 		goto error_get_regulator;
 	}
-	ret = msm_camera_get_clk_info_and_rates(pdev, &fd->clk_info,
+	ret = land_msm_camera_get_clk_info_and_rates(pdev, &fd->clk_info,
 		&fd->clk, &fd->clk_rates, &fd->clk_rates_num, &fd->clk_num);
 	if (ret < 0) {
 		dev_err(&pdev->dev, "Fail to get clocks\n");
 		goto error_get_clocks;
 	}
 
-	ret = msm_camera_register_bus_client(pdev, CAM_BUS_CLIENT_FD);
+	ret = land_msm_camera_register_bus_client(pdev, CAM_BUS_CLIENT_FD);
 	if (ret < 0) {
 		dev_err(&pdev->dev, "Fail to get bus\n");
 		goto error_get_bus;
 	}
 
 	/* Get face detect hw before read engine revision */
-	ret = msm_fd_hw_get(fd, 0);
+	ret = land_msm_fd_hw_get(fd, 0);
 	if (ret < 0) {
 		dev_err(&pdev->dev, "Fail to get hw\n");
 		goto error_hw_get_request_irq;
 	}
-	fd->hw_revision = msm_fd_hw_get_revision(fd);
+	fd->hw_revision = land_msm_fd_hw_get_revision(fd);
 
-	msm_fd_hw_put(fd);
+	land_msm_fd_hw_put(fd);
 
-	ret = msm_fd_hw_request_irq(pdev, fd, msm_fd_wq_handler);
+	ret = land_msm_fd_hw_request_irq(pdev, fd, msm_fd_wq_handler);
 	if (ret < 0) {
 		dev_err(&pdev->dev, "Fail request irq\n");
 		goto error_hw_get_request_irq;
@@ -1292,16 +1292,16 @@ static int fd_probe(struct platform_device *pdev)
 error_video_register:
 	v4l2_device_unregister(&fd->v4l2_dev);
 error_v4l2_register:
-	msm_fd_hw_release_irq(fd);
+	land_msm_fd_hw_release_irq(fd);
 error_hw_get_request_irq:
-	msm_camera_unregister_bus_client(CAM_BUS_CLIENT_FD);
+	land_msm_camera_unregister_bus_client(CAM_BUS_CLIENT_FD);
 error_get_bus:
-	msm_camera_put_clk_info_and_rates(pdev, &fd->clk_info,
+	land_msm_camera_put_clk_info_and_rates(pdev, &fd->clk_info,
 		&fd->clk, &fd->clk_rates, fd->clk_rates_num, fd->clk_num);
 error_get_clocks:
-	msm_camera_put_regulators(pdev, &fd->vdd, fd->num_reg);
+	land_msm_camera_put_regulators(pdev, &fd->vdd, fd->num_reg);
 error_get_regulator:
-	msm_fd_hw_release_mem_resources(fd);
+	land_msm_fd_hw_release_mem_resources(fd);
 error_mem_resources:
 	kfree(fd);
 	return ret;
@@ -1322,12 +1322,12 @@ static int fd_device_remove(struct platform_device *pdev)
 	}
 	video_unregister_device(&fd->video);
 	v4l2_device_unregister(&fd->v4l2_dev);
-	msm_fd_hw_release_irq(fd);
-	msm_camera_unregister_bus_client(CAM_BUS_CLIENT_FD);
-	msm_camera_put_clk_info_and_rates(pdev, &fd->clk_info,
+	land_msm_fd_hw_release_irq(fd);
+	land_msm_camera_unregister_bus_client(CAM_BUS_CLIENT_FD);
+	land_msm_camera_put_clk_info_and_rates(pdev, &fd->clk_info,
 		&fd->clk, &fd->clk_rates, fd->clk_rates_num, fd->clk_num);
-	msm_camera_put_regulators(pdev, &fd->vdd, fd->num_reg);
-	msm_fd_hw_release_mem_resources(fd);
+	land_msm_camera_put_regulators(pdev, &fd->vdd, fd->num_reg);
+	land_msm_fd_hw_release_mem_resources(fd);
 	kfree(fd);
 
 	return 0;
