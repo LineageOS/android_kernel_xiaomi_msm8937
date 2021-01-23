@@ -31,9 +31,17 @@
 #else
 #include <media/msmb_isp-legacy.h>
 #endif
+#ifdef CONFIG_MACH_XIAOMI_LAND
+#include <media/msmb_isp-land.h>
+#endif
 #endif
 #include <ipc/apr.h>
 #include <dsp/q6core.h>
+
+#ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_device.h>
+extern int xiaomi_device_read(void);
+#endif
 
 #define DEVICE_NAME "avtimer"
 #define TIMEOUT_MS 1000
@@ -342,11 +350,21 @@ static void avcs_set_isp_fptr(bool enable)
 		av_fptr.fptr_avtimer_open = avcs_core_open;
 		av_fptr.fptr_avtimer_enable = avcs_core_disable_power_collapse;
 		av_fptr.fptr_avtimer_get_time = avcs_core_query_timer;
+#ifdef CONFIG_MACH_XIAOMI_LAND
+		if (xiaomi_device_read() == XIAOMI_DEVICE_LAND)
+			land_msm_isp_set_avtimer_fptr(av_fptr);
+		else
+#endif
 		msm_isp_set_avtimer_fptr(av_fptr);
 	} else {
 		av_fptr.fptr_avtimer_open = NULL;
 		av_fptr.fptr_avtimer_enable = NULL;
 		av_fptr.fptr_avtimer_get_time = NULL;
+#ifdef CONFIG_MACH_XIAOMI_LAND
+		if (xiaomi_device_read() == XIAOMI_DEVICE_LAND)
+			land_msm_isp_set_avtimer_fptr(av_fptr);
+		else
+#endif
 		msm_isp_set_avtimer_fptr(av_fptr);
 	}
 }
