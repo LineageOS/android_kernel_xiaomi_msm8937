@@ -13,6 +13,11 @@
 #include <linux/module.h>
 #include <linux/ratelimit.h>
 
+#ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_device.h>
+extern int xiaomi_device_read(void);
+#endif
+
 #include "msm_isp46.h"
 #include "msm_isp_util.h"
 #include "msm_isp_axi_util.h"
@@ -2014,6 +2019,10 @@ static struct platform_driver vfe46_driver = {
 
 static int __init msm_vfe46_init_module(void)
 {
+#ifdef CONFIG_MACH_XIAOMI_LAND
+	if (xiaomi_device_read() == XIAOMI_DEVICE_LAND)
+		return -ENODEV;
+#endif
 	return platform_driver_register(&vfe46_driver);
 }
 

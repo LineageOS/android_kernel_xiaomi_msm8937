@@ -18,6 +18,11 @@
 #include "msm_sensor.h"
 #include "msm_sd.h"
 
+#ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_device.h>
+extern int xiaomi_device_read(void);
+#endif
+
 /* Logging macro */
 #undef CDBG
 #define CDBG(fmt, args...) pr_debug(fmt, ##args)
@@ -167,6 +172,10 @@ static long msm_sensor_init_subdev_fops_ioctl(
 static int __init msm_sensor_init_module(void)
 {
 	int ret = 0;
+#ifdef CONFIG_MACH_XIAOMI_LAND
+	if (xiaomi_device_read() == XIAOMI_DEVICE_LAND)
+		return -ENODEV;
+#endif
 	/* Allocate memory for msm_sensor_init control structure */
 	s_init = kzalloc(sizeof(struct msm_sensor_init_t), GFP_KERNEL);
 	if (!s_init)

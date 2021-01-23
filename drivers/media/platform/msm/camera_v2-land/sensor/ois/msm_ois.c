@@ -17,6 +17,11 @@
 #include "msm_ois.h"
 #include "msm_cci.h"
 
+#ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_device.h>
+extern int xiaomi_device_read(void);
+#endif
+
 DEFINE_MSM_MUTEX(msm_ois_mutex);
 /*#define MSM_OIS_DEBUG*/
 #undef CDBG
@@ -742,6 +747,12 @@ static struct platform_driver msm_ois_platform_driver = {
 static int __init msm_ois_init_module(void)
 {
 	int32_t rc = 0;
+
+#ifdef CONFIG_MACH_XIAOMI_LAND
+	if (xiaomi_device_read() != XIAOMI_DEVICE_LAND)
+		return -ENODEV;
+#endif
+
 	CDBG("Enter\n");
 	rc = platform_driver_register(&msm_ois_platform_driver);
 	if (!rc)

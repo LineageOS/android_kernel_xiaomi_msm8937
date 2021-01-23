@@ -24,6 +24,11 @@
 #include <media/v4l2-ioctl.h>
 #include <media/v4l2-event.h>
 
+#ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_device.h>
+extern int xiaomi_device_read(void);
+#endif
+
 #include "msm_isp.h"
 #include "msm_isp_util.h"
 #include "msm_isp_axi_util.h"
@@ -638,6 +643,10 @@ static struct platform_driver vfe_driver = {
 
 static int __init msm_vfe_init_module(void)
 {
+#ifdef CONFIG_MACH_XIAOMI_LAND
+	if (xiaomi_device_read() != XIAOMI_DEVICE_LAND)
+		return -ENODEV;
+#endif
 	return platform_driver_register(&vfe_driver);
 }
 

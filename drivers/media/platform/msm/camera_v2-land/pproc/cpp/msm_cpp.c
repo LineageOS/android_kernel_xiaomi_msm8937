@@ -42,6 +42,11 @@
 #include "cam_smmu_api.h"
 #include "cam_hw_ops.h"
 
+#ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_device.h>
+extern int xiaomi_device_read(void);
+#endif
+
 #define MSM_CPP_DRV_NAME "msm_cpp"
 
 #define MSM_CPP_MAX_BUFF_QUEUE	16
@@ -4485,6 +4490,10 @@ static struct platform_driver cpp_driver = {
 
 static int __init msm_cpp_init_module(void)
 {
+#ifdef CONFIG_MACH_XIAOMI_LAND
+	if (xiaomi_device_read() != XIAOMI_DEVICE_LAND)
+		return -ENODEV;
+#endif
 	return platform_driver_register(&cpp_driver);
 }
 

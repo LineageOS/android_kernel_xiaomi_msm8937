@@ -23,6 +23,11 @@
 #include <media/v4l2-event.h>
 #include <media/videobuf2-core.h>
 
+#ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_device.h>
+extern int xiaomi_device_read(void);
+#endif
+
 #include "msm_fd_dev.h"
 #include "msm_fd_hw.h"
 #include "msm_fd_regs.h"
@@ -1458,6 +1463,10 @@ static struct platform_driver fd_driver = {
 
 static int __init msm_fd_init_module(void)
 {
+#ifdef CONFIG_MACH_XIAOMI_LAND
+	if (xiaomi_device_read() == XIAOMI_DEVICE_LAND)
+		return -ENODEV;
+#endif
 	return platform_driver_register(&fd_driver);
 }
 

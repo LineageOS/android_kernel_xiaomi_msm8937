@@ -20,6 +20,11 @@
 #include "msm_cci.h"
 
 #ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_device.h>
+extern int xiaomi_device_read(void);
+#endif
+
+#ifdef CONFIG_MACH_XIAOMI
 #include <linux/xiaomi_series.h>
 extern int xiaomi_series_read(void);
 #endif
@@ -1337,6 +1342,12 @@ static struct platform_driver msm_flash_platform_driver = {
 static int __init msm_flash_init_module(void)
 {
 	int32_t rc = 0;
+
+#ifdef CONFIG_MACH_XIAOMI_LAND
+	if (xiaomi_device_read() == XIAOMI_DEVICE_LAND)
+		return -ENODEV;
+#endif
+
 	CDBG("Enter\n");
 	rc = platform_driver_register(&msm_flash_platform_driver);
 	if (!rc)

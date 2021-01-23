@@ -31,6 +31,11 @@
 #include "include/msm_csid_3_5_1_hwreg.h"
 #include "cam_hw_ops.h"
 
+#ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_device.h>
+extern int xiaomi_device_read(void);
+#endif
+
 #define V4L2_IDENT_CSID                            50002
 #define CSID_VERSION_V20                      0x02000011
 #define CSID_VERSION_V22                      0x02001000
@@ -1252,6 +1257,10 @@ static struct platform_driver csid_driver = {
 
 static int __init msm_csid_init_module(void)
 {
+#ifdef CONFIG_MACH_XIAOMI_LAND
+	if (xiaomi_device_read() == XIAOMI_DEVICE_LAND)
+		return -ENODEV;
+#endif
 	return platform_driver_register(&csid_driver);
 }
 

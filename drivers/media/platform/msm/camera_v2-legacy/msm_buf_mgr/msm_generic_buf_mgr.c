@@ -11,6 +11,11 @@
  */
 #define pr_fmt(fmt) "CAM-BUFMGR %s:%d " fmt, __func__, __LINE__
 
+#ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_device.h>
+extern int xiaomi_device_read(void);
+#endif
+
 #include "msm_generic_buf_mgr.h"
 
 static struct msm_buf_mngr_device *msm_buf_mngr_dev;
@@ -831,6 +836,12 @@ static long msm_buf_subdev_fops_ioctl(struct file *file, unsigned int cmd,
 static int32_t __init msm_buf_mngr_init(void)
 {
 	int32_t rc = 0;
+
+#ifdef CONFIG_MACH_XIAOMI_LAND
+	if (xiaomi_device_read() == XIAOMI_DEVICE_LAND)
+		return -ENODEV;
+#endif
+
 	msm_buf_mngr_dev = kzalloc(sizeof(*msm_buf_mngr_dev),
 		GFP_KERNEL);
 	if (WARN_ON(!msm_buf_mngr_dev)) {

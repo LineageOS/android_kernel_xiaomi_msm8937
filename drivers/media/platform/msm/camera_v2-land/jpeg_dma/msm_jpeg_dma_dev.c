@@ -23,6 +23,11 @@
 #include <media/v4l2-mem2mem.h>
 #include <media/msm_jpeg_dma.h>
 
+#ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_device.h>
+extern int xiaomi_device_read(void);
+#endif
+
 #include "msm_jpeg_dma_dev.h"
 #include "msm_jpeg_dma_hw.h"
 #include "cam_hw_ops.h"
@@ -1419,6 +1424,10 @@ static struct platform_driver jpegdma_driver = {
 
 static int __init msm_jpegdma_init_module(void)
 {
+#ifdef CONFIG_MACH_XIAOMI_LAND
+	if (xiaomi_device_read() != XIAOMI_DEVICE_LAND)
+		return -ENODEV;
+#endif
 	return platform_driver_register(&jpegdma_driver);
 }
 

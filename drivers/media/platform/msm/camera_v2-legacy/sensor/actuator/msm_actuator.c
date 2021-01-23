@@ -17,6 +17,11 @@
 #include "msm_actuator.h"
 #include "msm_cci.h"
 
+#ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_device.h>
+extern int xiaomi_device_read(void);
+#endif
+
 DEFINE_MSM_MUTEX(msm_actuator_mutex);
 
 #undef CDBG
@@ -2090,6 +2095,10 @@ static struct platform_driver msm_actuator_platform_driver = {
 
 static int __init msm_actuator_init_module(void)
 {
+#ifdef CONFIG_MACH_XIAOMI_LAND
+	if (xiaomi_device_read() == XIAOMI_DEVICE_LAND)
+		return -ENODEV;
+#endif
 	CDBG("Enter\n");
 	platform_driver_register(&msm_actuator_platform_driver);
 	return i2c_add_driver(&msm_actuator_i2c_driver);

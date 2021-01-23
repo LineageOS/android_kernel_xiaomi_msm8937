@@ -32,6 +32,11 @@
 #include "cam_hw_ops.h"
 #include <media/msmb_generic_buf_mgr-legacy.h>
 
+#ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_device.h>
+extern int xiaomi_device_read(void);
+#endif
+
 static struct v4l2_device *msm_v4l2_dev;
 static struct list_head    ordered_sd_list;
 static struct mutex        ordered_sd_mtx;
@@ -1439,6 +1444,10 @@ static struct platform_driver msm_driver = {
 
 static int __init msm_init(void)
 {
+#ifdef CONFIG_MACH_XIAOMI_LAND
+	if (xiaomi_device_read() == XIAOMI_DEVICE_LAND)
+		return -ENODEV;
+#endif
 	return platform_driver_register(&msm_driver);
 }
 

@@ -25,6 +25,11 @@
 #include "msm_camera_dt_util.h"
 #include "cam_hw_ops.h"
 
+#ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_device.h>
+extern int xiaomi_device_read(void);
+#endif
+
 #define V4L2_IDENT_CCI 50005
 #define CCI_I2C_QUEUE_0_SIZE 64
 #define CCI_I2C_QUEUE_1_SIZE 16
@@ -2161,6 +2166,10 @@ static struct platform_driver cci_driver = {
 
 static int __init msm_cci_init_module(void)
 {
+#ifdef CONFIG_MACH_XIAOMI_LAND
+	if (xiaomi_device_read() != XIAOMI_DEVICE_LAND)
+		return -ENODEV;
+#endif
 	return platform_driver_register(&cci_driver);
 }
 

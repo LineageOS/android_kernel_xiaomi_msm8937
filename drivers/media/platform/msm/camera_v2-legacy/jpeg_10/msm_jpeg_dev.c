@@ -26,6 +26,11 @@
 #include <media/v4l2-device.h>
 #include <media/v4l2-subdev.h>
 
+#ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_device.h>
+extern int xiaomi_device_read(void);
+#endif
+
 #include "msm_jpeg_sync.h"
 #include "msm_jpeg_common.h"
 
@@ -329,6 +334,12 @@ static struct platform_driver msm_jpeg_driver = {
 static int __init msm_jpeg_driver_init(void)
 {
 	int rc;
+
+#ifdef CONFIG_MACH_XIAOMI_LAND
+	if (xiaomi_device_read() == XIAOMI_DEVICE_LAND)
+		return -ENODEV;
+#endif
+
 	rc = platform_driver_register(&msm_jpeg_driver);
 	return rc;
 }

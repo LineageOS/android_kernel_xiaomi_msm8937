@@ -34,6 +34,11 @@
 #include "msm_vpe.h"
 #include "msm_camera_io_util.h"
 
+#ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_device.h>
+extern int xiaomi_device_read(void);
+#endif
+
 #define MSM_VPE_IDENT_TO_SESSION_ID(identity) ((identity >> 16) & 0xFFFF)
 #define MSM_VPE_IDENT_TO_STREAM_ID(identity) (identity & 0xFFFF)
 
@@ -1680,6 +1685,10 @@ static struct platform_driver vpe_driver = {
 
 static int __init msm_vpe_init_module(void)
 {
+#ifdef CONFIG_MACH_XIAOMI_LAND
+	if (xiaomi_device_read() == XIAOMI_DEVICE_LAND)
+		return -ENODEV;
+#endif
 	return platform_driver_register(&vpe_driver);
 }
 

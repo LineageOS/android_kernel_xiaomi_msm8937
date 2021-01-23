@@ -14,6 +14,11 @@
 #include <linux/export.h>
 #include "msm_led_flash.h"
 
+#ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_device.h>
+extern int xiaomi_device_read(void);
+#endif
+
 #define FLASH_NAME "qcom,led-flash"
 
 #undef CDBG
@@ -119,6 +124,11 @@ static struct platform_driver adp1660_platform_driver = {
 static int __init msm_flash_adp1660_init_module(void)
 {
 	int32_t rc = 0;
+
+#ifdef CONFIG_MACH_XIAOMI_LAND
+	if (xiaomi_device_read() == XIAOMI_DEVICE_LAND)
+		return -ENODEV;
+#endif
 
 	rc = platform_driver_register(&adp1660_platform_driver);
 

@@ -16,6 +16,11 @@
 #include <linux/module.h>
 #include "msm_led_flash.h"
 
+#ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_device.h>
+extern int xiaomi_device_read(void);
+#endif
+
 #define FLASH_NAME "camera-led-flash"
 
 #undef CDBG
@@ -311,6 +316,10 @@ static struct platform_driver msm_led_trigger_driver = {
 
 static int __init msm_led_trigger_add_driver(void)
 {
+#ifdef CONFIG_MACH_XIAOMI_LAND
+	if (xiaomi_device_read() == XIAOMI_DEVICE_LAND)
+		return -ENODEV;
+#endif
 	CDBG("called\n");
 	return platform_driver_register(&msm_led_trigger_driver);
 }

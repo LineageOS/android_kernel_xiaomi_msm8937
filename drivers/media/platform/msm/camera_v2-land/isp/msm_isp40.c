@@ -21,6 +21,11 @@
 #include "msm.h"
 #include "msm_camera_io_util.h"
 
+#ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_device.h>
+extern int xiaomi_device_read(void);
+#endif
+
 #undef CDBG
 #define CDBG(fmt, args...) pr_debug(fmt, ##args)
 
@@ -2428,6 +2433,10 @@ static struct platform_driver vfe40_driver = {
 
 static int __init msm_vfe40_init_module(void)
 {
+#ifdef CONFIG_MACH_XIAOMI_LAND
+	if (xiaomi_device_read() != XIAOMI_DEVICE_LAND)
+		return -ENODEV;
+#endif
 	return platform_driver_register(&vfe40_driver);
 }
 

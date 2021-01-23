@@ -19,6 +19,11 @@
 #include "msm_ir_led.h"
 #include "msm_camera_dt_util.h"
 
+#ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_device.h>
+extern int xiaomi_device_read(void);
+#endif
+
 #undef CDBG
 #define CDBG(fmt, args...) pr_debug(fmt, ##args)
 
@@ -424,6 +429,11 @@ static struct platform_driver msm_ir_led_platform_driver = {
 static int __init msm_ir_led_init_module(void)
 {
 	int32_t rc = 0;
+
+#ifdef CONFIG_MACH_XIAOMI_LAND
+	if (xiaomi_device_read() == XIAOMI_DEVICE_LAND)
+		return -ENODEV;
+#endif
 
 	rc = platform_driver_register(&msm_ir_led_platform_driver);
 	if (!rc)

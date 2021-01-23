@@ -20,6 +20,11 @@
 #include "msm_eeprom.h"
 
 #ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_device.h>
+extern int xiaomi_device_read(void);
+#endif
+
+#ifdef CONFIG_MACH_XIAOMI
 #include <linux/xiaomi_series.h>
 extern int xiaomi_series_read(void);
 #endif
@@ -2192,6 +2197,12 @@ static struct spi_driver msm_eeprom_spi_driver = {
 static int __init msm_eeprom_init_module(void)
 {
 	int rc = 0;
+
+#ifdef CONFIG_MACH_XIAOMI_LAND
+	if (xiaomi_device_read() == XIAOMI_DEVICE_LAND)
+		return -ENODEV;
+#endif
+
 	CDBG("%s E\n", __func__);
 	rc = platform_driver_register(&msm_eeprom_platform_driver);
 	CDBG("%s:%d platform rc %d\n", __func__, __LINE__, rc);

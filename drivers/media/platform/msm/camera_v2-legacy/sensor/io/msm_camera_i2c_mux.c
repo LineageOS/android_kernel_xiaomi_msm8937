@@ -16,6 +16,11 @@
 #include <linux/module.h>
 #include "msm_camera_i2c_mux.h"
 
+#ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_device.h>
+extern int xiaomi_device_read(void);
+#endif
+
 /* TODO move this somewhere else */
 #define MSM_I2C_MUX_DRV_NAME "msm_cam_i2c_mux"
 static int msm_i2c_mux_config(struct i2c_mux_device *mux_device, uint8_t *mode)
@@ -166,6 +171,10 @@ static struct platform_driver i2c_mux_driver = {
 
 static int __init msm_camera_i2c_mux_init_module(void)
 {
+#ifdef CONFIG_MACH_XIAOMI_LAND
+	if (xiaomi_device_read() == XIAOMI_DEVICE_LAND)
+		return -ENODEV;
+#endif
 	return platform_driver_register(&i2c_mux_driver);
 }
 

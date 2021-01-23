@@ -27,6 +27,11 @@
 #include "include/msm_csiphy_3_5_hwreg.h"
 #include "cam_hw_ops.h"
 
+#ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_device.h>
+extern int xiaomi_device_read(void);
+#endif
+
 #define DBG_CSIPHY 0
 #define SOF_DEBUG_ENABLE 1
 #define SOF_DEBUG_DISABLE 0
@@ -1545,6 +1550,10 @@ static struct platform_driver csiphy_driver = {
 
 static int __init msm_csiphy_init_module(void)
 {
+#ifdef CONFIG_MACH_XIAOMI_LAND
+	if (xiaomi_device_read() != XIAOMI_DEVICE_LAND)
+		return -ENODEV;
+#endif
 	return platform_driver_register(&csiphy_driver);
 }
 

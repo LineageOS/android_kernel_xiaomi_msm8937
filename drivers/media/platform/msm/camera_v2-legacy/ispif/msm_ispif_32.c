@@ -22,6 +22,11 @@
 #include <linux/compat.h>
 #include <media/msmb_isp-legacy.h>
 
+#ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_device.h>
+extern int xiaomi_device_read(void);
+#endif
+
 #include "msm_ispif_32.h"
 #include "msm.h"
 #include "msm_sd.h"
@@ -1564,6 +1569,10 @@ static struct platform_driver ispif_driver = {
 
 static int __init msm_ispif_init_module(void)
 {
+#ifdef CONFIG_MACH_XIAOMI_LAND
+	if (xiaomi_device_read() == XIAOMI_DEVICE_LAND)
+		return -ENODEV;
+#endif
 	return platform_driver_register(&ispif_driver);
 }
 

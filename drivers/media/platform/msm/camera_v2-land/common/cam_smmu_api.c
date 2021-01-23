@@ -23,6 +23,11 @@
 #include <linux/workqueue.h>
 #include "cam_smmu_api.h"
 
+#ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_device.h>
+extern int xiaomi_device_read(void);
+#endif
+
 #define SCRATCH_ALLOC_START SZ_128K
 #define SCRATCH_ALLOC_END   SZ_256M
 #define VA_SPACE_END	    SZ_2G
@@ -1603,6 +1608,10 @@ static struct platform_driver cam_smmu_driver = {
 
 static int __init cam_smmu_init_module(void)
 {
+#ifdef CONFIG_MACH_XIAOMI_LAND
+	if (xiaomi_device_read() != XIAOMI_DEVICE_LAND)
+		return -ENODEV;
+#endif
 	return platform_driver_register(&cam_smmu_driver);
 }
 

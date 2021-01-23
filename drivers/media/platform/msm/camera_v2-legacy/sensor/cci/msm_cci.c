@@ -25,6 +25,11 @@
 #include "cam_hw_ops.h"
 
 #ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_device.h>
+extern int xiaomi_device_read(void);
+#endif
+
+#ifdef CONFIG_MACH_XIAOMI
 #include <linux/xiaomi_series.h>
 extern int xiaomi_series_read(void);
 #endif
@@ -2216,6 +2221,10 @@ static struct platform_driver cci_driver = {
 
 static int __init msm_cci_init_module(void)
 {
+#ifdef CONFIG_MACH_XIAOMI_LAND
+	if (xiaomi_device_read() == XIAOMI_DEVICE_LAND)
+		return -ENODEV;
+#endif
 	return platform_driver_register(&cci_driver);
 }
 
