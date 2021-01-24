@@ -132,6 +132,10 @@ int ft5435_fts_create_gesture_sysfs(struct i2c_client *client)
 {
 		int ret = 0;
 
+#ifdef CONFIG_TOUCHSCREEN_XIAOMI_DT2W
+		return 0;
+#endif
+
 		ret = sysfs_create_group(&client->dev.kobj, &fts_gesture_group);
 		if ( ret != 0) {
 			FTS_ERROR( "[GESTURE]fts_gesture_mode_group(sysfs) create failed!");

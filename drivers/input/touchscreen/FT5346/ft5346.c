@@ -2712,6 +2712,10 @@ void Ctp_Gesture_Fucntion_Proc_File(void)
 	struct proc_dir_entry *ctp_gesture_type_proc = NULL;
 	struct proc_dir_entry *ctp_gesture_onoff_proc = NULL;
 
+#ifdef CONFIG_TOUCHSCREEN_XIAOMI_DT2W
+	return;
+#endif
+
 	ctp_device_proc = proc_mkdir("gesture", NULL);
 
 	ctp_gesture_type_proc = proc_create("data", 0660, ctp_device_proc, &gt_gesture_var_proc_fops);
