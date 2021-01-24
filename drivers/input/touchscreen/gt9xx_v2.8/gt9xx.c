@@ -22,6 +22,10 @@
 #include <linux/input/mt.h>
 #include "gt9xx.h"
 
+#ifdef CONFIG_TOUCHSCREEN_XIAOMI_DT2W
+#include <linux/input/xiaomi_dt2w.h>
+#endif
+
 #ifdef CONFIG_MACH_XIAOMI
 #include <linux/xiaomi_series.h>
 extern int xiaomi_series_read(void);
@@ -2094,6 +2098,10 @@ static int gtp_probe(struct i2c_client *client, const struct i2c_device_id *id)
 	pdata->max_touch_pressure = GTP_DEFAULT_MAX_PRESSURE;
 #endif
 
+#ifdef CONFIG_TOUCHSCREEN_XIAOMI_DT2W
+	pdata->slide_wakeup = true;
+#endif
+
 	ts->client = client;
 	ts->pdata = pdata;
 
@@ -2282,6 +2290,10 @@ static int gtp_drv_remove(struct i2c_client *client)
 static void gtp_suspend(struct goodix_ts_data *ts)
 {
 	int ret = -1;
+
+#ifdef CONFIG_TOUCHSCREEN_XIAOMI_DT2W
+	ts->pdata->slide_wakeup = xiaomi_dt2w_enable;
+#endif
 
 	if (test_bit(FW_UPDATE_RUNNING, &ts->flags)) {
 		dev_warn(&ts->client->dev,

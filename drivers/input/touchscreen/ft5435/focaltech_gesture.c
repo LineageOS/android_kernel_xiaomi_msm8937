@@ -17,6 +17,9 @@
  */
 
 #include "focaltech_core.h"
+#ifdef CONFIG_TOUCHSCREEN_XIAOMI_DT2W
+#include <linux/input/xiaomi_dt2w.h>
+#endif
 #if FTS_GESTURE_EN
 #define KEY_GESTURE_U                           KEY_WAKEUP
 #define KEY_GESTURE_UP                          KEY_UP
@@ -317,6 +320,10 @@ int ft5435_fts_gesture_suspend(struct i2c_client *i2c_client)
 
 		FTS_FUNC_ENTER();
 
+#ifdef CONFIG_TOUCHSCREEN_XIAOMI_DT2W
+		fts_gesture_data.mode = xiaomi_dt2w_enable;
+#endif
+
 		if (fts_gesture_data.mode == 0) {
 			FTS_DEBUG("gesture is disabled");
 			FTS_FUNC_EXIT();
@@ -387,6 +394,7 @@ int ft5435_fts_gesture_resume(struct i2c_client *client)
 int ft5435_fts_gesture_init(struct input_dev *input_dev, struct i2c_client *client)
 {
 	struct fts_ts_data *data = i2c_get_clientdata(client);
+	int ret = 0;
 		FTS_FUNC_ENTER();
 		input_set_capability(input_dev, EV_KEY, KEY_POWER);
 		input_set_capability(input_dev, EV_KEY, KEY_GESTURE_U);

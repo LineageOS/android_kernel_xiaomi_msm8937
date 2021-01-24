@@ -34,6 +34,10 @@
 #include <linux/fs.h>
 #include <asm/uaccess.h>
 
+#ifdef CONFIG_TOUCHSCREEN_XIAOMI_DT2W
+#include <linux/input/xiaomi_dt2w.h>
+#endif
+
 #if  WT_ADD_CTP_INFO
 #include <linux/hardware_info.h>
 #endif
@@ -741,6 +745,12 @@ static int ft5x06_ts_suspend(struct device *dev)
 	}
 
 #if WT_CTP_GESTURE_SUPPORT
+#ifdef CONFIG_TOUCHSCREEN_XIAOMI_DT2W
+	if (xiaomi_dt2w_enable)
+		gtp_gesture_onoff = '1';
+	else
+		gtp_gesture_onoff = '0';
+#endif
 			if (gtp_gesture_onoff == '1') {
 				ft5x0x_write_reg(gesture_client, 0xd0, 0x01);
 
@@ -3116,7 +3126,6 @@ static int ft5x06_ts_probe(struct i2c_client *client,
 #endif
 
 #if WT_CTP_GESTURE_SUPPORT
-
 	Ctp_Gesture_Fucntion_Proc_File();
 #endif
 
