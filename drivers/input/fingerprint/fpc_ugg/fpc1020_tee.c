@@ -54,7 +54,9 @@
 #define NUM_PARAMS_REG_ENABLE_SET 2
 #define PROC_NAME  "hwinfo"
 static struct proc_dir_entry *proc_entry;
+#ifdef CONFIG_MACH_XIAOMI_ULYSSE
 extern int ulysse_fpsensor;
+#endif
 
 static const char * const pctl_names[] = {
 	"fpc1020_reset_reset",
@@ -472,10 +474,12 @@ static int fpc1020_probe(struct platform_device *pdev)
 		goto exit;
 	}
 
+#ifdef CONFIG_MACH_XIAOMI_ULYSSE
 	if(ulysse_fpsensor != 1) {
 				pr_err("Macle fpc1020_probe failed as ulysse_fpsensor=%d(1=fp)\n", ulysse_fpsensor);
 				return -1;
 		 }
+#endif
 
 
 	fpc1020->dev = dev;

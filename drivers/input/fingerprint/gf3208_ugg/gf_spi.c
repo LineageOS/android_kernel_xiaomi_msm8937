@@ -75,7 +75,9 @@ static DEFINE_MUTEX(device_list_lock);
 static struct wake_lock fp_wakelock;
 static struct gf_dev gf;
 
+#ifdef CONFIG_MACH_XIAOMI_ULYSSE
 extern int ulysse_fpsensor;
+#endif
 static struct proc_dir_entry *proc_entry;
 struct gf_key_map maps[] = {
 	{ EV_KEY, KEY_HOME },
@@ -848,10 +850,12 @@ static int __init gf_init(void)
 {
 	int status;
 
+#ifdef CONFIG_MACH_XIAOMI_ULYSSE
 	   if(ulysse_fpsensor != 2) {
 				pr_err("Macle gf_init failed as ulysse_fpsensor=%d(2=gx)\n", ulysse_fpsensor);
 				return -1;
 		 }
+#endif
 
 
 	BUILD_BUG_ON(N_SPI_MINORS > 256);
