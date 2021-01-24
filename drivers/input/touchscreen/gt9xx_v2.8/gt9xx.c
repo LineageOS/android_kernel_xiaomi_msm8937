@@ -2681,6 +2681,10 @@ static struct i2c_driver goodix_ts_driver = {
 	},
 };
 
+#ifdef CONFIG_MACH_XIAOMI_ULYSSE
+extern int ulysse_tpsensor;
+#endif
+
 static int __init gtp_init(void)
 {
 	s32 ret;
@@ -2689,7 +2693,10 @@ static int __init gtp_init(void)
 	if (xiaomi_series_read() == XIAOMI_SERIES_LANDTONI)
 		return -ENODEV;
 #endif
-
+#ifdef CONFIG_MACH_XIAOMI_ULYSSE
+	if (xiaomi_series_read() == XIAOMI_SERIES_ULYSSE && ulysse_tpsensor != 2)
+		return -ENODEV;
+#endif
 	pr_info("Gt9xx driver installing..\n");
 	ret = i2c_add_driver(&goodix_ts_driver);
 
