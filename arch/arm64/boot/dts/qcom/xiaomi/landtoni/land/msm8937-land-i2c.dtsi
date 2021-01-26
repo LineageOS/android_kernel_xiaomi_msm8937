@@ -1,0 +1,70 @@
+&soc {
+	i2c@78b7000 {
+		/delete-node/ synaptics@4b;
+		ftech@3E {
+			compatible = "focaltech,5336";
+			reg = <0x3E>;
+			interrupt-parent = <&tlmm>;
+			interrupts = <65 0x2008>;
+			vdd-supply = <&pm8937_l10>;
+			vcc_i2c-supply = <&pm8937_l5>;
+			pinctrl-names = "pmx_ts_active","pmx_ts_suspend",
+				"pmx_ts_release";
+			pinctrl-0 = <&ts_int_active &ts_reset_active>;
+			pinctrl-1 = <&ts_int_suspend &ts_reset_suspend>;
+			pinctrl-2 = <&ts_release>;
+			ftech,name = "ft5336";
+			ftech,family-id = <0x36>;
+			ftech,reset-gpio = <&tlmm 64 0x00>;
+			ftech,irq-gpio = <&tlmm 65 0x2008>;
+			ftech,display-coords = <0 0 720 1280>;
+			ftech,panel-coords = <0 0 720 1280>;
+			ftech,button-map= <139 172 158>; /* APP_SWITCH HOME BACK just like stock rom */
+			ftech,button-y-coord = <2040>;
+			ftech,button-x-coords = <120 500 900>;
+			ftech,no-force-update;
+			ftech,i2c-pull-up;
+			ftech,group-id = <1>;
+			ftech,hard-reset-delay-ms = <20>;
+			ftech,soft-reset-delay-ms = <200>;
+			ftech,num-max-touches = <10>;
+			ftech,fw-delay-aa-ms = <30>;
+			ftech,fw-delay-55-ms = <30>;
+			ftech,fw-upgrade-id1 = <0x79>;
+			ftech,fw-upgrade-id2 = <0x18>;
+			ftech,fw-delay-readid-ms = <10>;
+			ftech,fw-delay-era-flsh-ms = <2000>;
+			ftech,fw-auto-cal;
+			ftech,ignore-id-check;
+	};
+
+	ist30xx@50 {
+		compatible = "imagis,ist30xx-ts";
+		reg = <0x50>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <65 0x2008>;
+		vdd-supply = <&pm8937_l10>;
+		vcc_i2c-supply = <&pm8937_l5>;
+		pinctrl-names = "pmx_ts_active","pmx_ts_suspend",
+			"pmx_ts_release";
+		pinctrl-0 = <&ts_int_active &ts_reset_active>;
+		pinctrl-1 = <&ts_int_suspend &ts_reset_suspend>;
+		pinctrl-2 = <&ts_release>;
+		ist30xx,name = "ist30xx";
+		ist30xx,family-id = <0x36>;
+		ist30xx,reset-gpio = <&tlmm 64 0x00>;
+		ist30xx,irq-gpio = <&tlmm 65 0x2008>;
+		};
+	};
+
+	gen-vkeys_ist {
+		compatible = "qcom,gen-vkeys_ist";
+		label = "ist30xx_ts_input";
+		qcom,disp-maxx = <1080>;
+		qcom,disp-maxy = <1920>;
+		qcom,panel-maxx = <1080>;
+		qcom,panel-maxy = <2098>;
+		qcom,key-codes = <139 172 158>;
+		qcom,y-offset = <0>;
+	};
+};

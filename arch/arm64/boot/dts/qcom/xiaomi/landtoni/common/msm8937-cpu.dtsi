@@ -1,0 +1,28 @@
+/{
+	cpus {
+  		CPU0: cpu@100 {
+    			clock-frequency = <1401000000>;
+  		};
+  		CPU1: cpu@101 {
+    			clock-frequency = <1401000000>;
+  		};
+  		CPU2: cpu@102 {
+    			clock-frequency = <1401000000>;
+  		};
+  		CPU3: cpu@103 {
+    			clock-frequency = <1401000000>;
+  		};
+  		CPU4: cpu@0 {
+    			clock-frequency = <1094000000>;
+  		};
+  		CPU5: cpu@1 {
+    			clock-frequency = <1094000000>;
+  		};
+  		CPU6: cpu@2 {
+    			clock-frequency = <1094000000>;
+  		};
+  		CPU7: cpu@3 {
+    			clock-frequency = <1094000000>;
+  		};
+	};
+};

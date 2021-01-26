@@ -1,0 +1,7 @@
+#include "msm8937-land-camera.dtsi"
+#include "msm8937-land-i2c.dtsi"
+#include "msm8937-land-mdss.dtsi"
+#include "msm8937-land-pinctrl.dtsi"
+#include "msm8937-land-regulator.dtsi"
+#include "msm8937-land-sound.dtsi"
+#include "msm8937-land-spmi.dtsi"
