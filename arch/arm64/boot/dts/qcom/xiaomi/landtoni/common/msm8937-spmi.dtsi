@@ -34,3 +34,7 @@
 	};
 */
 };
+
+&pmi8950_torch0 {
+	qcom,led-name = "flashlight";
+};
