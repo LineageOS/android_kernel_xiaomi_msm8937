@@ -20,6 +20,9 @@
 };
 
 &flash_led {
+	/delete-node/ qcom,flash_1;
+	/delete-node/ qcom,torch_1;
+/*
 	pmi8950_torch2: qcom,torch_2 {
 		label = "torch";
 		qcom,led-name = "flashlight";
@@ -29,4 +32,5 @@
 		qcom,id = <1>;
 		qcom,current = <100>;
 	};
+*/
 };
