@@ -17,6 +17,11 @@ config TOUCHSCREEN_PROPERTIES
 	def_tristate INPUT
 	depends on INPUT
 
+config TOUCHSCREEN_XIAOMI_DT2W
+	bool "Xiaomi DT2W Control Node"
+	depends on INPUT_TOUCHSCREEN
+	default y
+
 config TOUCHSCREEN_88PM860X
 	tristate "Marvell 88PM860x touchscreen"
 	depends on MFD_88PM860X
