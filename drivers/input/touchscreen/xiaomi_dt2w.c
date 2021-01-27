@@ -69,9 +69,12 @@ static int xiaomi_dt2w_proc_init(struct kernfs_node *sysfs_node_parent) {
 
 	double_tap_sysfs_node = kzalloc(PATH_MAX, GFP_KERNEL);
 	if (double_tap_sysfs_node)
+		#if (defined CONFIG_MACH_XIAOMI_LAND) || (defined CONFIG_MACH_XIAOMI_SANTONI)
+		sprintf(double_tap_sysfs_node, "/sys/android_touch/doubletap2wake");
+		#else
 		sprintf(double_tap_sysfs_node, "/sys%s/%s", buf, "onoff");
-	proc_symlink_tmp = proc_symlink("onoff",
-		proc_entry_tp, double_tap_sysfs_node);
+		#endif
+	proc_symlink_tmp = proc_symlink("onoff", proc_entry_tp, double_tap_sysfs_node);
 	if (proc_symlink_tmp == NULL) {
 		ret = -ENOMEM;
 		pr_info("%s: Couldn't create double_tap_enable symlink\n", __func__);
