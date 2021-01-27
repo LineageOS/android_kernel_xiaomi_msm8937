@@ -30,14 +30,6 @@
 	};
 };
 
-&soc {
-	led_flash0: qcom,camera-flash {
-		cell-index = <0>;
-		compatible = "qcom,camera-flash";
-		qcom,flash-type = <1>;
-	};
-};
-
 &i2c_2 { /* i2c 2 */
 	tps65132@3e {
 		compatible = "ti,tps65132";

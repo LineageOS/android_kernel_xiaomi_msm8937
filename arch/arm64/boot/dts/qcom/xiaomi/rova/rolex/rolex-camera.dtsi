@@ -14,15 +14,18 @@
 
 &soc {
 	flash_SGM3780:flashlight {
-		compatible = "qcom,leds-gpio-flash";
+		compatible = "qcom,leds-back-gpio-flash_ulysse";
 		status = "okay";
 		pinctrl-names = "flash_default";
 		pinctrl-0 = <&SGM3780_default>;
-		qcom,flash-en = <93>;
-		qcom,flash-now = <90>;
+		qcom,flash-en = <&tlmm 93 0>;
+		qcom,flash-now = <&tlmm 90 0>;
 		qcom,op-seq = "flash_en", "flash_now";
 		qcom,torch-seq-val = <1 0>;
 		qcom,flash-seq-val = <0 1>;
+		qcom,max-current = <600>;
+		qcom,duration = <1280>;
+		qcom,current = <300>;
 		linux,name = "flashlight";
 		linux,default-trigger = "flashlight-trigger";
 	};
@@ -381,7 +384,7 @@
 		qcom,csid-sd-index = <0>;
 		qcom,mount-angle = <90>;
 		qcom,actuator-src = <&actuator0>;
-		qcom,led-flash-src = <&led_flash0>;
+		qcom,led-flash-src = <&led_flash01>;
 		qcom,eeprom-src = <&eeprom0 &eeprom4>;
 		cam_vdig-supply = <&pm8937_l23>;
 		cam_vana-supply = <&pm8937_l22>;
