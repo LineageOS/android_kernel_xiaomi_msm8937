@@ -35,6 +35,8 @@
 #include <linux/hwmon-sysfs.h>
 #include <linux/qpnp/qpnp-adc.h>
 #include <linux/thermal.h>
+#include <linux/iio/iio.h>
+#include <linux/iio/consumer.h>
 #include <linux/platform_device.h>
 #include "thermal_core.h"
 
@@ -3028,9 +3030,12 @@ static const struct of_device_id qpnp_adc_tm_match_table[] = {
 static int qpnp_adc_tm_probe(struct platform_device *pdev)
 {
 	struct device_node *node = pdev->dev.of_node, *child;
+	struct device *dev = &pdev->dev;
+	struct iio_channel *channels;
 	struct qpnp_adc_tm_chip *chip;
 	struct qpnp_adc_drv *adc_qpnp;
 	int32_t count_adc_channel_list = 0, rc, sen_idx = 0, i = 0;
+	int indio_chan_count = 0;
 	bool thermal_node = false;
 	const struct of_device_id *id;
 
@@ -3039,6 +3044,18 @@ static int qpnp_adc_tm_probe(struct platform_device *pdev)
 
 	if (!count_adc_channel_list) {
 		pr_err("No channel listing\n");
+		return -EINVAL;
+	}
+
+	channels = iio_channel_get_all(dev);
+	if (IS_ERR(channels))
+		return PTR_ERR(channels);
+
+	while (channels[indio_chan_count].indio_dev)
+		indio_chan_count++;
+
+	if (indio_chan_count != count_adc_channel_list) {
+		dev_err(dev, "VADC IIO channel missing in main node\n");
 		return -EINVAL;
 	}
 
@@ -3103,13 +3120,6 @@ static int qpnp_adc_tm_probe(struct platform_device *pdev)
 			rc = -ENXIO;
 			goto fail;
 		}
-	}
-	chip->vadc_dev = qpnp_get_vadc(&pdev->dev, "adc_tm");
-	if (IS_ERR(chip->vadc_dev)) {
-		rc = PTR_ERR(chip->vadc_dev);
-		if (rc != -EPROBE_DEFER)
-			pr_err("vadc property missing, rc=%d\n", rc);
-		goto fail;
 	}
 
 	chip->adc_tm_recalib_check = of_property_read_bool(node,

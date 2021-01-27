@@ -2717,8 +2717,8 @@ int32_t qpnp_adc_get_devicetree_data(struct platform_device *pdev,
 
 	for_each_child_of_node(node, child) {
 		int channel_num, scaling = 0, post_scaling = 0;
-		int fast_avg_setup, calib_type = 0, rc, hw_settle_time = 0;
-		const char *calibration_param, *channel_name;
+		int fast_avg_setup = 0, calib_type = 0, rc, hw_settle_time = 0;
+		const char *channel_name;
 
 		channel_name = of_get_property(child,
 				"label", NULL) ? : child->name;
@@ -2740,73 +2740,12 @@ int32_t qpnp_adc_get_devicetree_data(struct platform_device *pdev,
 				pr_err("Invalid channel hw settle time property\n");
 				return -EINVAL;
 			}
-			rc = of_property_read_u32(child,
-				"qcom,pre-div-channel-scaling", &scaling);
-			if (rc) {
-				pr_err("Invalid channel scaling property\n");
-				return -EINVAL;
-			}
-			rc = of_property_read_u32(child,
-				"qcom,scale-function", &post_scaling);
-			if (rc) {
-				pr_err("Invalid channel post scaling property\n");
-				return -EINVAL;
-			}
-			rc = of_property_read_string(child,
-				"qcom,calibration-type", &calibration_param);
-			if (rc) {
-				pr_err("Invalid calibration type\n");
-				return -EINVAL;
-			}
-
-			if (!strcmp(calibration_param, "absolute")) {
-				if (adc_hc)
-					calib_type = ADC_HC_ABS_CAL;
-				else
-					calib_type = CALIB_ABSOLUTE;
-			} else if (!strcmp(calibration_param, "ratiometric")) {
-				if (adc_hc)
-					calib_type = ADC_HC_RATIO_CAL;
-				else
-					calib_type = CALIB_RATIOMETRIC;
-			} else if (!strcmp(calibration_param, "no_cal")) {
-				if (adc_hc)
-					calib_type = ADC_HC_NO_CAL;
-				else {
-					pr_err("%s: Invalid calibration property\n",
-						__func__);
-					return -EINVAL;
-				}
-			} else {
-				pr_err("%s: Invalid calibration property\n",
-						__func__);
-				return -EINVAL;
-			}
 		}
 
-		/* ADC_TM_HC fast avg setting is common across channels */
-		if (!of_device_is_compatible(node, "qcom,qpnp-adc-tm-hc")) {
-			rc = of_property_read_u32(child,
-				"qcom,fast-avg-setup", &fast_avg_setup);
-			if (rc) {
-				pr_err("Invalid channel fast average setup\n");
-				return -EINVAL;
-			}
-		} else {
-			fast_avg_setup = fast_avg_setup_tm_hc;
-		}
-
-		/* ADC_TM_HC decimation setting is common across channels */
-		if (!of_device_is_compatible(node, "qcom,qpnp-adc-tm-hc")) {
-			rc = of_property_read_u32(child,
-				"qcom,decimation", &decimation);
-			if (rc) {
-				pr_err("Invalid decimation\n");
-				return -EINVAL;
-			}
-		} else {
-			decimation = decimation_tm_hc;
-		}
+		if (of_property_read_bool(child, "qcom,ratiometric"))
+			calib_type = CALIB_RATIOMETRIC;
+		else
+			calib_type = CALIB_ABSOLUTE;
 
 		if (of_device_is_compatible(node, "qcom,qpnp-vadc-hc")) {
 			rc = of_property_read_u32(child, "qcom,cal-val",
