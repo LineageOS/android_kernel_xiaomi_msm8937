@@ -77,9 +77,9 @@ static inline int xiaomi_dt2w_proc_init(struct kernfs_node *sysfs_node_parent) {
 	double_tap_sysfs_node = kzalloc(PATH_MAX, GFP_KERNEL);
 	if (double_tap_sysfs_node) {
 
-		node[0].path="/proc/test/one";
-		node[1].path="/proc/test/two";
-		node[2].path="/proc/test/three";
+		node[0].path="/proc/sys/dev/dt2w";
+		node[1].path="/proc/touchpanel/enable_dt2w";
+		node[2].path="/sys/android_touch/doubletap2wake";
 
 		pr_info("%s: Starting dynamic symlinking...\n", __func__);
 
