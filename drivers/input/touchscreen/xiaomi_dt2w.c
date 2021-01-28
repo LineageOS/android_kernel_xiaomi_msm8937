@@ -24,29 +24,32 @@ struct node {
 #define NUM_PATHS 3
 struct node node[NUM_PATHS];
 
+char *proc_dir = "gesture";
+char *proc_file = "onoff";
+
 bool xiaomi_dt2w_enable = true;
 EXPORT_SYMBOL(xiaomi_dt2w_enable);
 
-static inline ssize_t xiaomi_dt2w_onoff_show(struct device *dev, struct device_attribute *attr, char *buf) {
+static inline ssize_t xiaomi_dt2w_show(struct device *dev, struct device_attribute *attr, char *buf) {
 	const char c = xiaomi_dt2w_enable ? '1' : '0';
 	return sprintf(buf, "%c\n", c);
 }
 
-static inline ssize_t xiaomi_dt2w_onoff_store(struct device *dev, struct device_attribute *attr, const char *buf, size_t count) {
+static inline ssize_t xiaomi_dt2w_store(struct device *dev, struct device_attribute *attr, const char *buf, size_t count) {
 	int i;
 	if (sscanf(buf, "%u", &i) == 1 && i < 2) {
 		xiaomi_dt2w_enable = (i == 1);
 		return count;
 	}
 	else {
-		pr_info("%s: onoff write error\n", __func__);
+		pr_info("%s: %s write error\n", __func__, proc_file);
 		return -EINVAL;
 	}
 }
 
-static DEVICE_ATTR(onoff, S_IWUSR | S_IRUSR, xiaomi_dt2w_onoff_show, xiaomi_dt2w_onoff_store);
+static DEVICE_ATTR(dt2w, S_IWUSR | S_IRUSR, xiaomi_dt2w_show, xiaomi_dt2w_store);
 
-static struct attribute *xiaomi_dt2w_attrs[] = { &dev_attr_onoff.attr, NULL };
+static struct attribute *xiaomi_dt2w_attrs[] = { &dev_attr_dt2w.attr, NULL };
 
 static const struct attribute_group xiaomi_dt2w_attr_group = { .attrs = xiaomi_dt2w_attrs, };
 
@@ -67,7 +70,7 @@ static inline int xiaomi_dt2w_proc_init(struct kernfs_node *sysfs_node_parent) {
 		}
 	}
 
-	proc_entry_tp = proc_mkdir("gesture", NULL);
+	proc_entry_tp = proc_mkdir(proc_dir, NULL);
 	if (proc_entry_tp == NULL) {
 		pr_info("%s: Couldn't create touchpanel dir in procfs\n", __func__);
 		ret = -ENOMEM;
@@ -93,16 +96,16 @@ static inline int xiaomi_dt2w_proc_init(struct kernfs_node *sysfs_node_parent) {
 				continue;
 			}
 
-			pr_info("%s: Linking of %s to /proc/gesture/onoff...\n", __func__, double_tap_sysfs_node);
+			pr_info("%s: Linking of %s to /proc/%s/%s...\n", __func__, double_tap_sysfs_node, proc_dir, proc_file);
 
-			proc_symlink_tmp = proc_symlink("onoff", proc_entry_tp, double_tap_sysfs_node);
+			proc_symlink_tmp = proc_symlink(proc_file, proc_entry_tp, double_tap_sysfs_node);
 
 			if (proc_symlink_tmp == NULL) {
-				pr_info("%s: Symlink of %s to /proc/gesture/onoff failed\n", __func__, double_tap_sysfs_node);
+				pr_info("%s: Symlink of %s to /proc/%s/%s failed\n", __func__, double_tap_sysfs_node, proc_dir, proc_file);
 				ret = -ENOMEM;
 				goto exit;
 			} else {
-				pr_info("%s: Symlink of %s to /proc/gesture/onoff done.\n", __func__, double_tap_sysfs_node);
+				pr_info("%s: Symlink of %s to /proc/%s/%s done.\n", __func__, double_tap_sysfs_node, proc_dir, proc_file);
 			}
 		}
 
@@ -110,18 +113,18 @@ static inline int xiaomi_dt2w_proc_init(struct kernfs_node *sysfs_node_parent) {
 
 			pr_info("%s: Fallback symlink mode starting...\n", __func__);
 
-			sprintf(double_tap_sysfs_node, "/sys%s/%s", buf, "onoff");
+			sprintf(double_tap_sysfs_node, "/sys%s/%s", buf, proc_file);
 
-			pr_info("%s: Linking of %s to /proc/gesture/onoff...\n", __func__, double_tap_sysfs_node);
+			pr_info("%s: Linking of %s to /proc/%s/%s...\n", __func__, double_tap_sysfs_node, proc_dir, proc_file);
 
-			proc_symlink_tmp = proc_symlink("onoff", proc_entry_tp, double_tap_sysfs_node);
+			proc_symlink_tmp = proc_symlink(proc_file, proc_entry_tp, double_tap_sysfs_node);
 
 			if (proc_symlink_tmp == NULL) {
-				pr_info("%s: Symlink of %s to /proc/gesture/onoff failed\n", __func__, double_tap_sysfs_node);
+				pr_info("%s: Symlink of %s to /proc/%s/%s failed\n", __func__, double_tap_sysfs_node, proc_dir, proc_file);
 				ret = -ENOMEM;
 				goto exit;
 			} else {
-				pr_info("%s: Fallback symlink of %s to /proc/gesture/onoff done\n", __func__, double_tap_sysfs_node);
+				pr_info("%s: Fallback symlink of %s to /proc/%s/%s done\n", __func__, double_tap_sysfs_node, proc_dir, proc_file);
 			}
 		}
 
@@ -148,12 +151,12 @@ int __maybe_unused dt2w_probe(struct i2c_client *client) {
 }
 EXPORT_SYMBOL(dt2w_probe);
 
-static int __init xiaomi_onoff_init(void) {
+static int __init xiaomi_dt2w_init(void) {
 
 	pr_info("%s: Init done!\n", __func__);
 	return 0;
 }
-late_initcall(xiaomi_onoff_init);
+late_initcall(xiaomi_dt2w_init);
 
 MODULE_AUTHOR("Jebaitedneko <jebaitedneko@gmail.com");
 MODULE_DESCRIPTION("Xiaomi Shared DT2W Driver");
