@@ -153,7 +153,7 @@ EXPORT_SYMBOL(dt2w_probe);
 
 static int __init xiaomi_dt2w_init(void) {
 
-	pr_info("%s: Init done!\n", __func__);
+	pr_info("%s: Init done! Initial status = %s\n", __func__, xiaomi_dt2w_enable ? "Enabled" : "Disabled");
 	return 0;
 }
 late_initcall(xiaomi_dt2w_init);
