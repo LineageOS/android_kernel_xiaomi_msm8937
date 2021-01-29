@@ -17,11 +17,12 @@
 #include <linux/module.h>
 #include <linux/proc_fs.h>
 #include <linux/slab.h>
+#include <linux/sysctl.h>
 
 struct xiaomi_dt2w_node {
 	char *path;
 };
-#define NUM_PATHS 3
+#define NUM_PATHS 2
 struct xiaomi_dt2w_node xiaomi_dt2w_node[NUM_PATHS];
 
 char *proc_dir = "gesture";
@@ -29,6 +30,32 @@ char *proc_file = "onoff";
 
 bool xiaomi_dt2w_enable = true;
 EXPORT_SYMBOL(xiaomi_dt2w_enable);
+
+static int sysctl_dt2w_min_val = 0;
+static int sysctl_dt2w_max_val = 1;
+static struct ctl_table_header *dt2w_sysctl_header;
+
+static struct ctl_table dt2w_child_table[] = {
+    {
+        .procname       = "dt2w",
+        .maxlen         = sizeof(int),
+        .mode           = 0666,
+        .data           = &xiaomi_dt2w_enable,
+        .proc_handler   = &proc_dointvec_minmax,
+        .extra1         = &sysctl_dt2w_min_val,
+        .extra2         = &sysctl_dt2w_max_val,
+    },
+    {}
+};
+
+static struct ctl_table dt2w_parent_table[] = {
+    {
+        .procname       = "dev",
+        .mode           = 0555,
+        .child          = dt2w_child_table,
+    },
+    {}
+};
 
 static inline ssize_t xiaomi_dt2w_show(struct device *dev, struct device_attribute *attr, char *buf) {
 	const char c = xiaomi_dt2w_enable ? '1' : '0';
@@ -80,9 +107,8 @@ static inline int xiaomi_dt2w_proc_init(struct kernfs_node *sysfs_node_parent) {
 	double_tap_sysfs_node = kzalloc(PATH_MAX, GFP_KERNEL);
 	if (double_tap_sysfs_node) {
 
-		xiaomi_dt2w_node[0].path="/proc/sys/dev/dt2w";
-		xiaomi_dt2w_node[1].path="/proc/touchpanel/enable_dt2w";
-		xiaomi_dt2w_node[2].path="/sys/android_touch/doubletap2wake";
+		xiaomi_dt2w_node[0].path="/proc/touchpanel/enable_dt2w";
+		xiaomi_dt2w_node[1].path="/sys/android_touch/doubletap2wake";
 
 		pr_info("%s: Starting dynamic symlinking...\n", __func__);
 
@@ -141,6 +167,10 @@ exit:
 int __maybe_unused xiaomi_dt2w_probe(struct i2c_client *client) {
 
 	int ret;
+	dt2w_sysctl_header = register_sysctl_table(dt2w_parent_table);
+	if (!dt2w_sysctl_header) {
+		pr_err("%s: Registeration of sysctl dev.dt2w control node failed\n", __func__);
+	}
 	ret = sysfs_create_group(&client->dev.kobj, &xiaomi_dt2w_attr_group);
 	if (ret) {
 		pr_info("%s: Failure %d creating sysfs group\n", __func__, ret);
