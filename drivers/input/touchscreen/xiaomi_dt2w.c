@@ -10,23 +10,17 @@
  *
  */
 
-#include <linux/device.h>
 #include <linux/fs.h>
-#include <linux/i2c.h>
-#include <linux/input.h>
 #include <linux/module.h>
 #include <linux/proc_fs.h>
-#include <linux/slab.h>
 #include <linux/sysctl.h>
 
-struct xiaomi_dt2w_node {
-	char *path;
+struct xiaomi_dt2w_proc_node {
+	char *dir;
+	char *file;
 };
 #define NUM_PATHS 2
-struct xiaomi_dt2w_node xiaomi_dt2w_node[NUM_PATHS];
-
-char *proc_dir = "gesture";
-char *proc_file = "onoff";
+struct xiaomi_dt2w_proc_node xiaomi_dt2w_proc_node[NUM_PATHS];
 
 bool xiaomi_dt2w_enable = true;
 EXPORT_SYMBOL(xiaomi_dt2w_enable);
@@ -57,136 +51,85 @@ static struct ctl_table dt2w_parent_table[] = {
     {}
 };
 
-static inline ssize_t xiaomi_dt2w_show(struct device *dev, struct device_attribute *attr, char *buf) {
-	const char c = xiaomi_dt2w_enable ? '1' : '0';
-	return sprintf(buf, "%c\n", c);
-}
+static inline int xiaomi_dt2w_proc_init(char *control_node_path) {
 
-static inline ssize_t xiaomi_dt2w_store(struct device *dev, struct device_attribute *attr, const char *buf, size_t count) {
-	int i;
-	if (sscanf(buf, "%u", &i) == 1 && i < 2) {
-		xiaomi_dt2w_enable = (i == 1);
-		return count;
-	}
-	else {
-		pr_info("%s: %s write error\n", __func__, proc_file);
-		return -EINVAL;
-	}
-}
-
-static DEVICE_ATTR(dt2w, S_IWUSR | S_IRUSR, xiaomi_dt2w_show, xiaomi_dt2w_store);
-
-static struct attribute *xiaomi_dt2w_attrs[] = { &dev_attr_dt2w.attr, NULL };
-
-static const struct attribute_group xiaomi_dt2w_attr_group = { .attrs = xiaomi_dt2w_attrs, };
-
-static inline int xiaomi_dt2w_proc_init(struct kernfs_node *sysfs_node_parent) {
-
-	int len, ret, i, fallback = 0;
-	char *buf, *double_tap_sysfs_node;
-	struct proc_dir_entry *proc_entry_tp = NULL;
+	int ret, i = 0;
+	struct proc_dir_entry *proc_directory_tmp = NULL;
 	struct proc_dir_entry *proc_symlink_tmp = NULL;
 
-	buf = kzalloc(PATH_MAX, GFP_KERNEL);
-	if (buf) {
-		len = kernfs_path(sysfs_node_parent, buf, PATH_MAX);
-		if (unlikely(len >= PATH_MAX)) {
-			pr_info("%s: Buffer too long: %d\n", __func__, len);
-			ret = -ERANGE;
-			goto exit;
-		}
-	}
+	pr_info("%s: control_node_path parameter is %s", __func__, control_node_path);
 
-	proc_entry_tp = proc_mkdir(proc_dir, NULL);
-	if (proc_entry_tp == NULL) {
-		pr_info("%s: Couldn't create touchpanel dir in procfs\n", __func__);
-		ret = -ENOMEM;
-		goto exit;
-	}
-
-	double_tap_sysfs_node = kzalloc(PATH_MAX, GFP_KERNEL);
-	if (double_tap_sysfs_node) {
-
-		xiaomi_dt2w_node[0].path="/proc/touchpanel/enable_dt2w";
-		xiaomi_dt2w_node[1].path="/sys/android_touch/doubletap2wake";
+	if (true) {
+		xiaomi_dt2w_proc_node[0].dir="gesture";
+		xiaomi_dt2w_proc_node[0].file="onoff";
+		xiaomi_dt2w_proc_node[1].dir="touchpanel";
+		xiaomi_dt2w_proc_node[1].file="enable_dt2w";
 
 		pr_info("%s: Starting dynamic symlinking...\n", __func__);
 
 		for(i=0; i<NUM_PATHS; i++) {
+			char *proc_path = "/proc/";
 
-			sprintf(double_tap_sysfs_node, xiaomi_dt2w_node[i].path);
+			strcat(proc_path, xiaomi_dt2w_proc_node[i].dir);
+			strcat(proc_path, "/");
+			strcat(proc_path, xiaomi_dt2w_proc_node[i].file);
 
-			if(IS_ERR(filp_open(double_tap_sysfs_node, O_RDONLY, 0440))) {
-				pr_info("%s: File at path %s doesn't exist, skipping...\n", __func__, double_tap_sysfs_node);
-				fallback++;
+			if(IS_ERR(filp_open(proc_path, O_RDONLY, 0440))) {
+				pr_info("%s: File at path %s doesn't exist, adding...\n", __func__, proc_path);
+			} else {
+				pr_err("%s: File at path %s already exists, skipping...\n", __func__, proc_path);
+				ret = -EEXIST;
 				continue;
 			}
 
-			pr_info("%s: Linking of %s to /proc/%s/%s...\n", __func__, double_tap_sysfs_node, proc_dir, proc_file);
-
-			proc_symlink_tmp = proc_symlink(proc_file, proc_entry_tp, double_tap_sysfs_node);
-
-			if (proc_symlink_tmp == NULL) {
-				pr_info("%s: Symlink of %s to /proc/%s/%s failed\n", __func__, double_tap_sysfs_node, proc_dir, proc_file);
-				ret = -ENOMEM;
-				goto exit;
-			} else {
-				pr_info("%s: Symlink of %s to /proc/%s/%s done.\n", __func__, double_tap_sysfs_node, proc_dir, proc_file);
+			pr_info("%s: Creating proc directory %s...\n", __func__, xiaomi_dt2w_proc_node[i].dir);
+			proc_directory_tmp = NULL;
+			proc_directory_tmp = proc_mkdir(xiaomi_dt2w_proc_node[i].dir, NULL);
+			if (proc_directory_tmp == NULL) {
+				pr_err("%s: Couldn't create %s dir in procfs\n", __func__, xiaomi_dt2w_proc_node[i].dir);
+				continue;
 			}
-		}
 
-		if(fallback >= NUM_PATHS) {
-
-			pr_info("%s: Fallback symlink mode starting...\n", __func__);
-
-			sprintf(double_tap_sysfs_node, "/sys%s/%s", buf, proc_file);
-
-			pr_info("%s: Linking of %s to /proc/%s/%s...\n", __func__, double_tap_sysfs_node, proc_dir, proc_file);
-
-			proc_symlink_tmp = proc_symlink(proc_file, proc_entry_tp, double_tap_sysfs_node);
-
+			pr_info("%s: Linking of %s to /proc/%s/%s...\n", __func__, control_node_path, xiaomi_dt2w_proc_node[i].dir, xiaomi_dt2w_proc_node[i].file);
+			proc_symlink_tmp = NULL;
+			proc_symlink_tmp = proc_symlink(xiaomi_dt2w_proc_node[i].file, proc_directory_tmp, control_node_path);
 			if (proc_symlink_tmp == NULL) {
-				pr_info("%s: Symlink of %s to /proc/%s/%s failed\n", __func__, double_tap_sysfs_node, proc_dir, proc_file);
-				ret = -ENOMEM;
-				goto exit;
+				pr_err("%s: Symlink of %s to /proc/%s/%s failed\n", __func__, control_node_path, xiaomi_dt2w_proc_node[i].dir, xiaomi_dt2w_proc_node[i].file);
+				ret = -EPERM;
 			} else {
-				pr_info("%s: Fallback symlink of %s to /proc/%s/%s done\n", __func__, double_tap_sysfs_node, proc_dir, proc_file);
+				pr_info("%s: Symlink of %s to /proc/%s/%s done.\n", __func__, control_node_path, xiaomi_dt2w_proc_node[i].dir, xiaomi_dt2w_proc_node[i].file);
 			}
 		}
 
 		pr_info("%s: Dynamic symlinking done.\n", __func__);
 	}
 
-exit:
-
-	kfree(buf);
-	kfree(double_tap_sysfs_node);
 	return ret;
 }
 
-int __maybe_unused xiaomi_dt2w_probe(struct i2c_client *client) {
+int xiaomi_dt2w_probe(void) {
 
 	int ret;
+
+	pr_info("%s: Start registering sysctl dev.dt2w control node...\n", __func__);
 	dt2w_sysctl_header = register_sysctl_table(dt2w_parent_table);
 	if (!dt2w_sysctl_header) {
 		pr_err("%s: Registeration of sysctl dev.dt2w control node failed\n", __func__);
+		ret = -EPERM;
+	} else {
+		pr_info("%s: Registeration of sysctl dev.dt2w control node succeeded, now creating proc symlinks...\n", __func__);
+		/* TODO: Dynamicially generate the below path */
+		ret = xiaomi_dt2w_proc_init("/proc/sys/dev/dt2w");
 	}
-	ret = sysfs_create_group(&client->dev.kobj, &xiaomi_dt2w_attr_group);
-	if (ret) {
-		pr_info("%s: Failure %d creating sysfs group\n", __func__, ret);
-		sysfs_remove_group(&client->dev.kobj, &xiaomi_dt2w_attr_group);
-	}
-	xiaomi_dt2w_proc_init(client->dev.kobj.sd);
+
+	pr_info("%s: Probe done! Initial status = %s\n", __func__, xiaomi_dt2w_enable ? "Enabled" : "Disabled");
 	return ret;
 }
-EXPORT_SYMBOL(xiaomi_dt2w_probe);
 
 static int __init xiaomi_dt2w_init(void) {
-
-	pr_info("%s: Init done! Initial status = %s\n", __func__, xiaomi_dt2w_enable ? "Enabled" : "Disabled");
-	return 0;
+	return xiaomi_dt2w_probe();
 }
-late_initcall(xiaomi_dt2w_init);
+module_init(xiaomi_dt2w_init);
 
 MODULE_AUTHOR("Jebaitedneko <jebaitedneko@gmail.com");
 MODULE_DESCRIPTION("Xiaomi Shared DT2W Driver");
