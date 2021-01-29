@@ -18,11 +18,11 @@
 #include <linux/proc_fs.h>
 #include <linux/slab.h>
 
-struct node {
+struct xiaomi_dt2w_node {
 	char *path;
 };
 #define NUM_PATHS 3
-struct node node[NUM_PATHS];
+struct xiaomi_dt2w_node xiaomi_dt2w_node[NUM_PATHS];
 
 char *proc_dir = "gesture";
 char *proc_file = "onoff";
@@ -80,15 +80,15 @@ static inline int xiaomi_dt2w_proc_init(struct kernfs_node *sysfs_node_parent) {
 	double_tap_sysfs_node = kzalloc(PATH_MAX, GFP_KERNEL);
 	if (double_tap_sysfs_node) {
 
-		node[0].path="/proc/sys/dev/dt2w";
-		node[1].path="/proc/touchpanel/enable_dt2w";
-		node[2].path="/sys/android_touch/doubletap2wake";
+		xiaomi_dt2w_node[0].path="/proc/sys/dev/dt2w";
+		xiaomi_dt2w_node[1].path="/proc/touchpanel/enable_dt2w";
+		xiaomi_dt2w_node[2].path="/sys/android_touch/doubletap2wake";
 
 		pr_info("%s: Starting dynamic symlinking...\n", __func__);
 
 		for(i=0; i<NUM_PATHS; i++) {
 
-			sprintf(double_tap_sysfs_node, node[i].path);
+			sprintf(double_tap_sysfs_node, xiaomi_dt2w_node[i].path);
 
 			if(IS_ERR(filp_open(double_tap_sysfs_node, O_RDONLY, 0440))) {
 				pr_info("%s: File at path %s doesn't exist, skipping...\n", __func__, double_tap_sysfs_node);
@@ -138,7 +138,7 @@ exit:
 	return ret;
 }
 
-int __maybe_unused dt2w_probe(struct i2c_client *client) {
+int __maybe_unused xiaomi_dt2w_probe(struct i2c_client *client) {
 
 	int ret;
 	ret = sysfs_create_group(&client->dev.kobj, &xiaomi_dt2w_attr_group);
@@ -149,7 +149,7 @@ int __maybe_unused dt2w_probe(struct i2c_client *client) {
 	xiaomi_dt2w_proc_init(client->dev.kobj.sd);
 	return ret;
 }
-EXPORT_SYMBOL(dt2w_probe);
+EXPORT_SYMBOL(xiaomi_dt2w_probe);
 
 static int __init xiaomi_dt2w_init(void) {
 
