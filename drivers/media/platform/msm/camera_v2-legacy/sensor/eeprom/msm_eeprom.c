@@ -688,22 +688,15 @@ static int msm_eeprom_config(struct msm_eeprom_ctrl_t *e_ctrl,
 		rc = msm_eeprom_get_cmm_data(e_ctrl, cdata);
 		break;
 	case CFG_EEPROM_INIT:
-#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE) || defined(CONFIG_MACH_XIAOMI_SANTONI)
-		if (xiaomi_series_read() != XIAOMI_SERIES_ROVA && xiaomi_device_read() != XIAOMI_DEVICE_SANTONI) {
-#endif
 		if (e_ctrl->userspace_probe == 0) {
 			pr_err("%s:%d Eeprom already probed at kernel boot",
 				__func__, __LINE__);
 			rc = -EINVAL;
-#ifdef CONFIG_MACH_XIAOMI_ULYSSE
-			if (xiaomi_series_read() == XIAOMI_SERIES_ULYSSE)
-				rc = 0;
+#ifdef CONFIG_MACH_XIAOMI
+			rc = 0;
 #endif
 			break;
 		}
-#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE) || defined(CONFIG_MACH_XIAOMI_SANTONI)
-		}
-#endif
 		if (e_ctrl->cal_data.num_data == 0) {
 			rc = eeprom_init_config(e_ctrl, argp);
 			if (rc < 0) {
@@ -1557,22 +1550,15 @@ static int msm_eeprom_config32(struct msm_eeprom_ctrl_t *e_ctrl,
 		rc = eeprom_config_read_cal_data32(e_ctrl, argp);
 		break;
 	case CFG_EEPROM_INIT:
-#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE) || defined(CONFIG_MACH_XIAOMI_SANTONI)
-		if (xiaomi_series_read() != XIAOMI_SERIES_ROVA && xiaomi_device_read() != XIAOMI_DEVICE_SANTONI) {
-#endif
 		if (e_ctrl->userspace_probe == 0) {
 			pr_err("%s:%d Eeprom already probed at kernel boot",
 				__func__, __LINE__);
 			rc = -EINVAL;
-#ifdef CONFIG_MACH_XIAOMI_ULYSSE
-			if (xiaomi_series_read() == XIAOMI_SERIES_ULYSSE)
-				rc = 0;
+#ifdef CONFIG_MACH_XIAOMI
+			rc = 0;
 #endif
 			break;
 		}
-#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE) || defined(CONFIG_MACH_XIAOMI_SANTONI)
-		}
-#endif
 		if (e_ctrl->cal_data.num_data == 0) {
 			rc = eeprom_init_config32(e_ctrl, argp);
 			if (rc < 0)
