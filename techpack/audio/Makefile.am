@@ -1,3 +1,4 @@
+ifneq ($(CONFIG_NO_TECHPACK_AUDIO),y)
 KBUILD_OPTIONS := AUDIO_ROOT=$(PWD)
 KBUILD_OPTIONS += MODNAME=audio
 KBUILD_OPTIONS += HEADER_INSTALL_DIR=$(KERNEL_SRC)/scripts
@@ -49,3 +50,4 @@ modules_install:
 clean:
 	rm -f *.o *.ko *.mod.c *.mod.o *~ .*.cmd Module.symvers
 	rm -rf .tmp_versions
+endif # CONFIG_NO_TECHPACK_AUDIO

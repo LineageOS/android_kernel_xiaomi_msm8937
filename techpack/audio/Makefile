@@ -1,3 +1,4 @@
+ifneq ($(CONFIG_NO_TECHPACK_AUDIO),y)
 # auto-detect subdirs
 ifeq ($(CONFIG_ARCH_SDM845), y)
 include $(srctree)/techpack/audio/config/sdm845auto.conf
@@ -51,3 +52,6 @@ obj-y += asoc/
 obj-y += dsp/
 obj-y += ipc/
 obj-y += soc/
+else # CONFIG_NO_TECHPACK_AUDIO
+obj-y += no_techpack_audio.o
+endif # CONFIG_NO_TECHPACK_AUDIO

@@ -9,3 +9,6 @@ config SRCARCH
 	option env="SRCARCH"
 
 source "arch/$SRCARCH/Kconfig"
+
+config NO_TECHPACK_AUDIO
+	bool "Don't compile techpack/audio"
