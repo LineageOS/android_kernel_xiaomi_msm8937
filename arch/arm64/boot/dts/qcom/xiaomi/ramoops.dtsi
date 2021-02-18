@@ -1,0 +1,10 @@
+/ {
+	reserved-memory {
+		ramoops@8f000000 {
+			compatible = "ramoops";
+			reg = <0 0x8f000000 0 0x100000>;
+			record-size = <0x4000>;
+			console-size = <0x4000>;
+		};
+	};
+};

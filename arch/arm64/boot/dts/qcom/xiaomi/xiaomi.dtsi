@@ -2,3 +2,4 @@
 
 #include "android.dtsi"
 #include "soc.dtsi"
+#include "ramoops.dtsi"
