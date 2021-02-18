@@ -87,7 +87,9 @@ static void gpio_enable(struct timed_output_dev *dev, int value)
 	if (value > 0) {
 		if (value > data->max_timeout)
 			value = data->max_timeout;
+#if 0
 			printk("max_timeout is %d\n", data->max_timeout);
+#endif
 		hrtimer_start(&data->timer,
 			ktime_set(value / 1000, (value % 1000) * 1000000),
 			HRTIMER_MODE_REL);
