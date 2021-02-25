@@ -16,7 +16,7 @@
 	i2c@78b7000 {
 		status = "ok";
 		ftech@38 {
-			compatible = "focaltech,5336";
+			compatible = "focaltech,5346";
 			reg = <0x38>;
 			interrupt-parent = <&tlmm>;
 			interrupts = <65 0x2008>;
