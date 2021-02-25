@@ -1,0 +1,95 @@
+/ {
+	aliases {
+		spi7 = &spi_7;
+	};
+};
+
+&tlmm {
+		spi7 {
+			spi7_default: spi7_default {
+				/* active state */
+				mux {
+					/* MOSI, MISO, CLK */
+					pins = "gpio85", "gpio86", "gpio88";
+					function = "blsp_spi7";
+				};
+
+				config {
+					pins = "gpio85", "gpio86", "gpio88";
+					drive-strength = <12>; /* 12 MA */
+					bias-disable = <0>; /* No PULL */
+				};
+			};
+
+			spi7_sleep: spi7_sleep {
+				/* suspended state */
+				mux {
+					/* MOSI, MISO, CLK */
+					pins = "gpio85", "gpio86", "gpio88";
+					function = "gpio";
+				};
+
+				config {
+					pins = "gpio85", "gpio86", "gpio88";
+					drive-strength = <2>; /* 2 MA */
+					bias-pull-down; /* PULL Down */
+				};
+			};
+
+			spi7_cs0_active: cs0_active {
+				/* CS */
+				mux {
+					pins = "gpio87";
+					function = "blsp_spi7";
+				};
+
+				config {
+					pins = "gpio87";
+					drive-strength = <2>;
+					bias-disable = <0>;
+				};
+			};
+
+			spi7_cs0_sleep: cs0_sleep {
+				/* CS */
+				mux {
+					pins = "gpio87";
+					function = "gpio";
+				};
+
+				config {
+					pins = "gpio87";
+					drive-strength = <2>;
+					bias-disable = <0>;
+				};
+			};
+		};
+};
+
+&soc {
+	spi_7: spi@7af7000 { /* BLSP1 QUP3 */
+		compatible = "qcom,spi-qup-v2";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg-names = "spi_physical", "spi_bam_physical";
+		reg = <0x7af7000 0x600>,
+			<0x7ac4000 0x1f000>;
+		interrupt-names = "spi_irq", "spi_bam_irq";
+		interrupts = <0 301 0>, <0 239 0>;
+		spi-max-frequency = <50000000>;
+		pinctrl-names = "spi_default", "spi_sleep";
+		pinctrl-0 = <&spi7_default &spi7_cs0_active>;
+		pinctrl-1 = <&spi7_sleep &spi7_cs0_sleep>;
+		clocks = <&clock_gcc clk_gcc_blsp2_ahb_clk>,
+			<&clock_gcc clk_gcc_blsp2_qup3_spi_apps_clk>;
+		clock-names = "iface_clk", "core_clk";
+		qcom,use-bam;
+		qcom,use-pinctrl;
+		qcom,ver-reg-exists;
+		qcom,bam-consumer-pipe-index = <8>;
+		qcom,bam-producer-pipe-index = <9>;
+		qcom,master-id = <84>;
+		qcom,rt-priority;
+		status = "disabled";
+	};
+};

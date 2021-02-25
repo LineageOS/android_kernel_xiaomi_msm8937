@@ -1,3 +1,5 @@
+#include "riva-spi7.dtsi"
+
 #include "riva-audio.dtsi"
 #include "riva-pinctrl.dtsi"
 #include "riva-battery.dtsi"
