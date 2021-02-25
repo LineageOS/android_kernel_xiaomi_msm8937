@@ -1,0 +1,7 @@
+&i2c_2 {
+	aw87319@58 {
+		compatible = "awinic,aw87319_pa";
+		qcom,ext_pa_spk_aw87319_rst = < 0x15 0x7c 0x00 >;
+		reg = < 0x58 >;
+	};
+};
