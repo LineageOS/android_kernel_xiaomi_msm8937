@@ -5,6 +5,7 @@
  *  SD support Copyright (C) 2004 Ian Molton, All Rights Reserved.
  *  Copyright (C) 2005-2008 Pierre Ossman, All Rights Reserved.
  *  MMCv4 support Copyright (C) 2006 Philip Langdale, All Rights Reserved.
+ *  Copyright (C) 2016 XiaoMi, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -36,6 +37,10 @@
 #include <linux/mmc/mmc.h>
 #include <linux/mmc/sd.h>
 #include <linux/mmc/slot-gpio.h>
+
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
+#include <xiaomi-msm8937/mach.h>
+#endif
 
 #define CREATE_TRACE_POINTS
 #include <trace/events/mmc.h>
@@ -681,6 +686,14 @@ static int mmc_devfreq_create_freq_table(struct mmc_host *host)
 		clk_scaling->freq_table[0])
 		pr_debug("%s: frequency table undershot possible freq\n",
 			mmc_hostname(host));
+
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_LAND)
+	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_LAND &&
+			strcmp(mmc_hostname(host), "mmc1") == 0) {
+		clk_scaling->freq_table[0] = host->card->clk_scaling_highest;
+		goto out;
+	}
+#endif
 
 	for (i = 0; i < clk_scaling->freq_table_sz; i++) {
 		if (clk_scaling->freq_table[i] <=
