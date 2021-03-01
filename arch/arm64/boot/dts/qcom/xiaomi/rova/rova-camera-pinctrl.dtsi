@@ -11,7 +11,7 @@
  * GNU General Public License for more details.
  */
 
-/ {
+&tlmm {
 	SGM3780_default: SGM3780_default {
 		mux {
 			pins = "gpio90", "gpio93";
