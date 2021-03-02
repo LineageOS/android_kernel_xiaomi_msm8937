@@ -42,8 +42,6 @@ enum tz_smmu_device_id {
 	TZ_DEVICE_MAX,
 };
 
-#ifdef CONFIG_MSM_TZ_SMMU
-
 int msm_tz_smmu_atos_start(struct device *dev, int cb_num);
 int msm_tz_smmu_atos_end(struct device *dev, int cb_num);
 enum tz_smmu_device_id msm_dev_to_device_id(struct device *dev);
@@ -59,62 +57,4 @@ extern void *arm_smmu_get_by_addr(void __iomem *addr);
 	if (!arm_smmu_skip_write(c))					\
 		((void)__raw_writel((u32)cpu_to_le32(v), (c)));	\
 	} while (0)
-
-#else
-
-static inline int msm_tz_smmu_atos_start(struct device *dev, int cb_num)
-{
-	return 0;
-}
-
-static inline int msm_tz_smmu_atos_end(struct device *dev, int cb_num)
-{
-	return 0;
-}
-
-static inline enum tz_smmu_device_id msm_dev_to_device_id(struct device *dev)
-{
-	return -EINVAL;
-}
-
-static inline int msm_tz_set_cb_format(enum tz_smmu_device_id sec_id,
-					int cbndx)
-{
-	return -EINVAL;
-}
-
-static inline int msm_iommu_sec_pgtbl_init(void)
-{
-	return -EINVAL;
-}
-
-static inline int register_iommu_sec_ptbl(void)
-{
-	return -EINVAL;
-}
-
-static inline size_t msm_secure_smmu_unmap(struct iommu_domain *domain,
-					   unsigned long iova,
-					   size_t size)
-{
-	return -EINVAL;
-}
-
-static inline size_t msm_secure_smmu_map_sg(struct iommu_domain *domain,
-					    unsigned long iova,
-					    struct scatterlist *sg,
-					    unsigned int nents, int prot)
-{
-	return -EINVAL;
-}
-
-static inline int msm_secure_smmu_map(struct iommu_domain *domain,
-				      unsigned long iova,
-				      phys_addr_t paddr, size_t size, int prot)
-{
-	return -EINVAL;
-}
-
-#endif /* CONFIG_MSM_TZ_SMMU */
-
 #endif /* __MSM_TZ_SMMU_H__ */
