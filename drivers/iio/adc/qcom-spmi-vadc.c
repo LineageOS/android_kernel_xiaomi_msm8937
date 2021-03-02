@@ -735,6 +735,12 @@ static int vadc_get_dt_channel_data(struct device *dev,
 	else
 		prop->calibration = VADC_CALIB_ABSOLUTE;
 
+	prop->scale_fn_type = -EINVAL;
+	ret = of_property_read_u32(node, "qcom,scale-fn-type", &value);
+
+	if (!ret && value < SCALE_HW_CALIB_MAX)
+		prop->scale_fn_type = value;
+
 	dev_dbg(dev, "%02x name %s\n", chan, name);
 
 	return 0;
@@ -772,7 +778,10 @@ static int vadc_get_dt_data(struct vadc_priv *vadc, struct device_node *node)
 			return ret;
 		}
 
-		prop.scale_fn_type = vadc_chans[prop.channel].scale_fn_type;
+		if (prop.scale_fn_type == -EINVAL)
+			prop.scale_fn_type =
+				vadc_chans[prop.channel].scale_fn_type;
+
 		vadc->chan_props[index] = prop;
 
 		vadc_chan = &vadc_chans[prop.channel];
