@@ -808,7 +808,7 @@ static u8 lockdown_info[MXT_LOCKDOWN_SIZE];
 #define CTP_PARENT_PROC_NAME  "touchscreen"
 #define CTP_LOCKDOWN_INFOR_NAME   "lockdown_info"
 #define CTP_OPEN_PROC_NAME        "ctp_openshort_test"
-extern  u8 tp_color;
+u8 tp_color;
 struct mxt_data *cmcs_data;
 static ssize_t ctp_lockdown_proc_read(struct file *file, char __user *buf, size_t count, loff_t *ppos);
 static ssize_t ctp_lockdown_proc_write(struct file *filp, const char __user *userbuf, size_t count, loff_t *ppos);
@@ -4368,7 +4368,7 @@ static ssize_t mxt_wakeup_mode_store(struct device *dev,
 		return count;
 	}
 
-	error = strict_strtoul(buf, 0, &val);
+	error = kstrtoul(buf, 0, &val);
 
 	if (!error)
 		data->wakeup_gesture_mode = (u8)val;
@@ -4411,7 +4411,7 @@ static ssize_t  mxt_sensitive_mode_store(struct device *dev,
 	unsigned long val;
 	int error;
 
-	error = strict_strtoul(buf, 0, &val);
+	error = kstrtoul(buf, 0, &val);
 	if (!error) {
 		if (val == 1) {
 			error = mxt_sensitive_mode_switch(data, true);
