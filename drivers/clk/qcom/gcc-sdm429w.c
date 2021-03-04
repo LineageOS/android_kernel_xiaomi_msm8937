@@ -4287,9 +4287,19 @@ static void fixup_for_qm215(struct platform_device *pdev,
 	gcc_sdm429w_desc.clks[GCC_MDSS_ESC1_CLK] = NULL;
 }
 
+static void fixup_for_sdm439_429(void)
+{
+	/*
+	 * Below clocks are not available on SDM429/439, thus mark them NULL.
+	 */
+	gcc_sdm429w_desc.clks[GCC_GFX_TCU_CLK] = NULL;
+	gcc_sdm429w_desc.clks[GCC_GFX_TBU_CLK] = NULL;
+	gcc_sdm429w_desc.clks[GCC_GTCU_AHB_CLK] = NULL;
+}
 static const struct of_device_id gcc_sdm429w_match_table[] = {
 	{ .compatible = "qcom,gcc-sdm429w" },
 	{ .compatible = "qcom,gcc-qm215" },
+	{ .compatible = "qcom,gcc-sdm439" },
 	{ }
 };
 MODULE_DEVICE_TABLE(of, gcc_sdm429w_match_table);
@@ -4299,10 +4309,13 @@ static int gcc_sdm429w_probe(struct platform_device *pdev)
 	struct regmap *regmap;
 	struct clk *clk;
 	int ret, speed_bin;
-	bool qm215;
+	bool qm215, is_sdm439;
 
 	qm215 = of_device_is_compatible(pdev->dev.of_node,
 						"qcom,gcc-qm215");
+
+	is_sdm439 = of_device_is_compatible(pdev->dev.of_node,
+						"qcom,gcc-sdm439");
 
 	clk = clk_get(&pdev->dev, "bi_tcxo");
 	if (IS_ERR(clk)) {
@@ -4332,6 +4345,9 @@ static int gcc_sdm429w_probe(struct platform_device *pdev)
 		regmap_update_bits(regmap, gcc_oxili_gmem_clk.clkr.enable_reg,
 				0xff0, 0xff0);
 	}
+
+	if (is_sdm439)
+		fixup_for_sdm439_429();
 
 	clk_alpha_pll_configure(&gpll3_out_main, regmap, &gpll3_config);
 
@@ -4421,6 +4437,7 @@ static void fixup_for_qm215_gcc_mdss(void)
 static const struct of_device_id mdss_sdm429w_match_table[] = {
 	{ .compatible = "qcom,gcc-mdss-sdm429w" },
 	{ .compatible = "qcom,gcc-mdss-qm215" },
+	{ .compatible = "qcom,gcc-mdss-sdm439" },
 	{}
 };
 MODULE_DEVICE_TABLE(of, mdss_sdm429w_match_table);
