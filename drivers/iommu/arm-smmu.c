@@ -3872,6 +3872,7 @@ struct arm_smmu_device *arm_smmu_get_by_fwnode(struct fwnode_handle *fwnode)
 	return dev ? dev_get_drvdata(dev) : NULL;
 }
 
+#ifdef CONFIG_MSM_TZ_SMMU
 static int msm_secure_smmu_map(struct iommu_domain *domain, unsigned long iova,
 			       phys_addr_t paddr, size_t size, int prot)
 {
@@ -3961,6 +3962,7 @@ bool arm_smmu_skip_write(void __iomem *addr)
 
 	return false;
 }
+#endif
 
 static int arm_smmu_add_device(struct device *dev)
 {
