@@ -3,7 +3,7 @@
  * Core MDSS framebuffer driver.
  *
  * Copyright (C) 2007 Google Incorporated
- * Copyright (c) 2008-2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2008-2020, The Linux Foundation. All rights reserved.
  */
 
 #define pr_fmt(fmt)	"%s: " fmt, __func__
@@ -1876,8 +1876,7 @@ static int mdss_fb_blank_blank(struct msm_fb_data_type *mfd,
 		pr_debug("No change in power state\n");
 		return 0;
 	}
-	pr_err("WA Fix: Disable Suspend for Display\n");
-	return 0;
+
 	mutex_lock(&mfd->update.lock);
 	mfd->update.type = NOTIFY_TYPE_SUSPEND;
 	mfd->update.is_suspend = 1;
