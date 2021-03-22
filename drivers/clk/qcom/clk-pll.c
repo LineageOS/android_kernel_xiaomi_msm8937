@@ -138,7 +138,8 @@ clk_pll_determine_rate(struct clk_hw *hw, struct clk_rate_request *req)
 
 	f = find_freq(pll->freq_tbl, req->rate);
 	if (!f)
-		req->rate = clk_pll_recalc_rate(hw, req->best_parent_rate);
+		req->rate = DIV_ROUND_UP_ULL(req->rate, req->best_parent_rate)
+			* req->best_parent_rate;
 	else
 		req->rate = f->freq;
 
