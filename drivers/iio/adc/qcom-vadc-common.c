@@ -930,9 +930,6 @@ static int qcom_vadc_scale_therm_qrd_215(
 
 	qcom_vadc_scale_calib(calib_graph, adc_code, absolute, &voltage);
 
-	if (absolute)
-		voltage = div64_s64(voltage, 1000);
-
 	ret = qcom_vadc_map_voltage_temp(adcmap_batt_therm_qrd_215,
 					 ARRAY_SIZE(adcmap_batt_therm_qrd_215),
 					 voltage, &result);

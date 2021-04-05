@@ -557,7 +557,7 @@ static const struct vadc_channels vadc_chans[] = {
 	VADC_CHAN_TEMP(DIE_TEMP, 0, SCALE_PMIC_THERM)
 	VADC_CHAN_VOLT(REF_625MV, 0, SCALE_DEFAULT)
 	VADC_CHAN_VOLT(REF_1250MV, 0, SCALE_DEFAULT)
-	VADC_CHAN_TEMP(CHG_TEMP, 0, SCALE_DEFAULT)
+	VADC_CHAN_NO_SCALE(CHG_TEMP, 0)
 	VADC_CHAN_VOLT(SPARE1, 0, SCALE_DEFAULT)
 	VADC_CHAN_TEMP(SPARE2, 0, SCALE_PMI_CHG_TEMP)
 	VADC_CHAN_VOLT(GND_REF, 0, SCALE_DEFAULT)
@@ -597,7 +597,7 @@ static const struct vadc_channels vadc_chans[] = {
 	VADC_CHAN_NO_SCALE(P_MUX15_1_3, 1)
 	VADC_CHAN_NO_SCALE(P_MUX16_1_3, 1)
 
-	VADC_CHAN_TEMP(LR_MUX1_BAT_THERM, 0, SCALE_DEFAULT)
+	VADC_CHAN_NO_SCALE(LR_MUX1_BAT_THERM, 0)
 	VADC_CHAN_VOLT(LR_MUX2_BAT_ID, 0, SCALE_DEFAULT)
 	VADC_CHAN_TEMP(LR_MUX3_XO_THERM, 0, SCALE_THERM_100K_PULLUP)
 	VADC_CHAN_NO_SCALE(LR_MUX4_AMUX_THM1, 0)
@@ -746,6 +746,7 @@ static int vadc_get_dt_data(struct vadc_priv *vadc, struct device_node *node)
 	struct vadc_channel_prop prop;
 	struct device_node *child;
 	unsigned int index = 0;
+	bool scale_fn_type_from_dt = false;
 	int ret;
 
 	vadc->nchannels = of_get_available_child_count(node);
@@ -771,9 +772,12 @@ static int vadc_get_dt_data(struct vadc_priv *vadc, struct device_node *node)
 			return ret;
 		}
 
-		if (prop.scale_fn_type == -EINVAL)
+		if (prop.scale_fn_type == -EINVAL) {
 			prop.scale_fn_type =
 				vadc_chans[prop.channel].scale_fn_type;
+		} else {
+			scale_fn_type_from_dt = true;
+		}
 
 		vadc->chan_props[index] = prop;
 
@@ -781,7 +785,11 @@ static int vadc_get_dt_data(struct vadc_priv *vadc, struct device_node *node)
 
 		iio_chan->channel = prop.channel;
 		iio_chan->datasheet_name = vadc_chan->datasheet_name;
-		iio_chan->info_mask_separate = vadc_chan->info_mask;
+		if (!scale_fn_type_from_dt)
+			iio_chan->info_mask_separate = vadc_chan->info_mask;
+		else
+			iio_chan->info_mask_separate =
+			  vadc_chan->info_mask | BIT(IIO_CHAN_INFO_PROCESSED);
 		iio_chan->type = vadc_chan->type;
 		iio_chan->indexed = 1;
 		iio_chan->address = index++;
