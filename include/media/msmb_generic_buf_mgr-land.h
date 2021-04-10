@@ -13,7 +13,7 @@
 #ifndef __MEDIA_MSMB_GENERIC_BUF_MGR_H__
 #define __MEDIA_MSMB_GENERIC_BUF_MGR_H__
 
-#include <uapi/media/msmb_generic_buf_mgr.h>
+#include <uapi/media/msmb_generic_buf_mgr-land.h>
 #include <linux/compat.h>
 
 struct v4l2_subdev *land_msm_buf_mngr_get_subdev(void);
