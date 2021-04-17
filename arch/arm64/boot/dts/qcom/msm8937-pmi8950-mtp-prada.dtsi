@@ -383,7 +383,33 @@
 		};
 	};
 };
-	
+
+&pmi8950_flash0 {
+	qcom,current = <1000>;
+	reg0 {
+		regulator-name = "pon_spare_reg";
+	};
+};
+
+&pmi8950_torch0 {
+	qcom,led-name = "flashlight";
+	qcom,current = <200>;
+};
+
+&pmi8950_flash1 {
+	status = "disabled";
+};
+
+&pmi8950_torch1 {
+	status = "disabled";
+};
+
+&led_flash0 {
+	/delete-property/ qcom,switch-source;
+	qcom,flash-source = <&pmi8950_flash0>;
+	qcom,torch-source = <&pmi8950_torch0>;
+};
+		
 &soc {
 	goodix_fp {
 		compatible = "goodix,fingerprint";
