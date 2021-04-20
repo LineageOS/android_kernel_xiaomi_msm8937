@@ -511,8 +511,7 @@ static struct clk_regmap_div dsi0pll_pclk_src = {
 			.parent_names = (const char *[]){
 					"dsi0pll_gp_div_mux"},
 			.num_parents = 1,
-			.flags = (CLK_GET_RATE_NOCACHE | CLK_SET_RATE_PARENT |
-					CLK_SET_RATE_NO_REPARENT),
+			.flags = CLK_GET_RATE_NOCACHE,
 			.ops = &clk_regmap_div_ops,
 		},
 	},
@@ -528,8 +527,7 @@ static struct clk_regmap_div dsi1pll_pclk_src = {
 			.parent_names = (const char *[]){
 					"dsi1pll_gp_div_mux"},
 			.num_parents = 1,
-			.flags = (CLK_GET_RATE_NOCACHE | CLK_SET_RATE_PARENT |
-					CLK_SET_RATE_NO_REPARENT),
+			.flags = CLK_GET_RATE_NOCACHE,
 			.ops = &clk_regmap_div_ops,
 		},
 	},
