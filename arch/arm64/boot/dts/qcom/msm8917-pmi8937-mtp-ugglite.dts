@@ -22,7 +22,6 @@
 
 #include "xiaomi/xiaomi.dtsi"
 #include "xiaomi/ulysse/ulysse.dtsi"
-#include "xiaomi/ulysse/ugglite/ugglite.dtsi"
 
 / {
 	model = "Qualcomm Technologies, Inc. MSM8917-PMI8937 MTP";

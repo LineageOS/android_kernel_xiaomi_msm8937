@@ -12,8 +12,5 @@
  * GNU General Public License for more details.
  */
 
-#include "pinctrl.dtsi"
-
-#include "camera.dtsi"
 #include "fingerprint.dtsi"
 
