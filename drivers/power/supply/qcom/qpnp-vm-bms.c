@@ -1395,7 +1395,7 @@ static int32_t get_vbat_sns_comp(int64_t *result,
 		*result -= offset;
 
 	*result = div64_s64(*result, 1000000);
-	pr_err("%lld compensated into %lld\n", old, *result);
+	pr_debug("%lld compensated into %lld\n", old, *result);
 
 	return 0;
 }
