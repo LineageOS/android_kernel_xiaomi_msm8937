@@ -4,9 +4,39 @@
 #include "panels/dsi-panel-ili9881c-tianma-c3b-720p-video.dtsi"
 
 &mdss_dsi0 {
+	qcom,dsi-pref-prim-pan = <&dsi_ili9881c_ebbg_720p_video>;
+	qcom,dsi-pref-sub1-pan = <&dsi_ili9881c_ebbgDJN_720p_video>;
+	qcom,dsi-pref-sub2-pan = <&dsi_ili9881c_tianma_720p_video>;
+
 	/delete-property/ qcom,dsi-pref-sub-pan;
 };
 
 &mdss_dsi0_pll {
 	/delete-property/ qcom,dsi-pll-ssc-en;
+};
+
+&dsi_hx8394f_720p_video {
+	//qcom,esd-check-enabled;
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+	/delete-property/ qcom,esd-check-enabled;
+};
+
+&dsi_ili9881c_ebbg_720p_video {
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+	/delete-property/ qcom,esd-check-enabled;
+};
+
+&dsi_hx8394f_boe_720_vid {
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+	/delete-property/ qcom,esd-check-enabled;
+};
+
+&dsi_ili9881c_ebbgDJN_720p_video {
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+	/delete-property/ qcom,esd-check-enabled;
+};
+
+&dsi_ili9881c_tianma_720p_video {
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+	/delete-property/ qcom,esd-check-enabled;
 };
