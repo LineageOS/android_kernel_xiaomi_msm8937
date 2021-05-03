@@ -16,13 +16,12 @@
 
 / {
 	reserved-memory {
-		pstore_reserve_mem: pstore_reserve_mem_region@0 {
-			linux,reserve-contiguous-region;
-			linux,reserve-region;
-			linux,remove-completely;
+		ramoops@91400000 {
+			compatible = "ramoops";
 			reg = <0x0 0x91400000 0x0 0x00100000>;
-			label = "pstore_reserve_mem";
-                };
+			record-size = <0x50000>;
+			console-size = <0x50000>;
+		};
 	};
 };
 
