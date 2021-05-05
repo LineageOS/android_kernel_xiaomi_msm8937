@@ -910,10 +910,9 @@ unsigned long vco_12nm_recalc_rate(struct clk_hw *hw,
 	}
 
 	if (pll->vco_current_rate != 0) {
-		rate = pll_vco_get_rate_12nm(hw);
 		pr_debug("%s:returning vco rate = %lld\n", __func__,
 				pll->vco_current_rate);
-		return rate;
+		return pll->vco_current_rate;
 	}
 
 	rc = mdss_pll_resource_enable(pll, true);
@@ -971,6 +970,25 @@ int pll_vco_prepare_12nm(struct clk_hw *hw)
 		}
 	}
 
+	if (!pll->handoff_resources) {
+		pr_debug("%s ndx = %d cache PLL regs\n", __func__, pll->index);
+		MDSS_PLL_REG_W(pll->pll_base,
+			DSIPHY_PLL_VCO_CTRL, pll->cached_cfg0);
+		udelay(1);
+		MDSS_PLL_REG_W(pll->pll_base,
+			DSIPHY_PLL_CHAR_PUMP_BIAS_CTRL, pll->cached_cfg1);
+		udelay(1);
+		MDSS_PLL_REG_W(pll->pll_base,
+			 DSIPHY_HS_FREQ_RAN_SEL, pll->cached_outdiv);
+		udelay(1);
+		MDSS_PLL_REG_W(pll->pll_base,
+			 DSIPHY_PLL_CTRL, pll->cached_postdiv1);
+		udelay(1);
+		MDSS_PLL_REG_W(pll->pll_base,
+			 DSIPHY_SSC9, pll->cached_postdiv3);
+		udelay(5); /* h/w recommended delay */
+	}
+
 	/*
 	 * For cases where  DSI PHY is already enabled like:
 	 * 1.) LP-11 during static screen
@@ -1009,6 +1027,15 @@ void pll_vco_unprepare_12nm(struct clk_hw *hw)
 	}
 
 	pll->vco_cached_rate = clk_hw_get_rate(hw);
+
+	pll->cached_cfg0 = MDSS_PLL_REG_R(pll->pll_base, DSIPHY_PLL_VCO_CTRL);
+	pll->cached_cfg1 = MDSS_PLL_REG_R(pll->pll_base,
+					DSIPHY_PLL_CHAR_PUMP_BIAS_CTRL);
+	pll->cached_outdiv =  MDSS_PLL_REG_R(pll->pll_base,
+					DSIPHY_HS_FREQ_RAN_SEL);
+	pll->cached_postdiv1 = MDSS_PLL_REG_R(pll->pll_base, DSIPHY_PLL_CTRL);
+	pll->cached_postdiv3 = MDSS_PLL_REG_R(pll->pll_base, DSIPHY_SSC9);
+
 	dsi_pll_disable(hw);
 }
 
