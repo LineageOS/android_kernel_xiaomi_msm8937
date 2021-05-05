@@ -127,7 +127,6 @@ static int cpucc_clk_determine_rate(struct clk_hw *hw,
 	struct clk_rate_request parent_req = { };
 	struct clk_regmap_mux_div *cpuclk = to_clk_regmap_mux_div(hw);
 	unsigned long apcs_gpll0_rate, apcs_gpll0_rrate, rate = req->rate;
-	unsigned long mask = BIT(cpuclk->hid_width) - 1;
 	u32 div = 1;
 	int ret;
 
@@ -146,15 +145,6 @@ static int cpucc_clk_determine_rate(struct clk_hw *hw,
 	apcs_gpll0_rate = clk_hw_get_rate(apcs_gpll0_hw);
 	apcs_gpll0_rrate = DIV_ROUND_UP(apcs_gpll0_rate, 1000000) * 1000000;
 
-	if (rate <= apcs_gpll0_rrate) {
-		req->best_parent_hw = apcs_gpll0_hw;
-		req->best_parent_rate = apcs_gpll0_rrate;
-		div = DIV_ROUND_CLOSEST(2 * apcs_gpll0_rrate, rate) - 1;
-		div = min_t(unsigned long, div, mask);
-		req->rate = calc_rate(req->best_parent_rate, 0,
-							0, 0, div);
-		cpuclk->src = cpuclk->parent_map[P_GPLL0_AO_OUT_MAIN].cfg;
-	} else {
 		parent_req.rate = rate;
 		parent_req.best_parent_hw = apcs_cpu_pll_hw;
 
@@ -165,7 +155,6 @@ static int cpucc_clk_determine_rate(struct clk_hw *hw,
 
 		req->best_parent_rate = parent_req.rate;
 		cpuclk->src = cpuclk->parent_map[P_APCS_CPU_PLL1].cfg;
-	}
 
 	cpuclk->div = div;
 
@@ -1188,9 +1177,11 @@ static int cpucc_driver_probe(struct platform_device *pdev)
 		if (is_sdm439) {
 			WARN(clk_prepare_enable(apcs_mux_c0_clk.clkr.hw.clk),
 				"Unable to turn on CPU clock\n");
+		} else {
+			WARN(clk_prepare_enable(apcs_mux_c1_clk.clkr.hw.clk),
+				"Unable to turn on CPU clock\n");
 		}
-		WARN(clk_prepare_enable(apcs_mux_c1_clk.clkr.hw.clk),
-			"Unable to turn on CPU clock\n");
+
 		if (is_sdm429 || is_sdm439)
 			clk_prepare_enable(apcs_mux_cci_clk.clkr.hw.clk);
 	}
