@@ -1177,10 +1177,9 @@ static int cpucc_driver_probe(struct platform_device *pdev)
 		if (is_sdm439) {
 			WARN(clk_prepare_enable(apcs_mux_c0_clk.clkr.hw.clk),
 				"Unable to turn on CPU clock\n");
-		} else {
-			WARN(clk_prepare_enable(apcs_mux_c1_clk.clkr.hw.clk),
-				"Unable to turn on CPU clock\n");
 		}
+		WARN(clk_prepare_enable(apcs_mux_c1_clk.clkr.hw.clk),
+			"Unable to turn on CPU clock\n");
 
 		if (is_sdm429 || is_sdm439)
 			clk_prepare_enable(apcs_mux_cci_clk.clkr.hw.clk);
