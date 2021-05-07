@@ -375,3 +375,12 @@
 		pins = "gpio91", "gpio127";
 	};
 };
+
+&tlmm {
+	/delete-node/ cam_sensor_rear_reset;
+	/delete-node/ cam_sensor_rear_reset_sleep;
+	/delete-node/ cam_sensor_rear_standby;
+	/delete-node/ cam_sensor_rear_standby_sleep;
+	/delete-node/ cam_sensor_rear_vana;
+	/delete-node/ cam_sensor_rear_vana_sleep;
+};
