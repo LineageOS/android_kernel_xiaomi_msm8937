@@ -1,13 +1,3 @@
-/ {
-	aliases {
-		/delete-property/ spi7;
-	};
-};
-
-&soc {
-	/delete-node/ spi@7af7000;
-};
-
 &apps_iommu {
 	/delete-property/ qcom,no-aarch64;
 };

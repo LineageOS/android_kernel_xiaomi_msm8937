@@ -1,0 +1,8 @@
+//#include "riva-spi7.dtsi"
+
+#include "../riva/riva-audio.dtsi"
+#include "../riva/riva-pinctrl.dtsi"
+#include "../riva/riva-battery.dtsi"
+//#include "riva-camera.dtsi"
+#include "../riva/riva-mdss.dtsi"
+//#include "riva-misc.dtsi"

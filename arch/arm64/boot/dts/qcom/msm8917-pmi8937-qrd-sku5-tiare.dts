@@ -20,7 +20,6 @@
 
 #include "xiaomi/xiaomi.dtsi"
 #include "xiaomi/rova/rova-overlay.dtsi"
-#include "xiaomi/rova/riva/riva-overlay.dtsi"
 #include "xiaomi/rova/tiare/tiare.dtsi"
 
 / {

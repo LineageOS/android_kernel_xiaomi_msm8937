@@ -1,3 +1,6 @@
+#include "import-riva.dtsi"
+#include "remove-riva.dtsi"
+
 #include "pinctrl.dtsi"
 
 #include "android.dtsi"
@@ -7,5 +10,4 @@
 #include "display.dtsi"
 #include "misc.dtsi"
 #include "pm.dtsi"
-#include "remove-riva.dtsi"
 #include "soc.dtsi"
