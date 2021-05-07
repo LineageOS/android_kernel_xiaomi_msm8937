@@ -1,0 +1,20 @@
+/*
+commit 6dfea3030dc58428129960523473f0a3bf3b3ed8
+Author: Vijay kumar Tumati <vtumati@codeaurora.org>
+Date:   Fri Mar 23 16:17:51 2018 +0530
+
+    ARM: dts: msm: Enable camera on SDM439 interposer
+    
+    Add device nodes to enable camera sensors
+    on SDM439 interposer.
+    It is a snapshot of msm8937 device node from
+    msm-3.18 at commit 71105998845fb ("ALSA: seq: Fix
+    use-after-free at creating a port").
+    
+    Change-Id: I9c23e9352598dc95117a2ac11cdedbb0d614c6d8
+    Signed-off-by: Vijay kumar Tumati <vtumati@codeaurora.org>
+*/
+&eeprom0 {
+	cam_vdig-supply = <&pm8937_l23>;
+	/delete-property/ qcom,gpio-vdig;
+};

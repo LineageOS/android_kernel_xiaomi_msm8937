@@ -12,5 +12,5 @@
  * GNU General Public License for more details.
  */
 
+#include "camera-revert.dtsi"
 #include "fingerprint.dtsi"
-
