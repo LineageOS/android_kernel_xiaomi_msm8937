@@ -44,4 +44,5 @@
 
 &int_codec {
 	/delete-property/ qcom,msm-spk-ext-pa;
+	/delete-property/ ext-spk-amp-gpio;
 };
