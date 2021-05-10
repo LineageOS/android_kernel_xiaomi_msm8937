@@ -222,6 +222,13 @@ extern int ulysse_msm_spk_ext_pa_ctrl(struct msm_asoc_mach_data *pdatadata, bool
 int ulysse_msm_hs_ext_pa_ctrl(struct msm_asoc_mach_data *pdatadata, bool value);
 #endif
 
+#if defined(CONFIG_MACH_XIAOMI_TIARE) && defined(CONFIG_SND_SOC_AW87329)
+extern unsigned char aw87329_audio_kspk(void);
+extern unsigned char aw87329_audio_off(void);
+bool tiare_hphr_pa_flag;
+struct work_struct tiare_aw87329_pa_work;
+#endif
+
 static int get_codec_version(struct sdm660_cdc_priv *sdm660_cdc)
 {
 	if (sdm660_cdc->codec_version == DRAX_CDC)
@@ -2055,6 +2062,15 @@ static const struct soc_enum msm_anlg_cdc_hph_mode_ctl_enum[] = {
 			msm_anlg_cdc_hph_mode_ctrl_text),
 };
 
+#if defined(CONFIG_MACH_XIAOMI_TIARE) && defined(CONFIG_SND_SOC_AW87329)
+static const char * const tiare_aw87329_spk_text[] = {
+	"Off", "On"
+};
+static const struct soc_enum tiare_aw87329_spk_enum =
+	SOC_ENUM_SINGLE(SND_SOC_NOPM, 0,
+		ARRAY_SIZE(tiare_aw87329_spk_text), tiare_aw87329_spk_text);
+#endif
+
 /*cut of frequency for high pass filter*/
 static const char * const cf_text[] = {
 	"MIN_3DB_4Hz", "MIN_3DB_75Hz", "MIN_3DB_150Hz"
@@ -2225,6 +2241,11 @@ static const struct snd_kcontrol_new wsa_spk_mux[] = {
 };
 
 
+#if defined(CONFIG_MACH_XIAOMI_TIARE) && defined(CONFIG_SND_SOC_AW87329)
+static const struct snd_kcontrol_new tiare_aw87329_spk_mux[] = {
+	SOC_DAPM_ENUM("Ext_Speaker_Amp Mux", tiare_aw87329_spk_enum)
+};
+#endif
 
 static const char * const hph_text[] = {
 	"ZERO", "Switch",
@@ -3165,6 +3186,9 @@ static int msm_anlg_cdc_hph_pa_event(struct snd_soc_dapm_widget *w,
 			msm_anlg_cdc_dig_notifier_call(codec,
 					       DIG_CDC_EVENT_RX2_MUTE_OFF);
 		}
+#if defined(CONFIG_MACH_XIAOMI_TIARE) && defined(CONFIG_SND_SOC_AW87329)
+		tiare_hphr_pa_flag=true;
+#endif
 		break;
 
 	case SND_SOC_DAPM_PRE_PMD:
@@ -3186,6 +3210,9 @@ static int msm_anlg_cdc_hph_pa_event(struct snd_soc_dapm_widget *w,
 				MSM89XX_PMIC_ANALOG_RX_HPH_R_TEST, 0x04, 0x00);
 			msm_anlg_cdc_notifier_call(codec,
 					WCD_EVENT_PRE_HPHR_PA_OFF);
+#if defined(CONFIG_MACH_XIAOMI_TIARE) && defined(CONFIG_SND_SOC_AW87329)
+		tiare_hphr_pa_flag=false;
+#endif
 		}
 		if (get_codec_version(sdm660_cdc) >= CAJON) {
 			snd_soc_update_bits(codec,
@@ -3233,6 +3260,12 @@ static const struct snd_soc_dapm_route audio_map[] = {
 	/* Headset (RX MIX1 and RX MIX2) */
 	{"HEADPHONE", NULL, "HPHL PA"},
 	{"HEADPHONE", NULL, "HPHR PA"},
+
+#if defined(CONFIG_MACH_XIAOMI_TIARE) && defined(CONFIG_SND_SOC_AW87329)
+	{"AW87329_OUT", NULL, "AW87329 PA"},
+	{"AW87329 PA", NULL, "Ext_Speaker_Amp"},
+	{"Ext_Speaker_Amp", "On", "HPHR PA"},
+#endif
 
 	{"Ext Spk", NULL, "Ext Spk Switch"},
 	{"Ext Spk Switch", "On", "HPHL PA"},
@@ -3466,6 +3499,39 @@ static int msm_anlg_cdc_codec_enable_lo_pa(struct snd_soc_dapm_widget *w,
 	return 0;
 }
 
+#if defined(CONFIG_MACH_XIAOMI_TIARE) && defined(CONFIG_SND_SOC_AW87329)
+void tiare_aw87329_pa_enable(struct work_struct *work)
+{
+	int retry;
+	for(retry=0;retry<10;retry++){
+		if((tiare_hphr_pa_flag)||((!tiare_hphr_pa_flag)&&(retry==9))){
+			aw87329_audio_kspk();
+			break;
+		}
+		usleep_range(5000, 5100);
+	}
+}
+static int tiare_spk_aw87329_pa(struct snd_soc_dapm_widget *w,
+		struct snd_kcontrol *kcontrol, int event)
+{
+    struct snd_soc_codec *codec = snd_soc_dapm_to_codec(w->dapm);
+	dev_dbg(codec->dev, "%s: %s event = %d\n", __func__, w->name, event);
+	switch (event) {
+	case SND_SOC_DAPM_POST_PMU:
+		dev_dbg(codec->dev,
+			"%s: enable aw87329 speaker PA\n", __func__);
+		schedule_work(&tiare_aw87329_pa_work);
+		break;
+	case SND_SOC_DAPM_PRE_PMD:
+		dev_dbg(codec->dev,
+			"%s: disable aw87329 speaker PA\n", __func__);
+		aw87329_audio_off();
+		break;
+	}
+	return 0;
+}
+#endif
+
 static int msm_anlg_cdc_codec_enable_spk_ext_pa(struct snd_soc_dapm_widget *w,
 						struct snd_kcontrol *kcontrol,
 						int event)
@@ -3590,6 +3656,13 @@ static const struct snd_soc_dapm_widget msm_anlg_cdc_dapm_widgets[] = {
 			6, 0, NULL, 0, msm_anlg_cdc_codec_enable_lo_pa,
 			SND_SOC_DAPM_POST_PMU | SND_SOC_DAPM_PRE_PMD),
 
+#if defined(CONFIG_MACH_XIAOMI_TIARE) && defined(CONFIG_SND_SOC_AW87329)
+	SND_SOC_DAPM_PGA_E("AW87329 PA", SND_SOC_NOPM,
+			0, 0, NULL, 0, tiare_spk_aw87329_pa,
+			SND_SOC_DAPM_PRE_PMU | SND_SOC_DAPM_POST_PMU |
+			SND_SOC_DAPM_PRE_PMD | SND_SOC_DAPM_POST_PMD),
+#endif
+
 	SND_SOC_DAPM_MUX("EAR_S", SND_SOC_NOPM, 0, 0, ear_pa_mux),
 	SND_SOC_DAPM_MUX("SPK", SND_SOC_NOPM, 0, 0, spkr_mux),
 	SND_SOC_DAPM_MUX("HPHL", SND_SOC_NOPM, 0, 0, hphl_mux),
@@ -3599,6 +3672,10 @@ static const struct snd_soc_dapm_widget msm_anlg_cdc_dapm_widgets[] = {
 	SND_SOC_DAPM_MUX("Ext Spk Switch", SND_SOC_NOPM, 0, 0, &ext_spk_mux),
 	SND_SOC_DAPM_MUX("LINE_OUT", SND_SOC_NOPM, 0, 0, lo_mux),
 	SND_SOC_DAPM_MUX("ADC2 MUX", SND_SOC_NOPM, 0, 0, &tx_adc2_mux),
+
+#if defined(CONFIG_MACH_XIAOMI_TIARE) && defined(CONFIG_SND_SOC_AW87329)
+	SND_SOC_DAPM_MUX("Ext_Speaker_Amp", SND_SOC_NOPM, 0, 0, tiare_aw87329_spk_mux),
+#endif
 
 	SND_SOC_DAPM_MIXER_E("HPHL DAC",
 		MSM89XX_PMIC_ANALOG_RX_HPH_L_PA_DAC_CTL, 3, 0, NULL,
@@ -3714,6 +3791,9 @@ static const struct snd_soc_dapm_widget msm_anlg_cdc_dapm_widgets[] = {
 	SND_SOC_DAPM_OUTPUT("HEADPHONE"),
 	SND_SOC_DAPM_OUTPUT("SPK_OUT"),
 	SND_SOC_DAPM_OUTPUT("LINEOUT"),
+#if defined(CONFIG_MACH_XIAOMI_TIARE) && defined(CONFIG_SND_SOC_AW87329)
+	SND_SOC_DAPM_OUTPUT("AW87329_OUT"),
+#endif
 	SND_SOC_DAPM_AIF_OUT("ADC1_OUT", "PDM Capture",
 		0, SND_SOC_NOPM, 0, 0),
 	SND_SOC_DAPM_AIF_OUT("ADC2_OUT", "PDM Capture",
@@ -4414,6 +4494,10 @@ static int msm_anlg_cdc_soc_probe(struct snd_soc_codec *codec)
 	snd_soc_dapm_ignore_suspend(dapm, "PDM Capture");
 
 	snd_soc_dapm_sync(dapm);
+
+#if defined(CONFIG_MACH_XIAOMI_TIARE) && defined(CONFIG_SND_SOC_AW87329)
+	INIT_WORK(&tiare_aw87329_pa_work, tiare_aw87329_pa_enable);
+#endif
 
 	return 0;
 }
