@@ -35,9 +35,10 @@ int pixel_div_set_div(void *context, unsigned int reg,
 	}
 
 	/* Programming during vco_prepare. Keep this value */
-	data = ((div - 1) & 0x7f);
+	data = (div & 0x7f);
 	MDSS_PLL_REG_W(pll_base, DSIPHY_SSC9, data);
 	pdb->param.pixel_divhf = data;
+	pll->cached_postdiv3 = data;
 
 	mdss_pll_resource_enable(pll, false);
 	pr_debug("ndx=%d div=%d divhf=%d\n",
@@ -63,7 +64,7 @@ int pixel_div_get_div(void *context, unsigned int reg,
 	}
 
 	val = (MDSS_PLL_REG_R(pll->pll_base, DSIPHY_SSC9) & 0x7F);
-	*div = val + 1;
+	*div = val;
 	pr_debug("pixel_div = %d\n", (*div));
 
 	mdss_pll_resource_enable(pll, false);
@@ -95,10 +96,13 @@ int set_post_div_mux_sel(void *context, unsigned int reg,
 	MDSS_PLL_REG_W(pll_base, DSIPHY_PLL_VCO_CTRL, data);
 	pr_debug("%s: vco_cntrl 0x%x\n", __func__, vco_cntrl);
 
+	pll->cached_cfg0 = data;
+	wmb();
 	data = ((cpbias_cntrl & 0x1) << 6) | BIT(4);
 	MDSS_PLL_REG_W(pll_base, DSIPHY_PLL_CHAR_PUMP_BIAS_CTRL, data);
 	pr_debug("%s: cpbias_cntrl 0x%x\n", __func__, cpbias_cntrl);
 
+	pll->cached_cfg1 = data;
 	pr_debug("ndx=%d post_div_mux_sel=%d p_div=%d\n",
 			pll->index, sel, (u32) BIT(sel));
 
@@ -168,6 +172,7 @@ int set_gp_mux_sel(void *context, unsigned int reg,
 	/* Programming during vco_prepare. Keep this value */
 	data = ((sel & 0x7) << 5) | 0x5;
 	MDSS_PLL_REG_W(pll_base, DSIPHY_PLL_CTRL, data);
+	pll->cached_postdiv1 = data;
 
 	pr_debug("ndx=%d gp_div_mux_sel=%d gp_cntrl=%d\n",
 			pll->index, sel, (u32) BIT(sel));
@@ -979,9 +984,6 @@ int pll_vco_prepare_12nm(struct clk_hw *hw)
 			DSIPHY_PLL_CHAR_PUMP_BIAS_CTRL, pll->cached_cfg1);
 		udelay(1);
 		MDSS_PLL_REG_W(pll->pll_base,
-			 DSIPHY_HS_FREQ_RAN_SEL, pll->cached_outdiv);
-		udelay(1);
-		MDSS_PLL_REG_W(pll->pll_base,
 			 DSIPHY_PLL_CTRL, pll->cached_postdiv1);
 		udelay(1);
 		MDSS_PLL_REG_W(pll->pll_base,
@@ -1031,11 +1033,8 @@ void pll_vco_unprepare_12nm(struct clk_hw *hw)
 	pll->cached_cfg0 = MDSS_PLL_REG_R(pll->pll_base, DSIPHY_PLL_VCO_CTRL);
 	pll->cached_cfg1 = MDSS_PLL_REG_R(pll->pll_base,
 					DSIPHY_PLL_CHAR_PUMP_BIAS_CTRL);
-	pll->cached_outdiv =  MDSS_PLL_REG_R(pll->pll_base,
-					DSIPHY_HS_FREQ_RAN_SEL);
 	pll->cached_postdiv1 = MDSS_PLL_REG_R(pll->pll_base, DSIPHY_PLL_CTRL);
 	pll->cached_postdiv3 = MDSS_PLL_REG_R(pll->pll_base, DSIPHY_SSC9);
-
 	dsi_pll_disable(hw);
 }
 
