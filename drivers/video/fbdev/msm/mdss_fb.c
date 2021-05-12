@@ -289,7 +289,7 @@ static int mdss_fb_notify_update(struct msm_fb_data_type *mfd,
 
 static int lcd_backlight_registered;
 
-#define ROVA_WINGTECH_MDSS_BRIGHT_TO_BL(out, v, bl_min, bl_max, min_bright, max_bright) do {\
+#define WINGTECH_MDSS_BRIGHT_TO_BL(out, v, bl_min, bl_max, min_bright, max_bright) do {\
 					if (v <= ((int)min_bright*(int)bl_max-(int)bl_min*(int)max_bright)\
 						/((int)bl_max - (int)bl_min)) out = 1; \
 					else \
@@ -303,8 +303,8 @@ static void mdss_fb_set_bl_brightness(struct led_classdev *led_cdev,
 {
 	struct msm_fb_data_type *mfd = dev_get_drvdata(led_cdev->dev->parent);
 	u64 bl_lvl;
-#ifdef CONFIG_MACH_XIAOMI_ROVA
-	int rova_brightness_min = 10;
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
+	int wingtech_brightness_min = 10;
 #endif
 
 	if (mfd->boot_notification_led) {
@@ -325,12 +325,12 @@ static void mdss_fb_set_bl_brightness(struct led_classdev *led_cdev,
 	}
 #endif
 
-#ifdef CONFIG_MACH_XIAOMI_ROVA
-	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA) {
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
+	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA || xiaomi_series_read() == XIAOMI_SERIES_LANDTONI) {
 		if (mfd->panel_info->bl_min == 1)
 			mfd->panel_info->bl_min = 5;
-			ROVA_WINGTECH_MDSS_BRIGHT_TO_BL(bl_lvl, value, mfd->panel_info->bl_min, mfd->panel_info->bl_max,
-			rova_brightness_min, mfd->panel_info->brightness_max);
+			WINGTECH_MDSS_BRIGHT_TO_BL(bl_lvl, value, mfd->panel_info->bl_min, mfd->panel_info->bl_max,
+			wingtech_brightness_min, mfd->panel_info->brightness_max);
 			if (bl_lvl && !value)
 				bl_lvl = 0;
 	} else {

@@ -51,14 +51,21 @@ static struct mdss_dsi_data *mdss_dsi_res;
 extern int xiaomi_series_read(void);
 #endif
 
+#ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_device.h>
+extern int xiaomi_device_read(void);
+#endif
+
 #ifdef CONFIG_MACH_XIAOMI_ULYSSE
 int ulysse_ID0_status,ulysse_ID1_status;
 #endif
 
 static struct pm_qos_request mdss_dsi_pm_qos_request;
 
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE) || defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
+bool wingtech_is_Lcm_Present = false;
+#endif
 #if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
-bool rova_tiare_is_Lcm_Present = false;
 bool rova_tiare_is_tianma_panel = false;
 #endif
 
@@ -398,8 +405,8 @@ static int mdss_dsi_panel_power_off(struct mdss_panel_data *pdata)
 		ret = 0;
 	}
 
-#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
-	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA)
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE) || defined(CONFIG_MACH_XIAOMI_SANTONI)
+	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA || xiaomi_device_read() == XIAOMI_DEVICE_SANTONI)
 		usleep(500);
 #endif
 
@@ -3066,9 +3073,9 @@ static struct device_node *mdss_dsi_find_panel_of_node(
 					cfg_np_name, MDSS_MAX_PANEL_LEN);
 			}
 		}
-#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
-	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA)
-		rova_tiare_is_Lcm_Present = true;
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE) || defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
+	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA || xiaomi_series_read() == XIAOMI_SERIES_LANDTONI)
+		wingtech_is_Lcm_Present = true;
 #endif
 
 		return dsi_pan_node;
@@ -3076,9 +3083,9 @@ static struct device_node *mdss_dsi_find_panel_of_node(
 end:
 	if (strcmp(panel_name, NONE_PANEL))
 		dsi_pan_node = mdss_dsi_pref_prim_panel(pdev);
-#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
-	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA)
-		rova_tiare_is_Lcm_Present = false;
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE) || defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
+	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA || xiaomi_series_read() == XIAOMI_SERIES_LANDTONI)
+		wingtech_is_Lcm_Present = false;
 #endif
 exit:
 	return dsi_pan_node;

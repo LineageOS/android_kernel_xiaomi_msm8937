@@ -41,8 +41,8 @@
 extern int xiaomi_series_read(void);
 #endif
 
-#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
-extern bool rova_tiare_is_Lcm_Present;
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE) || defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
+extern bool wingtech_is_Lcm_Present;
 #endif
 
 #ifdef CONFIG_MACH_XIAOMI
@@ -2235,9 +2235,9 @@ static void mdss_dsi_parse_esd_params(struct device_node *np,
 	pinfo->esd_check_enabled = of_property_read_bool(np,
 		"qcom,esd-check-enabled");
 
-#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
-	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA) {
-		if ((!pinfo->esd_check_enabled)||(!rova_tiare_is_Lcm_Present))
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE) || defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
+	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA || xiaomi_series_read() == XIAOMI_SERIES_LANDTONI) {
+		if ((!pinfo->esd_check_enabled)||(!wingtech_is_Lcm_Present))
 			return;
 	}
 #endif
@@ -3348,9 +3348,9 @@ int mdss_dsi_panel_init(struct device_node *node,
 	ctrl_pdata->post_panel_on = mdss_dsi_post_panel_on;
 	ctrl_pdata->off = mdss_dsi_panel_off;
 	ctrl_pdata->low_power_config = mdss_dsi_panel_low_power_config;
-#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE)
-	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA) {
-		if(rova_tiare_is_Lcm_Present)
+#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_TIARE) || defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
+	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA || xiaomi_series_read() == XIAOMI_SERIES_LANDTONI) {
+		if(wingtech_is_Lcm_Present)
 			ctrl_pdata->panel_data.set_backlight = mdss_dsi_panel_bl_ctrl;
 	} else
 #endif
