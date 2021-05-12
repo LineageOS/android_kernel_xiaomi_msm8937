@@ -6,3 +6,17 @@
 	/delete-node/ snfuse@0xa0128;
 	/delete-node/ secbootfuse@0xa41d0;
 };
+
+&cci {
+	qcom,camera@0 { /delete-property/ qcom,gpio-standby; };
+	qcom,camera@2 { /delete-property/ qcom,gpio-reset; };
+};
+
+&eeprom0 {
+	/delete-property/ qcom,gpio-standby;
+};
+
+&eeprom2 {
+	/delete-property/ cam_vaf-supply;
+	/delete-property/ qcom,gpio-reset;
+};
