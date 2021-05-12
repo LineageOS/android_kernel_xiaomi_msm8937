@@ -1,3 +1,9 @@
+/ {
+	reserved-memory {
+		/delete-node/ ramoops@b0000000;
+	};
+};
+
 &apps_iommu {
 	/delete-property/ qcom,no-aarch64;
 };
