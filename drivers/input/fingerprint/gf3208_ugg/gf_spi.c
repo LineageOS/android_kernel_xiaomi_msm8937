@@ -472,6 +472,9 @@ static long gf_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		pr_info("mode : 0x%x\n", info.mode);
 		pr_info("operation: 0x%x\n", info.operation);
 		break;
+	case GF_IOC_RELEASE_GPIO:
+		ugg_gf_cleanup(gf_dev);
+		break;
 	default:
 		pr_warn("unsupport cmd:0x%x\n", cmd);
 		break;

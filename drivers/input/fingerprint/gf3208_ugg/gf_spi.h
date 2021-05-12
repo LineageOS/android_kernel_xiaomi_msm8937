@@ -91,6 +91,7 @@ struct gf_ioc_chip_info {
 #define GF_IOC_GET_FW_INFO      _IOR(GF_IOC_MAGIC, 11, uint8_t)
 #define GF_IOC_REMOVE           _IO(GF_IOC_MAGIC, 12)
 #define GF_IOC_CHIP_INFO        _IOW(GF_IOC_MAGIC, 13, struct gf_ioc_chip_info)
+#define GF_IOC_RELEASE_GPIO	_IO(GF_IOC_MAGIC, 14)
 
 #if defined(SUPPORT_NAV_EVENT)
 #define GF_IOC_NAV_EVENT	_IOW(GF_IOC_MAGIC, 14, gf_nav_event_t)
