@@ -2306,6 +2306,19 @@ static int msm_eeprom_platform_probe(struct platform_device *pdev)
 			}
 		} else if (!strcmp(eb_info->eeprom_name, "s5k5e8_ofilm_riva")) {
 			CDBG("match id for s5k5e8_ofilm_riva\n");
+#ifdef CONFIG_MACH_XIAOMI_TIARE
+			if (xiaomi_device_read() == XIAOMI_DEVICE_TIARE) {
+				if (e_ctrl->cal_data.mapdata[52] == 0x55) {
+					module_id = e_ctrl->cal_data.mapdata[54] & 0x1f;
+				} else if (e_ctrl->cal_data.mapdata[26] == 0x55) {
+					module_id = e_ctrl->cal_data.mapdata[28] & 0x1f;
+				} else if (e_ctrl->cal_data.mapdata[0] == 0x55) {
+					module_id = e_ctrl->cal_data.mapdata[2] & 0x1f;
+				} else {
+					module_id = -1;
+				}
+			} else {
+#endif
 			if (e_ctrl->cal_data.mapdata[16] == 0x55) {
 				module_id = e_ctrl->cal_data.mapdata[17] & 0x1f;
 			} else if (e_ctrl->cal_data.mapdata[8] == 0x55) {
@@ -2315,6 +2328,9 @@ static int msm_eeprom_platform_probe(struct platform_device *pdev)
 			} else {
 				module_id = -1;
 			}
+#ifdef CONFIG_MACH_XIAOMI_TIARE
+			}
+#endif
 			printk("match id for s5k5e8_ofilm_riva module_id=%d\n", module_id);
 			if (module_id == 7) {
 				CDBG("match id for s5k5e8_ofilm_riva success\n");
