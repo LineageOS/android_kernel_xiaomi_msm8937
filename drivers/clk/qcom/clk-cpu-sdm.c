@@ -35,15 +35,14 @@ static DEFINE_VDD_REGS_INIT(vdd_cpu_cci, 1);
 enum apcs_mux_clk_parent {
 	P_BI_TCXO_AO,
 	P_GPLL0_AO_OUT_MAIN,
-	P_APCS_CPU_PLL1,
-	P_APCS_CPU_PLL0,
+	P_APCS_CPU_PLL,
 };
 
 struct pll_spm_ctrl {
 	u32 offset;
 	u32 force_event_offset;
 	u32 event_bit;
-	void __iomem *spm_base[2];
+	void __iomem *spm_base;
 };
 
 static struct pll_spm_ctrl apcs_pll_spm = {
@@ -55,10 +54,10 @@ static struct pll_spm_ctrl apcs_pll_spm = {
 static const struct parent_map apcs_mux_clk_parent_map0[] = {
 	{ P_BI_TCXO_AO, 0 },
 	{ P_GPLL0_AO_OUT_MAIN, 4 },
-	{ P_APCS_CPU_PLL1, 5 },
+	{ P_APCS_CPU_PLL, 5 },
 };
 
-static const char *const apcs_mux_clk_parent_name0[] = {
+static const char *const apcs_mux_clk_c1_parent_name0[] = {
 	"bi_tcxo_ao",
 	"gpll0_ao_out_main",
 	"apcs_cpu_pll1",
@@ -127,6 +126,7 @@ static int cpucc_clk_determine_rate(struct clk_hw *hw,
 	struct clk_rate_request parent_req = { };
 	struct clk_regmap_mux_div *cpuclk = to_clk_regmap_mux_div(hw);
 	unsigned long apcs_gpll0_rate, apcs_gpll0_rrate, rate = req->rate;
+	unsigned long mask = BIT(cpuclk->hid_width) - 1;
 	u32 div = 1;
 	int ret;
 
@@ -140,11 +140,20 @@ static int cpucc_clk_determine_rate(struct clk_hw *hw,
 	}
 
 	apcs_gpll0_hw = clk_hw_get_parent_by_index(hw, P_GPLL0_AO_OUT_MAIN);
-	apcs_cpu_pll_hw = clk_hw_get_parent_by_index(hw, P_APCS_CPU_PLL1);
+	apcs_cpu_pll_hw = clk_hw_get_parent_by_index(hw, P_APCS_CPU_PLL);
 
 	apcs_gpll0_rate = clk_hw_get_rate(apcs_gpll0_hw);
 	apcs_gpll0_rrate = DIV_ROUND_UP(apcs_gpll0_rate, 1000000) * 1000000;
 
+	if (rate <= apcs_gpll0_rrate) {
+		req->best_parent_hw = apcs_gpll0_hw;
+		req->best_parent_rate = apcs_gpll0_rrate;
+		div = DIV_ROUND_CLOSEST(2 * apcs_gpll0_rrate, rate) - 1;
+		div = min_t(unsigned long, div, mask);
+		req->rate = calc_rate(req->best_parent_rate, 0,
+							0, 0, div);
+		cpuclk->src = cpuclk->parent_map[P_GPLL0_AO_OUT_MAIN].cfg;
+	} else {
 		parent_req.rate = rate;
 		parent_req.best_parent_hw = apcs_cpu_pll_hw;
 
@@ -154,7 +163,8 @@ static int cpucc_clk_determine_rate(struct clk_hw *hw,
 			return ret;
 
 		req->best_parent_rate = parent_req.rate;
-		cpuclk->src = cpuclk->parent_map[P_APCS_CPU_PLL1].cfg;
+		cpuclk->src = cpuclk->parent_map[P_APCS_CPU_PLL].cfg;
+	}
 
 	cpuclk->div = div;
 
@@ -227,11 +237,10 @@ static u8 cpucc_clk_get_parent(struct clk_hw *hw)
 
 static void spm_event(struct pll_spm_ctrl *apcs_pll_spm, bool enable)
 {
-	void __iomem *base0 = &apcs_pll_spm->spm_base[0];
-	void __iomem *base1 = &apcs_pll_spm->spm_base[1];
+	void __iomem *base = apcs_pll_spm->spm_base;
 	u32 offset, force_event_offset, bit, val;
 
-	if (!apcs_pll_spm || !base0)
+	if (!apcs_pll_spm || !base)
 		return;
 
 	offset = apcs_pll_spm->offset;
@@ -240,69 +249,33 @@ static void spm_event(struct pll_spm_ctrl *apcs_pll_spm, bool enable)
 
 	if (enable) {
 		/* L2_SPM_FORCE_EVENT_EN */
-		val = readl_relaxed(base0 + offset);
+		val = readl_relaxed(base + offset);
 		val |= BIT(bit);
-		writel_relaxed(val, (base0 + offset));
+		writel_relaxed(val, (base + offset));
 		/* Ensure that the write above goes through. */
 		mb();
 
 		/* L2_SPM_FORCE_EVENT */
-		val = readl_relaxed(base0 + offset + force_event_offset);
+		val = readl_relaxed(base + offset + force_event_offset);
 		val |= BIT(bit);
-		writel_relaxed(val, (base0 + offset + force_event_offset));
+		writel_relaxed(val, (base + offset + force_event_offset));
 		/* Ensure that the write above goes through. */
 		mb();
-
-		if (base1) {
-			/* L2_SPM_FORCE_EVENT_EN */
-			val = readl_relaxed(base1 + offset);
-			val |= BIT(bit);
-			writel_relaxed(val, (base1 + offset));
-			/* Ensure that the write above goes through. */
-			mb();
-
-			/* L2_SPM_FORCE_EVENT */
-			val = readl_relaxed(base1 + offset +
-					force_event_offset);
-			val |= BIT(bit);
-			writel_relaxed(val, (base1 + offset +
-					force_event_offset));
-			/* Ensure that the write above goes through. */
-			mb();
-			}
 
 	} else {
 		/* L2_SPM_FORCE_EVENT */
-		val = readl_relaxed(base0 + offset + force_event_offset);
+		val = readl_relaxed(base + offset + force_event_offset);
 		val &= ~BIT(bit);
-		writel_relaxed(val, (base0 + offset + force_event_offset));
+		writel_relaxed(val, (base + offset + force_event_offset));
 		/* Ensure that the write above goes through. */
 		mb();
 
 		/* L2_SPM_FORCE_EVENT_EN */
-		val = readl_relaxed(base0 + offset);
+		val = readl_relaxed(base + offset);
 		val &= ~BIT(bit);
-		writel_relaxed(val, (base0 + offset));
+		writel_relaxed(val, (base + offset));
 		/* Ensure that the write above goes through. */
 		mb();
-
-		if (base1) {
-			/* L2_SPM_FORCE_EVENT */
-			val = readl_relaxed(base1 + offset +
-					force_event_offset);
-			val &= ~BIT(bit);
-			writel_relaxed(val, (base1 + offset +
-						force_event_offset));
-			/* Ensure that the write above goes through. */
-			mb();
-
-			/* L2_SPM_FORCE_EVENT_EN */
-			val = readl_relaxed(base1 + offset);
-			val &= ~BIT(bit);
-			writel_relaxed(val, (base1 + offset));
-			/* Ensure that the write above goes through. */
-			mb();
-		}
 	}
 }
 
@@ -436,7 +409,7 @@ static struct clk_regmap_mux_div apcs_mux_c1_clk = {
 	.clk_nb.notifier_call = cpucc_notifier_cb,
 	.clkr.hw.init = &(struct clk_init_data) {
 		.name = "apcs_mux_c1_clk",
-		.parent_names = apcs_mux_clk_parent_name0,
+		.parent_names = apcs_mux_clk_c1_parent_name0,
 		.num_parents = 3,
 		.vdd_class = &vdd_cpu_c1,
 		.flags = CLK_SET_RATE_PARENT,
@@ -647,7 +620,7 @@ cpucc_clk_add_opp(struct clk_hw *hw, struct device *dev, unsigned long max_rate)
 	return 0;
 }
 
-static void cpucc_clk_print_opp_table(int cpu, bool is_sdm439)
+static void cpucc_clk_print_opp_table(int c0, int c1, bool is_sdm439)
 {
 	struct dev_pm_opp *oppfmax, *oppfmin;
 	unsigned long apc_c0_fmax, apc_c0_fmin, apc_c1_fmax, apc_c1_fmin;
@@ -657,27 +630,28 @@ static void cpucc_clk_print_opp_table(int cpu, bool is_sdm439)
 	apc_c1_fmax = apcs_mux_c1_clk.clkr.hw.init->rate_max[max_index - 1];
 	apc_c1_fmin = apcs_mux_c1_clk.clkr.hw.init->rate_max[1];
 
-	oppfmax = dev_pm_opp_find_freq_exact(get_cpu_device(cpu),
+	oppfmax = dev_pm_opp_find_freq_exact(get_cpu_device(c1),
 		apc_c1_fmax, true);
-	oppfmin = dev_pm_opp_find_freq_exact(get_cpu_device(cpu),
+	oppfmin = dev_pm_opp_find_freq_exact(get_cpu_device(c1),
 		apc_c1_fmin, true);
-	pr_info("Clock_cpu:(cpu %d) OPP voltage for %lu: %ld\n", cpu,
+	pr_info("Clock_cpu:(cpu %d) OPP voltage for %lu: %ld\n", c1,
 		 apc_c1_fmin, dev_pm_opp_get_voltage(oppfmin));
-	pr_info("Clock_cpu:(cpu %d) OPP voltage for %lu: %ld\n", cpu,
+	pr_info("Clock_cpu:(cpu %d) OPP voltage for %lu: %ld\n", c1,
 		 apc_c1_fmax, dev_pm_opp_get_voltage(oppfmax));
 
 	if (is_sdm439) {
 		max_index = apcs_mux_c0_clk.clkr.hw.init->num_rate_max;
-		apc_c0_fmax = apcs_mux_c0_clk.clkr.hw.init->rate_max[max_index - 1];
+		apc_c0_fmax =
+			apcs_mux_c0_clk.clkr.hw.init->rate_max[max_index - 1];
 		apc_c0_fmin = apcs_mux_c0_clk.clkr.hw.init->rate_max[1];
 
-		oppfmax = dev_pm_opp_find_freq_exact(get_cpu_device(cpu),
+		oppfmax = dev_pm_opp_find_freq_exact(get_cpu_device(c0),
 			apc_c0_fmax, true);
-		oppfmin = dev_pm_opp_find_freq_exact(get_cpu_device(cpu),
+		oppfmin = dev_pm_opp_find_freq_exact(get_cpu_device(c0),
 			apc_c0_fmin, true);
-		pr_info("Clock_cpu:(cpu %d) OPP voltage for %lu: %ld\n", cpu,
+		pr_info("Clock_cpu:(cpu %d) OPP voltage for %lu: %ld\n", c0,
 			 apc_c0_fmin, dev_pm_opp_get_voltage(oppfmin));
-		pr_info("Clock_cpu:(cpu %d) OPP voltage for %lu: %ld\n", cpu,
+		pr_info("Clock_cpu:(cpu %d) OPP voltage for %lu: %ld\n", c0,
 			 apc_c0_fmax, dev_pm_opp_get_voltage(oppfmax));
 	}
 }
@@ -687,30 +661,31 @@ static void cpucc_clk_populate_opp_table(struct platform_device *pdev,
 {
 	unsigned long apc_c1_fmax, apc_c0_fmax;
 	u32 max_index;
-	int cpu, sdm_cpu = 0;
+	int cpu, sdm_cpu0 = 0, sdm_cpu1 = 0;
 
 	if (is_sdm439) {
 		max_index = apcs_mux_c0_clk.clkr.hw.init->num_rate_max;
-		apc_c0_fmax = apcs_mux_c0_clk.clkr.hw.init->rate_max[max_index - 1];
+		apc_c0_fmax =
+			apcs_mux_c0_clk.clkr.hw.init->rate_max[max_index - 1];
 	}
 
 	max_index = apcs_mux_c1_clk.clkr.hw.init->num_rate_max;
 	apc_c1_fmax = apcs_mux_c1_clk.clkr.hw.init->rate_max[max_index - 1];
 
 	for_each_possible_cpu(cpu) {
-		if (is_sdm439) {
-			sdm_cpu = cpu;
-			WARN(cpucc_clk_add_opp(&apcs_mux_c0_clk.clkr.hw,
-			 get_cpu_device(cpu), apc_c0_fmax),
-			  "Failed to add OPP levels for apcs_mux_c0_clk\n");
-		} else {
-			sdm_cpu = cpu;
+		if (cpu/4 == 0) {
+			sdm_cpu1 = cpu;
 			WARN(cpucc_clk_add_opp(&apcs_mux_c1_clk.clkr.hw,
-			 get_cpu_device(cpu), apc_c1_fmax),
-			  "Failed to add OPP levels for apcs_mux_c1_clk\n");
+			get_cpu_device(cpu), apc_c1_fmax),
+			"Failed to add OPP levels for apcs_mux_c1_clk\n");
+		} else if (cpu/4 == 1 && is_sdm439) {
+			sdm_cpu0 = cpu;
+			WARN(cpucc_clk_add_opp(&apcs_mux_c0_clk.clkr.hw,
+			get_cpu_device(cpu), apc_c0_fmax),
+			"Failed to add OPP levels for apcs_mux_c0_clk\n");
 		}
 	}
-	cpucc_clk_print_opp_table(sdm_cpu, is_sdm439);
+	cpucc_clk_print_opp_table(sdm_cpu0, sdm_cpu1, is_sdm439);
 }
 
 static int clock_sdm429_pm_event(struct notifier_block *this,
@@ -1017,25 +992,7 @@ static int cpucc_driver_probe(struct platform_device *pdev)
 			dev_err(&pdev->dev, "Failed to ioremap c1 spm registers\n");
 			return -ENOMEM;
 		}
-
-		apcs_pll_spm.spm_base[0] = base;
-
-		if (is_sdm439) {
-			res = platform_get_resource_byname(pdev, IORESOURCE_MEM,
-				"spm_c0_base");
-			if (res == NULL) {
-				dev_err(&pdev->dev, "Failed to get spm-c0 resources\n");
-				return -EINVAL;
-			}
-
-			base = devm_ioremap_resource(dev, res);
-			if (IS_ERR(base)) {
-				dev_err(&pdev->dev, "Failed to ioremap c0 spm registers\n");
-				return -ENOMEM;
-			}
-
-			apcs_pll_spm.spm_base[1] = base;
-		}
+		apcs_pll_spm.spm_base = base;
 	}
 
 	/* Get speed bin information */
@@ -1174,12 +1131,12 @@ static int cpucc_driver_probe(struct platform_device *pdev)
 	 */
 	get_online_cpus();
 	for_each_online_cpu(cpu) {
+		WARN(clk_prepare_enable(apcs_mux_c1_clk.clkr.hw.clk),
+			"Unable to turn on CPU clock\n");
 		if (is_sdm439) {
 			WARN(clk_prepare_enable(apcs_mux_c0_clk.clkr.hw.clk),
 				"Unable to turn on CPU clock\n");
 		}
-		WARN(clk_prepare_enable(apcs_mux_c1_clk.clkr.hw.clk),
-			"Unable to turn on CPU clock\n");
 
 		if (is_sdm429 || is_sdm439)
 			clk_prepare_enable(apcs_mux_cci_clk.clkr.hw.clk);
