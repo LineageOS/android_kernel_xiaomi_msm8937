@@ -46,9 +46,7 @@
 };
 
 &pmi_haptic {
-	/delete-property/ qcom,en-brake;
 	qcom,vmax-mv = <2700>;
-	qcom,actuator-type = <1>;
 };
 
 &qpnp_smbcharger {

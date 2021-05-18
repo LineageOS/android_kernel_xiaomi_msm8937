@@ -38,3 +38,13 @@
 &pmi8950_torch0 {
 	qcom,led-name = "flashlight";
 };
+
+&pmi_haptic {
+	qcom,vmax-mv = <2700>;
+	wf_0 { qcom,wf-vmax-mv = <2700>; };
+	wf_1 { qcom,wf-vmax-mv = <2700>; };
+	wf_2 { qcom,wf-vmax-mv = <2700>; };
+	wf_3 { qcom,wf-vmax-mv = <2700>; };
+	wf_4 { qcom,wf-vmax-mv = <2700>; };
+	wf_5 { qcom,wf-vmax-mv = <2700>; };
+};
