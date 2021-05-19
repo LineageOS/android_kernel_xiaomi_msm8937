@@ -119,6 +119,20 @@ static int cpucc_clk_set_rate(struct clk_hw *hw, unsigned long rate,
 	return mux_div_set_src_div(cpuclk, cpuclk->src, cpuclk->div);
 }
 
+static bool freq_from_gpll0(unsigned long req_rate, unsigned long gpll0_rate)
+{
+	unsigned long temp;
+	int div;
+
+	for (div = 10; div <= 40; div += 5) {
+		temp = mult_frac(gpll0_rate, 10, div);
+		if (req_rate == temp)
+			return true;
+	}
+
+	return false;
+}
+
 static int cpucc_clk_determine_rate(struct clk_hw *hw,
 					struct clk_rate_request *req)
 {
@@ -145,7 +159,7 @@ static int cpucc_clk_determine_rate(struct clk_hw *hw,
 	apcs_gpll0_rate = clk_hw_get_rate(apcs_gpll0_hw);
 	apcs_gpll0_rrate = DIV_ROUND_UP(apcs_gpll0_rate, 1000000) * 1000000;
 
-	if (rate <= apcs_gpll0_rrate) {
+	if (freq_from_gpll0(rate, apcs_gpll0_rrate)) {
 		req->best_parent_hw = apcs_gpll0_hw;
 		req->best_parent_rate = apcs_gpll0_rrate;
 		div = DIV_ROUND_CLOSEST(2 * apcs_gpll0_rrate, rate) - 1;
