@@ -1273,7 +1273,7 @@ static struct clk_rcg2 sdcc2_apps_clk_src = {
 static const struct freq_tbl ftbl_usb_hs_system_clk_src[] = {
 	F(57140000, P_GPLL0_OUT_MAIN, 14, 0, 0),
 	F(100000000, P_GPLL0_OUT_MAIN, 8, 0, 0),
-	F(133333333, P_GPLL0_OUT_MAIN, 6, 0, 0),
+	F(133330000, P_GPLL0_OUT_MAIN, 6, 0, 0),
 	F(177780000, P_GPLL0_OUT_MAIN, 4.5, 0, 0),
 	{ }
 };
@@ -1301,9 +1301,9 @@ static struct clk_rcg2 usb_hs_system_clk_src = {
 		.vdd_class = &vdd_cx,
 		.num_rate_max = VDD_NUM,
 		.rate_max = (unsigned long[VDD_NUM]) {
-			[VDD_LOW] = 57142857,
-			[VDD_NOMINAL] = 133333333,
-			[VDD_HIGH] = 177777778},
+			[VDD_LOW] = 57140000,
+			[VDD_NOMINAL] = 133330000,
+			[VDD_HIGH] = 177780000},
 	},
 };
 
