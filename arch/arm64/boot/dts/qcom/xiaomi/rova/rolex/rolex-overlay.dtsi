@@ -3,3 +3,4 @@
 #include "rolex-camera.dtsi"
 #include "rolex-mdss.dtsi"
 #include "rolex-misc.dtsi"
+#include "rolex-pm.dtsi"

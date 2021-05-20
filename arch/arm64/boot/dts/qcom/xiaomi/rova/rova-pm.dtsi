@@ -10,10 +10,6 @@
  * GNU General Public License for more details.
  */
 
-&pm8937_l6 {
-	regulator-always-on;
-};
-
 &pm8937_pwm {
 	status = "ok";
 	compatible = "qcom,pwm-lpg";
