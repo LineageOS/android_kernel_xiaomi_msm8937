@@ -514,17 +514,6 @@ static struct clk_pll gpll6 = {
 	},
 };
 
-static struct clk_regmap gpll6_out_main = {
-	.enable_reg = 0x45000,
-	.enable_mask = BIT(7),
-	.hw.init = &(struct clk_init_data){
-		.name = "gpll6_out_main",
-		.parent_names = (const char *[]){ "gpll6" },
-		.num_parents = 1,
-		.ops = &clk_pll_vote_ops,
-	},
-};
-
 static struct clk_regmap gpll6_out_aux = {
 	.enable_reg = 0x45000,
 	.enable_mask = BIT(7),
@@ -533,6 +522,18 @@ static struct clk_regmap gpll6_out_aux = {
 		.parent_names = (const char *[]){ "gpll6" },
 		.num_parents = 1,
 		.ops = &clk_pll_vote_ops,
+	},
+};
+
+static struct clk_fixed_factor gpll6_out_main = {
+	.mult = 1,
+	.div = 1,
+	.hw.init = &(struct clk_init_data){
+		.name = "gpll6_out_main",
+		.parent_names = (const char *[]){ "gpll6_out_aux" },
+		.num_parents = 1,
+		.flags = CLK_SET_RATE_PARENT,
+		.ops = &clk_fixed_factor_ops,
 	},
 };
 
@@ -4020,7 +4021,6 @@ static struct clk_regmap *gcc_sdm429w_clocks[] = {
 	[GPLL0_SLEEP_CLK_SRC] = &gpll0_sleep_clk_src.clkr,
 	[GPLL3_OUT_MAIN] = &gpll3_out_main.clkr,
 	[GPLL4_OUT_MAIN] = &gpll4_out_main.clkr,
-	[GPLL6_OUT_MAIN] = &gpll6_out_main,
 	[GPLL6] = &gpll6.clkr,
 	[GPLL6_OUT_AUX] = &gpll6_out_aux,
 	[JPEG0_CLK_SRC] = &jpeg0_clk_src.clkr,
@@ -4358,6 +4358,12 @@ static int gcc_sdm429w_probe(struct platform_device *pdev)
 	}
 
 	ret = devm_clk_hw_register(&pdev->dev, &gpll3_out_main_div.hw);
+	if (ret) {
+		dev_err(&pdev->dev, "Failed to register hardware clock\n");
+		return ret;
+	}
+
+	ret = devm_clk_hw_register(&pdev->dev, &gpll6_out_main.hw);
 	if (ret) {
 		dev_err(&pdev->dev, "Failed to register hardware clock\n");
 		return ret;
