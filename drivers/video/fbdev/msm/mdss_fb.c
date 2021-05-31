@@ -289,23 +289,11 @@ static int mdss_fb_notify_update(struct msm_fb_data_type *mfd,
 
 static int lcd_backlight_registered;
 
-#define WINGTECH_MDSS_BRIGHT_TO_BL(out, v, bl_min, bl_max, min_bright, max_bright) do {\
-					if (v <= ((int)min_bright*(int)bl_max-(int)bl_min*(int)max_bright)\
-						/((int)bl_max - (int)bl_min)) out = 1; \
-					else \
-					out = (((int)bl_max - (int)bl_min)*v + \
-					((int)max_bright*(int)bl_min - (int)min_bright*(int)bl_max)) \
-					/((int)max_bright - (int)min_bright); \
-					} while (0)
-
 static void mdss_fb_set_bl_brightness(struct led_classdev *led_cdev,
 				      enum led_brightness value)
 {
 	struct msm_fb_data_type *mfd = dev_get_drvdata(led_cdev->dev->parent);
 	u64 bl_lvl;
-#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
-	int wingtech_brightness_min = 1;
-#endif
 
 	if (mfd->boot_notification_led) {
 		led_trigger_event(mfd->boot_notification_led, 0);
@@ -318,28 +306,8 @@ static void mdss_fb_set_bl_brightness(struct led_classdev *led_cdev,
 	/* This maps android backlight level 0 to 255 into
 	 * driver backlight level 0 to bl_max with rounding
 	 */
-#ifdef CONFIG_MACH_XIAOMI_TIARE
-	if (xiaomi_device_read() == XIAOMI_DEVICE_TIARE) {
-		if(value >= 60)
-			value = (value*90)/100 + 6;
-	}
-#endif
-
-#if defined(CONFIG_MACH_XIAOMI_ROVA) || defined(CONFIG_MACH_XIAOMI_LAND) || defined(CONFIG_MACH_XIAOMI_SANTONI)
-	if (xiaomi_series_read() == XIAOMI_SERIES_ROVA || xiaomi_series_read() == XIAOMI_SERIES_LANDTONI) {
-		if (mfd->panel_info->bl_min == 1)
-			mfd->panel_info->bl_min = 5;
-			WINGTECH_MDSS_BRIGHT_TO_BL(bl_lvl, value, mfd->panel_info->bl_min, mfd->panel_info->bl_max,
-			wingtech_brightness_min, mfd->panel_info->brightness_max);
-			if (bl_lvl && !value)
-				bl_lvl = 0;
-	} else {
-#endif
 	MDSS_BRIGHT_TO_BL(bl_lvl, value, mfd->panel_info->bl_max,
 				mfd->panel_info->brightness_max);
-#ifdef CONFIG_MACH_XIAOMI_ROVA
-	}
-#endif
 
 	if (!bl_lvl && value)
 		bl_lvl = 1;
