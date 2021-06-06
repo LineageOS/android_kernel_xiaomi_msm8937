@@ -123,7 +123,11 @@ module_param_named(free_swap_limit, free_swap_limit, int, 0644);
  * group ID, and chooses the heaviest task from them to
  * be considered when tasks are getting killed.
  */
+#ifdef CONFIG_PRLMK_DISABLE_KILL_HEAVIEST_GID
+static bool kill_heaviest_gid = false;
+#else
 static bool kill_heaviest_gid = true;
+#endif
 module_param_named(kill_heaviest_gid, kill_heaviest_gid, bool, 0644);
 
 static inline int atask_limit(void)
