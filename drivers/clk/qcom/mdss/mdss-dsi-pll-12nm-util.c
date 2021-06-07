@@ -95,6 +95,8 @@ int set_post_div_mux_sel(void *context, unsigned int reg,
 	data = ((vco_cntrl & 0x3f) | BIT(6));
 	MDSS_PLL_REG_W(pll_base, DSIPHY_PLL_VCO_CTRL, data);
 	pr_debug("%s: vco_cntrl 0x%x\n", __func__, vco_cntrl);
+	pll->cached_cfg0 = data;
+	wmb(); /* make sure register committed before preparing the clocks */
 
 	pll->cached_cfg0 = data;
 	wmb();

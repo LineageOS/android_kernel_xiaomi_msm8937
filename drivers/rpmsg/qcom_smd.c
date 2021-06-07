@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * Copyright (c) 2015, Sony Mobile Communications AB.
- * Copyright (c) 2012-2013, 2020 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012-2013, 2021 The Linux Foundation. All rights reserved.
  */
 
 #include <linux/interrupt.h>
@@ -915,7 +915,7 @@ static int __qcom_smd_send(struct qcom_smd_channel *channel, const void *data,
 		ret = wait_event_interruptible(channel->fblockread_event,
 				       qcom_smd_get_tx_avail(channel) >= tlen ||
 				       channel->state != SMD_CHANNEL_OPENED ||
-					channel->remote_state != SMD_CHANNEL_OPENED);
+				channel->remote_state != SMD_CHANNEL_OPENED);
 		if (ret)
 			return ret;
 
