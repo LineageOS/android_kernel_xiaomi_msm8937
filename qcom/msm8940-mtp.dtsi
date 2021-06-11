@@ -11,7 +11,6 @@
  * GNU General Public License for more details.
  */
 
-#include <dt-bindings/clock/msm-clocks-8952.h>
 #include "msm8937-camera-sensor-mtp.dtsi"
 
 &blsp1_uart2 {
@@ -189,7 +188,7 @@
 		pinctrl-0 = <&nfc_int_active &nfc_disable_active
 						&nfc_clk_default>;
 		pinctrl-1 = <&nfc_int_suspend &nfc_disable_suspend>;
-		clocks = <&clock_gcc clk_bb_clk2_pin>;
+		clocks = <&rpmcc RPM_SMD_BB_CLK2_PIN>;
 		clock-names = "ref_clk";
 	};
 };
