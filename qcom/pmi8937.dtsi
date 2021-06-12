@@ -376,12 +376,11 @@
 
 		pmi8937_pwm: pwm@b000 {
 			status = "disabled";
-			compatible = "qcom,qpnp-pwm";
+			compatible = "qcom,pwm-lpg";
 			reg = <0xb000 0x100>;
-			reg-names = "qpnp-lpg-channel-base";
-			qcom,channel-id = <0>;
-			qcom,supported-sizes = <6>, <9>;
+			reg-names = "lpg-base";
 			#pwm-cells = <2>;
+			qcom,num-lpg-channels = <1>;
 		};
 
 		wled: qcom,leds@d800 {
