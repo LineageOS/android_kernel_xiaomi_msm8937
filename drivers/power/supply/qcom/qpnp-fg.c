@@ -433,23 +433,23 @@ static struct register_offset offset[] = {
 		((chip)->mem_base + (chip)->offset[MEM_INTF_WR_DATA0])
 
 struct fg_wakeup_source {
-	struct wakeup_source	source;
+	struct wakeup_source	*source;
 	unsigned long		enabled;
 };
 
 static void fg_stay_awake(struct fg_wakeup_source *source)
 {
 	if (!__test_and_set_bit(0, &source->enabled)) {
-		__pm_stay_awake(&source->source);
-		pr_debug("enabled source %s\n", source->source.name);
+		__pm_stay_awake(source->source);
+		pr_debug("enabled source %s\n", source->source->name);
 	}
 }
 
 static void fg_relax(struct fg_wakeup_source *source)
 {
 	if (__test_and_clear_bit(0, &source->enabled)) {
-		__pm_relax(&source->source);
-		pr_debug("disabled source %s\n", source->source.name);
+		__pm_relax(source->source);
+		pr_debug("disabled source %s\n", source->source->name);
 	}
 }
 
@@ -7478,20 +7478,20 @@ static void fg_cleanup(struct fg_chip *chip)
 	mutex_destroy(&chip->learning_data.learning_lock);
 	mutex_destroy(&chip->sysfs_restart_lock);
 	mutex_destroy(&chip->ima_recovery_lock);
-	wakeup_source_trash(&chip->resume_soc_wakeup_source.source);
-	wakeup_source_trash(&chip->empty_check_wakeup_source.source);
-	wakeup_source_trash(&chip->memif_wakeup_source.source);
-	wakeup_source_trash(&chip->profile_wakeup_source.source);
-	wakeup_source_trash(&chip->update_temp_wakeup_source.source);
-	wakeup_source_trash(&chip->update_sram_wakeup_source.source);
-	wakeup_source_trash(&chip->gain_comp_wakeup_source.source);
-	wakeup_source_trash(&chip->capacity_learning_wakeup_source.source);
-	wakeup_source_trash(&chip->esr_extract_wakeup_source.source);
-	wakeup_source_trash(&chip->slope_limit_wakeup_source.source);
-	wakeup_source_trash(&chip->dischg_gain_wakeup_source.source);
-	wakeup_source_trash(&chip->fg_reset_wakeup_source.source);
-	wakeup_source_trash(&chip->cc_soc_wakeup_source.source);
-	wakeup_source_trash(&chip->sanity_wakeup_source.source);
+	wakeup_source_unregister(chip->resume_soc_wakeup_source.source);
+	wakeup_source_unregister(chip->empty_check_wakeup_source.source);
+	wakeup_source_unregister(chip->memif_wakeup_source.source);
+	wakeup_source_unregister(chip->profile_wakeup_source.source);
+	wakeup_source_unregister(chip->update_temp_wakeup_source.source);
+	wakeup_source_unregister(chip->update_sram_wakeup_source.source);
+	wakeup_source_unregister(chip->gain_comp_wakeup_source.source);
+	wakeup_source_unregister(chip->capacity_learning_wakeup_source.source);
+	wakeup_source_unregister(chip->esr_extract_wakeup_source.source);
+	wakeup_source_unregister(chip->slope_limit_wakeup_source.source);
+	wakeup_source_unregister(chip->dischg_gain_wakeup_source.source);
+	wakeup_source_unregister(chip->fg_reset_wakeup_source.source);
+	wakeup_source_unregister(chip->cc_soc_wakeup_source.source);
+	wakeup_source_unregister(chip->sanity_wakeup_source.source);
 }
 
 static int fg_remove(struct platform_device *pdev)
@@ -8704,33 +8704,33 @@ static int fg_probe(struct platform_device *pdev)
 	chip->pdev = pdev;
 	chip->dev = &(pdev->dev);
 
-	wakeup_source_init(&chip->empty_check_wakeup_source.source,
+	chip->empty_check_wakeup_source.source = wakeup_source_register(&pdev->dev,
 			"qpnp_fg_empty_check");
-	wakeup_source_init(&chip->memif_wakeup_source.source,
+	chip->memif_wakeup_source.source = wakeup_source_register(&pdev->dev,
 			"qpnp_fg_memaccess");
-	wakeup_source_init(&chip->profile_wakeup_source.source,
+	chip->profile_wakeup_source.source = wakeup_source_register(&pdev->dev,
 			"qpnp_fg_profile");
-	wakeup_source_init(&chip->update_temp_wakeup_source.source,
+	chip->update_temp_wakeup_source.source = wakeup_source_register(&pdev->dev,
 			"qpnp_fg_update_temp");
-	wakeup_source_init(&chip->update_sram_wakeup_source.source,
+	chip->update_sram_wakeup_source.source = wakeup_source_register(&pdev->dev,
 			"qpnp_fg_update_sram");
-	wakeup_source_init(&chip->resume_soc_wakeup_source.source,
+	chip->resume_soc_wakeup_source.source = wakeup_source_register(&pdev->dev,
 			"qpnp_fg_set_resume_soc");
-	wakeup_source_init(&chip->gain_comp_wakeup_source.source,
+	chip->gain_comp_wakeup_source.source = wakeup_source_register(&pdev->dev,
 			"qpnp_fg_gain_comp");
-	wakeup_source_init(&chip->capacity_learning_wakeup_source.source,
+	chip->capacity_learning_wakeup_source.source = wakeup_source_register(&pdev->dev,
 			"qpnp_fg_cap_learning");
-	wakeup_source_init(&chip->esr_extract_wakeup_source.source,
+	chip->esr_extract_wakeup_source.source = wakeup_source_register(&pdev->dev,
 			"qpnp_fg_esr_extract");
-	wakeup_source_init(&chip->slope_limit_wakeup_source.source,
+	chip->slope_limit_wakeup_source.source = wakeup_source_register(&pdev->dev,
 			"qpnp_fg_slope_limit");
-	wakeup_source_init(&chip->dischg_gain_wakeup_source.source,
+	chip->dischg_gain_wakeup_source.source = wakeup_source_register(&pdev->dev,
 			"qpnp_fg_dischg_gain");
-	wakeup_source_init(&chip->fg_reset_wakeup_source.source,
+	chip->fg_reset_wakeup_source.source = wakeup_source_register(&pdev->dev,
 			"qpnp_fg_reset");
-	wakeup_source_init(&chip->cc_soc_wakeup_source.source,
+	chip->cc_soc_wakeup_source.source = wakeup_source_register(&pdev->dev,
 			"qpnp_fg_cc_soc");
-	wakeup_source_init(&chip->sanity_wakeup_source.source,
+	chip->sanity_wakeup_source.source = wakeup_source_register(&pdev->dev,
 			"qpnp_fg_sanity_check");
 	spin_lock_init(&chip->sec_access_lock);
 	mutex_init(&chip->rw_lock);
@@ -8933,20 +8933,20 @@ of_init_fail:
 	mutex_destroy(&chip->learning_data.learning_lock);
 	mutex_destroy(&chip->sysfs_restart_lock);
 	mutex_destroy(&chip->ima_recovery_lock);
-	wakeup_source_trash(&chip->resume_soc_wakeup_source.source);
-	wakeup_source_trash(&chip->empty_check_wakeup_source.source);
-	wakeup_source_trash(&chip->memif_wakeup_source.source);
-	wakeup_source_trash(&chip->profile_wakeup_source.source);
-	wakeup_source_trash(&chip->update_temp_wakeup_source.source);
-	wakeup_source_trash(&chip->update_sram_wakeup_source.source);
-	wakeup_source_trash(&chip->gain_comp_wakeup_source.source);
-	wakeup_source_trash(&chip->capacity_learning_wakeup_source.source);
-	wakeup_source_trash(&chip->esr_extract_wakeup_source.source);
-	wakeup_source_trash(&chip->slope_limit_wakeup_source.source);
-	wakeup_source_trash(&chip->dischg_gain_wakeup_source.source);
-	wakeup_source_trash(&chip->fg_reset_wakeup_source.source);
-	wakeup_source_trash(&chip->cc_soc_wakeup_source.source);
-	wakeup_source_trash(&chip->sanity_wakeup_source.source);
+	wakeup_source_unregister(chip->resume_soc_wakeup_source.source);
+	wakeup_source_unregister(chip->empty_check_wakeup_source.source);
+	wakeup_source_unregister(chip->memif_wakeup_source.source);
+	wakeup_source_unregister(chip->profile_wakeup_source.source);
+	wakeup_source_unregister(chip->update_temp_wakeup_source.source);
+	wakeup_source_unregister(chip->update_sram_wakeup_source.source);
+	wakeup_source_unregister(chip->gain_comp_wakeup_source.source);
+	wakeup_source_unregister(chip->capacity_learning_wakeup_source.source);
+	wakeup_source_unregister(chip->esr_extract_wakeup_source.source);
+	wakeup_source_unregister(chip->slope_limit_wakeup_source.source);
+	wakeup_source_unregister(chip->dischg_gain_wakeup_source.source);
+	wakeup_source_unregister(chip->fg_reset_wakeup_source.source);
+	wakeup_source_unregister(chip->cc_soc_wakeup_source.source);
+	wakeup_source_unregister(chip->sanity_wakeup_source.source);
 	return rc;
 }
 
