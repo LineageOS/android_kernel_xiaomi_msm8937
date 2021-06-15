@@ -98,8 +98,6 @@ int set_post_div_mux_sel(void *context, unsigned int reg,
 	pll->cached_cfg0 = data;
 	wmb(); /* make sure register committed before preparing the clocks */
 
-	pll->cached_cfg0 = data;
-	wmb();
 	data = ((cpbias_cntrl & 0x1) << 6) | BIT(4);
 	MDSS_PLL_REG_W(pll_base, DSIPHY_PLL_CHAR_PUMP_BIAS_CTRL, data);
 	pr_debug("%s: cpbias_cntrl 0x%x\n", __func__, cpbias_cntrl);
