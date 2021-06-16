@@ -142,6 +142,9 @@
 			qcom,force-aicl-rerun;
 			qcom,aicl-rerun-period-s = <180>;
 			qcom,autoadjust-vfloat;
+			
+			io-channels = <&pmi8940_vadc VADC_VCHG_SNS_LEGACY>;
+			io-channel-names = "vchg_sns";
 
 			qcom,chgr@1000 {
 				reg = <0x1000 0x100>;
