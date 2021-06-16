@@ -11,6 +11,7 @@
 #define VADC_USBIN				0x00
 #define VADC_DCIN				0x01
 #define VADC_VCHG_SNS				0x02
+#define VADC_VCHG_SNS_LEGACY			0x03
 #define VADC_SPARE1_03				0x03
 #define VADC_USB_ID_MV				0x04
 #define VADC_VCOIN				0x05
@@ -21,6 +22,7 @@
 #define VADC_REF_1250MV				0x0a
 #define VADC_CHG_TEMP				0x0b
 #define VADC_SPARE1				0x0c
+#define VADC_CHG_TEMP_LEGACY			0x0d
 #define VADC_SPARE2				0x0d
 #define VADC_GND_REF				0x0e
 #define VADC_VDD_VADC				0x0f
@@ -72,6 +74,9 @@
 #define VADC_AMUX_PU1				0x3a
 #define VADC_AMUX_PU2				0x3b
 #define VADC_LR_MUX3_BUF_XO_THERM		0x3c
+
+#define VADC_USB_DP				0x43
+#define VADC_USB_DM				0x44
 
 #define VADC_LR_MUX1_PU1_BAT_THERM		0x70
 #define VADC_LR_MUX2_PU1_BAT_ID			0x71
