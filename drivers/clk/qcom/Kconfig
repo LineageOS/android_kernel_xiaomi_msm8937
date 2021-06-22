@@ -625,6 +625,23 @@ config SM_GPUCC_KHAJE
 	 KHAJE devices.
 	 Say Y if you want to support graphics controller devices.
 
+config SM_DISPCC_KHAJE
+	tristate "KHAJE Display Clock Controller"
+	select SM_GCC_KHAJE
+	help
+	 Support for the display clock controller on Qualcomm Technologies, Inc.
+	 KHAJE devices.
+	 Say Y if you want to support display devices and functionality such as
+	 splash screen.
+
+config SM_DEBUGCC_KHAJE
+	tristate "KHAJE Debug Clock Controller"
+	select SM_GCC_KHAJE
+	help
+	 Support for the debug clock controller on Qualcomm Technologies, Inc
+	 KHAJE devices.
+	 Say Y if you want to support the clock measurement functionality.
+
 config SDM_DEBUGCC_439
 	tristate "SDM439 SDM429 Debug Clock Controller"
 	depends on SDM_GCC_429W
