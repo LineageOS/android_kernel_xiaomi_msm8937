@@ -3252,7 +3252,7 @@ static bool mdss_dsi_fifo_status(struct mdss_dsi_ctrl_pdata *ctrl)
 	if (status & 0xcccc4409) {
 		MIPI_OUTP(base + 0x000c, status);
 
-		pr_err("%s: status=%x\n", __func__, status);
+		pr_err_ratelimited("%s: status=%x\n", __func__, status);
 
 		/*
 		 * if DSI FIFO overflow is masked,
@@ -3336,10 +3336,8 @@ static void __dsi_error_counter(struct dsi_err_container *err_container)
 
 	if (prev_time &&
 		((curr_time - prev_time) < err_container->err_time_delta)) {
-		pr_err("%s: panic in WQ as dsi error intrs within:%dms\n",
+		pr_err_once("%s: panic in WQ as dsi error intrs within:%dms\n",
 				__func__, err_container->err_time_delta);
-		MDSS_XLOG_TOUT_HANDLER_WQ("mdp", "dsi0_ctrl", "dsi0_phy",
-			"dsi1_ctrl", "dsi1_phy", "dsi_dbg_bus", "panic");
 	}
 }
 
