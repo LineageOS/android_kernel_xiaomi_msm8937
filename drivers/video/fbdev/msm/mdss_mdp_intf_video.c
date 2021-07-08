@@ -372,7 +372,7 @@ static int mdss_mdp_video_intf_recovery(void *data, int event)
 	 * mode DSI interface
 	 */
 	if (event == MDP_INTF_DSI_CMD_FIFO_UNDERFLOW) {
-		pr_warn("%s: unsupported recovery event:%d\n",
+		pr_warn_once("%s: unsupported recovery event:%d\n",
 					__func__, event);
 		return -EPERM;
 	}
