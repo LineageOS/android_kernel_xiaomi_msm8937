@@ -1140,6 +1140,7 @@ static int cpucc_driver_probe(struct platform_device *pdev)
 	}
 
 	apcs_mux_c1_clk.clk_lpm.hw_low_power_ctrl = true;
+
 	ret = clk_notifier_register(apcs_mux_c1_clk.clkr.hw.clk,
 						&apcs_mux_c1_clk.clk_nb);
 	if (ret) {
@@ -1333,7 +1334,6 @@ static int __init clock_cpu_lpm_get_latency(void)
 {
 	int rc;
 	bool is_sdm439 = false;
-	bool is_qm215 = false;
 	struct device_node *ofnode = of_find_compatible_node(NULL, NULL,
 					"qcom,cpu-clock-sdm439");
 	if (ofnode)
@@ -1343,24 +1343,15 @@ static int __init clock_cpu_lpm_get_latency(void)
 		ofnode = of_find_compatible_node(NULL, NULL,
 				"qcom,cpu-clock-sdm429");
 
-	if (!ofnode)
-		ofnode = of_find_compatible_node(NULL, NULL,
-				"qcom,cpu-clock-qm215");
-
-	if (ofnode)
-		is_qm215 = true;
-
 	if (!ofnode) {
 		pr_err("device node not initialized\n");
 		return -ENOMEM;
 	}
 
-	if (!is_qm215) {
-		rc = lpm_get_latency(&apcs_mux_c1_clk.clk_lpm.latency_lvl,
-			&apcs_mux_c1_clk.clk_lpm.cpu_latency_no_l2_pc_us);
-		if (rc < 0)
-			pr_err("Failed to get the L2 PC value for perf\n");
-	}
+	rc = lpm_get_latency(&apcs_mux_c1_clk.clk_lpm.latency_lvl,
+		&apcs_mux_c1_clk.clk_lpm.cpu_latency_no_l2_pc_us);
+	if (rc < 0)
+		pr_err("Failed to get the L2 PC value for perf\n");
 
 	if (is_sdm439) {
 		rc = lpm_get_latency(&apcs_mux_c0_clk.clk_lpm.latency_lvl,
