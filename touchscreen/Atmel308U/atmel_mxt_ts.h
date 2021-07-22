@@ -93,7 +93,7 @@ struct mxt_platform_data {
 int mxt_register_glove_mode_notifier(struct notifier_block *nb);
 int mxt_unregister_glove_mode_notifier(struct notifier_block *nb);
 
-#define CTP_DEBUG_ON 1
+#define CTP_DEBUG_ON 0
 #define CTP_DEBUG(fmt, arg...)	do {\
 		if (CTP_DEBUG_ON)\
 			printk("Atmel-308U:[%d]"fmt"\n", __LINE__, ##arg);\
