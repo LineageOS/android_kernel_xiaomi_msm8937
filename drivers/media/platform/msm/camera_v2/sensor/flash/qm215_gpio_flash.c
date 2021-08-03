@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-2.0-only
 /* Copyright (c) 2019, 2021, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -114,7 +115,7 @@ static int32_t qm215_flash_release(
 	CDBG("Enter\n");
 	rc = flash_ctrl->func_tbl->camera_flash_off(flash_ctrl, NULL);
 	if (rc < 0) {
-		pr_err("%s:%d camera_flash_init failed rc = %d",
+		pr_err("%s:%d camera_flash_init failed rc = %d\n",
 			__func__, __LINE__, rc);
 		return rc;
 	}
@@ -224,7 +225,6 @@ static struct platform_driver msm_gpio_flash_platform_driver = {
 	.probe = qm215_flash_platform_probe,
 	.driver = {
 		.name = "qcom,camera-gpio-flash",
-		.owner = THIS_MODULE,
 		.of_match_table = msm_gpio_flash_dt_match,
 	},
 };
@@ -236,7 +236,7 @@ static int __init qm215_gpio_flash_init_module(void)
 	CDBG("Enter\n");
 	rc = platform_driver_register(&msm_gpio_flash_platform_driver);
 	if (rc)
-		pr_err("platform probe for flash failed");
+		pr_err("platform probe for flash failed\n");
 
 	return rc;
 }

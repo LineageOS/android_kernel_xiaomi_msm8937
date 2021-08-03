@@ -367,6 +367,7 @@ static struct mux_regmap_names mux_list[] = {
 static const struct of_device_id clk_debug_match_table[] = {
 	{ .compatible = "qcom,sdm429w-debugcc" },
 	{ .compatible = "qcom,qm215-debugcc" },
+	{ .compatible = "qcom,sdm429-debugcc" },
 	{ }
 };
 

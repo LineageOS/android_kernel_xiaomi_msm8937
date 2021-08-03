@@ -635,6 +635,7 @@ static void cpucc_clk_print_opp_table(int c0, int c1, bool is_sdm439)
 		apc_c1_fmax, true);
 	oppfmin = dev_pm_opp_find_freq_exact(get_cpu_device(c1),
 		apc_c1_fmin, true);
+
 	pr_info("Clock_cpu:(cpu %d) OPP voltage for %lu: %ld\n", c1,
 		 apc_c1_fmin, dev_pm_opp_get_voltage(oppfmin));
 	pr_info("Clock_cpu:(cpu %d) OPP voltage for %lu: %ld\n", c1,
@@ -650,6 +651,7 @@ static void cpucc_clk_print_opp_table(int c0, int c1, bool is_sdm439)
 			apc_c0_fmax, true);
 		oppfmin = dev_pm_opp_find_freq_exact(get_cpu_device(c0),
 			apc_c0_fmin, true);
+
 		pr_info("Clock_cpu:(cpu %d) OPP voltage for %lu: %ld\n", c0,
 			 apc_c0_fmin, dev_pm_opp_get_voltage(oppfmin));
 		pr_info("Clock_cpu:(cpu %d) OPP voltage for %lu: %ld\n", c0,
@@ -692,7 +694,6 @@ static void cpucc_clk_populate_opp_table(struct platform_device *pdev,
 static int clock_sdm429_pm_event(struct notifier_block *this,
 				unsigned long event, void *ptr)
 {
-
 	switch (event) {
 	case PM_POST_HIBERNATION:
 	case PM_POST_SUSPEND:
@@ -717,7 +718,6 @@ static struct notifier_block clock_sdm429_pm_notifier = {
 static int clock_sdm439_pm_event(struct notifier_block *this,
 				unsigned long event, void *ptr)
 {
-
 	switch (event) {
 	case PM_POST_HIBERNATION:
 	case PM_POST_SUSPEND:
@@ -762,6 +762,126 @@ static int clock_qm215_pm_event(struct notifier_block *this,
 static struct notifier_block clock_qm215_pm_notifier = {
 	.notifier_call = clock_qm215_pm_event,
 };
+
+static int fixup_for_sdm439(struct platform_device *pdev, int speed_bin,
+		int version)
+{
+	struct resource *res;
+	void __iomem *base;
+	struct device *dev = &pdev->dev;
+	char prop_name[] = "qcom,speedX-bin-vX-XXX";
+	int ret;
+
+	 /* Rail Regulator for apcs_pll0 */
+	vdd_sr2_pll.regulator[0] = devm_regulator_get(&pdev->dev,
+			"vdd_sr2_pll");
+	if (IS_ERR(vdd_sr2_pll.regulator[0])) {
+		if (!(PTR_ERR(vdd_sr2_pll.regulator[0]) ==
+			-EPROBE_DEFER))
+			dev_err(&pdev->dev,
+				"Unable to get sr2_pll regulator\n");
+		return PTR_ERR(vdd_sr2_pll.regulator[0]);
+	}
+
+	vdd_sr2_pll.regulator[1] = devm_regulator_get(&pdev->dev,
+			"vdd_sr2_dig_ao");
+	if (IS_ERR(vdd_sr2_pll.regulator[1])) {
+		if (!(PTR_ERR(vdd_sr2_pll.regulator[1]) ==
+			-EPROBE_DEFER))
+			dev_err(&pdev->dev,
+				"Unable to get dig_ao regulator\n");
+		return PTR_ERR(vdd_sr2_pll.regulator[1]);
+	}
+
+	/* Rail Regulator for APCS C0 mux */
+	vdd_cpu_c0.regulator[0] = devm_regulator_get(&pdev->dev,
+			"cpu-vdd");
+	if (IS_ERR(vdd_cpu_c0.regulator[0])) {
+		if (!(PTR_ERR(vdd_cpu_c0.regulator[0]) ==
+					-EPROBE_DEFER))
+			dev_err(&pdev->dev, "Unable to get C0 cpu-vdd regulator\n");
+		return PTR_ERR(vdd_cpu_c0.regulator[0]);
+	}
+
+	res = platform_get_resource_byname(pdev, IORESOURCE_MEM,
+			"apcs_pll0");
+	if (res == NULL) {
+		dev_err(&pdev->dev, "Failed to get apcs_pll0 resources\n");
+		return -EINVAL;
+	}
+
+	base = devm_ioremap_resource(dev, res);
+	if (IS_ERR(base)) {
+		dev_err(&pdev->dev, "Failed map apcs_cpu_pll0 register base\n");
+		return PTR_ERR(base);
+	}
+
+	cpu_regmap_config.name = "apcs_pll0";
+	apcs_cpu_pll0.clkr.regmap = devm_regmap_init_mmio(dev, base,
+						&cpu_regmap_config);
+	if (IS_ERR(apcs_cpu_pll0.clkr.regmap)) {
+		dev_err(&pdev->dev, "Couldn't get regmap for apcs_cpu_pll0\n");
+		return PTR_ERR(apcs_cpu_pll0.clkr.regmap);
+	}
+
+	res = platform_get_resource_byname(pdev, IORESOURCE_MEM,
+		 "apcs-c0-rcg-base");
+	if (res == NULL) {
+		dev_err(&pdev->dev, "Failed to get apcs-c0 resources\n");
+		return -EINVAL;
+	}
+
+	base = devm_ioremap_resource(dev, res);
+	if (IS_ERR(base)) {
+		dev_err(&pdev->dev, "Failed map apcs-c0-rcg register base\n");
+		return PTR_ERR(base);
+	}
+
+	cpu_regmap_config.name = "apcs-c0-rcg-base";
+	apcs_mux_c0_clk.clkr.regmap = devm_regmap_init_mmio(dev, base,
+						&cpu_regmap_config);
+	if (IS_ERR(apcs_mux_c0_clk.clkr.regmap)) {
+		dev_err(&pdev->dev, "Couldn't get regmap for apcs-c0-rcg\n");
+		return PTR_ERR(apcs_mux_c0_clk.clkr.regmap);
+	}
+
+	res = platform_get_resource_byname(pdev, IORESOURCE_MEM,
+		"spm_c0_base");
+	if (res == NULL) {
+		dev_err(&pdev->dev, "Failed to get spm-c0 resources\n");
+		return -EINVAL;
+	}
+
+	base = devm_ioremap_resource(dev, res);
+	if (IS_ERR(base)) {
+		dev_err(&pdev->dev, "Failed to ioremap c0 spm registers\n");
+		return -ENOMEM;
+	}
+	apcs_cpu_pll0.spm_ctrl.spm_base = base;
+
+	snprintf(prop_name, ARRAY_SIZE(prop_name),
+		"qcom,speed%d-bin-v%d-%s", speed_bin, version, "c0");
+
+	ret = cpucc_clk_get_fmax_vdd_class(pdev,
+		(struct clk_init_data *)apcs_mux_c0_clk.clkr.hw.init,
+			 prop_name);
+	if (ret) {
+		dev_err(&pdev->dev, "Didn't get c0 speed bin\n");
+
+		snprintf(prop_name, ARRAY_SIZE(prop_name),
+				"qcom,speed0-bin-v0-%s", "c0");
+		ret = cpucc_clk_get_fmax_vdd_class(pdev,
+			(struct clk_init_data *)
+			apcs_mux_c0_clk.clkr.hw.init,
+				prop_name);
+		if (ret) {
+			dev_err(&pdev->dev,
+				"Unable to load safe voltage plan for c0\n");
+			return ret;
+		}
+	}
+	return 0;
+}
 
 static int cpucc_driver_probe(struct platform_device *pdev)
 {
@@ -816,40 +936,6 @@ static int cpucc_driver_probe(struct platform_device *pdev)
 		return PTR_ERR(vdd_hf_pll.regulator[1]);
 	}
 
-	if (is_sdm439) {
-		 /* Rail Regulator for apcs_pll0 */
-		vdd_sr2_pll.regulator[0] = devm_regulator_get(&pdev->dev,
-				"vdd_sr2_pll");
-		if (IS_ERR(vdd_sr2_pll.regulator[0])) {
-			if (!(PTR_ERR(vdd_sr2_pll.regulator[0]) ==
-				-EPROBE_DEFER))
-				dev_err(&pdev->dev,
-					"Unable to get sr2_pll regulator\n");
-			return PTR_ERR(vdd_sr2_pll.regulator[0]);
-		}
-
-		vdd_sr2_pll.regulator[1] = devm_regulator_get(&pdev->dev,
-				"vdd_sr2_dig_ao");
-		if (IS_ERR(vdd_sr2_pll.regulator[1])) {
-			if (!(PTR_ERR(vdd_sr2_pll.regulator[1]) ==
-				-EPROBE_DEFER))
-				dev_err(&pdev->dev,
-					"Unable to get dig_ao regulator\n");
-			return PTR_ERR(vdd_sr2_pll.regulator[1]);
-		}
-
-		/* Rail Regulator for APCS C0 mux */
-		vdd_cpu_c0.regulator[0] = devm_regulator_get(&pdev->dev,
-				"cpu-vdd");
-		if (IS_ERR(vdd_cpu_c0.regulator[0])) {
-			if (!(PTR_ERR(vdd_cpu_c0.regulator[0]) ==
-						-EPROBE_DEFER))
-				dev_err(&pdev->dev, "Unable to get C0 cpu-vdd regulator\n");
-			return PTR_ERR(vdd_cpu_c0.regulator[0]);
-		}
-
-	}
-
 	/* Rail Regulator for APCS C1 mux */
 	vdd_cpu_c1.regulator[0] = devm_regulator_get(&pdev->dev, "cpu-vdd");
 	if (IS_ERR(vdd_cpu_c1.regulator[0])) {
@@ -872,29 +958,6 @@ static int cpucc_driver_probe(struct platform_device *pdev)
 		}
 	}
 
-	if (is_sdm439) {
-		res = platform_get_resource_byname(pdev, IORESOURCE_MEM,
-				"apcs_pll0");
-		if (res == NULL) {
-			dev_err(&pdev->dev, "Failed to get apcs_pll0 resources\n");
-			return -EINVAL;
-		}
-
-		base = devm_ioremap_resource(dev, res);
-		if (IS_ERR(base)) {
-			dev_err(&pdev->dev, "Failed map apcs_cpu_pll0 register base\n");
-			return PTR_ERR(base);
-		}
-
-		cpu_regmap_config.name = "apcs_pll0";
-		apcs_cpu_pll0.clkr.regmap = devm_regmap_init_mmio(dev, base,
-							&cpu_regmap_config);
-		if (IS_ERR(apcs_cpu_pll0.clkr.regmap)) {
-			dev_err(&pdev->dev, "Couldn't get regmap for apcs_cpu_pll0\n");
-			return PTR_ERR(apcs_cpu_pll0.clkr.regmap);
-		}
-	}
-
 	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "apcs_pll1");
 	if (res == NULL) {
 		dev_err(&pdev->dev, "Failed to get apcs_pll1 resources\n");
@@ -913,43 +976,6 @@ static int cpucc_driver_probe(struct platform_device *pdev)
 	if (IS_ERR(apcs_cpu_pll1.clkr.regmap)) {
 		dev_err(&pdev->dev, "Couldn't get regmap for apcs_cpu_pll1\n");
 		return PTR_ERR(apcs_cpu_pll1.clkr.regmap);
-	}
-
-	if (is_sdm439) {
-		res = platform_get_resource_byname(pdev, IORESOURCE_MEM,
-			 "apcs-c0-rcg-base");
-		if (res == NULL) {
-			dev_err(&pdev->dev, "Failed to get apcs-c0 resources\n");
-			return -EINVAL;
-		}
-
-		base = devm_ioremap_resource(dev, res);
-		if (IS_ERR(base)) {
-			dev_err(&pdev->dev, "Failed map apcs-c0-rcg register base\n");
-			return PTR_ERR(base);
-		}
-
-		cpu_regmap_config.name = "apcs-c0-rcg-base";
-		apcs_mux_c0_clk.clkr.regmap = devm_regmap_init_mmio(dev, base,
-							&cpu_regmap_config);
-		if (IS_ERR(apcs_mux_c0_clk.clkr.regmap)) {
-			dev_err(&pdev->dev, "Couldn't get regmap for apcs-c0-rcg\n");
-			return PTR_ERR(apcs_mux_c0_clk.clkr.regmap);
-		}
-
-		res = platform_get_resource_byname(pdev, IORESOURCE_MEM,
-			"spm_c0_base");
-		if (res == NULL) {
-			dev_err(&pdev->dev, "Failed to get spm-c0 resources\n");
-			return -EINVAL;
-		}
-
-		base = devm_ioremap_resource(dev, res);
-		if (IS_ERR(base)) {
-			dev_err(&pdev->dev, "Failed to ioremap c0 spm registers\n");
-			return -ENOMEM;
-		}
-		apcs_cpu_pll0.spm_ctrl.spm_base = base;
 	}
 
 	res = platform_get_resource_byname(pdev, IORESOURCE_MEM,
@@ -1013,26 +1039,6 @@ static int cpucc_driver_probe(struct platform_device *pdev)
 	/* Get speed bin information */
 	cpucc_clk_get_speed_bin(pdev, &speed_bin, &version);
 
-	if (is_sdm439) {
-		snprintf(prop_name, ARRAY_SIZE(prop_name),
-			"qcom,speed%d-bin-v%d-%s", speed_bin, version, "c0");
-
-		ret = cpucc_clk_get_fmax_vdd_class(pdev,
-			(struct clk_init_data *)apcs_mux_c0_clk.clkr.hw.init,
-				 prop_name);
-		if (ret) {
-			dev_err(&pdev->dev, "Didn't get c0 speed bin\n");
-			ret = cpucc_clk_get_fmax_vdd_class(pdev,
-				(struct clk_init_data *)
-				apcs_mux_c0_clk.clkr.hw.init,
-					prop_name);
-		if (ret) {
-			dev_err(&pdev->dev, "Unable to get vdd class for c0\n");
-			return ret;
-			}
-		}
-	}
-
 	snprintf(prop_name, ARRAY_SIZE(prop_name),
 			"qcom,speed%d-bin-v%d-%s", speed_bin, version, "c1");
 
@@ -1041,12 +1047,16 @@ static int cpucc_driver_probe(struct platform_device *pdev)
 				 prop_name);
 	if (ret) {
 		dev_err(&pdev->dev, "Didn't get c1 speed bin\n");
+
+		snprintf(prop_name, ARRAY_SIZE(prop_name),
+				"qcom,speed0-bin-v0-%s", "c1");
 		ret = cpucc_clk_get_fmax_vdd_class(pdev,
 				(struct clk_init_data *)
 				apcs_mux_c1_clk.clkr.hw.init,
 					prop_name);
 		if (ret) {
-			dev_err(&pdev->dev, "Unable to get vdd class for c1\n");
+			dev_err(&pdev->dev,
+				"Unable to load safe voltage plan for c1\n");
 			return ret;
 		}
 	}
@@ -1060,14 +1070,26 @@ static int cpucc_driver_probe(struct platform_device *pdev)
 				 prop_name);
 		if (ret) {
 			dev_err(&pdev->dev, "Didn't get cci speed bin\n");
+
+			snprintf(prop_name, ARRAY_SIZE(prop_name),
+				"qcom,speed0-bin-v0-%s", "cci");
 			ret = cpucc_clk_get_fmax_vdd_class(pdev,
 				(struct clk_init_data *)
 				apcs_mux_cci_clk.clkr.hw.init,
 					prop_name);
 			if (ret) {
-				dev_err(&pdev->dev, "Unable get vdd class for cci\n");
+				dev_err(&pdev->dev,
+					"Unable to load safe voltage plan for cci\n");
 				return ret;
 			}
+		}
+	}
+
+	if (is_sdm439) {
+		ret = fixup_for_sdm439(pdev, speed_bin, version);
+		if (ret) {
+			dev_err(&pdev->dev, "Unable get sdm439 clocks\n");
+			return ret;
 		}
 	}
 
@@ -1140,7 +1162,6 @@ static int cpucc_driver_probe(struct platform_device *pdev)
 	}
 
 	apcs_mux_c1_clk.clk_lpm.hw_low_power_ctrl = true;
-
 	ret = clk_notifier_register(apcs_mux_c1_clk.clkr.hw.clk,
 						&apcs_mux_c1_clk.clk_nb);
 	if (ret) {
@@ -1343,13 +1364,17 @@ static int __init clock_cpu_lpm_get_latency(void)
 		ofnode = of_find_compatible_node(NULL, NULL,
 				"qcom,cpu-clock-sdm429");
 
+	if (!ofnode)
+		ofnode = of_find_compatible_node(NULL, NULL,
+				"qcom,cpu-clock-qm215");
+
 	if (!ofnode) {
 		pr_err("device node not initialized\n");
 		return -ENOMEM;
 	}
 
 	rc = lpm_get_latency(&apcs_mux_c1_clk.clk_lpm.latency_lvl,
-		&apcs_mux_c1_clk.clk_lpm.cpu_latency_no_l2_pc_us);
+			&apcs_mux_c1_clk.clk_lpm.cpu_latency_no_l2_pc_us);
 	if (rc < 0)
 		pr_err("Failed to get the L2 PC value for perf\n");
 
@@ -1358,8 +1383,8 @@ static int __init clock_cpu_lpm_get_latency(void)
 			&apcs_mux_c0_clk.clk_lpm.cpu_latency_no_l2_pc_us);
 		if (rc < 0)
 			pr_err("Failed to get the L2 PC value for pwr\n");
-	pr_debug("Latency for pwr cluster : %d\n",
-		apcs_mux_c0_clk.clk_lpm.cpu_latency_no_l2_pc_us);
+		pr_debug("Latency for pwr cluster : %d\n",
+			apcs_mux_c0_clk.clk_lpm.cpu_latency_no_l2_pc_us);
 	}
 
 	pr_debug("Latency for perf cluster : %d\n",

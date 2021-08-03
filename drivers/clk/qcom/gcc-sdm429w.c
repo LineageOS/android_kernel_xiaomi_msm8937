@@ -532,7 +532,6 @@ static struct clk_fixed_factor gpll6_out_main = {
 		.name = "gpll6_out_main",
 		.parent_names = (const char *[]){ "gpll6_out_aux" },
 		.num_parents = 1,
-		.flags = CLK_SET_RATE_PARENT,
 		.ops = &clk_fixed_factor_ops,
 	},
 };
@@ -1272,18 +1271,18 @@ static struct clk_rcg2 sdcc2_apps_clk_src = {
 };
 
 static const struct freq_tbl ftbl_usb_hs_system_clk_src[] = {
-	F(57140000, P_GPLL0_OUT_MAIN, 14, 0, 0),
+	F(57142857, P_GPLL0_OUT_MAIN, 14, 0, 0),
 	F(100000000, P_GPLL0_OUT_MAIN, 8, 0, 0),
-	F(133330000, P_GPLL0_OUT_MAIN, 6, 0, 0),
-	F(177780000, P_GPLL0_OUT_MAIN, 4.5, 0, 0),
+	F(133333333, P_GPLL0_OUT_MAIN, 6, 0, 0),
+	F(177777778, P_GPLL0_OUT_MAIN, 4.5, 0, 0),
 	{ }
 };
 
 static const struct freq_tbl ftbl_usb_hs_system_clk_src_qm215[] = {
 	F( 80000000, P_GPLL0_OUT_MAIN, 10, 0, 0),
 	F( 100000000, P_GPLL0_OUT_MAIN, 8, 0, 0),
-	F( 133330000, P_GPLL0_OUT_MAIN, 6, 0, 0),
-	F( 177780000, P_GPLL0_OUT_MAIN, 4.5, 0, 0),
+	F( 133333333, P_GPLL0_OUT_MAIN, 6, 0, 0),
+	F( 177777778, P_GPLL0_OUT_MAIN, 4.5, 0, 0),
 	{ }
 };
 
@@ -1302,9 +1301,9 @@ static struct clk_rcg2 usb_hs_system_clk_src = {
 		.vdd_class = &vdd_cx,
 		.num_rate_max = VDD_NUM,
 		.rate_max = (unsigned long[VDD_NUM]) {
-			[VDD_LOW] = 57140000,
-			[VDD_NOMINAL] = 133330000,
-			[VDD_HIGH] = 177780000},
+			[VDD_LOW] = 57142857,
+			[VDD_NOMINAL] = 133333333,
+			[VDD_HIGH] = 177777778},
 	},
 };
 
@@ -3941,6 +3940,7 @@ static struct clk_dummy wcnss_m_clk = {
 
 struct clk_hw *gcc_sdm429w_hws[] = {
 	[GPLL0_OUT_AUX] = &gpll0_out_aux.hw,
+	[GPLL6_OUT_MAIN] = &gpll6_out_main.hw,
 };
 
 static struct clk_regmap *gcc_sdm429w_clocks[] = {
@@ -4266,8 +4266,8 @@ static void fixup_for_qm215(struct platform_device *pdev,
 	sdcc1_apps_clk_src.clkr.hw.init->rate_max[VDD_NOMINAL] = 400000000;
 
 	usb_hs_system_clk_src.clkr.hw.init->rate_max[VDD_LOW] = 800000000;
-	usb_hs_system_clk_src.clkr.hw.init->rate_max[VDD_NOMINAL] = 133333000;
-	usb_hs_system_clk_src.clkr.hw.init->rate_max[VDD_HIGH] = 177780000;
+	usb_hs_system_clk_src.clkr.hw.init->rate_max[VDD_NOMINAL] = 133333333;
+	usb_hs_system_clk_src.clkr.hw.init->rate_max[VDD_HIGH] = 177777778;
 	usb_hs_system_clk_src.freq_tbl = ftbl_usb_hs_system_clk_src_qm215;
 
 	/*
@@ -4358,12 +4358,6 @@ static int gcc_sdm429w_probe(struct platform_device *pdev)
 	}
 
 	ret = devm_clk_hw_register(&pdev->dev, &gpll3_out_main_div.hw);
-	if (ret) {
-		dev_err(&pdev->dev, "Failed to register hardware clock\n");
-		return ret;
-	}
-
-	ret = devm_clk_hw_register(&pdev->dev, &gpll6_out_main.hw);
 	if (ret) {
 		dev_err(&pdev->dev, "Failed to register hardware clock\n");
 		return ret;
