@@ -28,3 +28,78 @@
 		};
 	};
 };
+
+&i2c_2  {
+	aw2013@45 {
+		aw2013,red {
+			aw2013,name = "red";
+			aw2013,id = <0>;
+			aw2013,max-brightness = <255>;
+			aw2013,max-current = <1>;
+			aw2013,rise-time-ms = <2>;
+			aw2013,hold-time-ms = <1>;
+			aw2013,fall-time-ms = <2>;
+			aw2013,off-time-ms = <1>;
+		};
+		aw2013,green {
+			aw2013,name = "green";
+			aw2013,id = <1>;
+			aw2013,max-brightness = <255>;
+			aw2013,max-current = <1>;
+			aw2013,rise-time-ms = <2>;
+			aw2013,hold-time-ms = <1>;
+			aw2013,fall-time-ms = <2>;
+			aw2013,off-time-ms = <1>;
+		};
+		aw2013,blue {
+			aw2013,name = "blue";
+			aw2013,id = <2>;
+			aw2013,max-brightness = <255>;
+			aw2013,max-current = <1>;
+			aw2013,rise-time-ms = <2>;
+			aw2013,hold-time-ms = <1>;
+			aw2013,fall-time-ms = <2>;
+			aw2013,off-time-ms = <1>;
+		};
+		aw2013,white {
+			aw2013,name = "white";
+			aw2013,id = <3>;
+			aw2013,max-brightness = <255>;
+			aw2013,max-current = <1>;
+			aw2013,rise-time-ms = <2>;
+			aw2013,hold-time-ms = <1>;
+			aw2013,fall-time-ms = <2>;
+			aw2013,off-time-ms = <1>;
+		};
+		aw2013,yellow {
+			aw2013,name = "yellow";
+			aw2013,id = <4>;
+			aw2013,max-brightness = <255>;
+			aw2013,max-current = <1>;
+			aw2013,rise-time-ms = <2>;
+			aw2013,hold-time-ms = <1>;
+			aw2013,fall-time-ms = <2>;
+			aw2013,off-time-ms = <1>;
+		};
+		aw2013,cyan {
+			aw2013,name = "cyan";
+			aw2013,id = <5>;
+			aw2013,max-brightness = <255>;
+			aw2013,max-current = <1>;
+			aw2013,rise-time-ms = <2>;
+			aw2013,hold-time-ms = <1>;
+			aw2013,fall-time-ms = <2>;
+			aw2013,off-time-ms = <1>;
+		};
+		aw2013,purple {
+			aw2013,name = "purple";
+			aw2013,id = <6>;
+			aw2013,max-brightness = <255>;
+			aw2013,max-current = <1>;
+			aw2013,rise-time-ms = <2>;
+			aw2013,hold-time-ms = <1>;
+			aw2013,fall-time-ms = <2>;
+			aw2013,off-time-ms = <1>;
+		};
+	};
+};
