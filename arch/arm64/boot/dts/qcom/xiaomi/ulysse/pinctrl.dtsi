@@ -384,3 +384,14 @@
 	/delete-node/ cam_sensor_rear_vana;
 	/delete-node/ cam_sensor_rear_vana_sleep;
 };
+
+&tlmm {
+	i2c_2 {
+		i2c_2_sleep: i2c_2_sleep {
+			config {
+				/delete-property/ bias-disable;
+				bias-pull-down;
+			};
+		};
+	};
+};
