@@ -15,6 +15,12 @@ config MACH_XIAOMI_ROVA
 	help
 	  Support for Xiaomi Redmi 4A / 5A (Unified).
 
+config MACH_XIAOMI_RIVA_OREO
+	bool "Enable support for Xiaomi Redmi 5A with Oreo bootloader"
+	depends on MACH_XIAOMI_ROVA
+	help
+	  WARNING: This removes support for Xiaomi Redmi 4A.
+
 config MACH_XIAOMI_SANTONI
 	bool "Xiaomi Redmi 4X"
 	depends on ARCH_MSM8940
