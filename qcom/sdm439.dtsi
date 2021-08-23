@@ -685,4 +685,5 @@
 
 &usb_otg {
 	qcom,hsusb-otg-phy-init-seq = <0x43 0x80 0x06 0x82 0xffffffff>;
+	/delete-property/ vbus_otg-supply;
 };
