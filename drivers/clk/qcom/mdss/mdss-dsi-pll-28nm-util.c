@@ -611,6 +611,13 @@ int vco_28nm_prepare(struct clk_hw *hw)
 		return -EINVAL;
 	}
 
+	/* Skip vco recalculation for continuous splash use case */
+	if (rsc->handoff_resources) {
+		pr_debug("%s: Skip recalculation during cont splash\n",
+						__func__);
+		return rc;
+	}
+
 	if ((rsc->vco_cached_rate != 0)
 	    && (rsc->vco_cached_rate == clk_hw_get_rate(hw))) {
 		rc = hw->init->ops->set_rate(hw, rsc->vco_cached_rate,
