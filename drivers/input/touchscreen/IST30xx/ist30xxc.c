@@ -818,9 +818,11 @@ static void report_input_data(struct ist30xx_data *data, int finger_counts,
 					data->t_frame[id] =
 					    fingers[idx].full_field;
 
+/*
 				tsp_info("finger press id: %d ( %d, %d)\n", id,
 					 fingers[idx].bit_field.x,
 					 fingers[idx].bit_field.y);
+*/
 				input_mt_slot(data->input_dev, id);
 				input_mt_report_slot_state(data->input_dev,
 							   MT_TOOL_FINGER,
