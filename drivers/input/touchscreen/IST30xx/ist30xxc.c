@@ -1892,9 +1892,9 @@ static int ist30xx_proc_init(struct ist30xx_data *data)
        if (buf)
                path = "/devices/soc/78b7000.i2c/i2c-3/3-0050";
 
-       proc_entry_tp = proc_mkdir("touchpanel", NULL);
+       proc_entry_tp = proc_mkdir("touchpanel-ist30xx", NULL);
        if (proc_entry_tp == NULL) {
-               dev_err(&client->dev, "Couldn't create touchpanel dir in procfs\n");
+               dev_err(&client->dev, "Couldn't create touchpanel-ist30xx dir in procfs\n");
                ret = -ENOMEM;
        }
 
