@@ -356,9 +356,8 @@
 
 		qcom,wcd-rst-gpio-node = <&wcd_rst_gpio>;
 
-		clock-names = "wcd_clk", "wcd_native_clk";
-		clocks = < &clock_audio 0>,
-			<&clock_audio_native 0>;
+		clock-names = "wcd_clk";
+		clocks = < &clock_audio 0>;
 
 		qcom,cdc-static-supplies =
 				"cdc-vdd-buck",
