@@ -945,6 +945,11 @@ enum qca_wlan_vendor_attr_ll_stats_results
     /* Unsigned 32bit value to indicate ll stats result type */
     QCA_WLAN_VENDOR_ATTR_LL_STATS_TYPE,
 
+    /* u8 value representing the time slicing duty cycle percentage.
+        * Possible values are 0-100.
+        */
+    QCA_WLAN_VENDOR_ATTR_LL_STATS_IFACE_INFO_TS_DUTY_CYCLE = 87,
+
     /* keep last */
     QCA_WLAN_VENDOR_ATTR_LL_STATS_AFTER_LAST,
     QCA_WLAN_VENDOR_ATTR_LL_STATS_MAX   =
