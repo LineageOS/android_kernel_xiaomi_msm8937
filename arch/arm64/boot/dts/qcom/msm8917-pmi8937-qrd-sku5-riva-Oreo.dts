@@ -33,6 +33,10 @@
 	xiaomi,device = "riva";
 };
 
+&apps_iommu {
+	/delete-property/ qcom,no-aarch64;
+};
+
 &other_ext_mem {
 	reg = <0x0 0x85b00000 0x0 0xd00000>;
 };
