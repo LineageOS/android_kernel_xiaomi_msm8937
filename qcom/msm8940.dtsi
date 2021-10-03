@@ -209,12 +209,8 @@
 	compatible = "qcom,gcc-msm8940";
 };
 
-&debugcc {
-	compatible = "qcom,cc-debug-8940";
-};
-
-&gcc_mdss {
-	compatible = "qcom,gcc-mdss-8940";
+&rpmcc {
+	compatible = "qcom,rpmcc-msm8940";
 };
 
 &bam_dmux {
