@@ -1725,22 +1725,29 @@ int ipa3_tx_dp(enum ipa_client_type dst, struct sk_buff *skb,
 		data_idx++;
 
 		for (f = 0; f < num_frags; f++) {
-			desc[data_idx + f].frag = &skb_shinfo(skb)->frags[f];
-			desc[data_idx + f].type = IPA_DATA_DESC_SKB_PAGED;
-			desc[data_idx + f].len =
-				skb_frag_size(desc[data_idx + f].frag);
+			if (skb_frag_size(&skb_shinfo(skb)->frags[f]) != 0) {
+				desc[data_idx].frag =
+					&skb_shinfo(skb)->frags[f];
+				desc[data_idx].type =
+					IPA_DATA_DESC_SKB_PAGED;
+				desc[data_idx].len =
+					skb_frag_size(desc[data_idx].frag);
+				data_idx++;
+			} else {
+				IPAERR_RL("Received zero len SKB frag pkt\n");
+				IPA_STATS_INC_CNT(
+					ipa3_ctx->stats.zero_len_frag_pkt_cnt);
+			}
 		}
 		/* don't free skb till frag mappings are released */
 		if (num_frags) {
-			desc[data_idx + f - 1].callback =
-				desc[skb_idx].callback;
-			desc[data_idx + f - 1].user1 = desc[skb_idx].user1;
-			desc[data_idx + f - 1].user2 = desc[skb_idx].user2;
+			desc[data_idx - 1].callback = desc[skb_idx].callback;
+			desc[data_idx - 1].user1 = desc[skb_idx].user1;
+			desc[data_idx - 1].user2 = desc[skb_idx].user2;
 			desc[skb_idx].callback = NULL;
 		}
 
-		if (unlikely(ipa3_send(sys, num_frags + data_idx,
-		    desc, true))) {
+		if (unlikely(ipa3_send(sys, data_idx, desc, true))) {
 			IPAERR_RL("fail to send skb %pK num_frags %u SWP\n",
 				skb, num_frags);
 			goto fail_send;
@@ -3493,17 +3500,21 @@ static struct sk_buff *handle_page_completion(struct gsi_chan_xfer_notify
 		sys->ep->client == IPA_CLIENT_APPS_LAN_CONS) {
 		rx_skb = alloc_skb(0, GFP_ATOMIC);
 		if (unlikely(!rx_skb)) {
-			IPAERR("skb alloc failure\n");
-			list_del(&rx_pkt->link);
-			if (!rx_page.is_tmp_alloc) {
-				init_page_count(rx_page.page);
-			} else {
-				dma_unmap_page(ipa3_ctx->pdev, rx_page.dma_addr,
-					rx_pkt->len, DMA_FROM_DEVICE);
-				__free_pages(rx_pkt->page_data.page,
+			IPAERR("skb alloc failure, free all pending pages\n");
+			list_for_each_entry_safe(rx_pkt, tmp, head, link) {
+				rx_page = rx_pkt->page_data;
+				list_del_init(&rx_pkt->link);
+				if (!rx_page.is_tmp_alloc) {
+					init_page_count(rx_page.page);
+				} else {
+					dma_unmap_page(ipa3_ctx->pdev,
+						rx_page.dma_addr,
+						rx_pkt->len, DMA_FROM_DEVICE);
+					__free_pages(rx_pkt->page_data.page,
 							IPA_WAN_PAGE_ORDER);
+				}
+				rx_pkt->sys->free_rx_wrapper(rx_pkt);
 			}
-			rx_pkt->sys->free_rx_wrapper(rx_pkt);
 			IPA_STATS_INC_CNT(ipa3_ctx->stats.rx_page_drop_cnt);
 			return NULL;
 		}
