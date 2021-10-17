@@ -5,6 +5,7 @@
  * Copyright (C) 2008 Eurotech S.p.A. <info@eurotech.it>
  * Copyright (C) 2010-2011 Lars-Peter Clausen <lars@metafoo.de>
  * Copyright (C) 2011 Pali Rohár <pali.rohar@gmail.com>
+ * Copyright (C) 2018 XiaoMi, Inc.
  *
  * Based on a previous work by Copyright (C) 2008 Texas Instruments, Inc.
  *
@@ -41,8 +42,18 @@
 #include <linux/alarmtimer.h>
 #include <linux/qpnp/qpnp-adc.h>
 #include "bqfs_cmd_type.h"
-//#include "bq27426_gmfs.h"
-#include "bq27426_gmfs_coslight.h"
+
+#ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_series.h>
+extern int xiaomi_series_read(void);
+#endif
+
+#ifdef CONFIG_MACH_XIAOMI_ULYSSE
+#include "bq27426_gmfs_scud_ulysse.h"
+#include "bq27426_gmfs_coslight_ulysse.h"
+#include "bq27426_gmfs_sunwoda_ulysse.h"
+#include "bq27426_gmfs_sdi_ulysse.h"
+#endif
 
 #if 1
 #undef pr_debug
@@ -129,12 +140,6 @@ enum {
 	UPDATE_REASON_FORCED,
 };
 
-struct fg_batt_profile {
-	const bqfs_cmd_t * bqfs_image;
-	u32 array_size;
-	u8  version;
-};
-
 struct batt_chem_id {
 	u16 id;
 	u16 cmd;
@@ -146,11 +151,20 @@ static struct batt_chem_id batt_chem_id_arr[] = {
 	{3142, FG_SUBCMD_CHEM_C},
 };
 
-static const struct fg_batt_profile bqfs_image[] = {
-	{ bqfs_coslight, ARRAY_SIZE(bqfs_coslight), 1 },//100
-	/* Add more entries if multiple batteries are supported */
-
+#ifdef CONFIG_MACH_XIAOMI_ULYSSE
+struct fg_batt_profile_ulysse {
+	const bqfs_cmd_t * bqfs_image_ulysse;
+	u32 array_size;
+	u8  version;
 };
+
+static const struct fg_batt_profile_ulysse bqfs_image_ulysse[] = {
+	{ bqfs_scud_ulysse, ARRAY_SIZE(bqfs_scud_ulysse), 0x10 },
+	{ bqfs_coslight_ulysse, ARRAY_SIZE(bqfs_coslight_ulysse), 0x10 },
+	{ bqfs_sunwoda_ulysse, ARRAY_SIZE(bqfs_sunwoda_ulysse), 0x10 },
+	{ bqfs_sdi_ulysse, ARRAY_SIZE(bqfs_sdi_ulysse), 0x10 },
+};
+#endif
 
 static const unsigned char *device2str[] = {
 	"bq27x00",
@@ -1450,10 +1464,15 @@ static int fg_check_update_necessary(struct bq_fg_chip *bq)
 		return UPDATE_REASON_FG_RESET;
 
 	ret = fg_read_dm_version(bq, &dm_ver);
-	if (!ret && dm_ver < bqfs_image[bq->batt_id].version)
-		return UPDATE_REASON_NEW_VERSION;
-	else
-		return 0;
+
+#ifdef CONFIG_MACH_XIAOMI_ULYSSE
+	if (xiaomi_series_read() == XIAOMI_SERIES_ULYSSE) {
+		if (!ret && dm_ver < bqfs_image_ulysse[bq->batt_id].version)
+			return UPDATE_REASON_NEW_VERSION;
+	}
+#endif
+
+	return 0;
 }
 
 static bool fg_update_bqfs_execute_cmd(struct bq_fg_chip *bq,
@@ -1509,7 +1528,11 @@ static void fg_update_bqfs(struct bq_fg_chip *bq)
 	const bqfs_cmd_t *image;
 	int reason = 0;
 
-	
+#ifdef CONFIG_MACH_XIAOMI
+	if (xiaomi_series_read() != XIAOMI_SERIES_ULYSSE)
+		return;
+#endif
+
 	if (bq->force_update == ~BQFS_UPDATE_KEY)
 		reason = UPDATE_REASON_FORCED;
 	else
@@ -1520,29 +1543,37 @@ static void fg_update_bqfs(struct bq_fg_chip *bq)
 		return;
 	}
 
-	if (bq->batt_id >= ARRAY_SIZE(bqfs_image) ||
-		bq->batt_id < 0) {
-		pr_err("batt_id is out of range");
-		return;
-	}
+#ifdef CONFIG_MACH_XIAOMI_ULYSSE
+    if (xiaomi_series_read() == XIAOMI_SERIES_ULYSSE) {
+		if (bq->batt_id >= ARRAY_SIZE(bqfs_image_ulysse) ||
+			bq->batt_id < 0) {
+			pr_err("batt_id is out of range");
+			return;
+		}
+    }
+#endif
+
 	/* TODO:if unseal, enter cfg update mode cmd sequence are in gmfs file,
 	   no need to do explicitly */
 	fg_dm_pre_access(bq);
 
-	pr_err("Fuel Gauge parameter update, reason:%s, version:%d, batt_id=%d Start...\n", 
-			update_reason_str[reason - 1], bqfs_image[bq->batt_id].version, bq->batt_id);
-	
 	mutex_lock(&bq->update_lock);
-	image = bqfs_image[bq->batt_id].bqfs_image;
-	for (i = 0; i < bqfs_image[bq->batt_id].array_size; i++) {
-		if (!fg_update_bqfs_execute_cmd(bq, &image[i])) {
-			mutex_unlock(&bq->update_lock);
-			pr_err("Failed at command: %d\n", i);
-			fg_dm_post_access(bq); 
-			return;
+#ifdef CONFIG_MACH_XIAOMI_ULYSSE
+    if (xiaomi_series_read() == XIAOMI_SERIES_ULYSSE) {
+		pr_err("Fuel Gauge parameter update (ulysse), reason:%s, version:%d, batt_id=%d Start...\n", 
+				update_reason_str[reason - 1], bqfs_image_ulysse[bq->batt_id].version, bq->batt_id);
+		image = bqfs_image_ulysse[bq->batt_id].bqfs_image_ulysse;
+		for (i = 0; i < bqfs_image_ulysse[bq->batt_id].array_size; i++) {
+			if (!fg_update_bqfs_execute_cmd(bq, &image[i])) {
+				mutex_unlock(&bq->update_lock);
+				pr_err("Failed at command: %d\n", i);
+				fg_dm_post_access(bq);
+				return;
+			}
+			mdelay(5);
 		}
-		mdelay(5);
 	}
+#endif
 	mutex_unlock(&bq->update_lock);
 	
 	pr_err("Done!\n");
@@ -1879,21 +1910,23 @@ static void determine_initial_status(struct bq_fg_chip *bq)
 
 static void convert_rid2battid(struct bq_fg_chip *bq)
 {
-	//TODO: here is just an example, modify it accordingly
-#if 0
-	if (bq->connected_rid > 220 && bq->connected_rid < 440) { 
-		bq->batt_id = 2;
-	} 
-	else if (bq->connected_rid > 60 && bq->connected_rid < 140) {
-		bq->batt_id = 1;
-	}
-	else if (bq->connected_rid > 10 && bq->connected_rid < 50) {
-		bq->batt_id = 0;
-	}
-	else { //default coslight
-		bq->batt_id = 1;
-	}
+#ifdef CONFIG_MACH_XIAOMI_ULYSSE
+    if (xiaomi_series_read() == XIAOMI_SERIES_ULYSSE) {
+		if (bq->connected_rid > 400 && bq->connected_rid < 600) {
+			bq->batt_id = 3;
+		} else if (bq->connected_rid > 220 && bq->connected_rid < 385) {
+			bq->batt_id = 2;
+		} else if (bq->connected_rid > 60 && bq->connected_rid < 140) {
+			bq->batt_id = 1;
+		} else if (bq->connected_rid > 10 && bq->connected_rid < 50) {
+			bq->batt_id = 0;
+		} else {
+			bq->batt_id = 1;
+		}
+		return;
+    }
 #endif
+
 	bq->batt_id = 0;
 }
 
