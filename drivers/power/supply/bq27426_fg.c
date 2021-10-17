@@ -40,6 +40,9 @@
 #include <linux/debugfs.h>
 #include <linux/alarmtimer.h>
 #include <linux/qpnp/qpnp-adc.h>
+#include "bqfs_cmd_type.h"
+//#include "bq27426_gmfs.h"
+#include "bq27426_gmfs_coslight.h"
 
 #if 1
 #undef pr_debug
@@ -126,9 +129,38 @@ enum {
 	UPDATE_REASON_FORCED,
 };
 
+struct fg_batt_profile {
+	const bqfs_cmd_t * bqfs_image;
+	u32 array_size;
+	u8  version;
+};
+
+struct batt_chem_id {
+	u16 id;
+	u16 cmd;
+};
+
+static struct batt_chem_id batt_chem_id_arr[] = {
+	{3230, FG_SUBCMD_CHEM_A},
+	{1202, FG_SUBCMD_CHEM_B},
+	{3142, FG_SUBCMD_CHEM_C},
+};
+
+static const struct fg_batt_profile bqfs_image[] = {
+	{ bqfs_coslight, ARRAY_SIZE(bqfs_coslight), 1 },//100
+	/* Add more entries if multiple batteries are supported */
+
+};
+
 static const unsigned char *device2str[] = {
 	"bq27x00",
 	"bq27426",
+};
+
+const unsigned char *update_reason_str[] = {
+	"Reset", 
+	"New Version", 
+	"Force" 
 };
 
 static u8 bq27426_regs[NUM_REGS] = {
@@ -634,6 +666,21 @@ static int fg_check_cfg_update_mode(struct bq_fg_chip *bq)
 
 	return 0;
 
+}
+
+static int fg_check_itpor(struct bq_fg_chip *bq)
+{
+	int ret;
+	u16 flags;
+
+	ret = fg_read_word(bq, bq->regs[BQ_FG_REG_FLAGS], &flags);
+	if (ret < 0) {
+		return ret;
+	}
+
+	bq->itpor = !!(flags & FG_FLAGS_ITPOR);
+
+	return 0;
 }
 
 static int fg_read_dm_version(struct bq_fg_chip* bq, u8 *ver)
@@ -1323,6 +1370,190 @@ static void fg_psy_unregister(struct bq_fg_chip *bq)
 	power_supply_unregister(bq->fg_psy);
 }
 
+static int fg_change_chem_id(struct bq_fg_chip *bq, u16 new_id)
+{
+	int ret;
+	u16 old_id;
+	//u16 subcmd_chem_id = 0;
+	int i;
+	
+	ret = fg_write_word(bq, bq->regs[BQ_FG_REG_CTRL], FG_SUBCMD_CHEM_ID);
+	if (ret < 0) {
+		pr_err("Failed to write chemid subcmd, ret = %d\n", ret);
+		return ret;
+	}
+	
+	msleep(5);
+
+	ret = fg_read_word(bq, bq->regs[BQ_FG_REG_CTRL], &old_id);
+	if (ret < 0) {
+		pr_err("Failed to read control status, ret = %d\n", ret);
+		return ret;
+	}
+
+	if (new_id == old_id) {
+		pr_info("new chemid is same as old one, skip change\n");
+		return 0;
+	}
+
+	for (i = 0; i < ARRAY_SIZE(batt_chem_id_arr); i++) {
+		if (new_id == batt_chem_id_arr[i].id) 
+			break;
+	}
+
+	if (i == ARRAY_SIZE(batt_chem_id_arr)) {
+		pr_err("not supported chem_id %d\n", new_id);
+		return -1;
+	}
+
+	msleep(5);
+	ret = fg_dm_pre_access(bq);
+	if (ret < 0)
+		return ret;
+	msleep(5);
+	ret = fg_write_word(bq, bq->regs[BQ_FG_REG_CTRL], batt_chem_id_arr[i].cmd);
+	if (ret < 0) {
+		pr_err("Failed to send chem_id command, ret=%d\n", ret);
+		fg_dm_post_access(bq);
+		return ret;
+	}
+
+	msleep(5);
+	ret = fg_dm_post_access(bq);
+	if (ret < 0)
+		return ret;
+
+	msleep(2000);
+	/* Read back checm id to confirm  */
+	ret = fg_read_word(bq, bq->regs[BQ_FG_REG_CTRL], &old_id);
+	if (ret < 0) {
+		pr_err("Failed to read control status, ret = %d\n", ret);
+		return ret;
+	}
+
+	if (new_id == old_id) {
+		pr_info("chem ID changed successfully\n");
+		return 0;
+	} else {
+		return -1;
+	}
+}
+EXPORT_SYMBOL_GPL(fg_change_chem_id);
+
+static int fg_check_update_necessary(struct bq_fg_chip *bq)
+{
+	int ret;
+	u8 dm_ver = 0xFF;
+
+	ret = fg_check_itpor(bq);
+	if (!ret && bq->itpor)
+		return UPDATE_REASON_FG_RESET;
+
+	ret = fg_read_dm_version(bq, &dm_ver);
+	if (!ret && dm_ver < bqfs_image[bq->batt_id].version)
+		return UPDATE_REASON_NEW_VERSION;
+	else
+		return 0;
+}
+
+static bool fg_update_bqfs_execute_cmd(struct bq_fg_chip *bq,
+										const bqfs_cmd_t *cmd)
+{
+	int ret;
+	int i;
+	u8	tmp_buf[CMD_MAX_DATA_SIZE];
+
+	switch (cmd->cmd_type) {
+	case CMD_R:
+		ret = fg_read_block(bq, cmd->reg, (u8 *)&cmd->data.bytes, cmd->data_len);
+		if (ret < 0)
+			return false;
+		else
+			return true;
+		break;
+	case CMD_W:
+		ret = fg_write_block(bq, cmd->reg, (u8 *)&cmd->data.bytes, cmd->data_len);
+		if (ret < 0)
+			return false;
+		else
+			return true;
+		break;
+	case CMD_C:
+		if (fg_read_block(bq, cmd->reg, tmp_buf, cmd->data_len) < 0)
+			return false;
+		if (memcmp(tmp_buf, cmd->data.bytes, cmd->data_len)) {
+			pr_info("CMD_C failed at line %d\n", cmd->line_num);
+			for(i = 0; i < cmd->data_len; i++) {
+				pr_err("Read: %02X, Cmp:%02X", tmp_buf[i], cmd->data.bytes[i]);
+			}	
+			return false;
+		}
+
+		return true;
+		break;
+	case CMD_X:
+		mdelay(cmd->data.delay);
+		return true;
+		break;
+	default:
+		pr_err("Unsupported command at line %d\n", cmd->line_num);
+		return false;
+	}
+
+}
+EXPORT_SYMBOL_GPL(fg_update_bqfs_execute_cmd);
+
+static void fg_update_bqfs(struct bq_fg_chip *bq)
+{
+	int i;
+	const bqfs_cmd_t *image;
+	int reason = 0;
+
+	
+	if (bq->force_update == ~BQFS_UPDATE_KEY)
+		reason = UPDATE_REASON_FORCED;
+	else
+		reason = fg_check_update_necessary(bq);
+	
+	if (!reason) {
+		pr_info("Fuel Gauge parameter no need update, ignored\n");
+		return;
+	}
+
+	if (bq->batt_id >= ARRAY_SIZE(bqfs_image) ||
+		bq->batt_id < 0) {
+		pr_err("batt_id is out of range");
+		return;
+	}
+	/* TODO:if unseal, enter cfg update mode cmd sequence are in gmfs file,
+	   no need to do explicitly */
+	fg_dm_pre_access(bq);
+
+	pr_err("Fuel Gauge parameter update, reason:%s, version:%d, batt_id=%d Start...\n", 
+			update_reason_str[reason - 1], bqfs_image[bq->batt_id].version, bq->batt_id);
+	
+	mutex_lock(&bq->update_lock);
+	image = bqfs_image[bq->batt_id].bqfs_image;
+	for (i = 0; i < bqfs_image[bq->batt_id].array_size; i++) {
+		if (!fg_update_bqfs_execute_cmd(bq, &image[i])) {
+			mutex_unlock(&bq->update_lock);
+			pr_err("Failed at command: %d\n", i);
+			fg_dm_post_access(bq); 
+			return;
+		}
+		mdelay(5);
+	}
+	mutex_unlock(&bq->update_lock);
+	
+	pr_err("Done!\n");
+		
+	/* TODO:exit cfg update mode and seal device if these are not handled in gmfs file */
+	fg_dm_post_access(bq); 
+	return;
+
+}
+EXPORT_SYMBOL_GPL(fg_update_bqfs);
+
 static const u8 fg_dump_regs[] = {
 	0x00, 0x02, 0x04, 0x06, 
 	0x08, 0x0A, 0x0C, 0x0E, 
@@ -1553,6 +1784,14 @@ static int fg_enable_sleep(struct bq_fg_chip *bq, bool enable)
 	return ret;
 }
 EXPORT_SYMBOL_GPL(fg_enable_sleep);
+
+static void fg_update_bqfs_workfunc(struct work_struct *work)
+{
+		struct bq_fg_chip *bq = container_of(work, 
+							struct bq_fg_chip, update_work);
+	
+		fg_update_bqfs(bq);
+}
 
 static void fg_dump_registers(struct bq_fg_chip *bq)
 {
@@ -1810,8 +2049,11 @@ static int bq_fg_probe(struct i2c_client *client,
 		dev_err(&client->dev, "Unable to parse DT nodes\n");
 		//goto destroy_mutex;
 	}
+	INIT_WORK(&bq->update_work, fg_update_bqfs_workfunc);
 
 	fg_parse_batt_id(bq);
+
+	fg_update_bqfs(bq);
 
 	if (client->irq) {
 		ret = devm_request_threaded_irq(&client->dev, client->irq, NULL,
