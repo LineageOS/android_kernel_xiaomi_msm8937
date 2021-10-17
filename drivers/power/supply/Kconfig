@@ -450,6 +450,7 @@ config CHARGER_BQ2560
 config GAUGE_BQ27426
 	tristate "BQ27426 Battery Fg"
 	depends on I2C
+	select SENSORS_QPNP_ADC_VOLTAGE
 	help
 	  Say Y to include support for BQ27426 Battery Charger.
 	  BQ27426 is a single path switching mode charger capable of charging
