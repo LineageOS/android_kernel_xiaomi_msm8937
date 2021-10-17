@@ -44,6 +44,8 @@
 #include "bqfs_cmd_type.h"
 
 #ifdef CONFIG_MACH_XIAOMI
+#include <linux/xiaomi_device.h>
+extern int xiaomi_device_read(void);
 #include <linux/xiaomi_series.h>
 extern int xiaomi_series_read(void);
 #endif
@@ -53,6 +55,14 @@ extern int xiaomi_series_read(void);
 #include "bq27426_gmfs_coslight_ulysse.h"
 #include "bq27426_gmfs_sunwoda_ulysse.h"
 #include "bq27426_gmfs_sdi_ulysse.h"
+#endif
+
+#ifdef CONFIG_MACH_XIAOMI_ROVA
+#include "bq27426_gmfs_desay_riva.h"
+#include "bq27426_gmfs_scud_riva.h"
+#include "bq27426_gmfs_sunwoda_riva.h"
+#include "bq27426_gmfs_atl_riva.h"
+#include "bq27426_gmfs_default_riva.h"
 #endif
 
 #if 1
@@ -166,6 +176,34 @@ static const struct fg_batt_profile_ulysse bqfs_image_ulysse[] = {
 };
 #endif
 
+#ifdef CONFIG_MACH_XIAOMI_ROVA
+struct riva_bq_batt_ids {
+	int kohm;
+	const char *battery_type;
+};
+
+static struct riva_bq_batt_ids riva_bq_batt_ids_attr[] = {
+	{30, "wingtech-Desay-4v4-3000mah"},
+	{68, "wingtech-Scud-4v4-3000mah"},
+	{330, "wingtech-Sunwoda-4v4-3000mah"},
+	{82, "wingtech-Atl-4v4-3000mah"},
+};
+
+struct fg_batt_profile_riva {
+	const bqfs_cmd_t *bqfs_image_riva;
+	u32				   array_size;
+	u8				   version;
+};
+
+static const struct fg_batt_profile_riva bqfs_image_riva[] = {
+	{ bqfs_default_riva, ARRAY_SIZE(bqfs_default_riva), 1},
+	{ bqfs_desay_riva, ARRAY_SIZE(bqfs_desay_riva), 33},
+	{ bqfs_scud_riva, ARRAY_SIZE(bqfs_scud_riva), 98},
+	{ bqfs_sunwoda_riva, ARRAY_SIZE(bqfs_sunwoda_riva), 61},
+	{ bqfs_atl_riva, ARRAY_SIZE(bqfs_atl_riva), 98},
+};
+#endif
+
 static const unsigned char *device2str[] = {
 	"bq27x00",
 	"bq27426",
@@ -263,6 +301,11 @@ struct bq_fg_chip {
 	struct qpnp_vadc_chip	*vadc_dev;
 	struct regulator		*vdd;
 	u32	connected_rid;
+
+#ifdef CONFIG_MACH_XIAOMI_ROVA
+	struct regulator		*riva_vcc_i2c;
+#endif
+	const char *battery_type;
 };
 
 
@@ -985,6 +1028,67 @@ static int fg_read_temperature(struct bq_fg_chip *bq)
 
 }
 
+#ifdef CONFIG_MACH_XIAOMI_ROVA
+#define RIVA_DEFAULT_RESISTER 45
+static int riva_fg_get_battid_resister(struct bq_fg_chip *bq)
+{
+	int rc = 0;
+	int bq_battid_resister = 0;
+	struct qpnp_vadc_result results;
+
+	rc = qpnp_vadc_read(bq->vadc_dev, P_MUX4_1_1, &results);
+	if (rc) {
+		pr_debug("Unable to read batt resister rc=%d\n", rc);
+		return RIVA_DEFAULT_RESISTER;
+	}
+
+	bq_battid_resister = (results.physical)*100/(1800000 - results.physical);
+
+	return bq_battid_resister;
+}
+
+
+static char *riva_bq_default_batt_type = "Generic_Battery";
+
+static int riva_bq_batterydata_get_best_profile(struct bq_fg_chip *bq)
+{
+	int delta = 0, best_id_kohm = 0, id_range_pct = 15,
+		batt_id_kohm = 0, i = 0,  limit = 0;
+
+	batt_id_kohm = riva_fg_get_battid_resister(bq);
+
+	for (i = 0; i < ARRAY_SIZE(riva_bq_batt_ids_attr); i++) {
+		delta = abs(riva_bq_batt_ids_attr[i].kohm - batt_id_kohm);
+		limit = (riva_bq_batt_ids_attr[i].kohm * id_range_pct) / 100;
+		if (delta <= limit) {
+			best_id_kohm = riva_bq_batt_ids_attr[i].kohm;
+			bq->battery_type = riva_bq_batt_ids_attr[i].battery_type;
+			goto out;
+		}
+	}
+
+	pr_err("out of range, using default battery, best_id_kohm=%d\n", batt_id_kohm);
+
+	bq->battery_type = riva_bq_default_batt_type;
+
+out:
+	pr_err("%s found\n", bq->battery_type);
+
+	if (best_id_kohm == 30) {
+		bq->batt_id = 1;
+	} else if (best_id_kohm == 68) {
+		bq->batt_id = 2;
+	} else if (best_id_kohm == 330) {
+		bq->batt_id = 3;
+	} else if (best_id_kohm == 82) {
+		bq->batt_id = 4;
+	} else
+		bq->batt_id = 0;
+
+	return 0;
+}
+#endif
+
 static int fg_read_volt(struct bq_fg_chip *bq)
 {
 	int ret;
@@ -1174,6 +1278,7 @@ static enum power_supply_property fg_props[] = {
 	POWER_SUPPLY_PROP_PRESENT,
 	POWER_SUPPLY_PROP_VOLTAGE_NOW,
 	POWER_SUPPLY_PROP_CURRENT_NOW,
+	POWER_SUPPLY_PROP_BATTERY_TYPE,
 	POWER_SUPPLY_PROP_CAPACITY,
 	POWER_SUPPLY_PROP_CAPACITY_LEVEL,
 	POWER_SUPPLY_PROP_TEMP,
@@ -1217,7 +1322,9 @@ static int fg_get_property(struct power_supply *psy, enum power_supply_property 
 		pr_info("bq27426 current=%d\n", val->intval);
 		mutex_unlock(&bq->data_lock);
 		break;
-
+	case POWER_SUPPLY_PROP_BATTERY_TYPE:
+		val->strval = bq->battery_type;
+		break;
 	case POWER_SUPPLY_PROP_CAPACITY:
 		if (bq->fake_soc >= 0) {
 			val->intval = bq->fake_soc;
@@ -1471,6 +1578,12 @@ static int fg_check_update_necessary(struct bq_fg_chip *bq)
 			return UPDATE_REASON_NEW_VERSION;
 	}
 #endif
+#ifdef CONFIG_MACH_XIAOMI_ROVA
+	if (xiaomi_device_read() == XIAOMI_DEVICE_RIVA) {
+		if (!ret && dm_ver < bqfs_image_riva[bq->batt_id].version)
+			return UPDATE_REASON_NEW_VERSION;
+	}
+#endif
 
 	return 0;
 }
@@ -1529,7 +1642,7 @@ static void fg_update_bqfs(struct bq_fg_chip *bq)
 	int reason = 0;
 
 #ifdef CONFIG_MACH_XIAOMI
-	if (xiaomi_series_read() != XIAOMI_SERIES_ULYSSE)
+	if (xiaomi_series_read() != XIAOMI_SERIES_ULYSSE && xiaomi_device_read() != XIAOMI_DEVICE_RIVA)
 		return;
 #endif
 
@@ -1546,6 +1659,15 @@ static void fg_update_bqfs(struct bq_fg_chip *bq)
 #ifdef CONFIG_MACH_XIAOMI_ULYSSE
     if (xiaomi_series_read() == XIAOMI_SERIES_ULYSSE) {
 		if (bq->batt_id >= ARRAY_SIZE(bqfs_image_ulysse) ||
+			bq->batt_id < 0) {
+			pr_err("batt_id is out of range");
+			return;
+		}
+    }
+#endif
+#ifdef CONFIG_MACH_XIAOMI_ROVA
+    if (xiaomi_device_read() == XIAOMI_DEVICE_RIVA) {
+		if (bq->batt_id >= ARRAY_SIZE(bqfs_image_riva) ||
 			bq->batt_id < 0) {
 			pr_err("batt_id is out of range");
 			return;
@@ -1573,6 +1695,22 @@ static void fg_update_bqfs(struct bq_fg_chip *bq)
 			mdelay(5);
 		}
 	}
+#endif
+#ifdef CONFIG_MACH_XIAOMI_ROVA
+    if (xiaomi_device_read() == XIAOMI_DEVICE_RIVA) {
+		pr_err("Fuel Gauge parameter update (riva), reason:%s, version:%d, batt_id=%d Start...\n", 
+				update_reason_str[reason - 1], bqfs_image_riva[bq->batt_id].version, bq->batt_id);
+		image = bqfs_image_riva[bq->batt_id].bqfs_image_riva;
+		for (i = 0; i < bqfs_image_riva[bq->batt_id].array_size; i++) {
+			if (!fg_update_bqfs_execute_cmd(bq, &image[i])) {
+				mutex_unlock(&bq->update_lock);
+				pr_err("Failed at command: %d\n", i);
+				fg_dm_post_access(bq);
+				return;
+			}
+			mdelay(5);
+		}
+    }
 #endif
 	mutex_unlock(&bq->update_lock);
 	
@@ -2048,6 +2186,8 @@ static int bq_fg_probe(struct i2c_client *client,
 	bq->fake_soc 	= -EINVAL;
 	bq->fake_temp	= -EINVAL;
 
+	bq->battery_type = "Unknown";
+
 	if (bq->chip == BQ27426) {
 		regs = bq27426_regs; 
 	} else {
@@ -2067,6 +2207,11 @@ static int bq_fg_probe(struct i2c_client *client,
 	bq->resume_completed = true;
 	bq->irq_waiting = false;
 
+#ifdef CONFIG_MACH_XIAOMI_ROVA
+	if (xiaomi_device_read() == XIAOMI_DEVICE_RIVA)
+		bq->vadc_dev = qpnp_get_vadc(bq->dev, "battid");
+	else
+#endif
 	bq->vadc_dev = qpnp_get_vadc(bq->dev, "batt_id");
 	if (IS_ERR(bq->vadc_dev)) {
 		ret = PTR_ERR(bq->vadc_dev);
@@ -2077,6 +2222,30 @@ static int bq_fg_probe(struct i2c_client *client,
 
 		return ret;
 	}
+#ifdef CONFIG_MACH_XIAOMI_ROVA
+	if (xiaomi_device_read() == XIAOMI_DEVICE_RIVA) {
+		bq->riva_vcc_i2c = regulator_get(bq->dev, "riva_vcc_i2c");
+		if (IS_ERR(bq->riva_vcc_i2c)) {
+			pr_err("Regulator get failed vdd ret=%d\n", ret);
+
+		}
+
+		if (regulator_count_voltages(bq->riva_vcc_i2c) > 0) {
+			ret = regulator_set_voltage(bq->riva_vcc_i2c, SMB_VTG_MIN_UV,
+						SMB_VTG_MAX_UV);
+			if (ret) {
+				pr_err("Regulator set_vtg failed vdd ret=%d\n", ret);
+			}
+		}
+
+		ret = regulator_enable(bq->riva_vcc_i2c);
+		if (ret) {
+			pr_err("Regulator vdd enable failed ret=%d\n", ret);
+		}
+		ret = riva_bq_batterydata_get_best_profile(bq);
+	}
+	else
+#endif
 	ret = bq_parse_dt(bq);
 	if (ret < 0) {
 		dev_err(&client->dev, "Unable to parse DT nodes\n");
@@ -2084,6 +2253,9 @@ static int bq_fg_probe(struct i2c_client *client,
 	}
 	INIT_WORK(&bq->update_work, fg_update_bqfs_workfunc);
 
+#ifdef CONFIG_MACH_XIAOMI_ROVA
+	if (xiaomi_device_read() != XIAOMI_DEVICE_RIVA)
+#endif
 	fg_parse_batt_id(bq);
 
 	fg_update_bqfs(bq);
