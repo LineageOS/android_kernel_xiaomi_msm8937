@@ -77,14 +77,6 @@ enum btsco_rates {
 	RATE_16KHZ_ID,
 };
 
-/* dummy definition of deprecated FE DAI's*/
-enum {
-	MSM_FRONTEND_DAI_CS_VOICE = 39,
-	MSM_FRONTEND_DAI_VOICE2,
-	MSM_FRONTEND_DAI_VOLTE,
-	MSM_FRONTEND_DAI_VOWLAN,
-};
-
 static int msm8952_auxpcm_rate = 8000;
 static int msm_btsco_rate = BTSCO_RATE_8KHZ;
 static int msm_btsco_ch = 1;
@@ -2350,7 +2342,7 @@ static struct snd_soc_dai_link msm8952_dai[] = {
 	{/* hw:x,2 */
 		.name = "Circuit-Switch Voice",
 		.stream_name = "CS-Voice",
-		.cpu_dai_name   = "VoiceMMode1",
+		.cpu_dai_name   = "CS-VOICE",
 		.platform_name  = "msm-pcm-voice",
 		.dynamic = 1,
 		.dpcm_playback = 1,
@@ -2525,7 +2517,7 @@ static struct snd_soc_dai_link msm8952_dai[] = {
 	{/* hw:x,13 */
 		.name = "Voice2",
 		.stream_name = "Voice2",
-		.cpu_dai_name   = "VoiceMMode1",
+		.cpu_dai_name   = "Voice2",
 		.platform_name  = "msm-pcm-voice",
 		.dynamic = 1,
 		.dpcm_playback = 1,
@@ -2560,7 +2552,7 @@ static struct snd_soc_dai_link msm8952_dai[] = {
 	{ /* hw:x,15 */
 		.name = "VoLTE",
 		.stream_name = "VoLTE",
-		.cpu_dai_name   = "VoiceMMode1",
+		.cpu_dai_name   = "VoLTE",
 		.platform_name  = "msm-pcm-voice",
 		.dynamic = 1,
 		.dpcm_playback = 1,
@@ -2578,7 +2570,7 @@ static struct snd_soc_dai_link msm8952_dai[] = {
 	{ /* hw:x,16 */
 		.name = "VoWLAN",
 		.stream_name = "VoWLAN",
-		.cpu_dai_name   = "VoiceMMode1",
+		.cpu_dai_name   = "VoWLAN",
 		.platform_name  = "msm-pcm-voice",
 		.dynamic = 1,
 		.dpcm_playback = 1,
