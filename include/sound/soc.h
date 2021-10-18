@@ -1019,9 +1019,6 @@ struct snd_soc_dai_link {
 	 * only, which only works well when that device exposes a single DAI.
 	 */
 	const char *cpu_dai_name;
-#ifdef CONFIG_MACH_XIAOMI_LAND
-	const char *old_cpu_dai_name;
-#endif
 	/*
 	 * You MUST specify the link's codec, either by device name, or by
 	 * DT/OF node, but not both.

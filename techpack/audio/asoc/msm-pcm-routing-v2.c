@@ -45,11 +45,6 @@
 #include "msm-dolby-dap-config.h"
 #include "msm-ds2-dap-config.h"
 
-#ifdef CONFIG_MACH_XIAOMI
-#include <linux/xiaomi_device.h>
-extern int xiaomi_device_read(void);
-#endif
-
 #ifndef CONFIG_DOLBY_DAP
 #undef DOLBY_ADM_COPP_TOPOLOGY_ID
 #define DOLBY_ADM_COPP_TOPOLOGY_ID 0xFFFFFFFE
@@ -11918,7 +11913,7 @@ static const struct snd_kcontrol_new quat_tdm_rx_2_voice_mixer_controls[] = {
 };
 
 #ifdef CONFIG_MACH_XIAOMI_LAND
-static const struct snd_kcontrol_new old_stub_rx_mixer_controls[] = {
+static const struct snd_kcontrol_new stub_rx_mixer_controls[] = {
 	SOC_DOUBLE_EXT("Voice Stub", SND_SOC_NOPM,
 	MSM_BACKEND_DAI_EXTPROC_RX,
 	MSM_FRONTEND_DAI_VOICE_STUB, 1, 0, msm_routing_get_voice_stub_mixer,
@@ -11932,8 +11927,7 @@ static const struct snd_kcontrol_new old_stub_rx_mixer_controls[] = {
 	MSM_FRONTEND_DAI_VOLTE_STUB, 1, 0, msm_routing_get_voice_stub_mixer,
 	msm_routing_put_voice_stub_mixer),
 };
-#endif
-
+#else
 static const struct snd_kcontrol_new stub_rx_mixer_controls[] = {
 	SOC_DOUBLE_EXT("VoiceMMode1", SND_SOC_NOPM,
 	MSM_BACKEND_DAI_EXTPROC_RX,
@@ -11944,9 +11938,10 @@ static const struct snd_kcontrol_new stub_rx_mixer_controls[] = {
 	MSM_FRONTEND_DAI_VOICEMMODE2, 1, 0, msm_routing_get_voice_mixer,
 	msm_routing_put_voice_mixer),
 };
+#endif
 
 #ifdef CONFIG_MACH_XIAOMI_LAND
-static const struct snd_kcontrol_new old_slimbus_1_rx_mixer_controls[] = {
+static const struct snd_kcontrol_new slimbus_1_rx_mixer_controls[] = {
 	SOC_DOUBLE_EXT("Voice Stub", SND_SOC_NOPM,
 	MSM_BACKEND_DAI_SLIMBUS_1_RX,
 	MSM_FRONTEND_DAI_VOICE_STUB, 1, 0, msm_routing_get_voice_stub_mixer,
@@ -11960,8 +11955,7 @@ static const struct snd_kcontrol_new old_slimbus_1_rx_mixer_controls[] = {
 	MSM_FRONTEND_DAI_VOLTE_STUB, 1, 0, msm_routing_get_voice_stub_mixer,
 	msm_routing_put_voice_stub_mixer),
 };
-#endif
-
+#else
 static const struct snd_kcontrol_new slimbus_1_rx_mixer_controls[] = {
 	SOC_DOUBLE_EXT("VoiceMMode1", SND_SOC_NOPM,
 	MSM_BACKEND_DAI_SLIMBUS_1_RX,
@@ -11972,9 +11966,10 @@ static const struct snd_kcontrol_new slimbus_1_rx_mixer_controls[] = {
 	MSM_FRONTEND_DAI_VOICEMMODE2, 1, 0, msm_routing_get_voice_mixer,
 	msm_routing_put_voice_mixer),
 };
+#endif
 
 #ifdef CONFIG_MACH_XIAOMI_LAND
-static const struct snd_kcontrol_new old_slimbus_3_rx_mixer_controls[] = {
+static const struct snd_kcontrol_new slimbus_3_rx_mixer_controls[] = {
 	SOC_DOUBLE_EXT("Voice Stub", SND_SOC_NOPM,
 	MSM_BACKEND_DAI_SLIMBUS_3_RX,
 	MSM_FRONTEND_DAI_VOICE_STUB, 1, 0, msm_routing_get_voice_stub_mixer,
@@ -11988,7 +11983,7 @@ static const struct snd_kcontrol_new old_slimbus_3_rx_mixer_controls[] = {
 	MSM_FRONTEND_DAI_VOLTE_STUB, 1, 0, msm_routing_get_voice_stub_mixer,
 	msm_routing_put_voice_stub_mixer),
 };
-#endif
+#else
 static const struct snd_kcontrol_new slimbus_3_rx_mixer_controls[] = {
 	SOC_DOUBLE_EXT("VoiceMMode1", SND_SOC_NOPM,
 	MSM_BACKEND_DAI_SLIMBUS_3_RX,
@@ -11999,6 +11994,7 @@ static const struct snd_kcontrol_new slimbus_3_rx_mixer_controls[] = {
 	MSM_FRONTEND_DAI_VOICEMMODE2, 1, 0, msm_routing_get_voice_mixer,
 	msm_routing_put_voice_mixer),
 };
+#endif
 
 static const struct snd_kcontrol_new proxy_rx_voice_mixer_controls[] = {
 	SOC_DOUBLE_EXT("VoiceMMode1", SND_SOC_NOPM,
@@ -16879,26 +16875,6 @@ static const struct snd_kcontrol_new int4_mi2s_rx_vi_fb_stereo_ch_mux =
 	int4_mi2s_rx_vi_fb_stereo_ch_mux_enum, spkr_prot_get_vi_rch_port,
 	spkr_prot_put_vi_rch_port);
 
-#ifdef CONFIG_MACH_XIAOMI_LAND
-static const struct snd_soc_dapm_widget old_msm_qdsp6_widgets[] = {
-	SND_SOC_DAPM_MIXER("STUB_RX Mixer", SND_SOC_NOPM, 0, 0,
-	old_stub_rx_mixer_controls, ARRAY_SIZE(old_stub_rx_mixer_controls)),
-	SND_SOC_DAPM_MIXER("SLIMBUS_1_RX Mixer", SND_SOC_NOPM, 0, 0,
-	old_slimbus_1_rx_mixer_controls, ARRAY_SIZE(old_slimbus_1_rx_mixer_controls)),
-	SND_SOC_DAPM_MIXER("SLIMBUS_3_RX_Voice Mixer", SND_SOC_NOPM, 0, 0,
-	old_slimbus_3_rx_mixer_controls, ARRAY_SIZE(old_slimbus_3_rx_mixer_controls)),
-};
-
-static const struct snd_soc_dapm_widget normal_msm_qdsp6_widgets[] = {
-	SND_SOC_DAPM_MIXER("STUB_RX Mixer", SND_SOC_NOPM, 0, 0,
-	stub_rx_mixer_controls, ARRAY_SIZE(stub_rx_mixer_controls)),
-	SND_SOC_DAPM_MIXER("SLIMBUS_1_RX Mixer", SND_SOC_NOPM, 0, 0,
-	slimbus_1_rx_mixer_controls, ARRAY_SIZE(slimbus_1_rx_mixer_controls)),
-	SND_SOC_DAPM_MIXER("SLIMBUS_3_RX_Voice Mixer", SND_SOC_NOPM, 0, 0,
-	slimbus_3_rx_mixer_controls, ARRAY_SIZE(slimbus_3_rx_mixer_controls)),
-};
-#endif
-
 static const struct snd_soc_dapm_widget msm_qdsp6_widgets[] = {
 	/* Frontend AIF */
 	/* Widget name equals to Front-End DAI name<Need confirmation>,
@@ -18015,14 +17991,12 @@ static const struct snd_soc_dapm_widget msm_qdsp6_widgets[] = {
 			   ARRAY_SIZE(tx_voice2_stub_mixer_controls)),
 	SND_SOC_DAPM_MIXER("VoLTE Stub Tx Mixer", SND_SOC_NOPM, 0, 0,
 	tx_volte_stub_mixer_controls, ARRAY_SIZE(tx_volte_stub_mixer_controls)),
-#ifndef CONFIG_MACH_XIAOMI_LAND
 	SND_SOC_DAPM_MIXER("STUB_RX Mixer", SND_SOC_NOPM, 0, 0,
 	stub_rx_mixer_controls, ARRAY_SIZE(stub_rx_mixer_controls)),
 	SND_SOC_DAPM_MIXER("SLIMBUS_1_RX Mixer", SND_SOC_NOPM, 0, 0,
 	slimbus_1_rx_mixer_controls, ARRAY_SIZE(slimbus_1_rx_mixer_controls)),
 	SND_SOC_DAPM_MIXER("SLIMBUS_3_RX_Voice Mixer", SND_SOC_NOPM, 0, 0,
 	slimbus_3_rx_mixer_controls, ARRAY_SIZE(slimbus_3_rx_mixer_controls)),
-#endif
 	SND_SOC_DAPM_MIXER("SLIM_6_RX_Voice Mixer",
 			SND_SOC_NOPM, 0, 0,
 			slimbus_6_rx_voice_mixer_controls,
@@ -18236,40 +18210,6 @@ static const struct snd_soc_dapm_widget msm_qdsp6_widgets[] = {
 	SND_SOC_DAPM_MUX("AUDIO_REF_EC_UL29 MUX", SND_SOC_NOPM, 0, 0,
 		&ext_ec_ref_mux_ul29),
 };
-
-#ifdef CONFIG_MACH_XIAOMI_LAND
-static const struct snd_soc_dapm_route old_intercon[] = {
-	{"STUB_RX Mixer", "Voice Stub", "VOICE_STUB_DL"},
-	{"STUB_RX Mixer", "Voice2 Stub", "VOICE2_STUB_DL"},
-	{"STUB_RX Mixer", "VoLTE Stub", "VOLTE_STUB_DL"},
-	{"STUB_RX", NULL, "STUB_RX Mixer"},
-	{"SLIMBUS_1_RX Mixer", "Voice Stub", "VOICE_STUB_DL"},
-	{"SLIMBUS_1_RX Mixer", "Voice2 Stub", "VOICE2_STUB_DL"},
-	{"SLIMBUS_1_RX Mixer", "VoLTE Stub", "VOLTE_STUB_DL"},
-	{"SLIMBUS_1_RX", NULL, "SLIMBUS_1_RX Mixer"},
-	{"AFE_PCM_RX_Voice Mixer", "Voice Stub", "VOICE_STUB_DL"},
-	{"AFE_PCM_RX_Voice Mixer", "Voice2 Stub", "VOICE2_STUB_DL"},
-	{"AFE_PCM_RX_Voice Mixer", "VoLTE Stub", "VOLTE_STUB_DL"},
-	{"SLIMBUS_3_RX_Voice Mixer", "Voice Stub", "VOICE_STUB_DL"},
-	{"SLIMBUS_3_RX_Voice Mixer", "Voice2 Stub", "VOICE2_STUB_DL"},
-	{"SLIMBUS_3_RX_Voice Mixer", "VoLTE Stub", "VOLTE_STUB_DL"},
-	{"SLIMBUS_3_RX", NULL, "SLIMBUS_3_RX_Voice Mixer"},
-};
-
-static const struct snd_soc_dapm_route normal_intercon[] = {
-	{"STUB_RX Mixer", "VoiceMMode1", "VOICEMMODE1_DL"},
-	{"STUB_RX Mixer", "VoiceMMode2", "VOICEMMODE2_DL"},
-	{"STUB_RX", NULL, "STUB_RX Mixer"},
-
-	{"SLIMBUS_1_RX Mixer", "VoiceMMode1", "VOICEMMODE1_DL"},
-	{"SLIMBUS_1_RX Mixer", "VoiceMMode2", "VOICEMMODE2_DL"},
-	{"SLIMBUS_1_RX", NULL, "SLIMBUS_1_RX Mixer"},
-
-	{"SLIMBUS_3_RX_Voice Mixer", "VoiceMMode1", "VOICEMMODE1_DL"},
-	{"SLIMBUS_3_RX_Voice Mixer", "VoiceMMode2", "VOICEMMODE2_DL"},
-	{"SLIMBUS_3_RX", NULL, "SLIMBUS_3_RX_Voice Mixer"},
-};
-#endif
 
 static const struct snd_soc_dapm_route intercon[] = {
 	{"PRI_RX Audio Mixer", "MultiMedia1", "MM_DL1"},
@@ -21243,7 +21183,23 @@ static const struct snd_soc_dapm_route intercon[] = {
 	{"Voice2 Stub Tx Mixer", "QUAT_MI2S_TX", "QUAT_MI2S_TX"},
 	{"VOICE2_STUB_UL", NULL, "Voice2 Stub Tx Mixer"},
 
-#ifndef CONFIG_MACH_XIAOMI_LAND
+#ifdef CONFIG_MACH_XIAOMI_LAND
+	{"STUB_RX Mixer", "Voice Stub", "VOICE_STUB_DL"},
+	{"STUB_RX Mixer", "Voice2 Stub", "VOICE2_STUB_DL"},
+	{"STUB_RX Mixer", "VoLTE Stub", "VOLTE_STUB_DL"},
+	{"STUB_RX", NULL, "STUB_RX Mixer"},
+	{"SLIMBUS_1_RX Mixer", "Voice Stub", "VOICE_STUB_DL"},
+	{"SLIMBUS_1_RX Mixer", "Voice2 Stub", "VOICE2_STUB_DL"},
+	{"SLIMBUS_1_RX Mixer", "VoLTE Stub", "VOLTE_STUB_DL"},
+	{"SLIMBUS_1_RX", NULL, "SLIMBUS_1_RX Mixer"},
+	{"AFE_PCM_RX_Voice Mixer", "Voice Stub", "VOICE_STUB_DL"},
+	{"AFE_PCM_RX_Voice Mixer", "Voice2 Stub", "VOICE2_STUB_DL"},
+	{"AFE_PCM_RX_Voice Mixer", "VoLTE Stub", "VOLTE_STUB_DL"},
+	{"SLIMBUS_3_RX_Voice Mixer", "Voice Stub", "VOICE_STUB_DL"},
+	{"SLIMBUS_3_RX_Voice Mixer", "Voice2 Stub", "VOICE2_STUB_DL"},
+	{"SLIMBUS_3_RX_Voice Mixer", "VoLTE Stub", "VOLTE_STUB_DL"},
+	{"SLIMBUS_3_RX", NULL, "SLIMBUS_3_RX_Voice Mixer"},
+#else
 	{"STUB_RX Mixer", "VoiceMMode1", "VOICEMMODE1_DL"},
 	{"STUB_RX Mixer", "VoiceMMode2", "VOICEMMODE2_DL"},
 	{"STUB_RX", NULL, "STUB_RX Mixer"},
@@ -22162,27 +22118,8 @@ static int msm_routing_probe(struct snd_soc_platform *platform)
 {
 	snd_soc_dapm_new_controls(&platform->component.dapm, msm_qdsp6_widgets,
 			   ARRAY_SIZE(msm_qdsp6_widgets));
-
-#ifdef CONFIG_MACH_XIAOMI_LAND
-	if (xiaomi_device_read() == XIAOMI_DEVICE_LAND)
-		snd_soc_dapm_new_controls(&platform->component.dapm, old_msm_qdsp6_widgets,
-				ARRAY_SIZE(old_msm_qdsp6_widgets));
-	else
-		snd_soc_dapm_new_controls(&platform->component.dapm, normal_msm_qdsp6_widgets,
-				ARRAY_SIZE(normal_msm_qdsp6_widgets));
-#endif
-
 	snd_soc_dapm_add_routes(&platform->component.dapm, intercon,
 		ARRAY_SIZE(intercon));
-
-#ifdef CONFIG_MACH_XIAOMI_LAND
-	if (xiaomi_device_read() == XIAOMI_DEVICE_LAND)
-		snd_soc_dapm_add_routes(&platform->component.dapm, old_intercon,
-			ARRAY_SIZE(old_intercon));
-	else
-		snd_soc_dapm_add_routes(&platform->component.dapm, normal_intercon,
-			ARRAY_SIZE(normal_intercon));
-#endif
 
 	snd_soc_dapm_new_widgets(platform->component.dapm.card);
 

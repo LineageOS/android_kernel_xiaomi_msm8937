@@ -19,14 +19,9 @@
 #include "msm-pcm-routing-v2.h"
 #include "codecs/wcd9335.h"
 
-#ifdef CONFIG_MACH_XIAOMI
-#include <linux/xiaomi_device.h>
-extern int xiaomi_device_read(void);
-#endif
-
 #define DEV_NAME_STR_LEN            32
 
-#if 0
+#ifndef CONFIG_MACH_XIAOMI_LAND
 /* dummy definition of below deprecated FE DAI's*/
 enum {
 	MSM_FRONTEND_DAI_CS_VOICE = 39,
@@ -365,13 +360,11 @@ static struct snd_soc_dai_link msm8952_common_fe_dai[] = {
 		.ignore_pmdown_time = 1,
 		.id = MSM_FRONTEND_DAI_MULTIMEDIA2,
 	},
+#ifdef CONFIG_MACH_XIAOMI_LAND
 	{/* hw:x,2 */
 		.name = "Circuit-Switch Voice",
 		.stream_name = "CS-Voice",
-		.cpu_dai_name   = "VoiceMMode1",
-#ifdef CONFIG_MACH_XIAOMI_LAND
-		.old_cpu_dai_name   = "CS-VOICE",
-#endif
+		.cpu_dai_name   = "CS-VOICE",
 		.platform_name  = "msm-pcm-voice",
 		.dynamic = 1,
 		.dpcm_capture = 1,
@@ -386,6 +379,26 @@ static struct snd_soc_dai_link msm8952_common_fe_dai[] = {
 		.ignore_pmdown_time = 1,
 		.id = MSM_FRONTEND_DAI_CS_VOICE,
 	},
+#else
+	{/* hw:x,2 */
+		.name = "Circuit-Switch Voice",
+		.stream_name = "CS-Voice",
+		.cpu_dai_name   = "VoiceMMode1",
+		.platform_name  = "msm-pcm-voice",
+		.dynamic = 1,
+		.dpcm_capture = 1,
+		.dpcm_playback = 1,
+		.codec_dai_name = "snd-soc-dummy-dai",
+		.codec_name = "snd-soc-dummy",
+		.trigger = {SND_SOC_DPCM_TRIGGER_POST,
+			SND_SOC_DPCM_TRIGGER_POST},
+		.no_host_mode = SND_SOC_DAI_LINK_NO_HOST,
+		.ignore_suspend = 1,
+		/* this dai link has playback support */
+		.ignore_pmdown_time = 1,
+		.id = MSM_FRONTEND_DAI_CS_VOICE,
+	},
+#endif
 	{/* hw:x,3 */
 		.name = "MSM VoIP",
 		.stream_name = "VoIP",
@@ -541,13 +554,11 @@ static struct snd_soc_dai_link msm8952_common_fe_dai[] = {
 		.ignore_pmdown_time = 1,
 		.id = MSM_FRONTEND_DAI_MULTIMEDIA5,
 	},
+#ifdef CONFIG_MACH_XIAOMI_LAND
 	{/* hw:x,13 */
 		.name = "Voice2",
 		.stream_name = "Voice2",
-		.cpu_dai_name   = "VoiceMMode1",
-#ifdef CONFIG_MACH_XIAOMI_LAND
-		.old_cpu_dai_name   = "Voice2",
-#endif
+		.cpu_dai_name   = "Voice2",
 		.platform_name  = "msm-pcm-voice",
 		.dynamic = 1,
 		.dpcm_capture = 1,
@@ -562,6 +573,26 @@ static struct snd_soc_dai_link msm8952_common_fe_dai[] = {
 		.codec_name = "snd-soc-dummy",
 		.id = MSM_FRONTEND_DAI_VOICE2,
 	},
+#else
+	{/* hw:x,13 */
+		.name = "Voice2",
+		.stream_name = "Voice2",
+		.cpu_dai_name   = "VoiceMMode1",
+		.platform_name  = "msm-pcm-voice",
+		.dynamic = 1,
+		.dpcm_capture = 1,
+		.dpcm_playback = 1,
+		.trigger = {SND_SOC_DPCM_TRIGGER_POST,
+			    SND_SOC_DPCM_TRIGGER_POST},
+		.no_host_mode = SND_SOC_DAI_LINK_NO_HOST,
+		.ignore_suspend = 1,
+		/* this dai link has playback support */
+		.ignore_pmdown_time = 1,
+		.codec_dai_name = "snd-soc-dummy-dai",
+		.codec_name = "snd-soc-dummy",
+		.id = MSM_FRONTEND_DAI_VOICE2,
+	},
+#endif
 	{/* hw:x,14 */
 		.name = "MSM8952 Media9",
 		.stream_name = "MultiMedia9",
@@ -579,13 +610,47 @@ static struct snd_soc_dai_link msm8952_common_fe_dai[] = {
 		.ignore_pmdown_time = 1,
 		.id = MSM_FRONTEND_DAI_MULTIMEDIA9,
 	},
+#ifdef CONFIG_MACH_XIAOMI_LAND
+	{ /* hw:x,15 */
+		.name = "VoLTE",
+		.stream_name = "VoLTE",
+		.cpu_dai_name   = "VoLTE",
+		.platform_name  = "msm-pcm-voice",
+		.dynamic = 1,
+		.dpcm_capture = 1,
+		.dpcm_playback = 1,
+		.trigger = {SND_SOC_DPCM_TRIGGER_POST,
+			    SND_SOC_DPCM_TRIGGER_POST},
+		.no_host_mode = SND_SOC_DAI_LINK_NO_HOST,
+		.ignore_suspend = 1,
+		/* this dai link has playback support */
+		.ignore_pmdown_time = 1,
+		.codec_dai_name = "snd-soc-dummy-dai",
+		.codec_name = "snd-soc-dummy",
+		.id = MSM_FRONTEND_DAI_VOLTE,
+	},
+	{ /* hw:x,16 */
+		.name = "VoWLAN",
+		.stream_name = "VoWLAN",
+		.cpu_dai_name   = "VoWLAN",
+		.platform_name  = "msm-pcm-voice",
+		.dynamic = 1,
+		.dpcm_capture = 1,
+		.dpcm_playback = 1,
+		.trigger = {SND_SOC_DPCM_TRIGGER_POST,
+			    SND_SOC_DPCM_TRIGGER_POST},
+		.no_host_mode = SND_SOC_DAI_LINK_NO_HOST,
+		.ignore_suspend = 1,
+		.ignore_pmdown_time = 1,
+		.codec_dai_name = "snd-soc-dummy-dai",
+		.codec_name = "snd-soc-dummy",
+		.id = MSM_FRONTEND_DAI_VOWLAN,
+	},
+#else
 	{ /* hw:x,15 */
 		.name = "VoLTE",
 		.stream_name = "VoLTE",
 		.cpu_dai_name   = "VoiceMMode1",
-#ifdef CONFIG_MACH_XIAOMI_LAND
-		.old_cpu_dai_name   = "VoLTE",
-#endif
 		.platform_name  = "msm-pcm-voice",
 		.dynamic = 1,
 		.dpcm_capture = 1,
@@ -604,9 +669,6 @@ static struct snd_soc_dai_link msm8952_common_fe_dai[] = {
 		.name = "VoWLAN",
 		.stream_name = "VoWLAN",
 		.cpu_dai_name   = "VoiceMMode1",
-#ifdef CONFIG_MACH_XIAOMI_LAND
-		.old_cpu_dai_name   = "VoWLAN",
-#endif
 		.platform_name  = "msm-pcm-voice",
 		.dynamic = 1,
 		.dpcm_capture = 1,
@@ -620,6 +682,7 @@ static struct snd_soc_dai_link msm8952_common_fe_dai[] = {
 		.codec_name = "snd-soc-dummy",
 		.id = MSM_FRONTEND_DAI_VOWLAN,
 	},
+#endif
 	{/* hw:x,17 */
 		.name = "INT_HFP_BT Hostless",
 		.stream_name = "INT_HFP_BT Hostless",
@@ -1616,9 +1679,6 @@ struct snd_soc_card *populate_snd_card_dailinks(struct device *dev)
 		"msm8952-tashalite-snd-card",
 		"msm8953-tashalite-snd-card"
 	};
-#ifdef CONFIG_MACH_XIAOMI_LAND
-	int i;
-#endif
 
 	card->dev = dev;
 	ret = snd_soc_of_parse_card_name(card, "qcom,model");
@@ -1681,19 +1741,6 @@ struct snd_soc_card *populate_snd_card_dailinks(struct device *dev)
 	card->dai_link = msm8952_dai_links;
 	card->num_links = len5;
 	card->dev = dev;
-
-#ifdef CONFIG_MACH_XIAOMI_LAND
-	if (xiaomi_device_read() == XIAOMI_DEVICE_LAND) {
-		for (i = 0; i < card->num_links; i++) {
-			struct snd_soc_dai_link *link = &card->dai_link[i];
-			if (link->old_cpu_dai_name) {
-				pr_info("DAI LINK %s will use old cpu dai name: %s",link->name,link->old_cpu_dai_name);
-				link->cpu_dai_name = link->old_cpu_dai_name;
-			}
-		}
-	}
-#endif
-
 	return card;
 }
 
