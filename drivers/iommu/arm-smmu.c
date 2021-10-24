@@ -2466,7 +2466,8 @@ static void arm_smmu_free_asid(struct iommu_domain *domain)
 
 static int arm_smmu_init_domain_context(struct iommu_domain *domain,
 					struct arm_smmu_device *smmu,
-					struct device *dev)
+					struct device *dev,
+					bool try_64bit_fmt)
 {
 	int irq, start, ret = 0;
 	unsigned long ias, oas;
@@ -2546,7 +2547,8 @@ static int arm_smmu_init_domain_context(struct iommu_domain *domain,
 	if ((IS_ENABLED(CONFIG_64BIT) || cfg->fmt == ARM_SMMU_CTX_FMT_NONE) &&
 	    (smmu->features & (ARM_SMMU_FEAT_FMT_AARCH64_64K |
 			       ARM_SMMU_FEAT_FMT_AARCH64_16K |
-			       ARM_SMMU_FEAT_FMT_AARCH64_4K)))
+			       ARM_SMMU_FEAT_FMT_AARCH64_4K)) &&
+			       try_64bit_fmt)
 		cfg->fmt = ARM_SMMU_CTX_FMT_AARCH64;
 
 	if (cfg->fmt == ARM_SMMU_CTX_FMT_NONE) {
@@ -2662,6 +2664,20 @@ static int arm_smmu_init_domain_context(struct iommu_domain *domain,
 	}
 
 	smmu_domain->smmu = smmu;
+	if (!dynamic) {
+		ret = arm_smmu_set_pt_format(smmu_domain,
+				     &smmu_domain->pgtbl_cfg);
+		if (cfg->fmt == ARM_SMMU_CTX_FMT_AARCH64)
+			dev_info(smmu->dev, "AARCH64 is%s supported for %s\n", ret ? " not" : "", dev_name(dev));
+		if (ret) {
+			ret = arm_smmu_restore_sec_cfg(smmu, cfg->cbndx);
+			if (!ret)
+				/* Restore succeeded, we can try again with AARCH32 */
+				ret = -EAGAIN;
+			smmu_domain->smmu = NULL;
+			goto out_unlock;
+		}
+	}
 	smmu_domain->dev = dev;
 	pgtbl_ops = alloc_io_pgtable_ops(fmt, &smmu_domain->pgtbl_cfg,
 					smmu_domain);
@@ -2696,14 +2712,6 @@ static int arm_smmu_init_domain_context(struct iommu_domain *domain,
 					    smmu_domain->attributes);
 
 		arm_smmu_arch_init_context_bank(smmu_domain, dev);
-
-		/* for slave side secure, we may have to force the pagetable
-		 * format to V8L.
-		 */
-		ret = arm_smmu_set_pt_format(smmu_domain,
-					     &smmu_domain->pgtbl_cfg);
-		if (ret)
-			goto out_clear_smmu;
 
 		if (smmu->version < ARM_SMMU_V2) {
 			cfg->irptndx = atomic_inc_return(&smmu->irptndx);
@@ -3538,9 +3546,15 @@ static int arm_smmu_attach_dev(struct iommu_domain *domain, struct device *dev)
 		return ret;
 
 	/* Ensure that the domain is finalised */
-	ret = arm_smmu_init_domain_context(domain, smmu, dev);
-	if (ret < 0)
-		goto out_power_off;
+	ret = arm_smmu_init_domain_context(domain, smmu, dev, true);
+	if (ret < 0) {
+		if (ret != -EAGAIN)
+			goto out_power_off;
+
+		ret = arm_smmu_init_domain_context(domain, smmu, dev, false);
+		if (ret < 0)
+			goto out_power_off;
+	}
 
 	/* Do not modify the SIDs, HW is still running */
 	if (is_dynamic_domain(domain)) {
