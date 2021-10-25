@@ -45,7 +45,7 @@ static enum hrtimer_restart vibrator_timer_func(struct hrtimer *timer)
 {
 	struct vibrator_gpio_data *pdata =
 		container_of(timer, struct vibrator_gpio_data, vib_timer);
-	pr_debug("vibrator_timer_func pdata->gpio=%d\n",pdata->gpio);
+	pr_err("vibrator_timer_func pdata->gpio=%d\n",pdata->gpio);
 
 	gpio_direction_output(pdata->gpio, pdata->active_low ? 1 : 0);
 
@@ -79,7 +79,7 @@ static void vibrator_enable(struct timed_output_dev *dev, int value)
 
 	hrtimer_cancel(&pdata->vib_timer);
 	gpio_direction_output(pdata->gpio, pdata->active_low ? !value : !!value);
-	pr_debug("gpio_enable data->gpio=%d\n",pdata->gpio);
+	pr_err("gpio_enable data->gpio=%d\n",pdata->gpio);
 
 	if (value >= 0)
 	{
@@ -103,7 +103,7 @@ static int vibrator_parse_dt(struct device *dev,struct vibrator_gpio_data *pdata
 
 
 	pdata->gpio = of_get_named_gpio_flags(node,"qcom,vib-gpio_one",0, &temp_val);
-	pr_debug(" gpio=%d flag=%d\n",pdata->gpio,temp_val);
+	pr_err(" gpio=%d flag=%d\n",pdata->gpio,temp_val);
 	if (!gpio_is_valid(pdata->gpio)) {
 		dev_err(dev, "Failed to read vib-gpio_one\n");
 		return -EINVAL;
@@ -111,10 +111,10 @@ static int vibrator_parse_dt(struct device *dev,struct vibrator_gpio_data *pdata
 
 
 	if (NULL == (pdata->name = of_get_property(node, "label", NULL))) {
-		pr_debug("get label error\n");
+		pr_err("get label error\n");
 		return 1;
 	}
-	pr_debug("pdata-name=%s\n",pdata->name);
+	pr_err("pdata-name=%s\n",pdata->name);
 	rc = of_property_read_u32(node,"qcom,vibrator-timeout-ms", &pdata->timeout);
 
 	if (rc) {
@@ -130,7 +130,7 @@ static int vibrator_gpio_probe(struct platform_device *pdev)
 	struct vibrator_gpio_data *pdata;
 
 	int  ret;
-	pr_debug("vibrator gpio probe enter\n");
+	pr_err("vibrator gpio probe enter\n");
 
 	pdata =devm_kzalloc(&pdev->dev, sizeof(struct vibrator_gpio_data), GFP_KERNEL);
 	if (!pdata)
@@ -169,10 +169,10 @@ static int vibrator_gpio_probe(struct platform_device *pdev)
 	gpio_direction_output(pdata->gpio, 0);
 
 	platform_set_drvdata(pdev, pdata);
-	pr_debug("vibrator gpio probe success");
+	pr_err("vibrator gpio probe success");
 	return 0;
 err_out:
-	pr_debug("timed_gpio_probe Failed \n");
+	pr_err("timed_gpio_probe Failed \n");
 	timed_output_dev_unregister(&pdata->timed_dev);
 	kfree(pdata);
 	return ret;
