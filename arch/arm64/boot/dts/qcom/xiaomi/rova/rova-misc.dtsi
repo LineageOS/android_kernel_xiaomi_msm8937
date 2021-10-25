@@ -22,13 +22,11 @@
 };
 
 &soc {
-	gpio-vib {
-		compatible = "gpio-vibrator";
-		vibrator {
-			gpios = <&tlmm 97 0>;
-			label = "vibrator";
-			max_timeout = <50000>;
-		};
+	vibrator_gpio {
+		compatible = "qcom,vibrator-gpio";
+		qcom,vibrator-timeout-ms = <50000>;
+		qcom,vib-gpio_one = <&tlmm 97 0x00>;
+		label = "vibrator";
 	};
 };
 
