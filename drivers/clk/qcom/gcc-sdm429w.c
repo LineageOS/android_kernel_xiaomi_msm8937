@@ -4528,6 +4528,10 @@ static int gcc_sdm429w_probe(struct platform_device *pdev)
 		/* Configure Sleep and Wakeup cycles for GMEM clock */
 		regmap_update_bits(regmap, gcc_oxili_gmem_clk.clkr.enable_reg,
 				0xff0, 0xff0);
+	} else {
+		/* Configure Sleep and Wakeup cycles for OXILI clock */
+		regmap_update_bits(regmap, gcc_oxili_gfx3d_clk.clkr.enable_reg,
+				0xf0, 0xf0);
 	}
 
 	if (qm215 || msm8917) {
