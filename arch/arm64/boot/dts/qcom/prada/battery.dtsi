@@ -1,0 +1,37 @@
+&vendor {
+	mtp_batterydata: qcom,battery-data {
+		qcom,batt-id-range-pct = <15>;
+		#include "battery/coslight-4000mah.dtsi"
+		#include "battery/scud-4000mah.dtsi"
+	};
+};
+
+&qpnp_fg {
+	qcom,battery-data = <&mtp_batterydata>;
+};
+
+&qpnp_smbcharger {
+	qcom,battery-data = <&mtp_batterydata>;
+	qcom,chg-led-sw-controls;
+	dpdm-supply = <&usb_otg>;
+};
+
+&qpnp_fg {
+	qcom,resume-soc = <0x63>;
+	qcom,hold-soc-while-full;
+	qcom,warm-bat-decidegc = <0x1c2>;
+	qcom,cool-bat-decidegc = <0x64>;
+	qcom,hot-bat-decidegc = <0x258>;
+	qcom,cold-bat-decidegc = <0x0>;
+	qcom,fg-iterm-ma = <0xfa>;
+	qcom,fg-chg-iterm-ma = <0xc8>;
+	qcom,fg-vbat-estimate-diff-mv = <0xc8>;
+	qcom,fg-delta-soc = <0x1>;
+};
+
+&qpnp_smbcharger {
+	qcom,iterm-ma = <0xc8>;
+	qcom,float-voltage-mv = <0x1130>;
+	qcom,fastchg-current-comp = <0x4b0>;
+	qcom,float-voltage-comp = <0xb>;
+};

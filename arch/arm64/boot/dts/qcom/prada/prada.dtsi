@@ -1,0 +1,13 @@
+#include "camera-pinctrl.dtsi"
+#include "pinctrl.dtsi"
+
+#include "android.dtsi"
+#include "audio.dtsi"
+#include "battery.dtsi"
+#include "camera.dtsi"
+#include "display.dtsi"
+#include "fingerprint.dtsi"
+#include "misc.dtsi"
+#include "power.dtsi"
+#include "soc.dtsi"
+#include "touchscreen.dtsi"

@@ -1,0 +1,18 @@
+		qcom,scud-4000mah {
+			qcom,max-voltage-uv = <0x432380>;
+			qcom,nom-batt-capacity-mah = <0xfa0>;
+			qcom,v-cutoff-uv = <0x33e140>;
+			qcom,chg-term-ua = <0x186a0>;
+			qcom,batt-id-kohm = <0x32>;
+			qcom,battery-beta = <0xd6b>;
+			qcom,battery-type = "scud_4000mah";
+			qcom,chg-rslow-comp-c1 = <0x283f20>;
+			qcom,chg-rslow-comp-c2 = <0x2be6d3>;
+			qcom,chg-rs-to-rslow = <0x1bacdf>;
+			qcom,chg-rslow-comp-thr = <0x99>;
+			qcom,fastchg-current-ma = <0x7d0>;
+			qcom,fg-cc-cv-threshold-mv = <0x1126>;
+			qcom,checksum = <0xd1a3>;
+			qcom,gui-version = "PMI8950GUI - 2.0.0.15";
+			qcom,fg-profile-data = <0xb883e475 0x717a996d 0x6f830e7c 0x36905c97 0x282299a 0xa8bcb4c8 0x4c136383 0x773c6b71 0xe1483e83 0x9078c584 0xad7b5682 0x699dbb7 0x11c8710c 0x6c100453 0x1470eefc 0x723c4947 0x36430000 0x6b47153a 0xfd1e0000 0x0 0x0 0x90732772 0xed67e380 0x5e751e63 0x594b0c73 0x396fe651 0xcf6b4eb0 0x21b56a98 0x6ca0710c 0x2800ff36 0xf0113003 0xc>;
+		};

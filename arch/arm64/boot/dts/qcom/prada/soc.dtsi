@@ -1,0 +1,69 @@
+&other_ext_mem {
+	reg = <0x0 0x84F00000 0x0 0x1900000>;
+};
+
+&reserved_memory {
+	ramoops@ffc00000 {
+			compatible = "ramoops";
+			reg = <0 0xffc00000 0 0x400000>;
+			record-size = <0x200000>;
+			console-size = <0x200000>;
+	};
+
+	fih_removed_regions@0 {
+		compatible = "removed-dma-pool";
+		no-map;
+		reg = <0x0 0x91400000 0x0 0x200000>;
+		label = "fih_memory_hole";
+	};
+};
+
+&soc {
+	/delete-node/ qseecom@85b00000;
+
+	qcom_seecom: qseecom@84F00000 {
+		compatible = "qcom,qseecom";
+		reg = <0x84f00000 0x1400000>;
+		reg-names = "secapp-region";
+		qcom,hlos-num-ce-hw-instances = <1>;
+		qcom,hlos-ce-hw-instance = <0>;
+		qcom,qsee-ce-hw-instance = <0>;
+		qcom,disk-encrypt-pipe-pair = <2>;
+		qcom,support-fde;
+		qcom,appsbl-qseecom-support;
+		qcom,msm-bus,name = "qseecom-noc";
+		qcom,msm-bus,num-cases = <4>;
+		qcom,msm-bus,num-paths = <1>;
+		qcom,support-bus-scaling;
+		qcom,msm-bus,vectors-KBps =
+			<55 512 0 0>,
+			<55 512 0 0>,
+			<55 512 120000 1200000>,
+			<55 512 393600 3936000>;
+		clocks = <&clock_gcc clk_crypto_clk_src>,
+			 <&clock_gcc clk_gcc_crypto_clk>,
+			 <&clock_gcc clk_gcc_crypto_ahb_clk>,
+			 <&clock_gcc clk_gcc_crypto_axi_clk>;
+		clock-names = "core_clk_src", "core_clk",
+				"iface_clk", "bus_clk";
+		qcom,ce-opp-freq = <100000000>;
+	};
+};
+
+&soc {
+	sn_fuse: snfuse@0xa0128 {
+		compatible = "qcom,sn-fuse";
+		reg = <0xa4128 0x4>;
+		reg-names = "sn-base";
+	};
+};
+
+&soc {
+	restart@4ab000 {
+		qcom,force-warm-reboot;
+	};
+};
+
+&apps_iommu {
+	qcom,no-aarch64;
+};
