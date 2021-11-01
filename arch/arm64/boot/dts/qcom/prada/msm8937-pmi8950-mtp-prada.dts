@@ -13,7 +13,7 @@
 
 /dts-v1/;
 
-#include "msm8937.dtsi"
+#include "../msm8937.dtsi"
 #include "msm8937-pmi8950-mtp-prada.dtsi"
 
 / {

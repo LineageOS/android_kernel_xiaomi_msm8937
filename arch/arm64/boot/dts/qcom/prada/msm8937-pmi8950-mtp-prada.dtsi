@@ -11,8 +11,8 @@
  * GNU General Public License for more details.
  */
 
-#include "pmi8950.dtsi"
-#include "msm8937-mtp.dtsi"
+#include "../pmi8950.dtsi"
+#include "../msm8937-mtp.dtsi"
 #include "dsi-panel-prada.dtsi"
 
 #include "msm8937-camera-sensor-mtp-prada.dtsi"
