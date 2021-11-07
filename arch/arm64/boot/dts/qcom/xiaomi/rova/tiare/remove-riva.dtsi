@@ -4,10 +4,6 @@
 	};
 };
 
-&apps_iommu {
-	/delete-property/ qcom,no-aarch64;
-};
-
 &soc {
 	/delete-node/ snfuse@0xa0128;
 	/delete-node/ secbootfuse@0xa41d0;
