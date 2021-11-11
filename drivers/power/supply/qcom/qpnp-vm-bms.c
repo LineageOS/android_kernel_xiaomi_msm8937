@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-only
-/* Copyright (c) 2014-2016, 2018-2021, The Linux Foundation. All rights reserved.
+/*
+ * Copyright (c) 2014-2016, 2018-2021, The Linux Foundation. All rights reserved.
  */
+
 #define pr_fmt(fmt)	"VBMS: %s: " fmt, __func__
 
 #include <linux/module.h>
@@ -1411,6 +1413,8 @@ int32_t get_vbat_sns_comp_result(struct qpnp_bms_chip *chip,
 		return rc;
 	}
 
+	pr_debug("die-temp = %d\n", die_temp_result);
+
 	if (is_pon_ocv)
 		rc = get_ocv_comp(result, chip, die_temp_result);
 	else
@@ -2060,8 +2064,7 @@ static void btm_notify_vbat(enum qpnp_tm_state state, void *ctx)
 
 	rc = get_battery_voltage(chip, &vbat_uv);
 	if (rc) {
-		pr_err("error reading vbat_sns adc channel=%d, rc=%d\n",
-							VBAT_SNS, rc);
+		pr_err("error reading vbat_sns adc channel rc=%d\n", rc);
 		goto out;
 	}
 
@@ -4361,8 +4364,7 @@ static int qpnp_vm_bms_probe(struct platform_device *pdev)
 
 	rc = get_battery_voltage(chip, &vbatt);
 	if (rc) {
-		pr_err("error reading vbat_sns adc channel=%d, rc=%d\n",
-							VBAT_SNS, rc);
+		pr_err("error reading vbat_sns adc channel, rc=%d\n", rc);
 		goto fail_get_vtg;
 	}
 

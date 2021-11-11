@@ -1,6 +1,6 @@
-/* SPDX-License-Identifier: GPL-2.0 */
+/* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Copyright (c) 2012-2018, 2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012-2018, 2020-2021, The Linux Foundation. All rights reserved.
  */
 /*
  * Qualcomm Technologies Inc. PMIC QPNP ADC driver header file
@@ -114,165 +114,13 @@ enum qpnp_vadc_channels {
 	LR_MUX3_BUF_PU1_PU2_XO_THERM_BUF = 252,
 	ALL_OFF = 255,
 	ADC_MAX_NUM = 0xffff,
-
-	/* Channel listing for refreshed VADC in hex format */
-	VADC_VREF_GND = 0,
-	VADC_CALIB_VREF_1P25 = 1,
-	VADC_CALIB_VREF = 2,
-	VADC_CALIB_VREF_1_DIV_3 = 0x82,
-	VADC_VPH_PWR = 0x83,
-	VADC_VBAT_SNS = 0x84,
-	VADC_VCOIN = 0x85,
-	VADC_DIE_TEMP = 6,
-	VADC_CHG_TEMP = 7,
-	VADC_USB_IN_I_PM5 = 7,
-	VADC_USB_IN = 8,
-	VADC_USB_IN_V_DIV_16_PM5 = 8,
-	VADC_IREG_FB = 9,
-	VADC_CHG_TEMP_PM5 = 9,
-	/* External input connection */
-	VADC_BAT_THERM = 0xa,
-	VADC_BAT_ID = 0xb,
-	VADC_XO_THERM = 0xc,
-	VADC_AMUX_THM1 = 0xd,
-	VADC_AMUX_THM2 = 0xe,
-	VADC_AMUX_THM3 = 0xf,
-	VADC_AMUX_THM4 = 0x10,
-	VADC_AMUX_THM5 = 0x11,
-	VADC_AMUX1_GPIO = 0x12,
-	VADC_AMUX2_GPIO = 0x13,
-	VADC_AMUX3_GPIO = 0x14,
-	VADC_AMUX4_GPIO = 0x15,
-	VADC_AMUX5_GPIO = 0x16,
-	VADC_AMUX6_GPIO = 0x17,
-	VADC_AMUX7_GPIO = 0x18,
-	VADC_AMUX8_GPIO = 0x19,
-	VADC_ATEST1 = 0x1a,
-	VADC_ATEST2 = 0x1b,
-	VADC_ATEST3 = 0x1c,
-	VADC_ATEST4 = 0x1d,
-	VADC_MID_CHG_DIV_6 = 0x1e,
-	VADC_OFF = 0xff,
-	/* PU1 is 30K pull up */
-	VADC_BAT_THERM_PU1 = 0x2a,
-	VADC_BAT_ID_PU1 = 0x2b,
-	VADC_XO_THERM_PU1 = 0x2c,
-	VADC_AMUX_THM1_PU1 = 0x2d,
-	VADC_AMUX_THM2_PU1 = 0x2e,
-	VADC_AMUX_THM3_PU1 = 0x2f,
-	VADC_AMUX_THM4_PU1 = 0x30,
-	VADC_AMUX_THM5_PU1 = 0x31,
-	VADC_AMUX1_GPIO_PU1 = 0x32,
-	VADC_AMUX2_GPIO_PU1 = 0x33,
-	VADC_AMUX3_GPIO_PU1 = 0x34,
-	VADC_AMUX4_GPIO_PU1 = 0x35,
-	VADC_AMUX5_GPIO_PU1 = 0x36,
-	VADC_AMUX6_GPIO_PU1 = 0x37,
-	VADC_AMUX7_GPIO_PU1 = 0x38,
-	VADC_AMUX8_GPIO_PU1 = 0x39,
-	/* PU2 is 100K pull up */
-	VADC_BAT_THERM_PU2 = 0x4a,
-	VADC_BAT_ID_PU2 = 0x4b,
-	VADC_XO_THERM_PU2 = 0x4c,
-	VADC_AMUX_THM1_PU2 = 0x4d,
-	VADC_AMUX_THM2_PU2 = 0x4e,
-	VADC_AMUX_THM3_PU2 = 0x4f,
-	VADC_AMUX_THM4_PU2 = 0x50,
-	VADC_AMUX_THM5_PU2 = 0x51,
-	VADC_AMUX1_GPIO_PU2 = 0x52,
-	VADC_AMUX2_GPIO_PU2 = 0x53,
-	VADC_AMUX3_GPIO_PU2 = 0x54,
-	VADC_AMUX4_GPIO_PU2 = 0x55,
-	VADC_AMUX5_GPIO_PU2 = 0x56,
-	VADC_AMUX6_GPIO_PU2 = 0x57,
-	VADC_AMUX7_GPIO_PU2 = 0x58,
-	VADC_AMUX8_GPIO_PU2 = 0x59,
-	/* PU3 is 400K pull up */
-	VADC_BAT_THERM_PU3 = 0x6a,
-	VADC_BAT_ID_PU3 = 0x6b,
-	VADC_XO_THERM_PU3 = 0x6c,
-	VADC_AMUX_THM1_PU3 = 0x6d,
-	VADC_AMUX_THM2_PU3 = 0x6e,
-	VADC_AMUX_THM3_PU3 = 0x6f,
-	VADC_AMUX_THM4_PU3 = 0x70,
-	VADC_AMUX_THM5_PU3 = 0x71,
-	VADC_AMUX1_GPIO_PU3 = 0x72,
-	VADC_AMUX2_GPIO_PU3 = 0x73,
-	VADC_AMUX3_GPIO_PU3 = 0x74,
-	VADC_AMUX4_GPIO_PU3 = 0x75,
-	VADC_AMUX5_GPIO_PU3 = 0x76,
-	VADC_AMUX6_GPIO_PU3 = 0x77,
-	VADC_AMUX7_GPIO_PU3 = 0x78,
-	VADC_AMUX8_GPIO_PU3 = 0x79,
-	/* External input connection with 1/3 div */
-	VADC_AMUX1_GPIO_DIV_3 = 0x92,
-	VADC_AMUX2_GPIO_DIV_3 = 0x93,
-	VADC_AMUX3_GPIO_DIV_3 = 0x94,
-	VADC_AMUX4_GPIO_DIV_3 = 0x95,
-	VADC_AMUX5_GPIO_DIV_3 = 0x96,
-	VADC_AMUX6_GPIO_DIV_3 = 0x97,
-	VADC_AMUX7_GPIO_DIV_3 = 0x98,
-	VADC_AMUX8_GPIO_DIV_3 = 0x99,
-	VADC_ATEST1_DIV_3 = 0x9a,
-	VADC_ATEST2_DIV_3 = 0x9b,
-	VADC_ATEST3_DIV_3 = 0x9c,
-	VADC_ATEST4_DIV_3 = 0x9d,
-	VADC_REFRESH_MAX_NUM = 0xffff,
-	/*Current and synchronous channels*/
-	VADC_ISNS_INT_EXT_PM5 = 0xa1,
-	VADC_ISNS_PAR_PM5 = 0xa5,
-	VADC_V_I_INT_EXT_VDATA_PM5 = 0xb0,
-	VADC_V_I_INT_EXT_IDATA_PM5 = 0xb1,
-	VADC_V_I_PAR_VDATA_PM5 = 0xb4,
-	VADC_V_I_PAR_IDATA_PM5 = 0xb5,
 };
 
-/**
- * enum qpnp_iadc_channels - QPNP IADC channel list
- */
-enum qpnp_iadc_channels {
-	INTERNAL_RSENSE = 0,
-	EXTERNAL_RSENSE,
-	ALT_LEAD_PAIR,
-	GAIN_CALIBRATION_17P857MV,
-	OFFSET_CALIBRATION_SHORT_CADC_LEADS,
-	OFFSET_CALIBRATION_CSP_CSN,
-	OFFSET_CALIBRATION_CSP2_CSN2,
-	IADC_MUX_NUM,
-};
-
-#define QPNP_ADC_625_UV	625000
-#define QPNP_ADC_HWMON_NAME_LENGTH				64
-#define QPNP_MAX_PROP_NAME_LEN					32
-#define QPNP_THERMALNODE_NAME_LENGTH                            25
-#define QPNP_ADC_1P25_UV					1250000
-
-/* Structure device for qpnp vadc */
-struct qpnp_vadc_chip;
-
-/* Structure device for qpnp iadc */
-struct qpnp_iadc_chip;
+#define QPNP_ADC_625_UV		625000
+#define QPNP_MAX_PROP_NAME_LEN	32
 
 /* Structure device for qpnp adc tm */
 struct qpnp_adc_tm_chip;
-
-/**
- * enum qpnp_adc_clk_type - Clock rate supported.
- * %CLK_TYPE1: 2P4MHZ
- * %CLK_TYPE2: 4P8MHZ
- * %CLK_TYPE3: 9P6MHZ
- * %CLK_TYPE4: 19P2MHZ
- * %CLK_NONE: Do not use this Clk type.
- *
- * The Clock rate is specific to each channel of the QPNP ADC arbiter.
- */
-enum qpnp_adc_clk_type {
-	CLK_TYPE1 = 0,
-	CLK_TYPE2,
-	CLK_TYPE3,
-	CLK_TYPE4,
-	CLK_NONE,
-};
 
 /**
  * enum qpnp_adc_decimation_type - Sampling rate supported.
@@ -290,11 +138,6 @@ enum qpnp_adc_decimation_type {
 	DECIMATION_TYPE3,
 	DECIMATION_TYPE4,
 	DECIMATION_NONE = 0xff,
-
-	ADC_HC_DEC_RATIO_256 = 0,
-	ADC_HC_DEC_RATIO_512 = 1,
-	ADC_HC_DEC_RATIO_1024 = 2,
-	ADC_HC_DEC_RATIO_NONE = 0xff,
 };
 
 /**
@@ -306,16 +149,6 @@ enum qpnp_adc_decimation_type {
  * enum qpnp_adc_cal_sel - Selects the calibration type that is applied
  *			   on the corresponding channel measurement after
  *			   the ADC data is read.
- * %ADC_HC_NO_CAL :	To obtain raw, uncalibrated data on qpnp-vadc-hc type.
- * %ADC_HC_RATIO_CAL :	Applies ratiometric calibration. Note the calibration
- *			values stored in the CAL peripheral for VADC_VREF and
- *			VREF_1P25 already have GND_REF value removed. Used
- *			only with qpnp-vadc-hc type of VADC.
- * %ADC_HC_ABS_CAL :	Applies absolute calibration. Note the calibration
- *			values stored in the CAL peripheral for VADC_VREF and
- *			VREF_1P25 already have GND_REF value removed. Used
- *			only with qpnp-vadc-hc type of VADC.
- *
  * Use the input reference voltage depending on the calibration type
  * to calcluate the offset and gain parameters. The calibration is
  * specific to each channel of the QPNP ADC.
@@ -324,11 +157,6 @@ enum qpnp_adc_calib_type {
 	CALIB_ABSOLUTE = 0,
 	CALIB_RATIOMETRIC,
 	CALIB_NONE,
-
-	ADC_HC_NO_CAL = 0,
-	ADC_HC_RATIO_CAL = 1,
-	ADC_HC_ABS_CAL = 2,
-	ADC_HC_CAL_SEL_NONE,
 };
 
 /**
@@ -361,79 +189,6 @@ enum qpnp_adc_channel_scaling_param {
 };
 
 /**
- * enum qpnp_adc_scale_fn_type - Scaling function for pm8941 pre calibrated
- *				   digital data relative to ADC reference.
- * %SCALE_DEFAULT: Default scaling to convert raw adc code to voltage (uV).
- * %SCALE_BATT_THERM: Conversion to temperature(decidegC) based on btm
- *			parameters.
- * %SCALE_THERM_100K_PULLUP: Returns temperature in degC.
- *				 Uses a mapping table with 100K pullup.
- * %SCALE_PMIC_THERM: Returns result in milli degree's Centigrade.
- * %SCALE_XOTHERM: Returns XO thermistor voltage in degree's Centigrade.
- * %SCALE_THERM_150K_PULLUP: Returns temperature in degC.
- *				 Uses a mapping table with 150K pullup.
- * %SCALE_QRD_BATT_THERM: Conversion to temperature(decidegC) based on
- *			btm parameters.
- * %SCALE_QRD_SKUAA_BATT_THERM: Conversion to temperature(decidegC) based on
- *          btm parameters for SKUAA.
- * %SCALE_SMB_BATT_THERM: Conversion to temperature(decidegC) based on
- *          btm parameters for SMB.
- * %SCALE_QRD_SKUG_BATT_THERM: Conversion to temperature(decidegC) based on
- *          btm parameters for SKUG.
- * %SCALE_QRD_SKUH_BATT_THERM: Conversion to temperature(decidegC) based on
- *          btm parameters for SKUH
- * %SCALE_QRD_SKUT1_BATT_THERM: Conversion to temperature(decidegC) based on
- *          btm parameters for SKUT1
- * %SCALE_QRD_SKUE_BATT_THERM: Conversion to temperature(decidegC) based on
- *          btm parameters for SKUE
- * %SCALE_PMI_CHG_TEMP: Conversion for PMI CHG temp
- * %SCALE_BATT_THERM_TEMP: Conversion to temperature(decidegC) based on btm
- *			parameters.
- * %SCALE_CHRG_TEMP: Conversion for charger temp.
- * %SCALE_DIE_TEMP: Conversion for die temp.
- * %SCALE_I_DEFAULT: Default scaling to convert raw adc code to current (uA).
- * %SCALE_USBIN_I: Conversion for USB input current.
- * %SCALE_BATT_THERM_TEMP_QRD: Conversion to temperature(decidegC) based on btm
- *			parameters for QRD.
- * %SCALE_BATT_THERM_TEMP_PU30: Conversion to temperature(decidegC) for 30k
- * pullup.
- * %SCALE_BATT_THERM_TEMP_PU400: Conversion to temperature(decidegC) for 400k
- * pullup.
- * %SCALE_SMB1390_DIE_TEMP: Conversion for SMB1390 die temp
- * %SCALE_BATT_THERM_TEMP_QRD_215: Conversion to temperature(decidegC) based on
- *			btm parameters for QRD.
- * %SCALE_NONE: Do not use this scaling type.
- */
-enum qpnp_adc_scale_fn_type {
-	SCALE_DEFAULT = 0,
-	SCALE_BATT_THERM,
-	SCALE_THERM_100K_PULLUP,
-	SCALE_PMIC_THERM,
-	SCALE_XOTHERM,
-	SCALE_THERM_150K_PULLUP,
-	SCALE_QRD_BATT_THERM,
-	SCALE_QRD_SKUAA_BATT_THERM,
-	SCALE_SMB_BATT_THERM,
-	SCALE_QRD_SKUG_BATT_THERM,
-	SCALE_QRD_SKUH_BATT_THERM,
-	SCALE_NCP_03WF683_THERM,
-	SCALE_QRD_SKUT1_BATT_THERM,
-	SCALE_QRD_SKUE_BATT_THERM,
-	SCALE_PMI_CHG_TEMP = 16,
-	SCALE_BATT_THERM_TEMP,
-	SCALE_CHRG_TEMP,
-	SCALE_DIE_TEMP,
-	SCALE_I_DEFAULT,
-	SCALE_USBIN_I,
-	SCALE_BATT_THERM_TEMP_QRD,
-	SCALE_SMB1390_DIE_TEMP,
-	SCALE_BATT_THERM_TEMP_PU30,
-	SCALE_BATT_THERM_TEMP_PU400,
-	SCALE_BATT_THERM_TEMP_QRD_215,
-	SCALE_NONE,
-};
-
-/**
  * enum qpnp_adc_tm_rscale_fn_type - Scaling function used to convert the
  *	channels input voltage/temperature to corresponding ADC code that is
  *	applied for thresholds. Check the corresponding channels scaling to
@@ -455,19 +210,6 @@ enum qpnp_adc_tm_rscale_fn_type {
 	SCALE_QRD_SKUT1_RBATT_THERM,
 	SCALE_QRD_215_RBATT_THERM,
 	SCALE_RSCALE_NONE,
-};
-
-/**
- * enum qpnp_vadc_rscale_fn_type - Scaling function used to convert the
- *	channels input voltage/temperature to corresponding ADC code that is
- *	applied for thresholds. Check the corresponding channels scaling to
- *	determine the appropriate temperature/voltage units that are passed
- *	to the scaling function. The order below should match the one in the
- *	driver for qpnp_adc_scale_fn[].
- */
-enum qpnp_vadc_rscale_fn_type {
-	SCALE_RVADC_ABSOLUTE = 0,
-	SCALE_RVADC_SCALE_NONE,
 };
 
 /**
@@ -554,35 +296,6 @@ enum qpnp_vadc_dec_ratio_sel {
 };
 
 /**
- * enum qpnp_adc_cal_sel - Selects the calibration type that is applied
- *			   on the corresponding channel measurement after
- *			   the ADC data is read.
- * %ADC_NO_CAL :	To obtain raw, uncalibrated data.
- * %ADC_RATIO_CAL :	Applies ratiometric calibration. Note the calibration
- *			values stored in the CAL peripheral for VADC_VREF and
- *			VREF_1P25 already have GND_REF value removed.
- * %ADC_ABS_CAL :	Applies absolute calibration. Note the calibration
- *			values stored in the CAL peripheral for VADC_VREF and
- *			VREF_1P25 already have GND_REF value removed.
- */
-
-/**
- * enum qpnp_adc_cal_val - Selects if the calibration values applied
- *			    are the ones when collected on a timer interval
- *			    or if an immediate calibration needs to be forced.
- * %ADC_TIMER_CAL : Uses calibration value collected on the timer interval.
- * %ADC_NEW_CAL : Forces an immediate calibration. Use only when necessary
- *		  since it forces 3 calibration measurements in addition to
- *		  the channel measurement. For most measurement, using
- *		  calibration based on the timer interval is sufficient.
- */
-enum qpnp_adc_cal_val {
-	ADC_TIMER_CAL = 0,
-	ADC_NEW_CAL,
-	ADC_CAL_VAL_NONE,
-};
-
-/**
  * enum qpnp_vadc_mode_sel - Selects the basic mode of operation.
  *		- The normal mode is used for single measurement.
  *		- The Conversion sequencer is used to trigger an
@@ -603,95 +316,6 @@ enum qpnp_vadc_mode_sel {
 	ADC_OP_CONVERSION_SEQUENCER,
 	ADC_OP_MEASUREMENT_INTERVAL,
 	ADC_OP_MODE_NONE,
-};
-
-/**
- * enum qpnp_vadc_trigger - Select the HW trigger to be used while
- *		measuring the ADC reading.
- * %ADC_GSM_PA_ON : GSM power amplifier on.
- * %ADC_TX_GTR_THRES : Transmit power greater than threshold.
- * %ADC_CAMERA_FLASH_RAMP : Flash ramp up done.
- * %ADC_DTEST : DTEST.
- */
-enum qpnp_vadc_trigger {
-	ADC_GSM_PA_ON = 0,
-	ADC_TX_GTR_THRES,
-	ADC_CAMERA_FLASH_RAMP,
-	ADC_DTEST,
-	ADC_SEQ_NONE,
-};
-
-/**
- * enum qpnp_vadc_conv_seq_timeout - Select delay (0 to 15ms) from
- *		conversion request to triggering conversion sequencer
- *		hold off time.
- */
-enum qpnp_vadc_conv_seq_timeout {
-	ADC_CONV_SEQ_TIMEOUT_0MS = 0,
-	ADC_CONV_SEQ_TIMEOUT_1MS,
-	ADC_CONV_SEQ_TIMEOUT_2MS,
-	ADC_CONV_SEQ_TIMEOUT_3MS,
-	ADC_CONV_SEQ_TIMEOUT_4MS,
-	ADC_CONV_SEQ_TIMEOUT_5MS,
-	ADC_CONV_SEQ_TIMEOUT_6MS,
-	ADC_CONV_SEQ_TIMEOUT_7MS,
-	ADC_CONV_SEQ_TIMEOUT_8MS,
-	ADC_CONV_SEQ_TIMEOUT_9MS,
-	ADC_CONV_SEQ_TIMEOUT_10MS,
-	ADC_CONV_SEQ_TIMEOUT_11MS,
-	ADC_CONV_SEQ_TIMEOUT_12MS,
-	ADC_CONV_SEQ_TIMEOUT_13MS,
-	ADC_CONV_SEQ_TIMEOUT_14MS,
-	ADC_CONV_SEQ_TIMEOUT_15MS,
-	ADC_CONV_SEQ_TIMEOUT_NONE,
-};
-
-/**
- * enum qpnp_adc_conv_seq_holdoff - Select delay from conversion
- *		trigger signal (i.e. adc_conv_seq_trig) transition
- *		to ADC enable. Delay = 25us * (value + 1).
- */
-enum qpnp_adc_conv_seq_holdoff {
-	ADC_SEQ_HOLD_25US = 0,
-	ADC_SEQ_HOLD_50US,
-	ADC_SEQ_HOLD_75US,
-	ADC_SEQ_HOLD_100US,
-	ADC_SEQ_HOLD_125US,
-	ADC_SEQ_HOLD_150US,
-	ADC_SEQ_HOLD_175US,
-	ADC_SEQ_HOLD_200US,
-	ADC_SEQ_HOLD_225US,
-	ADC_SEQ_HOLD_250US,
-	ADC_SEQ_HOLD_275US,
-	ADC_SEQ_HOLD_300US,
-	ADC_SEQ_HOLD_325US,
-	ADC_SEQ_HOLD_350US,
-	ADC_SEQ_HOLD_375US,
-	ADC_SEQ_HOLD_400US,
-	ADC_SEQ_HOLD_NONE,
-};
-
-/**
- * enum qpnp_adc_conv_seq_state - Conversion sequencer operating state
- * %ADC_CONV_SEQ_IDLE : Sequencer is in idle.
- * %ADC_CONV_TRIG_RISE : Waiting for rising edge trigger.
- * %ADC_CONV_TRIG_HOLDOFF : Waiting for rising trigger hold off time.
- * %ADC_CONV_MEAS_RISE : Measuring selected ADC signal.
- * %ADC_CONV_TRIG_FALL : Waiting for falling trigger edge.
- * %ADC_CONV_FALL_HOLDOFF : Waiting for falling trigger hold off time.
- * %ADC_CONV_MEAS_FALL : Measuring selected ADC signal.
- * %ADC_CONV_ERROR : Aberrant Hardware problem.
- */
-enum qpnp_adc_conv_seq_state {
-	ADC_CONV_SEQ_IDLE = 0,
-	ADC_CONV_TRIG_RISE,
-	ADC_CONV_TRIG_HOLDOFF,
-	ADC_CONV_MEAS_RISE,
-	ADC_CONV_TRIG_FALL,
-	ADC_CONV_FALL_HOLDOFF,
-	ADC_CONV_MEAS_FALL,
-	ADC_CONV_ERROR,
-	ADC_CONV_NONE,
 };
 
 /**
@@ -838,19 +462,6 @@ enum qpnp_adc_meas_timer_select {
 };
 
 /**
- * enum qpnp_adc_meas_interval_op_ctl - Select operating mode.
- * %ADC_MEAS_INTERVAL_OP_SINGLE : Conduct single measurement at specified time
- *			delay.
- * %ADC_MEAS_INTERVAL_OP_CONTINUOUS : Make measurements at measurement interval
- *			times.
- */
-enum qpnp_adc_meas_interval_op_ctl {
-	ADC_MEAS_INTERVAL_OP_SINGLE = 0,
-	ADC_MEAS_INTERVAL_OP_CONTINUOUS,
-	ADC_MEAS_INTERVAL_OP_NONE,
-};
-
-/**
  * Channel selection registers for each of the configurable measurements
  * Channels allotment is set at device config for a channel.
  * The USB_ID, BATT_THERM, PMIC_THERM and VBAT channels are used by the
@@ -882,13 +493,6 @@ enum qpnp_adc_tm_channel_num {
 	QPNP_ADC_TM_CHAN6,
 	QPNP_ADC_TM_CHAN7,
 	QPNP_ADC_TM_CHAN_NONE
-};
-
-enum qpnp_comp_scheme_type {
-	COMP_ID_GF = 0,
-	COMP_ID_SMIC,
-	COMP_ID_TSMC,
-	COMP_ID_NUM,
 };
 
 /**
@@ -985,7 +589,6 @@ enum qpnp_state_request {
  * @low_temp: Low temperature threshold for which notification is requested.
  * @high_thr_voltage: High voltage for which notification is requested.
  * @low_thr_voltage: Low voltage for which notification is requested.
- * @adc_tm_hc: Represents the refreshed BTM register design.
  * @state_request: Enable/disable the corresponding high and low temperature
  *		thresholds.
  * @timer_interval1: Select polling rate from qpnp_adc_meas_timer_1 type.
@@ -1009,7 +612,6 @@ struct qpnp_adc_tm_btm_param {
 	int32_t					low_thr;
 	int32_t					gain_num;
 	int32_t					gain_den;
-	bool					adc_tm_hc;
 	enum qpnp_vadc_channels			channel;
 	enum qpnp_state_request			state_request;
 	enum qpnp_adc_meas_timer_1		timer_interval;
@@ -1063,15 +665,11 @@ struct qpnp_vadc_scaling_ratio {
  * @adc_reference: Reference voltage for QPNP ADC.
  * @full_scale_code: Full scale value with intrinsic offset removed.
  * @biploar: Polarity for QPNP ADC.
- * @adc_hc: Represents using HC variant of the ADC controller.
- * @is_pmic_5: To check if PMIC5 is used.
  */
 struct qpnp_adc_properties {
 	uint32_t	adc_vdd_reference;
 	uint32_t	full_scale_code;
 	bool		bipolar;
-	bool		adc_hc;
-	bool		is_pmic_5;
 };
 
 /**
@@ -1102,29 +700,7 @@ struct qpnp_vadc_chan_properties {
 	enum qpnp_adc_tm_channel_select		tm_channel_select;
 	enum qpnp_state_request			state_request;
 	enum qpnp_adc_calib_type		calib_type;
-	struct qpnp_vadc_linear_graph	adc_graph[ADC_HC_CAL_SEL_NONE];
-};
-
-/**
- * struct qpnp_vadc_result - Represent the result of the QPNP ADC.
- * @chan: The channel number of the requested conversion.
- * @adc_code: The pre-calibrated digital output of a given ADC relative to the
- *	      the ADC reference.
- * @measurement: In units specific for a given ADC; most ADC uses reference
- *		 voltage but some ADC uses reference current. This measurement
- *		 here is a number relative to a reference of a given ADC.
- * @physical: The data meaningful for each individual channel whether it is
- *	      voltage, current, temperature, etc.
- *	      All voltage units are represented in micro - volts.
- *	      -Battery temperature units are represented as 0.1 DegC.
- *	      -PA Therm temperature units are represented as DegC.
- *	      -PMIC Die temperature units are represented as 0.001 DegC.
- */
-struct qpnp_vadc_result {
-	uint32_t	chan;
-	int32_t		adc_code;
-	int64_t		measurement;
-	int64_t		physical;
+	struct qpnp_vadc_linear_graph		adc_graph[CALIB_NONE];
 };
 
 /**
@@ -1142,11 +718,10 @@ struct qpnp_adc_amux {
 	enum qpnp_vadc_channels			channel_num;
 	enum qpnp_adc_channel_scaling_param	chan_path_prescaling;
 	enum qpnp_adc_decimation_type		adc_decimation;
-	enum qpnp_adc_scale_fn_type		adc_scale_fn;
+	enum qpnp_adc_tm_rscale_fn_type		adc_scale_fn;
 	enum qpnp_adc_fast_avg_ctl		fast_avg_setup;
 	enum qpnp_adc_hw_settle_time		hw_settle_time;
 	enum qpnp_adc_calib_type		calib_type;
-	enum qpnp_adc_cal_val			cal_val;
 };
 
 /**
@@ -1163,76 +738,6 @@ static const struct qpnp_vadc_scaling_ratio qpnp_vadc_amux_scaling_ratio[] = {
 	{10, 81},
 	{1, 10},
 	{1, 16}
-};
-
-/**
- * struct qpnp_vadc_scale_fn - Scaling function prototype
- * @chan: Function pointer to one of the scaling functions
- *	which takes the adc properties, channel properties,
- *	and returns the physical result
- */
-struct qpnp_vadc_scale_fn {
-	int32_t (*chan)(struct qpnp_vadc_chip *vadc, int32_t adc_code,
-		const struct qpnp_adc_properties *adc_properties,
-		const struct qpnp_vadc_chan_properties *chan_properties,
-		struct qpnp_vadc_result *adc_chan_result);
-};
-
-/**
- * struct qpnp_adc_tm_reverse_scale_fn - Reverse scaling prototype
- * @chan: Function pointer to one of the scaling functions
- *	which takes the adc properties, channel properties,
- *	and returns the physical result
- */
-struct qpnp_adc_tm_reverse_scale_fn {
-	int32_t (*chan)(struct qpnp_vadc_chip *chip,
-		struct qpnp_adc_tm_btm_param *param,
-		uint32_t *low_threshold, uint32_t *high_threshold);
-};
-
-/**
- * struct qpnp_vadc_rscale_fn - Scaling function prototype
- * @chan: Function pointer to one of the scaling functions
- *	which takes the adc properties, channel properties,
- *	and returns the physical result
- */
-struct qpnp_vadc_rscale_fn {
-	int32_t (*chan)(struct qpnp_vadc_chip *chip,
-		const struct qpnp_vadc_chan_properties *chan_prop,
-		struct qpnp_adc_tm_btm_param *param,
-		uint32_t *low_threshold, uint32_t *high_threshold);
-};
-
-/**
- * struct qpnp_iadc_calib - IADC channel calibration structure.
- * @channel - Channel for which the historical offset and gain is
- *	      calculated. Available channels are internal rsense,
- *	      external rsense and alternate lead pairs.
- * @offset_raw - raw Offset value for the channel.
- * @gain_raw - raw Gain of the channel.
- * @ideal_offset_uv - ideal offset value for the channel.
- * @ideal_gain_nv - ideal gain for the channel.
- * @offset_uv - converted value of offset in uV.
- * @gain_uv - converted value of gain in uV.
- */
-struct qpnp_iadc_calib {
-	enum qpnp_iadc_channels		channel;
-	uint16_t			offset_raw;
-	uint16_t			gain_raw;
-	uint32_t			ideal_offset_uv;
-	uint32_t			ideal_gain_nv;
-	uint32_t			offset_uv;
-	uint32_t			gain_uv;
-};
-
-/**
- * struct qpnp_iadc_result - IADC read result structure.
- * @oresult_uv - Result of ADC in uV.
- * @result_ua - Result of ADC in uA.
- */
-struct qpnp_iadc_result {
-	int32_t				result_uv;
-	int32_t				result_ua;
 };
 
 /**
@@ -1256,7 +761,6 @@ struct qpnp_iadc_result {
 struct qpnp_adc_drv {
 	struct platform_device		*pdev;
 	struct regmap			*regmap;
-	uint8_t				slave;
 	uint16_t			offset;
 	struct qpnp_adc_properties	*adc_prop;
 	struct qpnp_adc_amux_properties	*amux_prop;
@@ -1267,11 +771,6 @@ struct qpnp_adc_drv {
 	int				adc_high_thr_irq;
 	int				adc_low_thr_irq;
 	struct mutex			adc_lock;
-	struct completion		adc_rslt_completion;
-	struct qpnp_iadc_calib		calib;
-	struct regulator		*hkadc_ldo;
-	struct regulator		*hkadc_ldo_ok;
-	bool				adc_hc;
 };
 
 /**
@@ -1283,7 +782,6 @@ struct qpnp_adc_drv {
  *			start of conversion.
  * @fast_avg_setup - Ability to provide single result from the ADC
  *			that is an average of multiple measurements.
- * @trigger_channel - HW trigger channel for conversion sequencer.
  * @calib_type - Used to store the calibration type for the channel
  *		 absolute/ratiometric.
  * @cal_val - Used to determine if fresh calibration value or timer
@@ -1296,9 +794,7 @@ struct qpnp_adc_amux_properties {
 	uint32_t				mode_sel;
 	uint32_t				hw_settle_time;
 	uint32_t				fast_avg_setup;
-	enum qpnp_vadc_trigger			trigger_channel;
 	enum qpnp_adc_calib_type		calib_type;
-	enum qpnp_adc_cal_val			cal_val;
 	struct qpnp_vadc_chan_properties	chan_prop[0];
 };
 
@@ -1319,613 +815,28 @@ struct qpnp_adc_amux_properties {
 #define QPNP_REV_ID_8909_1_1	14
 #define QPNP_REV_ID_PM8950_1_0	16
 
+
+struct qpnp_adc_tm_reverse_scale_fn {
+	int32_t (*chan)(struct qpnp_adc_drv *adc,
+		struct qpnp_adc_tm_btm_param *param,
+		uint32_t *low_threshold, uint32_t *high_threshold);
+};
+
 /* Public API */
-#if defined(CONFIG_SENSORS_QPNP_ADC_VOLTAGE)				\
-			|| defined(CONFIG_SENSORS_QPNP_ADC_VOLTAGE_MODULE)
-/**
- * qpnp_vadc_read() - Performs ADC read on the channel.
- * @dev:	Structure device for qpnp vadc
- * @channel:	Input channel to perform the ADC read.
- * @result:	Structure pointer of type adc_chan_result
- *		in which the ADC read results are stored.
- */
-int32_t qpnp_vadc_read(struct qpnp_vadc_chip *dev,
-				enum qpnp_vadc_channels channel,
-				struct qpnp_vadc_result *result);
-
-/**
- * qpnp_vadc_hc_read() - Performs ADC read on the channel.
- *		It uses the refreshed VADC design from qpnp-vadc-hc.
- * @dev:	Structure device for qpnp vadc
- * @channel:	Input channel to perform the ADC read.
- * @result:	Structure pointer of type adc_chan_result
- *		in which the ADC read results are stored.
- */
-int32_t qpnp_vadc_hc_read(struct qpnp_vadc_chip *dev,
-				enum qpnp_vadc_channels channel,
-				struct qpnp_vadc_result *result);
-
-/**
- * qpnp_vadc_conv_seq_request() - Performs ADC read on the conversion
- *				sequencer channel.
- * @dev:	Structure device for qpnp vadc
- * @channel:	Input channel to perform the ADC read.
- * @result:	Structure pointer of type adc_chan_result
- *		in which the ADC read results are stored.
- */
-int32_t qpnp_vadc_conv_seq_request(struct qpnp_vadc_chip *dev,
-			enum qpnp_vadc_trigger trigger_channel,
-			enum qpnp_vadc_channels channel,
-			struct qpnp_vadc_result *result);
-
 /**
  * qpnp_adc_get_devicetree_data() - Abstracts the ADC devicetree data.
- * @spmi:	spmi ADC device.
- * @adc_qpnp:	spmi device tree node structure
+ * @pdev:	Platform device structure.
+ * @adc_qpnp:	QPNP ADC device structure.
  */
 int32_t qpnp_adc_get_devicetree_data(struct platform_device *pdev,
 					struct qpnp_adc_drv *adc_qpnp);
 
 /**
- * qpnp_adc_scale_default() - Scales the pre-calibrated digital output
- *		of an ADC to the ADC reference and compensates for the
- *		gain and offset.
- * @dev:	Structure device for qpnp vadc
- * @adc_code:	pre-calibrated digital output of the ADC.
- * @adc_prop:	adc properties of the qpnp adc such as bit resolution,
- *		reference voltage.
- * @chan_prop:	Individual channel properties to compensate the i/p scaling,
- *		slope and offset.
- * @chan_rslt:	Physical result to be stored.
- */
-int32_t qpnp_adc_scale_default(struct qpnp_vadc_chip *dev,
-			int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt);
-/**
- * qpnp_iadc_scale_default() - Scales the pre-calibrated digital output
- *		of current ADC to the ADC reference and compensates for the
- *		gain and offset.
- * @dev:	Structure device for qpnp vadc
- * @adc_code:	pre-calibrated digital output of the ADC.
- * @adc_prop:	adc properties of the qpnp adc such as bit resolution,
- *		reference voltage.
- * @chan_prop:	Individual channel properties to compensate the i/p scaling,
- *		slope and offset.
- * @chan_rslt:	Physical result to be stored.
- */
-int32_t qpnp_iadc_scale_default(struct qpnp_vadc_chip *dev,
-			int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt);
-/**
- * qpnp_adc_scale_pmic_therm() - Scales the pre-calibrated digital output
- *		of an ADC to the ADC reference and compensates for the
- *		gain and offset. Performs the AMUX out as 2mV/K and returns
- *		the temperature in milli degC.
- * @dev:	Structure device for qpnp vadc
- * @adc_code:	pre-calibrated digital output of the ADC.
- * @adc_prop:	adc properties of the qpnp adc such as bit resolution,
- *		reference voltage.
- * @chan_prop:	Individual channel properties to compensate the i/p scaling,
- *		slope and offset.
- * @chan_rslt:	Physical result to be stored.
- */
-int32_t qpnp_adc_scale_pmic_therm(struct qpnp_vadc_chip *dev,
-			int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt);
-/**
- * qpnp_adc_scale_pmi_chg_temp() - Scales the pre-calibrated digital output
- *		of an ADC to the ADC reference and compensates for the
- *		gain and offset. The voltage measured by HKADC is related to
- *		the junction temperature according to
- *		Tj = -137.67 degC * (V_adc * 2) + 382.04 degC
- * @dev:	Structure device for qpnp vadc
- * @adc_code:	pre-calibrated digital output of the ADC.
- * @adc_prop:	adc properties of the qpnp adc such as bit resolution,
- *		reference voltage.
- * @chan_prop:	Individual channel properties to compensate the i/p scaling,
- *		slope and offset.
- * @chan_rslt:	Physical result to be stored.
- */
-int32_t qpnp_adc_scale_pmi_chg_temp(struct qpnp_vadc_chip *dev,
-			int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt);
-/**
- * qpnp_adc_batt_therm() - Scales the pre-calibrated digital output
- *		of an ADC to the ADC reference and compensates for the
- *		gain and offset. Returns the temperature in decidegC.
- * @dev:	Structure device for qpnp vadc
- * @adc_code:	pre-calibrated digital output of the ADC.
- * @adc_prop:	adc properties of the pm8xxx adc such as bit resolution,
- *		reference voltage.
- * @chan_prop:	individual channel properties to compensate the i/p scaling,
- *		slope and offset.
- * @chan_rslt:	physical result to be stored.
- */
-int32_t qpnp_adc_batt_therm(struct qpnp_vadc_chip *dev,
-			int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt);
-/**
- * qpnp_adc_batt_therm_qrd() - Scales the pre-calibrated digital output
- *		of an ADC to the ADC reference and compensates for the
- *		gain and offset. Returns the temperature in decidegC for QRD.
- * @dev:	Structure device for qpnp vadc
- * @adc_code:	pre-calibrated digital output of the ADC.
- * @adc_prop:	adc properties of the pm8xxx adc such as bit resolution,
- *		reference voltage.
- * @chan_prop:	individual channel properties to compensate the i/p scaling,
- *		slope and offset.
- * @chan_rslt:	physical result to be stored.
- */
-int32_t qpnp_adc_batt_therm_qrd(struct qpnp_vadc_chip *dev,
-			int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt);
-/**
- * qpnp_adc_batt_therm_pu30() - Scales the pre-calibrated digital output
- *		of an ADC to the ADC reference and compensates for the
- *		gain and offset. Returns the temperature in decidegC.
- *		It uses a mapping table computed for a 30K pull-up.
- * @dev:	Structure device for qpnp vadc
- * @adc_code:	pre-calibrated digital output of the ADC.
- * @adc_prop:	adc properties of the pm8xxx adc such as bit resolution,
- *		reference voltage.
- * @chan_prop:	individual channel properties to compensate the i/p scaling,
- *		slope and offset.
- * @chan_rslt:	physical result to be stored.
- */
-int32_t qpnp_adc_batt_therm_pu30(struct qpnp_vadc_chip *dev,
-			int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt);
-/**
- * qpnp_adc_batt_therm_pu400() - Scales the pre-calibrated digital output
- *		of an ADC to the ADC reference and compensates for the
- *		gain and offset. Returns the temperature in decidegC.
- *		It uses a mapping table computed for a 400K pull-up.
- * @dev:	Structure device for qpnp vadc
- * @adc_code:	pre-calibrated digital output of the ADC.
- * @adc_prop:	adc properties of the adc such as bit resolution,
- *		reference voltage.
- * @chan_prop:	individual channel properties to compensate the i/p scaling,
- *		slope and offset.
- * @chan_rslt:	physical result to be stored.
- */
-int32_t qpnp_adc_batt_therm_pu400(struct qpnp_vadc_chip *dev,
-			int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt);
-/**
- * qpnp_adc_batt_therm_qrd_215() - Scales the pre-calibrated digital output
- *		of an ADC to the ADC reference and compensates for the
- *		gain and offset. Returns the temperature in decidegC for QRD.
- * @dev:	Structure device for qpnp vadc
- * @adc_code:	pre-calibrated digital output of the ADC.
- * @adc_prop:	adc properties of the pm8xxx adc such as bit resolution,
- *		reference voltage.
- * @chan_prop:	individual channel properties to compensate the i/p scaling,
- *		slope and offset.
- * @chan_rslt:	physical result to be stored.
- */
-int32_t qpnp_adc_batt_therm_qrd_215(struct qpnp_vadc_chip *dev,
-			int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt);
-/**
- * qpnp_adc_scale_batt_therm() - Scales the pre-calibrated digital output
- *		of an ADC to the ADC reference and compensates for the
- *		gain and offset. Returns the temperature in decidegC.
- * @dev:	Structure device for qpnp vadc
- * @adc_code:	pre-calibrated digital output of the ADC.
- * @adc_prop:	adc properties of the adc such as bit resolution,
- *		reference voltage.
- * @chan_prop:	individual channel properties to compensate the i/p scaling,
- *		slope and offset.
- * @chan_rslt:	physical result to be stored.
- */
-int32_t qpnp_adc_scale_batt_therm(struct qpnp_vadc_chip *dev,
-			int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt);
-/**
- * qpnp_adc_scale_chrg_temp() - Scales the pre-calibrated digital output
- *		of an ADC to the ADC reference and compensates for the
- *		gain and offset. The voltage measured by HKADC is related to
- *		the junction temperature according to
- *		Tj = 377.5 degC - (V_adc / 0.004)
- * @dev:	Structure device for qpnp vadc
- * @adc_code:	pre-calibrated digital output of the ADC.
- * @adc_prop:	adc properties of the qpnp adc such as bit resolution,
- *		reference voltage.
- * @chan_prop:	Individual channel properties to compensate the i/p scaling,
- *		slope and offset.
- * @chan_rslt:	Physical result to be stored.
- */
-int32_t qpnp_adc_scale_chrg_temp(struct qpnp_vadc_chip *dev,
-			int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt);
-/**
- * qpnp_adc_scale_die_temp() - Scales the pre-calibrated digital output
- *		of an ADC to the ADC reference and compensates for the
- *		gain and offset. The voltage measured by HKADC is related to
- *		the junction temperature according to
- *		Tj = -273.15 degC + (V_adc / 0.002)
- * @dev:	Structure device for qpnp vadc
- * @adc_code:	pre-calibrated digital output of the ADC.
- * @adc_prop:	adc properties of the qpnp adc such as bit resolution,
- *		reference voltage.
- * @chan_prop:	Individual channel properties to compensate the i/p scaling,
- *		slope and offset.
- * @chan_rslt:	Physical result to be stored.
- */
-int32_t qpnp_adc_scale_die_temp(struct qpnp_vadc_chip *dev,
-			int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt);
-/**
- * qpnp_adc_scale_usbin_curr() - Scales the pre-calibrated digital output
- *		of an ADC to the ADC reference and compensates for the
- *		gain and offset.
- * @dev:	Structure device for qpnp vadc
- * @adc_code:	pre-calibrated digital output of the ADC.
- * @adc_prop:	adc properties of the qpnp adc such as bit resolution,
- *		reference voltage.
- * @chan_prop:	Individual channel properties to compensate the i/p scaling,
- *		slope and offset.
- * @chan_rslt:	Physical result to be stored.
- */
-int32_t qpnp_adc_scale_usbin_curr(struct qpnp_vadc_chip *dev,
-			int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt);
-/**
- * qpnp_adc_scale_qrd_batt_therm() - Scales the pre-calibrated digital output
- *		of an ADC to the ADC reference and compensates for the
- *		gain and offset. Returns the temperature in decidegC.
- * @dev:	Structure device for qpnp vadc
- * @adc_code:	pre-calibrated digital output of the ADC.
- * @adc_prop:	adc properties of the pm8xxx adc such as bit resolution,
- *		reference voltage.
- * @chan_prop:	individual channel properties to compensate the i/p scaling,
- *		slope and offset.
- * @chan_rslt:	physical result to be stored.
- */
-int32_t qpnp_adc_scale_qrd_batt_therm(struct qpnp_vadc_chip *dev,
-			int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt);
-/**
- * qpnp_adc_scale_qrd_skuaa_batt_therm() - Scales the pre-calibrated digital
- *		output of an ADC to the ADC reference and compensates for the
- *		gain and offset. Returns the temperature in decidegC.
- * @dev:	Structure device for qpnp vadc
- * @adc_code:	pre-calibrated digital output of the ADC.
- * @adc_prop:	adc properties of the pm8xxx adc such as bit resolution,
- *		reference voltage.
- * @chan_prop:	individual channel properties to compensate the i/p scaling,
- *		slope and offset.
- * @chan_rslt:	physical result to be stored.
- */
-int32_t qpnp_adc_scale_qrd_skuaa_batt_therm(struct qpnp_vadc_chip *dev,
-			int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt);
-/**
- * qpnp_adc_scale_qrd_skug_batt_therm() - Scales the pre-calibrated digital
- *		output of an ADC to the ADC reference and compensates for the
- *		gain and offset. Returns the temperature in decidegC.
- * @dev:	Structure device for qpnp vadc
- * @adc_code:	pre-calibrated digital output of the ADC.
- * @adc_prop:	adc properties of the pm8xxx adc such as bit resolution,
- *		reference voltage.
- * @chan_prop:	individual channel properties to compensate the i/p scaling,
- *		slope and offset.
- * @chan_rslt:	physical result to be stored.
- */
-int32_t qpnp_adc_scale_qrd_skug_batt_therm(struct qpnp_vadc_chip *dev,
-			int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt);
-/**
- * qpnp_adc_scale_qrd_skuh_batt_therm() - Scales the pre-calibrated digital
- *		output of an ADC to the ADC reference and compensates for the
- *		gain and offset. Returns the temperature in decidegC.
- * @dev:	Structure device for qpnp vadc
- * @adc_code:	pre-calibrated digital output of the ADC.
- * @adc_prop:	adc properties of the pm8xxx adc such as bit resolution,
- *		reference voltage.
- * @chan_prop:	individual channel properties to compensate the i/p scaling,
- *		slope and offset.
- * @chan_rslt:	physical result to be stored.
- */
-int32_t qpnp_adc_scale_qrd_skuh_batt_therm(struct qpnp_vadc_chip *dev,
-			int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt);
-/**
- * qpnp_adc_scale_qrd_skut1_batt_therm() - Scales the pre-calibrated digital
- *		output of an ADC to the ADC reference and compensates for the
- *		gain and offset. Returns the temperature in decidegC.
- * @dev:	Structure device for qpnp vadc
- * @adc_code:	pre-calibrated digital output of the ADC.
- * @adc_prop:	adc properties of the pm8xxx adc such as bit resolution,
- *		reference voltage.
- * @chan_prop:	individual channel properties to compensate the i/p scaling,
- *		slope and offset.
- * @chan_rslt:	physical result to be stored.
- */
-int32_t qpnp_adc_scale_qrd_skut1_batt_therm(struct qpnp_vadc_chip *dev,
-			int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt);
-/**
- * qpnp_adc_scale_qrd_skue_batt_therm() - Scales the pre-calibrated digital
- *		output of an ADC to the ADC reference and compensates for the
- *		gain and offset. Returns the temperature in decidegC.
- * @dev:	Structure device for qpnp vadc
- * @adc_code:	pre-calibrated digital output of the ADC.
- * @adc_prop:	adc properties of the pm8xxx adc such as bit resolution,
- *		reference voltage.
- * @chan_prop:	individual channel properties to compensate the i/p scaling,
- *		slope and offset.
- * @chan_rslt:	physical result to be stored.
- */
-int32_t qpnp_adc_scale_qrd_skue_batt_therm(struct qpnp_vadc_chip *dev,
-			int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt);
-/**
- * qpnp_adc_scale_smb_batt_therm() - Scales the pre-calibrated digital output
- *		of an ADC to the ADC reference and compensates for the
- *		gain and offset. Returns the temperature in decidegC.
- * @dev:	Structure device for qpnp vadc
- * @adc_code:	pre-calibrated digital output of the ADC.
- * @adc_prop:	adc properties of the pm8xxx adc such as bit resolution,
- *		reference voltage.
- * @chan_prop:	individual channel properties to compensate the i/p scaling,
- *		slope and offset.
- * @chan_rslt:	physical result to be stored.
- */
-int32_t qpnp_adc_scale_smb_batt_therm(struct qpnp_vadc_chip *dev,
-			int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt);
-/**
- * qpnp_adc_scale_batt_id() - Scales the pre-calibrated digital output
- *		of an ADC to the ADC reference and compensates for the
- *		gain and offset.
- * @dev:	Structure device for qpnp vadc
- * @adc_code:	pre-calibrated digital output of the ADC.
- * @adc_prop:	adc properties of the pm8xxx adc such as bit resolution,
- *		reference voltage.
- * @chan_prop:	individual channel properties to compensate the i/p scaling,
- *		slope and offset.
- * @chan_rslt:	physical result to be stored.
- */
-int32_t qpnp_adc_scale_batt_id(struct qpnp_vadc_chip *dev, int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt);
-/**
- * qpnp_adc_scale_tdkntcg_therm() - Scales the pre-calibrated digital output
- *		of an ADC to the ADC reference and compensates for the
- *		gain and offset. Returns the temperature of the xo therm in
- *		milidegC.
- * @dev:	Structure device for qpnp vadc
- * @adc_code:	pre-calibrated digital output of the ADC.
- * @adc_prop:	adc properties of the pm8xxx adc such as bit resolution,
- *		reference voltage.
- * @chan_prop:	individual channel properties to compensate the i/p scaling,
- *		slope and offset.
- * @chan_rslt:	physical result to be stored.
- */
-int32_t qpnp_adc_tdkntcg_therm(struct qpnp_vadc_chip *dev, int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt);
-/**
- * qpnp_adc_scale_therm_pu1() - Scales the pre-calibrated digital output
- *		of an ADC to the ADC reference and compensates for the
- *		gain and offset. Returns the temperature of the therm in degC.
- *		It uses a mapping table computed for a 150K pull-up.
- *		Pull-up1 is an internal pull-up on the AMUX of 150K.
- * @dev:	Structure device for qpnp vadc
- * @adc_code:	pre-calibrated digital output of the ADC.
- * @adc_prop:	adc properties of the pm8xxx adc such as bit resolution,
- *		reference voltage.
- * @chan_prop:	individual channel properties to compensate the i/p scaling,
- *		slope and offset.
- * @chan_rslt:	physical result to be stored.
- */
-int32_t qpnp_adc_scale_therm_pu1(struct qpnp_vadc_chip *dev, int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt);
-/**
- * qpnp_adc_scale_therm_pu2() - Scales the pre-calibrated digital output
- *		of an ADC to the ADC reference and compensates for the
- *		gain and offset. Returns the temperature of the therm in degC.
- *		It uses a mapping table computed for a 100K pull-up.
- *		Pull-up2 is an internal pull-up on the AMUX of 100K.
- * @dev:	Structure device for qpnp vadc
- * @adc_code:	pre-calibrated digital output of the ADC.
- * @adc_prop:	adc properties of the pm8xxx adc such as bit resolution,
- *		reference voltage.
- * @chan_prop:	individual channel properties to compensate the i/p scaling,
- *		slope and offset.
- * @chan_rslt:	physical result to be stored.
- */
-int32_t qpnp_adc_scale_therm_pu2(struct qpnp_vadc_chip *dev, int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt);
-/**
- * qpnp_adc_scale_therm_ncp03() - Scales the pre-calibrated digital output
- *		of an ADC to the ADC reference and compensates for the
- *		gain and offset. Returns the temperature of the therm in degC.
- *		It uses a mapping table computed for a NCP03WF683.
- * @dev:	Structure device for qpnp vadc
- * @adc_code:	pre-calibrated digital output of the ADC.
- * @adc_prop:	adc properties of the pm8xxx adc such as bit resolution,
- *		reference voltage.
- * @chan_prop:	individual channel properties to compensate the i/p scaling,
- *		slope and offset.
- * @chan_rslt:	physical result to be stored.
- */
-int32_t qpnp_adc_scale_therm_ncp03(struct qpnp_vadc_chip *dev, int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt);
-/**
- * qpnp_adc_scale_die_temp_1390() -  Scales the pre-calibrated digital output
- *		of an ADC to the ADC reference and compensates for the
- *		gain and offset. The voltage measured by HKADC is related to
- *		the junction temperature according to
- *		V_adc = 1.496 – 0.00381*Tj
- * @dev:	Structure device for qpnp vadc
- * @adc_code:	pre-calibrated digital output of the ADC.
- * @adc_prop:	adc properties of the pm8xxx adc such as bit resolution,
- *		reference voltage.
- * @chan_prop:	individual channel properties to compensate the i/p scaling,
- *		slope and offset.
- * @chan_rslt:	physical result to be stored.
- */
-int32_t qpnp_adc_scale_die_temp_1390(struct qpnp_vadc_chip *dev,
-			int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt);
-/**
- * qpnp_get_vadc() - Clients need to register with the vadc using the
- *		corresponding device instance it wants to read the channels
- *		from. Read the bindings document on how to pass the phandle
- *		for the corresponding vadc driver to register with.
- * @dev:	Clients device structure
- * @name:	Corresponding client's DT parser name. Read the DT bindings
- *		document on how to register with the vadc
- * @struct qpnp_vadc_chip * - On success returns the vadc device structure
- *		pointer that needs to be used during an ADC request.
- */
-struct qpnp_vadc_chip *qpnp_get_vadc(struct device *dev, const char *name);
-/**
- * qpnp_adc_tm_scaler() - Performs reverse calibration.
- * @config:	Thermal monitoring configuration.
- * @adc_prop:	adc properties of the qpnp adc such as bit resolution and
- *		reference voltage.
- * @chan_prop:	Individual channel properties to compensate the i/p scaling,
- *		slope and offset.
- */
-static inline int32_t qpnp_adc_tm_scaler(struct qpnp_adc_tm_config *tm_config,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop)
-{ return -ENXIO; }
-/**
- * qpnp_get_vadc_gain_and_offset() - Obtains the VADC gain and offset
- *		for absolute and ratiometric calibration.
- * @dev:	Structure device for qpnp vadc
- * @param:	The result in which the ADC offset and gain values are stored.
- * @type:	The calibration type whether client needs the absolute or
- *		ratiometric gain and offset values.
- */
-int32_t qpnp_get_vadc_gain_and_offset(struct qpnp_vadc_chip *dev,
-			struct qpnp_vadc_linear_graph *param,
-			enum qpnp_adc_calib_type calib_type);
-/**
- * qpnp_adc_scale_millidegc_pmic_voltage_thr() - Performs reverse calibration
- *		on the low/high temperature threshold values passed by the
- *		client. The function coverts milldegC to voltage threshold
- *		and accounts for the corresponding channels scaling as (2mV/K).
- * @dev:	Structure device for qpnp vadc
- * @param:	The input parameters that contain the low/high temperature
- *		values.
- * @low_threshold: The low threshold value that needs to be updated with
- *		the above calibrated voltage value.
- * @high_threshold: The low threshold value that needs to be updated with
- *		the above calibrated voltage value.
- */
-int32_t qpnp_adc_scale_millidegc_pmic_voltage_thr(struct qpnp_vadc_chip *dev,
-		struct qpnp_adc_tm_btm_param *param,
-		uint32_t *low_threshold, uint32_t *high_threshold);
-/**
- * qpnp_adc_btm_scaler() - Performs reverse calibration on the low/high
- *		temperature threshold values passed by the client.
- *		The function maps the temperature to voltage and applies
- *		ratiometric calibration on the voltage values.
- * @dev:	Structure device for qpnp vadc
- * @param:	The input parameters that contain the low/high temperature
- *		values.
- * @low_threshold: The low threshold value that needs to be updated with
- *		the above calibrated voltage value.
- * @high_threshold: The low threshold value that needs to be updated with
- *		the above calibrated voltage value.
- */
-int32_t qpnp_adc_btm_scaler(struct qpnp_vadc_chip *dev,
-		struct qpnp_adc_tm_btm_param *param,
-		uint32_t *low_threshold, uint32_t *high_threshold);
-
-/**
- * qpnp_adc_qrd_skuh_btm_scaler() - Performs reverse calibration on the low/high
- *		temperature threshold values passed by the client.
- *		The function maps the temperature to voltage and applies
- *		ratiometric calibration on the voltage values for SKUH board.
- * @dev:	Structure device for qpnp vadc
- * @param:	The input parameters that contain the low/high temperature
- *		values.
- * @low_threshold: The low threshold value that needs to be updated with
- *		the above calibrated voltage value.
- * @high_threshold: The low threshold value that needs to be updated with
- *		the above calibrated voltage value.
- */
-int32_t qpnp_adc_qrd_skuh_btm_scaler(struct qpnp_vadc_chip *dev,
-		struct qpnp_adc_tm_btm_param *param,
-		uint32_t *low_threshold, uint32_t *high_threshold);
-/**
- * qpnp_adc_qrd_skut1_btm_scaler() - Performs reverse calibration on the
- *		low/high temperature threshold values passed by the client.
- *		The function maps the temperature to voltage and applies
- *		ratiometric calibration on the voltage values for SKUT1 board.
- * @dev:	Structure device for qpnp vadc
- * @param:	The input parameters that contain the low/high temperature
- *		values.
- * @low_threshold: The low threshold value that needs to be updated with
- *		the above calibrated voltage value.
- * @high_threshold: The low threshold value that needs to be updated with
- *		the above calibrated voltage value.
- */
-int32_t qpnp_adc_qrd_skut1_btm_scaler(struct qpnp_vadc_chip *dev,
-		struct qpnp_adc_tm_btm_param *param,
-		uint32_t *low_threshold, uint32_t *high_threshold);
-/**
  * qpnp_adc_qrd_215_btm_scaler() - Performs reverse calibration on the
  *		low/high temperature threshold values passed by the client.
  *		The function maps the temperature to voltage and applies
  *		ratiometric calibration on the voltage values for SKUT1 board.
- * @dev:	Structure device for qpnp vadc
+ * @adc:	QPNP ADC device structure.
  * @param:	The input parameters that contain the low/high temperature
  *		values.
  * @low_threshold: The low threshold value that needs to be updated with
@@ -1933,40 +844,29 @@ int32_t qpnp_adc_qrd_skut1_btm_scaler(struct qpnp_vadc_chip *dev,
  * @high_threshold: The low threshold value that needs to be updated with
  *		the above calibrated voltage value.
  */
-int32_t qpnp_adc_qrd_215_btm_scaler(struct qpnp_vadc_chip *dev,
+int32_t qpnp_adc_qrd_215_btm_scaler(struct qpnp_adc_drv *adc,
 		struct qpnp_adc_tm_btm_param *param,
 		uint32_t *low_threshold, uint32_t *high_threshold);
+
 /**
  * qpnp_adc_tm_scale_therm_voltage_pu2() - Performs reverse calibration
  *		and convert given temperature to voltage on supported
  *		thermistor channels using 100k pull-up.
- * @dev:	Structure device for qpnp vadc
+ * @adc:	QPNP ADC device structure.
  * @adc_prop:	adc properties of the qpnp adc such as bit resolution,
  *		reference voltage.
  * @param:	The input temperature values.
  */
-int32_t qpnp_adc_tm_scale_therm_voltage_pu2(struct qpnp_vadc_chip *dev,
+int32_t qpnp_adc_tm_scale_therm_voltage_pu2(struct qpnp_adc_drv *adc,
 		const struct qpnp_adc_properties *adc_properties,
 				struct qpnp_adc_tm_config *param);
-/**
- * qpnp_adc_tm_scale_therm_voltage_pu2() - Performs reverse calibration
- *		and converts the given ADC code to temperature for
- *		thermistor channels using 100k pull-up.
- * @dev:	Structure device for qpnp vadc
- * @adc_prop:	adc properties of the qpnp adc such as bit resolution,
- *		reference voltage.
- * @reg:	The input ADC code.
- * @result:	The physical measurement temperature on the thermistor.
- */
-int32_t qpnp_adc_tm_scale_voltage_therm_pu2(struct qpnp_vadc_chip *dev,
-			const struct qpnp_adc_properties *adc_prop,
-				uint32_t reg, int64_t *result);
+
 /**
  * qpnp_adc_usb_scaler() - Performs reverse calibration on the low/high
  *		voltage threshold values passed by the client.
  *		The function applies ratiometric calibration on the
  *		voltage values.
- * @dev:	Structure device for qpnp vadc
+ * @adc:        QPNP ADC device structure.
  * @param:	The input parameters that contain the low/high voltage
  *		threshold values.
  * @low_threshold: The low threshold value that needs to be updated with
@@ -1974,7 +874,7 @@ int32_t qpnp_adc_tm_scale_voltage_therm_pu2(struct qpnp_vadc_chip *dev,
  * @high_threshold: The low threshold value that needs to be updated with
  *		the above calibrated voltage value.
  */
-int32_t qpnp_adc_usb_scaler(struct qpnp_vadc_chip *dev,
+int32_t qpnp_adc_usb_scaler(struct qpnp_adc_drv *adc,
 		struct qpnp_adc_tm_btm_param *param,
 		uint32_t *low_threshold, uint32_t *high_threshold);
 /**
@@ -1982,7 +882,7 @@ int32_t qpnp_adc_usb_scaler(struct qpnp_vadc_chip *dev,
  *		voltage threshold values passed by the client.
  *		The function applies ratiometric calibration on the
  *		voltage values.
- * @dev:	Structure device for qpnp vadc
+ * @adc:        QPNP ADC device structure.
  * @param:	The input parameters that contain the low/high voltage
  *		threshold values.
  * @low_threshold: The low threshold value that needs to be updated with
@@ -1990,26 +890,7 @@ int32_t qpnp_adc_usb_scaler(struct qpnp_vadc_chip *dev,
  * @high_threshold: The low threshold value that needs to be updated with
  *		the above calibrated voltage value.
  */
-int32_t qpnp_adc_vbatt_rscaler(struct qpnp_vadc_chip *dev,
-		struct qpnp_adc_tm_btm_param *param,
-		uint32_t *low_threshold, uint32_t *high_threshold);
-/**
- * qpnp_vadc_absolute_rthr() - Performs reverse calibration on the low/high
- *		voltage threshold values passed by the client.
- *		The function applies absolute calibration on the
- *		voltage values.
- * @dev:	Structure device for qpnp vadc
- * @chan_prop:	Individual channel properties to compensate the i/p scaling,
- *		slope and offset.
- * @param:	The input parameters that contain the low/high voltage
- *		threshold values.
- * @low_threshold: The low threshold value that needs to be updated with
- *		the above calibrated voltage value.
- * @high_threshold: The low threshold value that needs to be updated with
- *		the above calibrated voltage value.
- */
-int32_t qpnp_vadc_absolute_rthr(struct qpnp_vadc_chip *dev,
-		const struct qpnp_vadc_chan_properties *chan_prop,
+int32_t qpnp_adc_vbatt_rscaler(struct qpnp_adc_drv *adc,
 		struct qpnp_adc_tm_btm_param *param,
 		uint32_t *low_threshold, uint32_t *high_threshold);
 /**
@@ -2017,7 +898,7 @@ int32_t qpnp_vadc_absolute_rthr(struct qpnp_vadc_chip *dev,
  *		voltage threshold values passed by the client.
  *		The function applies absolute calibration on the
  *		voltage values.
- * @dev:	Structure device for qpnp vadc
+ * @adc:        QPNP ADC device structure.
  * @param:	The input parameters that contain the low/high voltage
  *		threshold values.
  * @low_threshold: The low threshold value that needs to be updated with
@@ -2025,7 +906,7 @@ int32_t qpnp_vadc_absolute_rthr(struct qpnp_vadc_chip *dev,
  * @high_threshold: The low threshold value that needs to be updated with
  *		the above calibrated voltage value.
  */
-int32_t qpnp_adc_absolute_rthr(struct qpnp_vadc_chip *dev,
+int32_t qpnp_adc_absolute_rthr(struct qpnp_adc_drv *adc,
 		struct qpnp_adc_tm_btm_param *param,
 		uint32_t *low_threshold, uint32_t *high_threshold);
 /**
@@ -2033,7 +914,7 @@ int32_t qpnp_adc_absolute_rthr(struct qpnp_vadc_chip *dev,
  *		temperature threshold values passed by the client.
  *		The function maps the temperature to voltage and applies
  *		ratiometric calibration on the voltage values.
- * @dev:	Structure device for qpnp vadc
+ * @adc:        QPNP ADC device structure.
  * @param:	The input parameters that contain the low/high temperature
  *		values.
  * @low_threshold: The low threshold value that needs to be updated with
@@ -2041,499 +922,18 @@ int32_t qpnp_adc_absolute_rthr(struct qpnp_vadc_chip *dev,
  * @high_threshold: The low threshold value that needs to be updated with
  *		the above calibrated voltage value.
  */
-int32_t qpnp_adc_smb_btm_rscaler(struct qpnp_vadc_chip *dev,
+int32_t qpnp_adc_smb_btm_rscaler(struct qpnp_adc_drv *adc,
 		struct qpnp_adc_tm_btm_param *param,
 		uint32_t *low_threshold, uint32_t *high_threshold);
-/**
- * qpnp_vadc_iadc_sync_request() - Performs Voltage ADC read and
- *		locks the peripheral. When performing simultaneous
- *		voltage and current request the VADC peripheral is
- *		prepared for conversion and the IADC sync conversion
- *		is done from the IADC peripheral.
- * @dev:	Structure device for qpnp vadc
- * @channel:	Input channel to perform the voltage ADC read.
- */
-int32_t qpnp_vadc_iadc_sync_request(struct qpnp_vadc_chip *dev,
-				enum qpnp_vadc_channels channel);
-/**
- * qpnp_vadc_iadc_sync_complete_request() - Reads the ADC result and
- *		unlocks the peripheral.
- * @dev:	Structure device for qpnp vadc
- * @result:	Structure pointer of type adc_chan_result
- *		in which the ADC read results are stored.
- */
-int32_t qpnp_vadc_iadc_sync_complete_request(struct qpnp_vadc_chip *dev,
-	enum qpnp_vadc_channels channel, struct qpnp_vadc_result *result);
-/**
- * qpnp_vadc_sns_comp_result() - Compensate vbatt readings based on temperature
- * @dev:	Structure device for qpnp vadc
- * @result:	Voltage in uV that needs compensation.
- * @is_pon_ocv: Whether the reading is from a power on OCV or not
- */
-int32_t qpnp_vbat_sns_comp_result(struct qpnp_vadc_chip *dev,
-					int64_t *result, bool is_pon_ocv);
+
 /**
  * qpnp_adc_get_revid_version() - Obtain the PMIC number and revision.
  * @dev:	Structure device node.
  * returns internal mapped PMIC number and revision id.
  */
 int qpnp_adc_get_revid_version(struct device *dev);
-/**
- * qpnp_vadc_channel_monitor() - Configures kernel clients a channel to
- *		monitor the corresponding ADC channel for threshold detection.
- *		Driver passes the high/low voltage threshold along
- *		with the notification callback once the set thresholds
- *		are crossed.
- * @param:	Structure pointer of qpnp_adc_tm_btm_param type.
- *		Clients pass the low/high temperature along with the threshold
- *		notification callback.
- */
-int32_t qpnp_vadc_channel_monitor(struct qpnp_vadc_chip *chip,
-					struct qpnp_adc_tm_btm_param *param);
-/**
- * qpnp_vadc_end_channel_monitor() - Disables recurring measurement mode for
- *		VADC_USR and disables the bank.
- * @param:	device instance for the VADC
- */
-int32_t qpnp_vadc_end_channel_monitor(struct qpnp_vadc_chip *chip);
-/**
- * qpnp_vadc_calib_vref() - Read calibration channel REF_125V/VDD_VADC
- * @dev:	Structure device for qpnp vadc
- * @calib_type:	absolute or ratiometric calib type.
- * returns calibration channel adc code.
- */
-int32_t qpnp_vadc_calib_vref(struct qpnp_vadc_chip *vadc,
-				enum qpnp_adc_calib_type calib_type,
-				int *calib_data);
-/**
- * qpnp_vadc_calib_gnd() - Read calibration channel REF_625MV/GND_REF
- * @dev:	Structure device for qpnp vadc
- * @calib_type:	absolute or ratiometric calib type.
- * returns calibration channel adc code.
- */
-int32_t qpnp_vadc_calib_gnd(struct qpnp_vadc_chip *vadc,
-				enum qpnp_adc_calib_type calib_type,
-				int *calib_data);
-
-/**
- * qpnp_adc_enable_voltage() - Enable LDO for HKADC
- * @dev:	Structure device for qpnp vadc
- * returns result of enabling the regulator interface.
- */
-int32_t qpnp_adc_enable_voltage(struct qpnp_adc_drv *adc);
-
-/**
- * qpnp_adc_disable_voltage() - Disable vote for HKADC LDO
- * @dev:	Structure device for qpnp vadc
- */
-void qpnp_adc_disable_voltage(struct qpnp_adc_drv *adc);
-
-/**
- * qpnp_adc_free_voltage_resource() - Puts HKADC LDO
- * @dev:	Structure device for qpnp vadc
- */
-void qpnp_adc_free_voltage_resource(struct qpnp_adc_drv *adc);
-
-#else
-static inline int32_t qpnp_vadc_read(struct qpnp_vadc_chip *dev,
-				uint32_t channel,
-				struct qpnp_vadc_result *result)
-{ return -ENXIO; }
-static inline int32_t qpnp_vadc_hc_read(struct qpnp_vadc_chip *dev,
-				uint32_t channel,
-				struct qpnp_vadc_result *result)
-{ return -ENXIO; }
-static inline int32_t qpnp_vadc_conv_seq_request(struct qpnp_vadc_chip *dev,
-			enum qpnp_vadc_trigger trigger_channel,
-			enum qpnp_vadc_channels channel,
-			struct qpnp_vadc_result *result)
-{ return -ENXIO; }
-static inline int32_t qpnp_adc_scale_default(struct qpnp_vadc_chip *vadc,
-			int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt)
-{ return -ENXIO; }
-static inline int32_t qpnp_iadc_scale_default(struct qpnp_vadc_chip *vadc,
-			int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt)
-{ return -ENXIO; }
-static inline int32_t qpnp_adc_scale_pmic_therm(struct qpnp_vadc_chip *vadc,
-			int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt)
-{ return -ENXIO; }
-static inline int32_t qpnp_adc_scale_pmi_chg_temp(struct qpnp_vadc_chip *vadc,
-			int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt)
-{ return -ENXIO; }
-static inline int32_t qpnp_adc_batt_therm(struct qpnp_vadc_chip *vadc,
-			int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt)
-{ return -ENXIO; }
-static inline int32_t qpnp_adc_batt_therm_qrd(struct qpnp_vadc_chip *vadc,
-			int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt)
-{ return -ENXIO; }
-static inline int32_t qpnp_adc_batt_therm_pu30(struct qpnp_vadc_chip *vadc,
-			int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt)
-{ return -ENXIO; }
-static inline int32_t qpnp_adc_batt_therm_pu400(struct qpnp_vadc_chip *vadc,
-			int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt)
-{ return -ENXIO; }
-static inline int32_t qpnp_adc_batt_therm_qrd_215(struct qpnp_vadc_chip *vadc,
-			int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt)
-{ return -ENXIO; }
-static inline int32_t qpnp_adc_scale_batt_therm(struct qpnp_vadc_chip *vadc,
-			int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt)
-{ return -ENXIO; }
-static inline int32_t qpnp_adc_scale_chrg_temp(struct qpnp_vadc_chip *vadc,
-			int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt)
-{ return -ENXIO; }
-static inline int32_t qpnp_adc_scale_die_temp(struct qpnp_vadc_chip *vadc,
-			int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt)
-{ return -ENXIO; }
-static inline int32_t qpnp_adc_scale_usbin_curr(struct qpnp_vadc_chip *vadc,
-			int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt)
-{ return -ENXIO; }
-static inline int32_t qpnp_adc_scale_qrd_batt_therm(
-			struct qpnp_vadc_chip *vadc, int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt)
-{ return -ENXIO; }
-static inline int32_t qpnp_adc_scale_qrd_skuaa_batt_therm(
-			struct qpnp_vadc_chip *vadc, int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt)
-{ return -ENXIO; }
-static inline int32_t qpnp_adc_scale_qrd_skug_batt_therm(
-			struct qpnp_vadc_chip *vadc, int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt)
-{ return -ENXIO; }
-static inline int32_t qpnp_adc_scale_qrd_skuh_batt_therm(
-			struct qpnp_vadc_chip *vdev, int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt)
-{ return -ENXIO; }
-static inline int32_t qpnp_adc_scale_qrd_skut1_batt_therm(
-			struct qpnp_vadc_chip *vdev, int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt)
-{ return -ENXIO; }
-static inline int32_t qpnp_adc_scale_qrd_skue_batt_therm(
-			struct qpnp_vadc_chip *vdev, int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt)
-{ return -ENXIO; }
-static inline int32_t qpnp_adc_scale_smb_batt_therm(struct qpnp_vadc_chip *vadc,
-			int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt)
-{ return -ENXIO; }
-static inline int32_t qpnp_adc_scale_batt_id(struct qpnp_vadc_chip *vadc,
-			int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt)
-{ return -ENXIO; }
-static inline int32_t qpnp_adc_tdkntcg_therm(struct qpnp_vadc_chip *vadc,
-			int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt)
-{ return -ENXIO; }
-static inline int32_t qpnp_adc_scale_therm_pu1(struct qpnp_vadc_chip *vadc,
-			int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt)
-{ return -ENXIO; }
-static inline int32_t qpnp_adc_scale_therm_pu2(struct qpnp_vadc_chip *vadc,
-			int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt)
-{ return -ENXIO; }
-static inline int32_t qpnp_adc_scale_therm_ncp03(struct qpnp_vadc_chip *vadc,
-			int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt)
-{ return -ENXIO; }
-static inline int32_t qpnp_adc_scale_die_temp_1390(struct qpnp_vadc_chip *vadc,
-			int32_t adc_code,
-			const struct qpnp_adc_properties *adc_prop,
-			const struct qpnp_vadc_chan_properties *chan_prop,
-			struct qpnp_vadc_result *chan_rslt)
-{ return -ENXIO; }
-static inline struct qpnp_vadc_chip *qpnp_get_vadc(struct device *dev,
-							const char *name)
-{ return ERR_PTR(-ENXIO); }
-static inline int32_t qpnp_get_vadc_gain_and_offset(struct qpnp_vadc_chip *dev,
-			struct qpnp_vadc_linear_graph *param,
-			enum qpnp_adc_calib_type calib_type)
-{ return -ENXIO; }
-static inline int32_t qpnp_adc_usb_scaler(struct qpnp_vadc_chip *dev,
-		struct qpnp_adc_tm_btm_param *param,
-		uint32_t *low_threshold, uint32_t *high_threshold)
-{ return -ENXIO; }
-static inline int32_t qpnp_adc_vbatt_rscaler(struct qpnp_vadc_chip *dev,
-		struct qpnp_adc_tm_btm_param *param,
-		uint32_t *low_threshold, uint32_t *high_threshold)
-{ return -ENXIO; }
-static inline int32_t qpnp_vadc_absolute_rthr(struct qpnp_vadc_chip *dev,
-		const struct qpnp_vadc_chan_properties *chan_prop,
-		struct qpnp_adc_tm_btm_param *param,
-		uint32_t *low_threshold, uint32_t *high_threshold)
-{ return -ENXIO; }
-static inline int32_t qpnp_adc_absolute_rthr(struct qpnp_vadc_chip *dev,
-		struct qpnp_adc_tm_btm_param *param,
-		uint32_t *low_threshold, uint32_t *high_threshold)
-{ return -ENXIO; }
-static inline int32_t qpnp_adc_btm_scaler(struct qpnp_vadc_chip *dev,
-		struct qpnp_adc_tm_btm_param *param,
-		uint32_t *low_threshold, uint32_t *high_threshold)
-{ return -ENXIO; }
-static inline int32_t qpnp_adc_qrd_skuh_btm_scaler(struct qpnp_vadc_chip *dev,
-		struct qpnp_adc_tm_btm_param *param,
-		uint32_t *low_threshold, uint32_t *high_threshold)
-{ return -ENXIO; }
-static inline int32_t qpnp_adc_qrd_skut1_btm_scaler(struct qpnp_vadc_chip *dev,
-		struct qpnp_adc_tm_btm_param *param,
-		uint32_t *low_threshold, uint32_t *high_threshold)
-{ return -ENXIO; }
-static inline int32_t qpnp_adc_qrd_215_btm_scaler(struct qpnp_vadc_chip *dev,
-		struct qpnp_adc_tm_btm_param *param,
-		uint32_t *low_threshold, uint32_t *high_threshold)
-{ return -ENXIO; }
-static inline int32_t qpnp_adc_scale_millidegc_pmic_voltage_thr(
-		struct qpnp_vadc_chip *dev,
-		struct qpnp_adc_tm_btm_param *param,
-		uint32_t *low_threshold, uint32_t *high_threshold)
-{ return -ENXIO; }
-static inline int32_t qpnp_adc_tm_scale_therm_voltage_pu2(
-				struct qpnp_vadc_chip *dev,
-			const struct qpnp_adc_properties *adc_properties,
-				struct qpnp_adc_tm_config *param)
-{ return -ENXIO; }
-static inline int32_t qpnp_adc_tm_scale_voltage_therm_pu2(
-				struct qpnp_vadc_chip *dev,
-			const struct qpnp_adc_properties *adc_prop,
-			uint32_t reg, int64_t *result)
-{ return -ENXIO; }
-static inline int32_t qpnp_adc_smb_btm_rscaler(struct qpnp_vadc_chip *dev,
-		struct qpnp_adc_tm_btm_param *param,
-		uint32_t *low_threshold, uint32_t *high_threshold)
-{ return -ENXIO; }
-static inline int32_t qpnp_vadc_iadc_sync_request(struct qpnp_vadc_chip *dev,
-				enum qpnp_vadc_channels channel)
-{ return -ENXIO; }
-static inline int32_t qpnp_vadc_iadc_sync_complete_request(
-				struct qpnp_vadc_chip *dev,
-				enum qpnp_vadc_channels channel,
-				struct qpnp_vadc_result *result)
-{ return -ENXIO; }
-static inline int32_t qpnp_vbat_sns_comp_result(struct qpnp_vadc_chip *dev,
-						int64_t *result)
-{ return -ENXIO; }
-static inline int qpnp_adc_get_revid_version(struct device *dev)
-{ return -ENXIO; }
-static inline int32_t qpnp_vadc_channel_monitor(struct qpnp_vadc_chip *chip,
-					struct qpnp_adc_tm_btm_param *param)
-{ return -ENXIO; }
-static inline int32_t qpnp_vadc_end_channel_monitor(struct qpnp_vadc_chip *chip)
-{ return -ENXIO; }
-static inline int32_t qpnp_vadc_calib_vref(struct qpnp_vadc_chip *vadc,
-					enum qpnp_adc_calib_type calib_type,
-					int *calib_data)
-{ return -ENXIO; }
-static inline int32_t qpnp_vadc_calib_gnd(struct qpnp_vadc_chip *vadc,
-					enum qpnp_adc_calib_type calib_type,
-					int *calib_data)
-{ return -ENXIO; }
-
-static inline int32_t qpnp_adc_enable_voltage(struct qpnp_adc_drv *adc)
-{ return -ENXIO; }
-
-static inline void qpnp_adc_disable_voltage(struct qpnp_adc_drv *adc)
-{ return; }
-
-static inline void qpnp_adc_free_voltage_resource(struct qpnp_adc_drv *adc)
-{ return; }
-
-static inline int32_t qpnp_adc_get_devicetree_data(
-		struct platform_device *pdev, struct qpnp_adc_drv *adc_qpnp)
-{ return -ENXIO; }
-
-#endif
 
 /* Public API */
-#if defined(CONFIG_SENSORS_QPNP_ADC_CURRENT)				\
-			|| defined(CONFIG_SENSORS_QPNP_ADC_CURRENT_MODULE)
-/**
- * qpnp_iadc_read() - Performs ADC read on the current channel.
- * @dev:	Structure device for qpnp iadc
- * @channel:	Input channel to perform the ADC read.
- * @result:	Current across rsense in mA.
- * @return:	0 on success.
- */
-int32_t qpnp_iadc_read(struct qpnp_iadc_chip *dev,
-				enum qpnp_iadc_channels channel,
-				struct qpnp_iadc_result *result);
-/**
- * qpnp_iadc_get_rsense() - Reads the RDS resistance value from the
-			trim registers.
- * @dev:	Structure device for qpnp iadc
- * @rsense:	RDS resistance in nOhms.
- * @return:	0 on success.
- */
-int32_t qpnp_iadc_get_rsense(struct qpnp_iadc_chip *dev, int32_t *rsense);
-/**
- * qpnp_iadc_get_gain_and_offset() - Performs gain calibration
- *				over 17.8571mV and offset over selected
- *				channel. Channel can be internal rsense,
- *				external rsense and alternate lead pair.
- * @dev:	Structure device for qpnp iadc
- * @result:	result structure where the gain and offset is stored of
- *		type qpnp_iadc_calib.
- * @return:	0 on success.
- */
-int32_t qpnp_iadc_get_gain_and_offset(struct qpnp_iadc_chip *dev,
-					struct qpnp_iadc_calib *result);
-/**
- * qpnp_get_iadc() - Clients need to register with the iadc with the
- *		corresponding device instance it wants to read the channels.
- *		Read the bindings document on how to pass the phandle for
- *		the corresponding vadc driver to register with.
- * @dev:	Clients device structure
- * @name:	Corresponding client's DT parser name. Read the DT bindings
- *		document on how to register with the iadc
- * @struct qpnp_iadc_chip * - On success returns the iadc device structure
- *		pointer used everytime client makes an ADC request.
- */
-struct qpnp_iadc_chip *qpnp_get_iadc(struct device *dev, const char *name);
-/**
- * qpnp_iadc_vadc_sync_read() - Performs synchronous VADC and IADC read.
- *		The api is to be used only by the BMS to perform
- *		simultaneous VADC and IADC measurement for battery voltage
- *		and current.
- * @dev:	Structure device for qpnp iadc
- * @i_channel:	Input battery current channel to perform the IADC read.
- * @i_result:	Current across the rsense in mA.
- * @v_channel:	Input battery voltage channel to perform VADC read.
- * @v_result:	Voltage on the vbatt channel with units in mV.
- * @return:	0 on success.
- */
-int32_t qpnp_iadc_vadc_sync_read(struct qpnp_iadc_chip *dev,
-	enum qpnp_iadc_channels i_channel, struct qpnp_iadc_result *i_result,
-	enum qpnp_vadc_channels v_channel, struct qpnp_vadc_result *v_result);
-/**
- * qpnp_iadc_calibrate_for_trim - Clients can use this API to re-calibrate
- *		IADC. The offset and gain values are programmed in the trim
- *		registers. The offset and the gain can be retrieved using
- *		qpnp_iadc_get_gain_and_offset
- * @dev:	Structure device for qpnp iadc
- * @batfet_closed: batfet is opened or closed. The IADC chooses proper
- *			channel (internal/external) based on batfet status
- *			for calibration.
- * RETURNS:	0 on success.
- */
-int32_t qpnp_iadc_calibrate_for_trim(struct qpnp_iadc_chip *dev,
-						bool batfet_closed);
-/**
- * qpnp_iadc_comp_result() - Compensates the result of the current based on
- *		the gain and offset co-effients and rsense parameters.
- * @dev:	Structure device for qpnp iadc
- * @result:	Current value to perform the compensation.
- * @return:	0 on success.
- */
-int32_t qpnp_iadc_comp_result(struct qpnp_iadc_chip *dev, int64_t *result);
-/**
- * qpnp_iadc_skip_calibration() - Clients can use this API to ask the driver
- *				to skip iadc calibrations
- * @dev:	Structure device for qpnp iadc
- * @result:	0 on success and -EPROBE_DEFER when probe for the device
- *		has not occurred.
- */
-int qpnp_iadc_skip_calibration(struct qpnp_iadc_chip *dev);
-/**
- * qpnp_iadc_resume_calibration() - Clients can use this API to ask the driver
- *				to resume iadc calibrations
- * @dev:	Structure device for qpnp iadc
- * @result:	0 on success and -EPROBE_DEFER when probe for the device
- *		has not occurred.
- */
-int qpnp_iadc_resume_calibration(struct qpnp_iadc_chip *dev);
-#else
-static inline int32_t qpnp_iadc_read(struct qpnp_iadc_chip *iadc,
-	enum qpnp_iadc_channels channel, struct qpnp_iadc_result *result)
-{ return -ENXIO; }
-static inline int32_t qpnp_iadc_get_rsense(struct qpnp_iadc_chip *iadc,
-							int32_t *rsense)
-{ return -ENXIO; }
-static inline int32_t qpnp_iadc_get_gain_and_offset(struct qpnp_iadc_chip *iadc,
-				struct qpnp_iadc_calib *result)
-{ return -ENXIO; }
-static inline struct qpnp_iadc_chip *qpnp_get_iadc(struct device *dev,
-							const char *name)
-{ return ERR_PTR(-ENXIO); }
-static inline int32_t qpnp_iadc_vadc_sync_read(struct qpnp_iadc_chip *iadc,
-	enum qpnp_iadc_channels i_channel, struct qpnp_iadc_result *i_result,
-	enum qpnp_vadc_channels v_channel, struct qpnp_vadc_result *v_result)
-{ return -ENXIO; }
-static inline int32_t qpnp_iadc_calibrate_for_trim(struct qpnp_iadc_chip *iadc,
-							bool batfet_closed)
-{ return -ENXIO; }
-static inline int32_t qpnp_iadc_comp_result(struct qpnp_iadc_chip *iadc,
-						int64_t *result)
-{ return -ENXIO; }
-static inline int qpnp_iadc_skip_calibration(struct qpnp_iadc_chip *iadc)
-{ return -ENXIO; }
-static inline int qpnp_iadc_resume_calibration(struct qpnp_iadc_chip *iadc)
-{ return -ENXIO; }
-#endif
-
-/* Public API */
-#if defined(CONFIG_THERMAL_QPNP_ADC_TM)				\
-			|| defined(CONFIG_THERMAL_QPNP_ADC_TM_MODULE)
 /**
  * qpnp_adc_tm_channel_measure() - Configures kernel clients a channel to
  *		monitor the corresponding ADC channel for threshold detection.
@@ -2567,24 +967,4 @@ int32_t qpnp_adc_tm_disable_chan_meas(struct qpnp_adc_tm_chip *chip,
  *		pointer that needs to be used during an ADC TM request.
  */
 struct qpnp_adc_tm_chip *qpnp_get_adc_tm(struct device *dev, const char *name);
-#else
-static inline int32_t qpnp_adc_tm_usbid_configure(
-			struct qpnp_adc_tm_chip *chip,
-			struct qpnp_adc_tm_btm_param *param)
-{ return -ENXIO; }
-static inline int32_t qpnp_adc_tm_usbid_end(struct qpnp_adc_tm_chip *chip)
-{ return -ENXIO; }
-static inline int32_t qpnp_adc_tm_channel_measure(
-					struct qpnp_adc_tm_chip *chip,
-					struct qpnp_adc_tm_btm_param *param)
-{ return -ENXIO; }
-static inline int32_t qpnp_adc_tm_disable_chan_meas(
-					struct qpnp_adc_tm_chip *chip,
-					struct qpnp_adc_tm_btm_param *param)
-{ return -ENXIO; }
-static inline struct qpnp_adc_tm_chip *qpnp_get_adc_tm(struct device *dev,
-							const char *name)
-{ return ERR_PTR(-ENXIO); }
-#endif
-
 #endif

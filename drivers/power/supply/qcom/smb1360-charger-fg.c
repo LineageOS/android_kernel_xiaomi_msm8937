@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-only
-/* Copyright (c) 2013-2015, 2018-2021, The Linux Foundation. All rights reserved.
+/*
+ * Copyright (c) 2013-2015, 2018-2021, The Linux Foundation. All rights reserved.
  */
+
 #define pr_fmt(fmt) "SMB:%s: " fmt, __func__
 
 #include <linux/i2c.h>

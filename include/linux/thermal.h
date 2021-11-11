@@ -75,11 +75,6 @@ enum thermal_device_mode {
 	THERMAL_DEVICE_ENABLED,
 };
 
-enum thermal_trip_activation_mode {
-	THERMAL_TRIP_ACTIVATION_DISABLED = 0,
-	THERMAL_TRIP_ACTIVATION_ENABLED,
-};
-
 enum thermal_trip_type {
 	THERMAL_TRIP_ACTIVE = 0,
 	THERMAL_TRIP_PASSIVE,

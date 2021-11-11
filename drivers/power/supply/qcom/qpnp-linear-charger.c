@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-only
-/* Copyright (c) 2013-2015, 2017-2021, The Linux Foundation. All rights reserved.
+/*
+ * Copyright (c) 2013-2015, 2017-2021, The Linux Foundation. All rights reserved.
  */
+
 #define pr_fmt(fmt)	"CHG: %s: " fmt, __func__
 
 #include <linux/module.h>
@@ -191,6 +193,7 @@ static inline int get_bpd(const char *name)
 		if (strcmp(bpd_label[i], name) == 0)
 			return i;
 	}
+
 	return -EINVAL;
 }
 
