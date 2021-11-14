@@ -5,8 +5,8 @@
 		input-device-name = "gf3208";
 		interrupt-parent = <&tlmm>;
 		interrupts = <0x2e 0x0>;
-		goodix,gpio_reset = <&tlmm 62>;
-		goodix,gpio_irq = <&tlmm 46>;
+		goodix,gpio_reset = <&tlmm 62 0>;
+		goodix,gpio_irq = <&tlmm 46 0>;
 		clock-names = "iface_clk", "core_clk";
 		clocks = <&clock_gcc clk_gcc_blsp1_ahb_clk>,
 			<&clock_gcc clk_gcc_blsp1_qup1_spi_apps_clk>;
