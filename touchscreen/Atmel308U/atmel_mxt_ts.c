@@ -827,7 +827,9 @@ static const struct file_operations ctp_open_procs_fops = {
 };
 #endif
 
+#if 0
 static int mxt_read_key_delta(struct mxt_data *data);
+#endif
 
 static int mxt_initialize_input_device(struct mxt_data *data);
 
@@ -1575,6 +1577,7 @@ static void mxt_proc_t100_messages(struct mxt_data *data, u8 *message)
 	}
 }
 
+#if 0
 static void mxt_proc_t15_messages(struct mxt_data *data, u8 *msg)
 {
 	struct input_dev *input_dev = data->input_dev;
@@ -1624,6 +1627,13 @@ static void mxt_proc_t15_messages(struct mxt_data *data, u8 *msg)
 
 	printk("Key:input sync!\n");
 }
+#else
+static void mxt_proc_t97_messages(struct mxt_data *data, u8 *msg);
+static void mxt_proc_t15_messages(struct mxt_data *data, u8 *msg)
+{
+	mxt_proc_t97_messages(data, msg);
+}
+#endif
 
 static void mxt_proc_t19_messages(struct mxt_data *data, u8 *msg)
 {
@@ -4494,6 +4504,7 @@ static ssize_t mxt_mutual_ref_read(struct file *filp, struct kobject *kobj,
 
 }
 
+#if 0
 static int mxt_read_key_delta(struct mxt_data *data)
 {
 	int error = 0;
@@ -4545,6 +4556,7 @@ err_free_raw_key_delta:
 out:
 	return keyvalue;
 }
+#endif
 
 static ssize_t mxt_mutual_ref_write(struct file *filp, struct kobject *kobj,
 	struct bin_attribute *bin_attr, char *buf, loff_t off, size_t count)
