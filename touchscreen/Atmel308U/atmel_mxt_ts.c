@@ -5344,6 +5344,7 @@ static int mxt_initialize_input_device(struct mxt_data *data)
 {
 	struct device *dev = &data->client->dev;
 	struct input_dev *input_dev;
+	int i = 0;
 	int ret;
 	int index = data->current_index;
 
@@ -5402,6 +5403,10 @@ static int mxt_initialize_input_device(struct mxt_data *data)
 		input_set_abs_params(input_dev, ABS_MT_TOOL_TYPE,
 			0, MT_TOOL_MAX, 0, 0);
 	}
+
+	/* For key codes */
+	for (i = 0; i < data->pdata->config_array[index].key_num; i++)
+		input_set_capability(input_dev, EV_KEY, data->pdata->config_array[index].key_codes[i]);
 
 	/* For wakeup gesture */
 	if (data->pdata->config_array[index].wakeup_gesture_support) {
