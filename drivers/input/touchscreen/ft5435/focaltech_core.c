@@ -25,7 +25,8 @@
 #define FTS_SUSPEND_LEVEL 1     /* Early-suspend level */
 #endif
 
-#define FTS_DRIVER_NAME                     "fts_ts"
+#define FTS_DRIVER_NAME                     "ft5435_ts"
+#define FTS_INPUT_DEV_NAME                  "fts_ts"
 #define INTERVAL_READ_REG                   20
 #define TIMEOUT_READ_REG                    300
 #if FTS_POWER_SOURCE_CUST_EN
@@ -175,7 +176,7 @@ static int ft5435_fts_input_dev_init( struct i2c_client *client, struct fts_ts_d
 
 	FTS_FUNC_ENTER();
 
-	input_dev->name = FTS_DRIVER_NAME;
+	input_dev->name = FTS_INPUT_DEV_NAME;
 	input_dev->id.bustype = BUS_I2C;
 	input_dev->dev.parent = &client->dev;
 
