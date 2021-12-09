@@ -51,10 +51,10 @@ int idc_esdcheck_lcderror(void)
 	FTS_DEBUG("[ESD]Check LCD ESD");
 	if ( (tp_need_recovery == 1) && (lcd_need_reset == 0) ) {
 		 tp_need_recovery = 0;
-		 fts_tp_state_recovery(fts_i2c_client);
+		 ft5435_fts_tp_state_recovery(ft5435_fts_i2c_client);
 	}
 
-	ret = fts_i2c_read_reg(fts_i2c_client, FTS_REG_ESD_SATURATE, &val);
+	ret = ft5435_ft5435_fts_i2c_read_reg(ft5435_fts_i2c_client, FTS_REG_ESD_SATURATE, &val);
 	if ( ret < 0) {
 		 FTS_ERROR("[ESD]: Read ESD_SATURATE(0xED) failed ret=%d!", ret);
 		 return -EIO;
@@ -77,8 +77,8 @@ static int fts_esdcheck_tp_reset( void )
 	fts_esdcheck_data.flow_work_hold_cnt = 0;
 	fts_esdcheck_data.hardware_reset_cnt++;
 
-	fts_reset_proc(200);
-	fts_tp_state_recovery(fts_i2c_client);
+	ft5435_fts_reset_proc(200);
+	ft5435_fts_tp_state_recovery(ft5435_fts_i2c_client);
 
 	FTS_FUNC_EXIT();
 	return 0;
@@ -93,13 +93,13 @@ static bool get_chip_id( void )
 
 	for (i = 0; i < 3; i++) {
 		 reg_addr = FTS_REG_CHIP_ID;
-		 err = fts_i2c_read(fts_i2c_client, &reg_addr, 1, &reg_value, 1);
+		 err = ft5435_fts_i2c_read(ft5435_fts_i2c_client, &reg_addr, 1, &reg_value, 1);
 
 		 if ( err < 0 ) {
 			FTS_ERROR("[ESD]: Read Reg 0xA3 failed ret = %d!!", err);
 			fts_esdcheck_data.i2c_nack_cnt++;
 		 } else {
-			if ( (reg_value == chip_types.chip_idh) || (reg_value == 0xEF) ) /* Upgrade sometimes can't detect */ {
+			if ( (reg_value == ft5435_chip_types.chip_idh) || (reg_value == 0xEF) ) /* Upgrade sometimes can't detect */ {
 				break;
 			} else {
 				fts_esdcheck_data.i2c_dataerror_cnt++;
@@ -123,7 +123,7 @@ static bool get_flow_cnt( void )
 	u8      reg_addr = 0;
 
 	reg_addr = FTS_REG_FLOW_WORK_CNT;
-	err = fts_i2c_read(fts_i2c_client, &reg_addr, 1, &reg_value, 1);
+	err = ft5435_fts_i2c_read(ft5435_fts_i2c_client, &reg_addr, 1, &reg_value, 1);
 	if (err < 0) {
 		 FTS_ERROR("[ESD]: Read Reg 0x91 failed ret = %d!!", err);
 		 fts_esdcheck_data.i2c_nack_cnt++;
@@ -174,7 +174,7 @@ static int esdcheck_algorithm(void)
 
 
 	reg_addr = FTS_REG_WORKMODE;
-	err = fts_i2c_read(fts_i2c_client, &reg_addr, 1, &reg_value, 1);
+	err = ft5435_fts_i2c_read(ft5435_fts_i2c_client, &reg_addr, 1, &reg_value, 1);
 	if ( err < 0 ) {
 		 fts_esdcheck_data.i2c_nack_cnt++;
 	} else if ( (reg_value & 0x70) ==  FTS_REG_WORKMODE_FACTORY_VALUE) {

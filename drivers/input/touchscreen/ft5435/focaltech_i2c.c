@@ -20,7 +20,7 @@
 
 static DEFINE_MUTEX(i2c_rw_access);
 
-int fts_i2c_read(struct i2c_client *client, char *writebuf, int writelen, char *readbuf, int readlen)
+int ft5435_fts_i2c_read(struct i2c_client *client, char *writebuf, int writelen, char *readbuf, int readlen)
 {
 	int ret;
 
@@ -66,7 +66,7 @@ int fts_i2c_read(struct i2c_client *client, char *writebuf, int writelen, char *
 	return ret;
 }
 
-int fts_i2c_write(struct i2c_client *client, char *writebuf, int writelen)
+int ft5435_fts_i2c_write(struct i2c_client *client, char *writebuf, int writelen)
 {
 	int ret = 0;
 
@@ -89,28 +89,28 @@ int fts_i2c_write(struct i2c_client *client, char *writebuf, int writelen)
 
 	return ret;
 }
-int fts_i2c_write_reg(struct i2c_client *client, u8 regaddr, u8 regvalue)
+int ft5435_ft5435_fts_i2c_write_reg(struct i2c_client *client, u8 regaddr, u8 regvalue)
 {
 	u8 buf[2] = {0};
 
 	buf[0] = regaddr;
 	buf[1] = regvalue;
-	return fts_i2c_write(client, buf, sizeof(buf));
+	return ft5435_fts_i2c_write(client, buf, sizeof(buf));
 }
 
-int fts_i2c_read_reg(struct i2c_client *client, u8 regaddr, u8 *regvalue)
+int ft5435_ft5435_fts_i2c_read_reg(struct i2c_client *client, u8 regaddr, u8 *regvalue)
 {
-	return fts_i2c_read(client, &regaddr, 1, regvalue, 1);
+	return ft5435_fts_i2c_read(client, &regaddr, 1, regvalue, 1);
 }
 
-int fts_i2c_init(void)
+int ft5435_fts_i2c_init(void)
 {
 	FTS_FUNC_ENTER();
 
 	FTS_FUNC_EXIT();
 	return 0;
 }
-int fts_i2c_exit(void)
+int ft5435_fts_i2c_exit(void)
 {
 	FTS_FUNC_ENTER();
 

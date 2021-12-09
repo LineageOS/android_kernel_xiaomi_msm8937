@@ -184,8 +184,8 @@ int fts_sensor_resume(struct fts_ts_data *data);
 int fts_sensor_remove(struct fts_ts_data *data);
 #endif
 
-extern struct i2c_client *fts_i2c_client;
-extern struct fts_ts_data *fts_wq_data;
-extern struct input_dev *fts_input_dev;
+extern struct i2c_client *ft5435_fts_i2c_client;
+extern struct fts_ts_data *ft5435_fts_wq_data;
+extern struct input_dev *ft5435_fts_input_dev;
 
 #endif

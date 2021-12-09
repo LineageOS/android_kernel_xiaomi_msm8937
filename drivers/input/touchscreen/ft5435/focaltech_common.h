@@ -83,33 +83,33 @@ struct ft_chip_t
 	unsigned char bootloader_idl;
 };
 
-int fts_i2c_write_reg(struct i2c_client *client, u8 regaddr, u8 regvalue);
-int fts_i2c_read_reg(struct i2c_client *client, u8 regaddr, u8 *regvalue);
-int fts_i2c_read(struct i2c_client *client, char *writebuf, int writelen, char *readbuf, int readlen);
-int fts_i2c_write(struct i2c_client *client, char *writebuf, int writelen);
-int fts_i2c_init(void);
-int fts_i2c_exit(void);
+int ft5435_ft5435_fts_i2c_write_reg(struct i2c_client *client, u8 regaddr, u8 regvalue);
+int ft5435_ft5435_fts_i2c_read_reg(struct i2c_client *client, u8 regaddr, u8 *regvalue);
+int ft5435_fts_i2c_read(struct i2c_client *client, char *writebuf, int writelen, char *readbuf, int readlen);
+int ft5435_fts_i2c_write(struct i2c_client *client, char *writebuf, int writelen);
+int ft5435_fts_i2c_init(void);
+int ft5435_fts_i2c_exit(void);
 
 #if FTS_GESTURE_EN
-int fts_gesture_init(struct input_dev *input_dev, struct i2c_client *client);
-int fts_gesture_exit(struct i2c_client *client);
-void fts_gesture_recovery(struct i2c_client *client);
-int fts_gesture_readdata(struct i2c_client *client);
-int fts_gesture_suspend(struct i2c_client *i2c_client);
-int fts_gesture_resume(struct i2c_client *client);
+int ft5435_fts_gesture_init(struct input_dev *input_dev, struct i2c_client *client);
+int ft5435_fts_gesture_exit(struct i2c_client *client);
+void ft5435_fts_gesture_recovery(struct i2c_client *client);
+int ft5435_fts_gesture_readdata(struct i2c_client *client);
+int ft5435_fts_gesture_suspend(struct i2c_client *i2c_client);
+int ft5435_fts_gesture_resume(struct i2c_client *client);
 
 int fts_select_gesture_mode(struct input_dev *dev, unsigned int type, unsigned int code, int value);
 
 #endif
 
 #if FTS_APK_NODE_EN
-int fts_create_apk_debug_channel(struct i2c_client * client);
-void fts_release_apk_debug_channel(void);
+int ft5435_fts_create_apk_debug_channel(struct i2c_client * client);
+void ft5435_fts_release_apk_debug_channel(void);
 #endif
 
 #if FTS_SYSFS_NODE_EN
-int fts_create_sysfs(struct i2c_client *client);
-int fts_remove_sysfs(struct i2c_client *client);
+int ft5435_fts_create_sysfs(struct i2c_client *client);
+int ft5435_fts_remove_sysfs(struct i2c_client *client);
 #endif
 
 #if FTS_ESDCHECK_EN
@@ -134,16 +134,16 @@ int fts_point_report_check_exit(void);
 void fts_point_report_check_queue_work(void);
 #endif
 
-extern int g_show_log;
-int fts_reset_proc(int hdelayms);
-int fts_wait_tp_to_valid(struct i2c_client *client);
-void fts_tp_state_recovery(struct i2c_client *client);
-int fts_ex_mode_init(struct i2c_client *client);
-int fts_ex_mode_exit(struct i2c_client *client);
-int fts_ex_mode_recovery(struct i2c_client *client);
+extern int ft5435_g_show_log;
+int ft5435_fts_reset_proc(int hdelayms);
+int ft5435_fts_wait_tp_to_valid(struct i2c_client *client);
+void ft5435_fts_tp_state_recovery(struct i2c_client *client);
+int ft5435_fts_ex_mode_init(struct i2c_client *client);
+int ft5435_fts_ex_mode_exit(struct i2c_client *client);
+int ft5435_fts_ex_mode_recovery(struct i2c_client *client);
 
-void fts_irq_disable(void);
-void fts_irq_enable(void);
+void ft5435_fts_irq_disable(void);
+void ft5435_fts_irq_enable(void);
 
 #if FTS_DEBUG_EN
 #define FTS_DEBUG_LEVEL     1
@@ -163,11 +163,11 @@ void fts_irq_enable(void);
 #endif
 
 #define FTS_INFO(fmt, args...) do { \
-			if (g_show_log) {printk(KERN_ERR "[FTS][Info]"fmt"\n", ##args);} \
+			if (ft5435_g_show_log) {printk(KERN_ERR "[FTS][Info]"fmt"\n", ##args);} \
 		 }  while (0)
 
 #define FTS_ERROR(fmt, args...)  do { \
-			 if (g_show_log) {printk(KERN_ERR "[FTS][Error]"fmt"\n", ##args);} \
+			 if (ft5435_g_show_log) {printk(KERN_ERR "[FTS][Error]"fmt"\n", ##args);} \
 		 }  while (0)
 
 

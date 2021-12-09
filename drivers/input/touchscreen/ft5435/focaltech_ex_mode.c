@@ -51,7 +51,7 @@ static ssize_t fts_touch_glove_store(struct device *dev, struct device_attribute
 		 if (!g_fts_mode_flag.fts_glove_mode_flag)
 		 {
 			FTS_INFO("[Mode]enter glove mode");
-			ret = fts_enter_glove_mode(fts_i2c_client, true);
+			ret = fts_enter_glove_mode(ft5435_fts_i2c_client, true);
 			if (ret >= 0) {
 				g_fts_mode_flag.fts_glove_mode_flag = true;
 			}
@@ -59,7 +59,7 @@ static ssize_t fts_touch_glove_store(struct device *dev, struct device_attribute
 	} else if (FTS_SYSFS_ECHO_OFF(buf)) {
 		 if (g_fts_mode_flag.fts_glove_mode_flag) {
 			FTS_INFO("[Mode]exit glove mode");
-			ret = fts_enter_glove_mode(fts_i2c_client, false);
+			ret = fts_enter_glove_mode(ft5435_fts_i2c_client, false);
 			if (ret >= 0) {
 				g_fts_mode_flag.fts_glove_mode_flag = false;
 			}
@@ -81,7 +81,7 @@ int fts_enter_glove_mode( struct i2c_client *client, int mode)
 	else
 		 buf_value[0] = 0x00;
 
-	ret = fts_i2c_write_reg( client, buf_addr[0], buf_value[0]);
+	ret = ft5435_ft5435_fts_i2c_write_reg( client, buf_addr[0], buf_value[0]);
 	if (ret<0) {
 		 FTS_ERROR("[Mode]fts_enter_glove_mode write value fail");
 	}
@@ -107,7 +107,7 @@ static ssize_t fts_touch_cover_store(struct device *dev, struct device_attribute
 	if (FTS_SYSFS_ECHO_ON(buf)) {
 		 if (!g_fts_mode_flag.fts_cover_mode_flag) {
 			FTS_INFO("[Mode]enter cover mode");
-			ret = fts_enter_cover_mode(fts_i2c_client, true);
+			ret = fts_enter_cover_mode(ft5435_fts_i2c_client, true);
 			if (ret >= 0) {
 				g_fts_mode_flag.fts_cover_mode_flag = true;
 			}
@@ -115,7 +115,7 @@ static ssize_t fts_touch_cover_store(struct device *dev, struct device_attribute
 	} else if (FTS_SYSFS_ECHO_OFF(buf)) {
 		 if (g_fts_mode_flag.fts_cover_mode_flag) {
 			FTS_INFO("[Mode]exit cover mode");
-			ret = fts_enter_cover_mode(fts_i2c_client, false);
+			ret = fts_enter_cover_mode(ft5435_fts_i2c_client, false);
 			if (ret >= 0) {
 				g_fts_mode_flag.fts_cover_mode_flag = false;
 			}
@@ -137,7 +137,7 @@ int  fts_enter_cover_mode( struct i2c_client *client, int mode)
 	else
 		 buf_value[0] = 0x00;
 
-	ret = fts_i2c_write_reg( client, buf_addr[0], buf_value[0]);
+	ret = ft5435_ft5435_fts_i2c_write_reg( client, buf_addr[0], buf_value[0]);
 	if (ret<0) {
 		 FTS_ERROR("[Mode] fts_enter_cover_mode write value fail \n");
 	}
@@ -163,7 +163,7 @@ static ssize_t fts_touch_charger_store(struct device *dev, struct device_attribu
 	if (FTS_SYSFS_ECHO_ON(buf)) {
 		 if (!g_fts_mode_flag.fts_charger_mode_flag) {
 			FTS_INFO("[Mode]enter charger mode");
-			ret = fts_enter_charger_mode(fts_i2c_client, true);
+			ret = fts_enter_charger_mode(ft5435_fts_i2c_client, true);
 			if (ret >= 0) {
 				g_fts_mode_flag.fts_charger_mode_flag = true;
 			}
@@ -171,7 +171,7 @@ static ssize_t fts_touch_charger_store(struct device *dev, struct device_attribu
 	} else if (FTS_SYSFS_ECHO_OFF(buf)) {
 		 if (g_fts_mode_flag.fts_charger_mode_flag) {
 			FTS_INFO("[Mode]exit charger mode");
-			ret = fts_enter_charger_mode(fts_i2c_client, false);
+			ret = fts_enter_charger_mode(ft5435_fts_i2c_client, false);
 			if (ret >= 0) {
 				g_fts_mode_flag.fts_charger_mode_flag = false;
 			}
@@ -193,7 +193,7 @@ int  fts_enter_charger_mode(struct i2c_client *client, int mode)
 	else
 		 buf_value[0] = 0x00;
 
-	ret = fts_i2c_write_reg( client, buf_addr[0], buf_value[0]);
+	ret = ft5435_ft5435_fts_i2c_write_reg( client, buf_addr[0], buf_value[0]);
 	if (ret<0) {
 		 FTS_DEBUG("[Mode]fts_enter_charger_mode write value fail");
 	}
@@ -226,7 +226,7 @@ static struct attribute_group fts_touch_mode_group = {
 	.attrs = fts_touch_mode_attrs,
 };
 
-int fts_ex_mode_init(struct i2c_client *client)
+int ft5435_fts_ex_mode_init(struct i2c_client *client)
 {
 	int err=0;
 
@@ -247,13 +247,13 @@ int fts_ex_mode_init(struct i2c_client *client)
 
 }
 
-int fts_ex_mode_exit(struct i2c_client *client)
+int ft5435_fts_ex_mode_exit(struct i2c_client *client)
 {
 	sysfs_remove_group(&client->dev.kobj, &fts_touch_mode_group);
 	return 0;
 }
 
-int fts_ex_mode_recovery(struct i2c_client *client)
+int ft5435_fts_ex_mode_recovery(struct i2c_client *client)
 {
 	int ret = 0;
 #if FTS_GLOVE_EN

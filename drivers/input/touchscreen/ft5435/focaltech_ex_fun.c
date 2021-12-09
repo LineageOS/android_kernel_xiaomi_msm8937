@@ -96,16 +96,16 @@ static ssize_t fts_debug_write(struct file *filp, const char __user *buff, size_
 			sprintf(upgrade_file_path, "%s", writebuf + 1);
 			upgrade_file_path[buflen-1] = '\0';
 			FTS_DEBUG("%s\n", upgrade_file_path);
-			fts_irq_disable();
+			ft5435_fts_irq_disable();
 #if FTS_ESDCHECK_EN
 			fts_esdcheck_switch(DISABLE);
 #endif
-			if (fts_updatefun_curr.upgrade_with_app_bin_file)
-				ret = fts_updatefun_curr.upgrade_with_app_bin_file(fts_i2c_client, upgrade_file_path);
+			if (ft5435_fts_updatefun_curr.upgrade_with_app_bin_file)
+				ret = ft5435_fts_updatefun_curr.upgrade_with_app_bin_file(ft5435_fts_i2c_client, upgrade_file_path);
 #if FTS_ESDCHECK_EN
 			fts_esdcheck_switch(ENABLE);
 #endif
-			fts_irq_enable();
+			ft5435_fts_irq_enable();
 			if (ret < 0) {
 				FTS_ERROR("[APK]: upgrade failed!!");
 			}
@@ -124,24 +124,24 @@ static ssize_t fts_debug_write(struct file *filp, const char __user *buff, size_
 			break;
 		case PROC_READ_REGISTER:
 			writelen = 1;
-			ret = fts_i2c_write(fts_i2c_client, writebuf + 1, writelen);
+			ret = ft5435_fts_i2c_write(ft5435_fts_i2c_client, writebuf + 1, writelen);
 			if (ret < 0) {
 				FTS_ERROR("[APK]: write iic error!!");
 			}
 			break;
 		case PROC_WRITE_REGISTER:
 			writelen = 2;
-			ret = fts_i2c_write(fts_i2c_client, writebuf + 1, writelen);
+			ret = ft5435_fts_i2c_write(ft5435_fts_i2c_client, writebuf + 1, writelen);
 			if (ret < 0) {
 				FTS_ERROR("[APK]: write iic error!!");
 			}
 			break;
 		case PROC_SET_SLAVE_ADDR:
 
-			ret = fts_i2c_client->addr;
+			ret = ft5435_fts_i2c_client->addr;
 			FTS_DEBUG("Original i2c addr 0x%x ", ret<<1 );
-			if (writebuf[1] != fts_i2c_client->addr) {
-				fts_i2c_client->addr = writebuf[1];
+			if (writebuf[1] != ft5435_fts_i2c_client->addr) {
+				ft5435_fts_i2c_client->addr = writebuf[1];
 				FTS_DEBUG("Change i2c addr 0x%x to 0x%x", ret<<1, writebuf[1]<<1);
 
 			}
@@ -153,20 +153,20 @@ static ssize_t fts_debug_write(struct file *filp, const char __user *buff, size_
 			tmp[buflen - 1] = '\0';
 			if (strncmp(tmp, "focal_driver", 12)==0) {
 				FTS_DEBUG("Begin HW Reset");
-				fts_reset_proc(1);
+				ft5435_fts_reset_proc(1);
 			}
 
 			break;
 
 		case PROC_AUTOCLB:
 			FTS_DEBUG("[APK]: autoclb!!");
-			fts_ctpm_auto_clb(fts_i2c_client);
+			ft5435_fts_ctpm_auto_clb(ft5435_fts_i2c_client);
 			break;
 		case PROC_READ_DATA:
 		case PROC_WRITE_DATA:
 			writelen = count - 1;
 			if (writelen>0) {
-				ret = fts_i2c_write(fts_i2c_client, writebuf + 1, writelen);
+				ret = ft5435_fts_i2c_write(ft5435_fts_i2c_client, writebuf + 1, writelen);
 				if (ret < 0) {
 					FTS_ERROR("[APK]: write iic error!!");
 				}
@@ -202,7 +202,7 @@ static ssize_t fts_debug_read(struct file *filp, char __user *buff, size_t count
 	case PROC_UPGRADE:
 
 		regaddr = FTS_REG_FW_VER;
-		ret = fts_i2c_read_reg(fts_i2c_client, regaddr, &regvalue);
+		ret = ft5435_ft5435_fts_i2c_read_reg(ft5435_fts_i2c_client, regaddr, &regvalue);
 		if (ret < 0)
 			num_read_chars = sprintf(buf, "%s", "get fw version failed.\n");
 			else
@@ -210,7 +210,7 @@ static ssize_t fts_debug_read(struct file *filp, char __user *buff, size_t count
 		break;
 	case PROC_READ_REGISTER:
 		readlen = 1;
-		ret = fts_i2c_read(fts_i2c_client, NULL, 0, buf, readlen);
+		ret = ft5435_fts_i2c_read(ft5435_fts_i2c_client, NULL, 0, buf, readlen);
 		if (ret < 0) {
 #if FTS_ESDCHECK_EN
 			fts_esdcheck_proc_busy(0);
@@ -222,7 +222,7 @@ static ssize_t fts_debug_read(struct file *filp, char __user *buff, size_t count
 		break;
 	case PROC_READ_DATA:
 		readlen = count;
-		ret = fts_i2c_read(fts_i2c_client, NULL, 0, buf, readlen);
+		ret = ft5435_fts_i2c_read(ft5435_fts_i2c_client, NULL, 0, buf, readlen);
 		if (ret < 0) {
 #if FTS_ESDCHECK_EN
 			fts_esdcheck_proc_busy(0);
@@ -281,16 +281,16 @@ static int fts_debug_write(struct file *filp,
 			sprintf(upgrade_file_path, "%s", writebuf + 1);
 			upgrade_file_path[buflen-1] = '\0';
 			FTS_DEBUG("%s\n", upgrade_file_path);
-			fts_irq_disable();
+			ft5435_fts_irq_disable();
 #if FTS_ESDCHECK_EN
 			fts_esdcheck_switch(DISABLE);
 #endif
-			if (fts_updatefun_curr.upgrade_with_app_bin_file)
-				ret = fts_updatefun_curr.upgrade_with_app_bin_file(fts_i2c_client, upgrade_file_path);
+			if (ft5435_fts_updatefun_curr.upgrade_with_app_bin_file)
+				ret = ft5435_fts_updatefun_curr.upgrade_with_app_bin_file(ft5435_fts_i2c_client, upgrade_file_path);
 #if FTS_ESDCHECK_EN
 			fts_esdcheck_switch(ENABLE);
 #endif
-			fts_irq_enable();
+			ft5435_fts_irq_enable();
 			if (ret < 0) {
 				FTS_ERROR("[APK]: upgrade failed!!");
 			}
@@ -308,24 +308,24 @@ static int fts_debug_write(struct file *filp,
 			break;
 		case PROC_READ_REGISTER:
 			writelen = 1;
-			ret = fts_i2c_write(fts_i2c_client, writebuf + 1, writelen);
+			ret = ft5435_fts_i2c_write(ft5435_fts_i2c_client, writebuf + 1, writelen);
 			if (ret < 0) {
 				FTS_ERROR("[APK]: write iic error!!n");
 			}
 			break;
 		case PROC_WRITE_REGISTER:
 			writelen = 2;
-			ret = fts_i2c_write(fts_i2c_client, writebuf + 1, writelen);
+			ret = ft5435_fts_i2c_write(ft5435_fts_i2c_client, writebuf + 1, writelen);
 			if (ret < 0) {
 				FTS_ERROR("[APK]: write iic error!!");
 			}
 			break;
 		case PROC_SET_SLAVE_ADDR:
 
-			ret = fts_i2c_client->addr;
+			ret = ft5435_fts_i2c_client->addr;
 			FTS_DEBUG("Original i2c addr 0x%x ", ret<<1 );
-			if (writebuf[1] != fts_i2c_client->addr) {
-				fts_i2c_client->addr = writebuf[1];
+			if (writebuf[1] != ft5435_fts_i2c_client->addr) {
+				ft5435_fts_i2c_client->addr = writebuf[1];
 				FTS_DEBUG("Change i2c addr 0x%x to 0x%x", ret<<1, writebuf[1]<<1);
 
 			}
@@ -337,20 +337,20 @@ static int fts_debug_write(struct file *filp,
 			tmp[buflen - 1] = '\0';
 			if (strncmp(tmp, "focal_driver", 12)==0) {
 				FTS_DEBUG("Begin HW Reset");
-				fts_reset_proc(1);
+				ft5435_fts_reset_proc(1);
 			}
 
 			break;
 
 		case PROC_AUTOCLB:
 			FTS_DEBUG("[APK]: autoclb!!");
-			fts_ctpm_auto_clb(fts_i2c_client);
+			ft5435_fts_ctpm_auto_clb(ft5435_fts_i2c_client);
 			break;
 		case PROC_READ_DATA:
 		case PROC_WRITE_DATA:
 			writelen = len - 1;
 			if (writelen>0) {
-				ret = fts_i2c_write(fts_i2c_client, writebuf + 1, writelen);
+				ret = ft5435_fts_i2c_write(ft5435_fts_i2c_client, writebuf + 1, writelen);
 				if (ret < 0) {
 					FTS_ERROR("[APK]: write iic error!!");
 				}
@@ -387,7 +387,7 @@ static int fts_debug_read( char *page, char **start,
 		case PROC_UPGRADE:
 
 			regaddr = FTS_REG_FW_VER;
-			ret = fts_i2c_read_reg(fts_i2c_client, regaddr, &regvalue);
+			ret = ft5435_ft5435_fts_i2c_read_reg(ft5435_fts_i2c_client, regaddr, &regvalue);
 			if (ret < 0)
 				num_read_chars = sprintf(buf, "%s", "get fw version failed.\n");
 			else
@@ -395,7 +395,7 @@ static int fts_debug_read( char *page, char **start,
 			break;
 		case PROC_READ_REGISTER:
 			readlen = 1;
-			ret = fts_i2c_read(fts_i2c_client, NULL, 0, buf, readlen);
+			ret = ft5435_fts_i2c_read(ft5435_fts_i2c_client, NULL, 0, buf, readlen);
 			if (ret < 0) {
 #if FTS_ESDCHECK_EN
 				fts_esdcheck_proc_busy(0);
@@ -407,7 +407,7 @@ static int fts_debug_read( char *page, char **start,
 			break;
 		case PROC_READ_DATA:
 			readlen = count;
-			ret = fts_i2c_read(fts_i2c_client, NULL, 0, buf, readlen);
+			ret = ft5435_fts_i2c_read(ft5435_fts_i2c_client, NULL, 0, buf, readlen);
 			if (ret < 0) {
 #if FTS_ESDCHECK_EN
 				fts_esdcheck_proc_busy(0);
@@ -432,7 +432,7 @@ static int fts_debug_read( char *page, char **start,
 	return num_read_chars;
 }
 #endif
-int fts_create_apk_debug_channel(struct i2c_client * client)
+int ft5435_fts_create_apk_debug_channel(struct i2c_client * client)
 {
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 10, 0))
 	fts_proc_entry = proc_create(PROC_NAME, 0777, NULL, &fts_proc_fops);
@@ -452,7 +452,7 @@ int fts_create_apk_debug_channel(struct i2c_client * client)
 	}
 	return 0;
 }
-void fts_release_apk_debug_channel(void)
+void ft5435_fts_release_apk_debug_channel(void)
 {
 
 	if (fts_proc_entry)
@@ -471,7 +471,7 @@ static ssize_t fts_hw_reset_show(struct device *dev, struct device_attribute *at
 {
 	ssize_t count = 0;
 
-	fts_reset_proc(200);
+	ft5435_fts_reset_proc(200);
 
 	count = snprintf(buf, PAGE_SIZE, "hw reset executed\n");
 
@@ -482,10 +482,10 @@ static ssize_t fts_irq_store(struct device *dev, struct device_attribute *attr, 
 {
 	if (FTS_SYSFS_ECHO_ON(buf)) {
 		FTS_INFO("[EX-FUN]enable irq");
-		fts_irq_enable();
+		ft5435_fts_irq_enable();
 	} else if (FTS_SYSFS_ECHO_OFF(buf)) {
 		FTS_INFO("[EX-FUN]disable irq");
-		fts_irq_disable();
+		ft5435_fts_irq_disable();
 	}
 	return count;
 }
@@ -500,12 +500,12 @@ static ssize_t fts_tpfwver_show(struct device *dev, struct device_attribute *att
 	ssize_t num_read_chars = 0;
 	u8 fwver = 0;
 
-	mutex_lock(&fts_input_dev->mutex);
+	mutex_lock(&ft5435_fts_input_dev->mutex);
 
 #if FTS_ESDCHECK_EN
 	fts_esdcheck_proc_busy(1);
 #endif
-	if (fts_i2c_read_reg(fts_i2c_client, FTS_REG_FW_VER, &fwver) < 0) {
+	if (ft5435_ft5435_fts_i2c_read_reg(ft5435_fts_i2c_client, FTS_REG_FW_VER, &fwver) < 0) {
 		num_read_chars = snprintf(buf, PAGE_SIZE, "I2c transfer error!\n");
 	}
 #if FTS_ESDCHECK_EN
@@ -517,7 +517,7 @@ static ssize_t fts_tpfwver_show(struct device *dev, struct device_attribute *att
 		num_read_chars = snprintf(buf, PAGE_SIZE, "FT5435 fw version:\t%02X\n", fwver);
 	}
 
-	mutex_unlock(&fts_input_dev->mutex);
+	mutex_unlock(&ft5435_fts_input_dev->mutex);
 
 	return num_read_chars;
 }
@@ -617,7 +617,7 @@ static ssize_t fts_tprwreg_show(struct device *dev, struct device_attribute *att
 {
 	int count;
 
-	mutex_lock(&fts_input_dev->mutex);
+	mutex_lock(&ft5435_fts_input_dev->mutex);
 
 	if (!g_rwreg_result.op) {
 		if (g_rwreg_result.result == 0) {
@@ -632,7 +632,7 @@ static ssize_t fts_tprwreg_show(struct device *dev, struct device_attribute *att
 			count = sprintf(buf, "Write %02X failed, ret: %d\n", g_rwreg_result.reg,  g_rwreg_result.result);
 		}
 	}
-	mutex_unlock(&fts_input_dev->mutex);
+	mutex_unlock(&ft5435_fts_input_dev->mutex);
 
 	return count;
 }
@@ -646,7 +646,7 @@ static ssize_t fts_tprwreg_store(struct device *dev, struct device_attribute *at
 	u8 valbuf[5]= {0};
 
 	memset(valbuf, 0, sizeof(valbuf));
-	mutex_lock(&fts_input_dev->mutex);
+	mutex_lock(&ft5435_fts_input_dev->mutex);
 	num_read_chars = count - 1;
 	if (num_read_chars != 2) {
 		if (num_read_chars != 4) {
@@ -679,7 +679,7 @@ static ssize_t fts_tprwreg_store(struct device *dev, struct device_attribute *at
 		g_rwreg_result.op = 0;
 		g_rwreg_result.reg = regaddr;
 		regaddr = wmreg;
-		g_rwreg_result.result = fts_i2c_read_reg(client, regaddr, &regvalue);
+		g_rwreg_result.result = ft5435_ft5435_fts_i2c_read_reg(client, regaddr, &regvalue);
 		if (g_rwreg_result.result < 0) {
 			FTS_ERROR("Could not read the register(0x%02x)", regaddr);
 		} else {
@@ -694,7 +694,7 @@ static ssize_t fts_tprwreg_store(struct device *dev, struct device_attribute *at
 		g_rwreg_result.op = 1;
 		g_rwreg_result.reg = regaddr;
 		g_rwreg_result.value = regvalue;
-		g_rwreg_result.result = fts_i2c_write_reg(client, regaddr, regvalue);
+		g_rwreg_result.result = ft5435_ft5435_fts_i2c_write_reg(client, regaddr, regvalue);
 		if (g_rwreg_result.result < 0) {
 			FTS_ERROR("Could not write the register(0x%02x)", regaddr);
 
@@ -707,7 +707,7 @@ static ssize_t fts_tprwreg_store(struct device *dev, struct device_attribute *at
 	fts_esdcheck_proc_busy(0);
 #endif
 error_return:
-	mutex_unlock(&fts_input_dev->mutex);
+	mutex_unlock(&ft5435_fts_input_dev->mutex);
 
 	return count;
 }
@@ -720,18 +720,18 @@ static ssize_t fts_fwupdate_store(struct device *dev, struct device_attribute *a
 {
 	struct i2c_client *client = container_of(dev, struct i2c_client, dev);
 
-	mutex_lock(&fts_input_dev->mutex);
-	fts_irq_disable();
+	mutex_lock(&ft5435_fts_input_dev->mutex);
+	ft5435_fts_irq_disable();
 #if FTS_ESDCHECK_EN
 	fts_esdcheck_switch(DISABLE);
 #endif
-	if (fts_updatefun_curr.upgrade_with_app_i_file)
-		fts_updatefun_curr.upgrade_with_app_i_file(client);
+	if (ft5435_fts_updatefun_curr.upgrade_with_app_i_file)
+		ft5435_fts_updatefun_curr.upgrade_with_app_i_file(client);
 #if FTS_ESDCHECK_EN
 	fts_esdcheck_switch(ENABLE);
 #endif
-	fts_irq_enable();
-	mutex_unlock(&fts_input_dev->mutex);
+	ft5435_fts_irq_enable();
+	mutex_unlock(&ft5435_fts_input_dev->mutex);
 
 	return count;
 }
@@ -749,18 +749,18 @@ static ssize_t fts_fwupgradeapp_store(struct device *dev, struct device_attribut
 	sprintf(fwname, "%s", buf);
 	fwname[count-1] = '\0';
 
-	mutex_lock(&fts_input_dev->mutex);
-	fts_irq_disable();
+	mutex_lock(&ft5435_fts_input_dev->mutex);
+	ft5435_fts_irq_disable();
 #if FTS_ESDCHECK_EN
 	fts_esdcheck_switch(DISABLE);
 #endif
-	if (fts_updatefun_curr.upgrade_with_app_bin_file)
-		fts_updatefun_curr.upgrade_with_app_bin_file(client, fwname);
+	if (ft5435_fts_updatefun_curr.upgrade_with_app_bin_file)
+		ft5435_fts_updatefun_curr.upgrade_with_app_bin_file(client, fwname);
 #if FTS_ESDCHECK_EN
 	fts_esdcheck_switch(ENABLE);
 #endif
-	fts_irq_enable();
-	mutex_unlock(&fts_input_dev->mutex);
+	ft5435_fts_irq_enable();
+	mutex_unlock(&ft5435_fts_input_dev->mutex);
 
 	return count;
 }
@@ -768,11 +768,11 @@ static ssize_t fts_driverversion_show(struct device *dev, struct device_attribut
 {
 	int count;
 
-	mutex_lock(&fts_input_dev->mutex);
+	mutex_lock(&ft5435_fts_input_dev->mutex);
 
 	count = sprintf(buf, FTS_DRIVER_VERSION "\n");
 
-	mutex_unlock(&fts_input_dev->mutex);
+	mutex_unlock(&ft5435_fts_input_dev->mutex);
 
 	return count;
 }
@@ -784,7 +784,7 @@ static ssize_t fts_driverversion_store(struct device *dev, struct device_attribu
 #if FTS_ESDCHECK_EN
 static ssize_t fts_esdcheck_store(struct device *dev, struct device_attribute *attr, const char *buf, size_t count)
 {
-	mutex_lock(&fts_input_dev->mutex);
+	mutex_lock(&ft5435_fts_input_dev->mutex);
 	if (FTS_SYSFS_ECHO_ON(buf)) {
 		FTS_DEBUG("enable esdcheck");
 		fts_esdcheck_switch(ENABLE);
@@ -792,7 +792,7 @@ static ssize_t fts_esdcheck_store(struct device *dev, struct device_attribute *a
 		FTS_DEBUG("disable esdcheck");
 		fts_esdcheck_switch(DISABLE);
 	}
-	mutex_unlock(&fts_input_dev->mutex);
+	mutex_unlock(&ft5435_fts_input_dev->mutex);
 
 	return -EPERM;
 }
@@ -801,11 +801,11 @@ static ssize_t fts_esdcheck_show(struct device *dev, struct device_attribute *at
 {
 	int count;
 
-	mutex_lock(&fts_input_dev->mutex);
+	mutex_lock(&ft5435_fts_input_dev->mutex);
 
 	count = sprintf(buf, "Esd check: %s\n", fts_esdcheck_get_status() ? "On" : "Off");
 
-	mutex_unlock(&fts_input_dev->mutex);
+	mutex_unlock(&ft5435_fts_input_dev->mutex);
 
 	return count;
 }
@@ -814,7 +814,7 @@ static ssize_t fts_module_config_show(struct device *dev, struct device_attribut
 {
 	int count = 0;
 
-	mutex_lock(&fts_input_dev->mutex);
+	mutex_lock(&ft5435_fts_input_dev->mutex);
 
 	count += sprintf(buf, "FTS_CHIP_TYPE: \t\t\t%04X\n", FTS_CHIP_TYPE);
 	count += sprintf(buf+count, "FTS_DEBUG_EN: \t\t\t%s\n", FTS_DEBUG_EN ? "ON" : "OFF");
@@ -838,7 +838,7 @@ static ssize_t fts_module_config_show(struct device *dev, struct device_attribut
 	count += sprintf(buf+count, "FTS_POWER_SOURCE_CUST_EN: \t%s\n", FTS_POWER_SOURCE_CUST_EN ? "ON" : "OFF");
 	count += sprintf(buf+count, "FTS_AUTO_UPGRADE_EN: \t\t%s\n", FTS_AUTO_UPGRADE_EN ? "ON" : "OFF");
 
-	mutex_unlock(&fts_input_dev->mutex);
+	mutex_unlock(&ft5435_fts_input_dev->mutex);
 
 	return count;
 }
@@ -851,25 +851,25 @@ static ssize_t fts_show_log_show(struct device *dev, struct device_attribute *at
 {
 	int count;
 
-	mutex_lock(&fts_input_dev->mutex);
+	mutex_lock(&ft5435_fts_input_dev->mutex);
 
-	count = sprintf(buf, "Log: %s\n", g_show_log ? "On" : "Off");
+	count = sprintf(buf, "Log: %s\n", ft5435_g_show_log ? "On" : "Off");
 
-	mutex_unlock(&fts_input_dev->mutex);
+	mutex_unlock(&ft5435_fts_input_dev->mutex);
 
 	return count;
 }
 static ssize_t fts_show_log_store(struct device *dev, struct device_attribute *attr, const char *buf, size_t count)
 {
-	mutex_lock(&fts_input_dev->mutex);
+	mutex_lock(&ft5435_fts_input_dev->mutex);
 	if (FTS_SYSFS_ECHO_ON(buf)) {
 		FTS_DEBUG("enable show log info/error");
-		g_show_log = 1;
+		ft5435_g_show_log = 1;
 	} else if (FTS_SYSFS_ECHO_OFF(buf)) {
 		FTS_DEBUG("disable show log info/error");
-		g_show_log = 0;
+		ft5435_g_show_log = 0;
 	}
-	mutex_unlock(&fts_input_dev->mutex);
+	mutex_unlock(&ft5435_fts_input_dev->mutex);
 	return count;
 }
 static ssize_t fts_dumpreg_store(struct device *dev, struct device_attribute *attr, const char *buf, size_t count)
@@ -884,39 +884,39 @@ static ssize_t fts_dumpreg_show(struct device *dev, struct device_attribute *att
 	u8 regvalue = 0;
 	struct i2c_client *client;
 
-	mutex_lock(&fts_input_dev->mutex);
+	mutex_lock(&ft5435_fts_input_dev->mutex);
 #if FTS_ESDCHECK_EN
 	fts_esdcheck_proc_busy(1);
 #endif
 	client = container_of(dev, struct i2c_client, dev);
-	fts_i2c_read_reg(client, FTS_REG_POWER_MODE, &regvalue);
+	ft5435_ft5435_fts_i2c_read_reg(client, FTS_REG_POWER_MODE, &regvalue);
 	count += sprintf(tmp + count, "Power Mode:0x%02x\n", regvalue);
 
-	fts_i2c_read_reg(client, FTS_REG_FW_VER, &regvalue);
+	ft5435_ft5435_fts_i2c_read_reg(client, FTS_REG_FW_VER, &regvalue);
 	count += sprintf(tmp + count, "FW Ver:0x%02x\n", regvalue);
 
-	fts_i2c_read_reg(client, FTS_REG_VENDOR_ID, &regvalue);
+	ft5435_ft5435_fts_i2c_read_reg(client, FTS_REG_VENDOR_ID, &regvalue);
 	count += sprintf(tmp + count, "Vendor ID:0x%02x\n", regvalue);
 
-	fts_i2c_read_reg(client, FTS_REG_LCD_BUSY_NUM, &regvalue);
+	ft5435_ft5435_fts_i2c_read_reg(client, FTS_REG_LCD_BUSY_NUM, &regvalue);
 	count += sprintf(tmp + count, "LCD Busy Number:0x%02x\n", regvalue);
 
-	fts_i2c_read_reg(client, FTS_REG_GESTURE_EN, &regvalue);
+	ft5435_ft5435_fts_i2c_read_reg(client, FTS_REG_GESTURE_EN, &regvalue);
 	count += sprintf(tmp + count, "Gesture Mode:0x%02x\n", regvalue);
 
-	fts_i2c_read_reg(client, FTS_REG_CHARGER_MODE_EN, &regvalue);
+	ft5435_ft5435_fts_i2c_read_reg(client, FTS_REG_CHARGER_MODE_EN, &regvalue);
 	count += sprintf(tmp + count, "charge stat:0x%02x\n", regvalue);
 
-	fts_i2c_read_reg(client, FTS_REG_INT_CNT, &regvalue);
+	ft5435_ft5435_fts_i2c_read_reg(client, FTS_REG_INT_CNT, &regvalue);
 	count += sprintf(tmp + count, "INT count:0x%02x\n", regvalue);
 
-	fts_i2c_read_reg(client, FTS_REG_FLOW_WORK_CNT, &regvalue);
+	ft5435_ft5435_fts_i2c_read_reg(client, FTS_REG_FLOW_WORK_CNT, &regvalue);
 	count += sprintf(tmp + count, "ESD count:0x%02x\n", regvalue);
 #if FTS_ESDCHECK_EN
 	fts_esdcheck_proc_busy(0);
 #endif
 	memcpy(buf, tmp, count);
-	mutex_unlock(&fts_input_dev->mutex);
+	mutex_unlock(&ft5435_fts_input_dev->mutex);
 	return count;
 }
 
@@ -989,7 +989,7 @@ static struct attribute_group fts_attribute_group = {
 	.attrs = fts_attributes
 };
 
-int fts_create_sysfs(struct i2c_client * client)
+int ft5435_fts_create_sysfs(struct i2c_client * client)
 {
 	int err;
 	err = sysfs_create_group(&client->dev.kobj, &fts_attribute_group);
@@ -1002,7 +1002,7 @@ int fts_create_sysfs(struct i2c_client * client)
 	}
 	return err;
 }
-int fts_remove_sysfs(struct i2c_client * client)
+int ft5435_fts_remove_sysfs(struct i2c_client * client)
 {
 	sysfs_remove_group(&client->dev.kobj, &fts_attribute_group);
 	return 0;

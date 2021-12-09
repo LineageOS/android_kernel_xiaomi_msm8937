@@ -31,20 +31,20 @@ static void fts_point_report_check_func(struct work_struct *work)
 #endif
 
 	FTS_FUNC_ENTER();
-	mutex_lock(&fts_wq_data->report_mutex);
+	mutex_lock(&ft5435_fts_wq_data->report_mutex);
 
 #if FTS_MT_PROTOCOL_B_EN
-	for (finger_count = 0; finger_count < fts_wq_data->pdata->max_touch_number; finger_count++) {
-		 input_mt_slot(fts_input_dev, finger_count);
-		 input_mt_report_slot_state(fts_input_dev, MT_TOOL_FINGER, false);
+	for (finger_count = 0; finger_count < ft5435_fts_wq_data->pdata->max_touch_number; finger_count++) {
+		 input_mt_slot(ft5435_fts_input_dev, finger_count);
+		 input_mt_report_slot_state(ft5435_fts_input_dev, MT_TOOL_FINGER, false);
 	}
 #else
-	input_mt_sync(fts_input_dev);
+	input_mt_sync(ft5435_fts_input_dev);
 #endif
-	input_report_key(fts_input_dev, BTN_TOUCH, 0);
-	input_sync(fts_input_dev);
+	input_report_key(ft5435_fts_input_dev, BTN_TOUCH, 0);
+	input_sync(ft5435_fts_input_dev);
 
-	mutex_unlock(&fts_wq_data->report_mutex);
+	mutex_unlock(&ft5435_fts_wq_data->report_mutex);
 
 	FTS_FUNC_EXIT();
 }

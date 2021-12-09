@@ -91,36 +91,36 @@ extern struct fts_upgrade_fun fts_updatefun;
 extern u8 CTPM_FW[];
 extern u8 CTPM_FW2[];
 extern u8 CTPM_FW3[];
-extern u8 aucFW_PRAM_BOOT[];
+extern u8 ft5435_aucFW_PRAM_BOOT[];
 extern u8 CTPM_LCD_CFG[];
-extern u8 *g_fw_file;
-extern int g_fw_len;
-extern struct fts_upgrade_fun  fts_updatefun_curr;
-extern struct ft_chip_t chip_types;
+extern u8 *ft5435_g_fw_file;
+extern int ft5435_g_fw_len;
+extern struct fts_upgrade_fun  ft5435_fts_updatefun_curr;
+extern struct ft_chip_t ft5435_chip_types;
 
 #if FTS_AUTO_UPGRADE_EN
-extern struct workqueue_struct *touch_wq;
-extern struct work_struct fw_update_work;
+extern struct workqueue_struct *ft5435_touch_wq;
+extern struct work_struct ft5435_fw_update_work;
 #endif
 
 void fts_ctpm_upgrade_init(void);
 void fts_ctpm_upgrade_exit(void);
-void fts_ctpm_upgrade_delay(u32 i);
-void fts_ctpm_get_upgrade_array(void);
-int fts_ctpm_auto_upgrade(struct i2c_client *client);
+void ft5435_fts_ctpm_upgrade_delay(u32 i);
+void ft5435_fts_ctpm_get_upgrade_array(void);
+int ft5435_fts_ctpm_auto_upgrade(struct i2c_client *client);
 int fts_fw_upgrade(struct device *dev, bool force);
-int fts_ctpm_auto_clb(struct i2c_client *client);
+int ft5435_fts_ctpm_auto_clb(struct i2c_client *client);
 
 
 void fts_LockDownInfo_get(struct i2c_client *client, char *pProjectCode);
-int fts_ctpm_fw_upgrade_ReadBootloadorID(struct i2c_client *client);
+int ft5435_fts_ctpm_fw_upgrade_ReadBootloadorID(struct i2c_client *client);
 
 
-u32 fts_getsize(u8 fw_type);
+u32 ft5435_fts_getsize(u8 fw_type);
 int fts_GetFirmwareSize(char *firmware_name);
-int fts_ctpm_i2c_hid2std(struct i2c_client *client);
+int ft5435_fts_ctpm_i2c_hid2std(struct i2c_client *client);
 int fts_ReadFirmware(char *firmware_name, u8 *firmware_buf);
-void fts_ctpm_rom_or_pram_reset(struct i2c_client *client);
-enum FW_STATUS fts_ctpm_get_pram_or_rom_id(struct i2c_client *client);
+void ft5435_fts_ctpm_rom_or_pram_reset(struct i2c_client *client);
+enum FW_STATUS ft5435_fts_ctpm_get_pram_or_rom_id(struct i2c_client *client);
 #endif
 

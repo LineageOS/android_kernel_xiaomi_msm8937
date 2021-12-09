@@ -41,9 +41,9 @@
 #define WANGHAN_FT5435_VCC_I2C				1
 #define WANGHAN_FT5435_VDD 					0
 
-struct i2c_client *fts_i2c_client;
-struct fts_ts_data *fts_wq_data;
-struct input_dev *fts_input_dev;
+struct i2c_client *ft5435_fts_i2c_client;
+struct fts_ts_data *ft5435_fts_wq_data;
+struct input_dev *ft5435_fts_input_dev;
 
 
 #if WANGHAN_FT5435_PINCTRL
@@ -71,9 +71,9 @@ struct mutex ft5435_resume_mutex;
 
 
 #if FTS_DEBUG_EN
-int g_show_log = 1;
+int ft5435_g_show_log = 1;
 #else
-int g_show_log = 0;
+int ft5435_g_show_log = 0;
 #endif
 
 #if (FTS_DEBUG_EN && (FTS_DEBUG_LEVEL == 2))
@@ -89,24 +89,24 @@ static void do_ts_resume_work(struct work_struct *work)
 	int ret;
 	FTS_DEBUG("do_ts_resume_work start.");
 	mutex_lock(&ft5435_resume_mutex);
-	ret = fts_ts_resume(&fts_wq_data->client->dev);
+	ret = fts_ts_resume(&ft5435_fts_wq_data->client->dev);
 	if(ret)
 		FTS_DEBUG("fts_ts_resume fail.");
 	mutex_unlock(&ft5435_resume_mutex);
 	FTS_DEBUG("do_ts_resume_work end.");
 }
 
-int fts_wait_tp_to_valid(struct i2c_client *client)
+int ft5435_fts_wait_tp_to_valid(struct i2c_client *client)
 {
 	int ret = 0;
 	int cnt = 0;
 	u8  reg_value = 0;
 
 	do {
-		ret = fts_i2c_read_reg(client, FTS_REG_CHIP_ID, &reg_value);
-		if ((ret < 0) || (reg_value != chip_types.chip_idh)) {
+		ret = ft5435_ft5435_fts_i2c_read_reg(client, FTS_REG_CHIP_ID, &reg_value);
+		if ((ret < 0) || (reg_value != ft5435_chip_types.chip_idh)) {
 			FTS_INFO("TP Not Ready, ReadData = 0x%x", reg_value);
-		} else if (reg_value == chip_types.chip_idh) {
+		} else if (reg_value == ft5435_chip_types.chip_idh) {
 			FTS_INFO("TP Ready, Device ID = 0x%x", reg_value);
 			return 0;
 		}
@@ -116,7 +116,7 @@ int fts_wait_tp_to_valid(struct i2c_client *client)
 	while ((cnt * INTERVAL_READ_REG) < TIMEOUT_READ_REG);
 
 
-	ret = fts_ctpm_fw_upgrade_ReadBootloadorID(client);
+	ret = ft5435_fts_ctpm_fw_upgrade_ReadBootloadorID(client);
 	if(!ret) {
 		FTS_INFO("TP Need Upgrade, ret = 0x%x", ret);
 		return 0;
@@ -125,51 +125,51 @@ int fts_wait_tp_to_valid(struct i2c_client *client)
 	return -1;
 }
 
-void fts_tp_state_recovery(struct i2c_client *client)
+void ft5435_fts_tp_state_recovery(struct i2c_client *client)
 {
-	fts_wait_tp_to_valid(client);
-	fts_ex_mode_recovery(client);
+	ft5435_fts_wait_tp_to_valid(client);
+	ft5435_fts_ex_mode_recovery(client);
 #if FTS_GESTURE_EN
-	fts_gesture_recovery(client);
+	ft5435_fts_gesture_recovery(client);
 #endif
 }
 
-int fts_reset_proc(int hdelayms)
+int ft5435_fts_reset_proc(int hdelayms)
 {
-	gpio_direction_output(fts_wq_data->pdata->reset_gpio, 0);
+	gpio_direction_output(ft5435_fts_wq_data->pdata->reset_gpio, 0);
 	msleep(20);
-	gpio_direction_output(fts_wq_data->pdata->reset_gpio, 1);
+	gpio_direction_output(ft5435_fts_wq_data->pdata->reset_gpio, 1);
 	msleep(hdelayms);
 
 	return 0;
 }
-void fts_irq_disable(void)
+void ft5435_fts_irq_disable(void)
 {
 	unsigned long irqflags;
-	spin_lock_irqsave(&fts_wq_data->irq_lock, irqflags);
+	spin_lock_irqsave(&ft5435_fts_wq_data->irq_lock, irqflags);
 
-	if (!fts_wq_data->irq_disable) {
-		disable_irq_nosync(fts_wq_data->client->irq);
-		fts_wq_data->irq_disable = 1;
+	if (!ft5435_fts_wq_data->irq_disable) {
+		disable_irq_nosync(ft5435_fts_wq_data->client->irq);
+		ft5435_fts_wq_data->irq_disable = 1;
 	}
 
-	spin_unlock_irqrestore(&fts_wq_data->irq_lock, irqflags);
+	spin_unlock_irqrestore(&ft5435_fts_wq_data->irq_lock, irqflags);
 }
 
-void fts_irq_enable(void)
+void ft5435_fts_irq_enable(void)
 {
 	unsigned long irqflags = 0;
-	spin_lock_irqsave(&fts_wq_data->irq_lock, irqflags);
+	spin_lock_irqsave(&ft5435_fts_wq_data->irq_lock, irqflags);
 
-	if (fts_wq_data->irq_disable) {
-		enable_irq(fts_wq_data->client->irq);
-		fts_wq_data->irq_disable = 0;
+	if (ft5435_fts_wq_data->irq_disable) {
+		enable_irq(ft5435_fts_wq_data->client->irq);
+		ft5435_fts_wq_data->irq_disable = 0;
 	}
 
-	spin_unlock_irqrestore(&fts_wq_data->irq_lock, irqflags);
+	spin_unlock_irqrestore(&ft5435_fts_wq_data->irq_lock, irqflags);
 }
 
-static int fts_input_dev_init( struct i2c_client *client, struct fts_ts_data *data,  struct input_dev *input_dev, struct fts_ts_platform_data *pdata)
+static int ft5435_fts_input_dev_init( struct i2c_client *client, struct fts_ts_data *data,  struct input_dev *input_dev, struct fts_ts_platform_data *pdata)
 {
 	int  err, len;
 
@@ -365,18 +365,18 @@ static void fts_release_all_finger(void)
 	unsigned int finger_count=0;
 #endif
 
-	mutex_lock(&fts_wq_data->report_mutex);
+	mutex_lock(&ft5435_fts_wq_data->report_mutex);
 #if FTS_MT_PROTOCOL_B_EN
-	for (finger_count = 0; finger_count < fts_wq_data->pdata->max_touch_number; finger_count++) {
-		input_mt_slot(fts_input_dev, finger_count);
-		input_mt_report_slot_state(fts_input_dev, MT_TOOL_FINGER, false);
+	for (finger_count = 0; finger_count < ft5435_fts_wq_data->pdata->max_touch_number; finger_count++) {
+		input_mt_slot(ft5435_fts_input_dev, finger_count);
+		input_mt_report_slot_state(ft5435_fts_input_dev, MT_TOOL_FINGER, false);
 	}
 #else
-	input_mt_sync(fts_input_dev);
+	input_mt_sync(ft5435_fts_input_dev);
 #endif
-	input_report_key(fts_input_dev, BTN_TOUCH, 0);
-	input_sync(fts_input_dev);
-	mutex_unlock(&fts_wq_data->report_mutex);
+	input_report_key(ft5435_fts_input_dev, BTN_TOUCH, 0);
+	input_sync(ft5435_fts_input_dev);
+	mutex_unlock(&ft5435_fts_wq_data->report_mutex);
 }
 
 
@@ -416,7 +416,7 @@ static int get_key_value(struct ts_event *event, struct fts_ts_data *data, int i
 	return 0;
 }
 
-static int fts_input_dev_report_key_event(struct ts_event *event, struct fts_ts_data *data)
+static int ft5435_fts_input_dev_report_key_event(struct ts_event *event, struct fts_ts_data *data)
 {
 	int i;
 	unsigned char key_value;
@@ -467,7 +467,7 @@ static int fts_input_dev_report_key_event(struct ts_event *event, struct fts_ts_
 }
 
 #if FTS_MT_PROTOCOL_B_EN
-static int fts_input_dev_report_b(struct ts_event *event, struct fts_ts_data *data)
+static int ft5435_fts_input_dev_report_b(struct ts_event *event, struct fts_ts_data *data)
 {
 	int i = 0;
 	int uppoint = 0;
@@ -549,7 +549,7 @@ static int fts_input_dev_report_b(struct ts_event *event, struct fts_ts_data *da
 }
 
 #else
-static int fts_input_dev_report_a(struct ts_event *event, struct fts_ts_data *data)
+static int ft5435_fts_input_dev_report_a(struct ts_event *event, struct fts_ts_data *data)
 {
 	int i =0;
 	int uppoint = 0;
@@ -620,9 +620,9 @@ static int fts_read_touchdata(struct fts_ts_data *data)
 	{
 		u8 state;
 		if (data->suspended) {
-			fts_i2c_read_reg(data->client, FTS_REG_GESTURE_EN, &state);
+			ft5435_ft5435_fts_i2c_read_reg(data->client, FTS_REG_GESTURE_EN, &state);
 			if (state ==1) {
-				fts_gesture_readdata(data->client);
+				ft5435_fts_gesture_readdata(data->client);
 				return 1;
 			}
 		}
@@ -641,7 +641,7 @@ static int fts_read_touchdata(struct fts_ts_data *data)
 	memset(event, 0, sizeof(struct ts_event));
 
 	buf[0] = 0x00;
-	ret = fts_i2c_read(data->client, buf, 1, buf, (3 + FTS_ONE_TCH_LEN));
+	ret = ft5435_fts_i2c_read(data->client, buf, 1, buf, (3 + FTS_ONE_TCH_LEN));
 	if (ret < 0) {
 
 		return ret;
@@ -653,10 +653,10 @@ static int fts_read_touchdata(struct fts_ts_data *data)
 
 	if (event->point_num > 1) {
 		buf[9] = 0x09;
-		fts_i2c_read(data->client, buf+9, 1, buf+9, (event->point_num - 1) * FTS_ONE_TCH_LEN);
+		ft5435_fts_i2c_read(data->client, buf+9, 1, buf+9, (event->point_num - 1) * FTS_ONE_TCH_LEN);
 	}
 #else
-	ret = fts_i2c_read(data->client, buf, 1, buf, POINT_READ_BUF);
+	ret = ft5435_fts_i2c_read(data->client, buf, 1, buf, POINT_READ_BUF);
 	if (ret < 0) {
 		FTS_ERROR("[B]Read touchdata failed, ret: %d", ret);
 		return ret;
@@ -722,7 +722,7 @@ static void fts_report_value(struct fts_ts_data *data)
 
 
 
-	if (0 == fts_input_dev_report_key_event(event, data)) {
+	if (0 == ft5435_fts_input_dev_report_key_event(event, data)) {
 		return;
 	}
 
@@ -735,9 +735,9 @@ static void fts_report_value(struct fts_ts_data *data)
 	}
 
 #if FTS_MT_PROTOCOL_B_EN
-	fts_input_dev_report_b(event, data);
+	ft5435_fts_input_dev_report_b(event, data);
 #else
-	fts_input_dev_report_a(event, data);
+	ft5435_fts_input_dev_report_a(event, data);
 #endif
 
 
@@ -759,12 +759,12 @@ static irqreturn_t fts_ts_interrupt(int irq, void *dev_id)
 	fts_esdcheck_set_intr(1);
 #endif
 
-	ret = fts_read_touchdata(fts_wq_data);
+	ret = fts_read_touchdata(ft5435_fts_wq_data);
 
 	if (ret == 0) {
-		mutex_lock(&fts_wq_data->report_mutex);
-		fts_report_value(fts_wq_data);
-		mutex_unlock(&fts_wq_data->report_mutex);
+		mutex_lock(&ft5435_fts_wq_data->report_mutex);
+		fts_report_value(ft5435_fts_wq_data);
+		mutex_unlock(&ft5435_fts_wq_data->report_mutex);
 	}
 
 #if FTS_ESDCHECK_EN
@@ -1075,14 +1075,14 @@ static int fts_ts_probe(struct i2c_client *client, const struct i2c_device_id *i
 	data->client = client;
 	data->pdata = pdata;
 
-	fts_wq_data = data;
-	fts_i2c_client = client;
-	fts_input_dev = input_dev;
+	ft5435_fts_wq_data = data;
+	ft5435_fts_i2c_client = client;
+	ft5435_fts_input_dev = input_dev;
 
-	spin_lock_init(&fts_wq_data->irq_lock);
-	mutex_init(&fts_wq_data->report_mutex);
+	spin_lock_init(&ft5435_fts_wq_data->irq_lock);
+	mutex_init(&ft5435_fts_wq_data->report_mutex);
 
-	fts_input_dev_init(client, data, input_dev, pdata);
+	ft5435_fts_input_dev_init(client, data, input_dev, pdata);
 
 #if FTS_POWER_SOURCE_CUST_EN
 	fts_power_source_init(data);
@@ -1095,13 +1095,13 @@ static int fts_ts_probe(struct i2c_client *client, const struct i2c_device_id *i
 		goto free_gpio;
 	}
 
-	fts_reset_proc(200);
+	ft5435_fts_reset_proc(200);
 
 	msleep(200);
 
-	fts_ctpm_get_upgrade_array();
+	ft5435_fts_ctpm_get_upgrade_array();
 
-	err = fts_wait_tp_to_valid(client);
+	err = ft5435_fts_wait_tp_to_valid(client);
 	if(err < 0) {
 		FTS_ERROR("tp is not exist!!! remove it");
 		goto free_gpio;
@@ -1120,7 +1120,7 @@ static int fts_ts_probe(struct i2c_client *client, const struct i2c_device_id *i
 		goto free_gpio;
 	}
 
-	fts_irq_disable();
+	ft5435_fts_irq_disable();
 
 #if FTS_PSENSOR_EN
 	if ( fts_sensor_init(data) != 0) {
@@ -1131,28 +1131,28 @@ static int fts_ts_probe(struct i2c_client *client, const struct i2c_device_id *i
 #endif
 
 #if FTS_APK_NODE_EN
-	fts_create_apk_debug_channel(client);
+	ft5435_fts_create_apk_debug_channel(client);
 #endif
 
 #if FTS_SYSFS_NODE_EN
-	fts_create_sysfs(client);
+	ft5435_fts_create_sysfs(client);
 #endif
 
 #if FTS_POINT_REPORT_CHECK_EN
 	fts_point_report_check_init();
 #endif
 
-	fts_ex_mode_init(client);
+	ft5435_fts_ex_mode_init(client);
 
 #if FTS_GESTURE_EN
-	fts_gesture_init(input_dev, client);
+	ft5435_fts_gesture_init(input_dev, client);
 #endif
 
 #if FTS_ESDCHECK_EN
 	fts_esdcheck_init();
 #endif
 
-	fts_irq_enable();
+	ft5435_fts_irq_enable();
 
 #if FTS_AUTO_UPGRADE_EN
 	fts_ctpm_upgrade_init();
@@ -1175,7 +1175,7 @@ static int fts_ts_probe(struct i2c_client *client, const struct i2c_device_id *i
 #endif
 
 
-	if (fts_i2c_read_reg(fts_i2c_client, FTS_REG_FW_VER, &g_fwver) < 0)
+	if (ft5435_ft5435_fts_i2c_read_reg(ft5435_fts_i2c_client, FTS_REG_FW_VER, &g_fwver) < 0)
 		printk("[FTS][ERROR][tp_info] I2c transfer error!\n");
 	if(255 != g_fwver) {
 		printk("[FTS][tp_info] FT5435 fw-version is right!\n");
@@ -1227,17 +1227,17 @@ static int fts_ts_remove(struct i2c_client *client)
 #endif
 
 #if FTS_APK_NODE_EN
-	fts_release_apk_debug_channel();
+	ft5435_fts_release_apk_debug_channel();
 #endif
 
 #if FTS_SYSFS_NODE_EN
-	fts_remove_sysfs(client);
+	ft5435_fts_remove_sysfs(client);
 #endif
 
-	fts_ex_mode_exit(client);
+	ft5435_fts_ex_mode_exit(client);
 
 #if FTS_AUTO_UPGRADE_EN
-	cancel_work_sync(&fw_update_work);
+	cancel_work_sync(&ft5435_fw_update_work);
 #endif
 
 #if defined(CONFIG_FB)
@@ -1285,9 +1285,9 @@ static int fts_ts_suspend(struct device *dev)
 #endif
 
 #if FTS_GESTURE_EN
-	retval = fts_gesture_suspend(data->client);
+	retval = ft5435_fts_gesture_suspend(data->client);
 	if (retval == 0) {
-		retval = enable_irq_wake(fts_wq_data->client->irq);
+		retval = enable_irq_wake(ft5435_fts_wq_data->client->irq);
 		if (retval)
 			FTS_ERROR("%s: set_irq_wake failed", __func__);
 		data->suspended = true;
@@ -1305,9 +1305,9 @@ static int fts_ts_suspend(struct device *dev)
 	}
 #endif
 
-	fts_irq_disable();
+	ft5435_fts_irq_disable();
 
-	retval = fts_i2c_write_reg(data->client, FTS_REG_POWER_MODE, FTS_REG_POWER_MODE_SLEEP_VALUE);
+	retval = ft5435_ft5435_fts_i2c_write_reg(data->client, FTS_REG_POWER_MODE, FTS_REG_POWER_MODE_SLEEP_VALUE);
 	if (retval < 0) {
 		FTS_ERROR("Set TP to sleep mode fail, ret=%d!", retval);
 	}
@@ -1373,16 +1373,16 @@ static int fts_ts_resume(struct device *dev)
 	fts_release_all_finger();
 
 #if (!FTS_CHIP_IDC)
-	fts_reset_proc(200);
+	ft5435_fts_reset_proc(200);
 #endif
-	fts_tp_state_recovery(data->client);
+	ft5435_fts_tp_state_recovery(data->client);
 
 #if FTS_ESDCHECK_EN
 	fts_esdcheck_resume();
 #endif
 
 #if FTS_GESTURE_EN
-	if (fts_gesture_resume(data->client) == 0) {
+	if (ft5435_fts_gesture_resume(data->client) == 0) {
 		int err;
 		err = disable_irq_wake(data->client->irq);
 		if (err)
@@ -1404,7 +1404,7 @@ static int fts_ts_resume(struct device *dev)
 
 	data->suspended = false;
 
-	fts_irq_enable();
+	ft5435_fts_irq_enable();
 
 	FTS_FUNC_EXIT();
 	return 0;

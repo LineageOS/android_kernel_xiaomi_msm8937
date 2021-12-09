@@ -74,18 +74,18 @@ static ssize_t fts_gesture_show(struct device *dev, struct device_attribute *att
 		u8 val;
 		struct i2c_client *client = container_of(dev, struct i2c_client, dev);
 
-		mutex_lock(&fts_input_dev->mutex);
-		fts_i2c_read_reg(client, FTS_REG_GESTURE_EN, &val);
+		mutex_lock(&ft5435_fts_input_dev->mutex);
+		ft5435_ft5435_fts_i2c_read_reg(client, FTS_REG_GESTURE_EN, &val);
 		count = sprintf(buf, "Gesture Mode: %s\n", fts_gesture_data.mode ? "On" : "Off");
 		count += sprintf(buf + count, "Reg(0xD0) = %d\n", val);
-		mutex_unlock(&fts_input_dev->mutex);
+		mutex_unlock(&ft5435_fts_input_dev->mutex);
 
 		return count;
 }
 
 static ssize_t fts_gesture_store(struct device *dev, struct device_attribute *attr, const char *buf, size_t count)
 {
-		mutex_lock(&fts_input_dev->mutex);
+		mutex_lock(&ft5435_fts_input_dev->mutex);
 
 		if (FTS_SYSFS_ECHO_ON(buf)) {
 			FTS_INFO("[GESTURE]enable gesture");
@@ -95,7 +95,7 @@ static ssize_t fts_gesture_store(struct device *dev, struct device_attribute *at
 			fts_gesture_data.mode = DISABLE;
 		}
 
-		mutex_unlock(&fts_input_dev->mutex);
+		mutex_unlock(&ft5435_fts_input_dev->mutex);
 
 		return count;
 }
@@ -105,7 +105,7 @@ static ssize_t fts_gesture_buf_show(struct device *dev, struct device_attribute 
 		int count;
 		int i = 0;
 
-		mutex_lock(&fts_input_dev->mutex);
+		mutex_lock(&ft5435_fts_input_dev->mutex);
 		count = snprintf(buf, PAGE_SIZE, "Gesture ID: 0x%x\n", fts_gesture_data.header[0]);
 		count += snprintf(buf + count, PAGE_SIZE, "Gesture PointNum: %d\n", fts_gesture_data.header[1]);
 		count += snprintf(buf + count, PAGE_SIZE, "Gesture Point Buf:\n");
@@ -115,7 +115,7 @@ static ssize_t fts_gesture_buf_show(struct device *dev, struct device_attribute 
 			count += snprintf(buf + count, PAGE_SIZE, "\n");
 		}
 		count += snprintf(buf + count, PAGE_SIZE, "\n");
-		mutex_unlock(&fts_input_dev->mutex);
+		mutex_unlock(&ft5435_fts_input_dev->mutex);
 
 		return count;
 }
@@ -125,7 +125,7 @@ static ssize_t fts_gesture_buf_store(struct device *dev, struct device_attribute
 		return -EPERM;
 }
 
-int fts_create_gesture_sysfs(struct i2c_client *client)
+int ft5435_fts_create_gesture_sysfs(struct i2c_client *client)
 {
 		int ret = 0;
 
@@ -209,15 +209,15 @@ static int fts_gesture_read_buffer(struct i2c_client *client, u8 *buf, int read_
 		int i;
 
 		if (read_bytes <= I2C_BUFFER_LENGTH_MAXINUM) {
-			ret = fts_i2c_read(client, buf, 1, buf, read_bytes);
+			ret = ft5435_fts_i2c_read(client, buf, 1, buf, read_bytes);
 		} else {
-			ret = fts_i2c_read(client, buf, 1, buf, I2C_BUFFER_LENGTH_MAXINUM);
+			ret = ft5435_fts_i2c_read(client, buf, 1, buf, I2C_BUFFER_LENGTH_MAXINUM);
 			remain_bytes = read_bytes - I2C_BUFFER_LENGTH_MAXINUM;
 			for (i = 1; remain_bytes > 0; i++) {
 				if (remain_bytes <= I2C_BUFFER_LENGTH_MAXINUM)
-					ret = fts_i2c_read(client, buf, 0, buf + I2C_BUFFER_LENGTH_MAXINUM * i, remain_bytes);
+					ret = ft5435_fts_i2c_read(client, buf, 0, buf + I2C_BUFFER_LENGTH_MAXINUM * i, remain_bytes);
 			else
-				ret = fts_i2c_read(client, buf, 0, buf + I2C_BUFFER_LENGTH_MAXINUM * i, I2C_BUFFER_LENGTH_MAXINUM);
+				ret = ft5435_fts_i2c_read(client, buf, 0, buf + I2C_BUFFER_LENGTH_MAXINUM * i, I2C_BUFFER_LENGTH_MAXINUM);
 			remain_bytes -= I2C_BUFFER_LENGTH_MAXINUM;
 			}
 		}
@@ -229,7 +229,7 @@ static int fts_gesture_fw(void)
 {
 		int ret = 0;
 
-		switch (chip_types.chip_idh) {
+		switch (ft5435_chip_types.chip_idh) {
 		case 0x54:
 		case 0x58:
 		case 0x64:
@@ -246,7 +246,7 @@ static int fts_gesture_fw(void)
 		return ret;
 }
 
-int fts_gesture_readdata(struct i2c_client *client)
+int ft5435_fts_gesture_readdata(struct i2c_client *client)
 {
 		u8 buf[FTS_GESTRUE_POINTS * 4] = { 0 };
 		int ret = -1;
@@ -261,7 +261,7 @@ int fts_gesture_readdata(struct i2c_client *client)
 		memset(fts_gesture_data.coordinate_y, 0, FTS_GESTRUE_POINTS * sizeof(u16));
 
 		buf[0] = FTS_REG_GESTURE_OUTPUT_ADDRESS;
-		ret = fts_i2c_read(client, buf, 1, buf, FTS_GESTRUE_POINTS_HEADER);
+		ret = ft5435_fts_i2c_read(client, buf, 1, buf, FTS_GESTRUE_POINTS_HEADER);
 		if (ret < 0) {
 			FTS_ERROR("[GESTURE]Read gesture header data failed!!");
 			FTS_FUNC_EXIT();
@@ -282,7 +282,7 @@ int fts_gesture_readdata(struct i2c_client *client)
 			return ret;
 		}
 
-		fts_gesture_report(fts_input_dev, gestrue_id);
+		fts_gesture_report(ft5435_fts_input_dev, gestrue_id);
 		for (i = 0; i < pointnum; i++) {
 			fts_gesture_data.coordinate_x[i] = (((s16) buf[0 + (4 * i + 2)]) & 0x0F) << 8
 										      | (((s16) buf[1 + (4 * i + 2)]) & 0xFF);
@@ -292,25 +292,25 @@ int fts_gesture_readdata(struct i2c_client *client)
 			FTS_FUNC_EXIT();
 			return 0;
 		} else {
-			FTS_ERROR("[GESTURE]IC 0x%x need gesture lib to support gestures.", chip_types.chip_idh);
+			FTS_ERROR("[GESTURE]IC 0x%x need gesture lib to support gestures.", ft5435_chip_types.chip_idh);
 			return 0;
 		}
 }
 
-void fts_gesture_recovery(struct i2c_client *client)
+void ft5435_fts_gesture_recovery(struct i2c_client *client)
 {
 		if (fts_gesture_data.mode && fts_gesture_data.active) {
-			fts_i2c_write_reg(client, 0xD1, 0xff);
-			fts_i2c_write_reg(client, 0xD2, 0xff);
-			fts_i2c_write_reg(client, 0xD5, 0xff);
-			fts_i2c_write_reg(client, 0xD6, 0xff);
-			fts_i2c_write_reg(client, 0xD7, 0xff);
-			fts_i2c_write_reg(client, 0xD8, 0xff);
-			fts_i2c_write_reg(client, FTS_REG_GESTURE_EN, ENABLE);
+			ft5435_ft5435_fts_i2c_write_reg(client, 0xD1, 0xff);
+			ft5435_ft5435_fts_i2c_write_reg(client, 0xD2, 0xff);
+			ft5435_ft5435_fts_i2c_write_reg(client, 0xD5, 0xff);
+			ft5435_ft5435_fts_i2c_write_reg(client, 0xD6, 0xff);
+			ft5435_ft5435_fts_i2c_write_reg(client, 0xD7, 0xff);
+			ft5435_ft5435_fts_i2c_write_reg(client, 0xD8, 0xff);
+			ft5435_ft5435_fts_i2c_write_reg(client, FTS_REG_GESTURE_EN, ENABLE);
 		}
 }
 
-int fts_gesture_suspend(struct i2c_client *i2c_client)
+int ft5435_fts_gesture_suspend(struct i2c_client *i2c_client)
 {
 		int i;
 		u8 state;
@@ -324,15 +324,15 @@ int fts_gesture_suspend(struct i2c_client *i2c_client)
 		}
 
 		for (i = 0; i < 5; i++) {
-			fts_i2c_write_reg(i2c_client, 0xd1, 0xff);
-			fts_i2c_write_reg(i2c_client, 0xd2, 0xff);
-			fts_i2c_write_reg(i2c_client, 0xd5, 0xff);
-			fts_i2c_write_reg(i2c_client, 0xd6, 0xff);
-			fts_i2c_write_reg(i2c_client, 0xd7, 0xff);
-			fts_i2c_write_reg(i2c_client, 0xd8, 0xff);
-			fts_i2c_write_reg(i2c_client, FTS_REG_GESTURE_EN, 0x01);
+			ft5435_ft5435_fts_i2c_write_reg(i2c_client, 0xd1, 0xff);
+			ft5435_ft5435_fts_i2c_write_reg(i2c_client, 0xd2, 0xff);
+			ft5435_ft5435_fts_i2c_write_reg(i2c_client, 0xd5, 0xff);
+			ft5435_ft5435_fts_i2c_write_reg(i2c_client, 0xd6, 0xff);
+			ft5435_ft5435_fts_i2c_write_reg(i2c_client, 0xd7, 0xff);
+			ft5435_ft5435_fts_i2c_write_reg(i2c_client, 0xd8, 0xff);
+			ft5435_ft5435_fts_i2c_write_reg(i2c_client, FTS_REG_GESTURE_EN, 0x01);
 			msleep(1);
-			fts_i2c_read_reg(i2c_client, FTS_REG_GESTURE_EN, &state);
+			ft5435_ft5435_fts_i2c_read_reg(i2c_client, FTS_REG_GESTURE_EN, &state);
 			if (state == 1)
 				break;
 		}
@@ -349,7 +349,7 @@ int fts_gesture_suspend(struct i2c_client *i2c_client)
 		return 0;
 }
 
-int fts_gesture_resume(struct i2c_client *client)
+int ft5435_fts_gesture_resume(struct i2c_client *client)
 {
 		int i;
 		u8 state;
@@ -369,9 +369,9 @@ int fts_gesture_resume(struct i2c_client *client)
 
 		fts_gesture_data.active = 0;
 		for (i = 0; i < 5; i++) {
-			fts_i2c_write_reg(client, FTS_REG_GESTURE_EN, 0x00);
+			ft5435_ft5435_fts_i2c_write_reg(client, FTS_REG_GESTURE_EN, 0x00);
 			msleep(1);
-				fts_i2c_read_reg(client, FTS_REG_GESTURE_EN, &state);
+				ft5435_ft5435_fts_i2c_read_reg(client, FTS_REG_GESTURE_EN, &state);
 			if (state == 0)
 				break;
 		}
@@ -384,7 +384,7 @@ int fts_gesture_resume(struct i2c_client *client)
 		return 0;
 }
 
-int fts_gesture_init(struct input_dev *input_dev, struct i2c_client *client)
+int ft5435_fts_gesture_init(struct input_dev *input_dev, struct i2c_client *client)
 {
 	struct fts_ts_data *data = i2c_get_clientdata(client);
 		FTS_FUNC_ENTER();
@@ -419,7 +419,7 @@ int fts_gesture_init(struct input_dev *input_dev, struct i2c_client *client)
 		__set_bit(KEY_GESTURE_C, input_dev->keybit);
 		__set_bit(KEY_GESTURE_Z, input_dev->keybit);
 
-		fts_create_gesture_sysfs(client);
+		ft5435_fts_create_gesture_sysfs(client);
 		fts_gesture_data.mode = 1;
 		fts_gesture_data.active = 0;
 	data->gesture_data = &fts_gesture_data;
@@ -427,7 +427,7 @@ int fts_gesture_init(struct input_dev *input_dev, struct i2c_client *client)
 		return 0;
 }
 
-int fts_gesture_exit(struct i2c_client *client)
+int ft5435_fts_gesture_exit(struct i2c_client *client)
 {
 		FTS_FUNC_ENTER();
 		sysfs_remove_group(&client->dev.kobj, &fts_gesture_group);
@@ -439,7 +439,7 @@ int fts_select_gesture_mode(struct input_dev *dev, unsigned int type, unsigned i
 {
 	printk("[GESTURE]zhanghao enter the gesture func\n");
 	if((type == EV_SYN )&& (code == SYN_CONFIG)) {
-		mutex_lock(&fts_input_dev->mutex);
+		mutex_lock(&ft5435_fts_input_dev->mutex);
 
 		if (value == 5) {
 			printk("[GESTURE]enable gesture\n");
@@ -449,7 +449,7 @@ int fts_select_gesture_mode(struct input_dev *dev, unsigned int type, unsigned i
 			fts_gesture_data.mode = DISABLE;
 		}
 
-		mutex_unlock(&fts_input_dev->mutex);
+		mutex_unlock(&ft5435_fts_input_dev->mutex);
 	}
 
 	return 0;

@@ -31,7 +31,7 @@ int fts_ctpm_upgrade_idc_init(struct i2c_client *client)
 	FTS_INFO("[UPGRADE]**********Upgrade setting Init**********");
 	auc_i2c_write_buf[0] = 0x05;
 	reg_val_id[0] = 0x00;
-	i_ret =fts_i2c_read(client, auc_i2c_write_buf, 1, reg_val_id, 1);
+	i_ret =ft5435_fts_i2c_read(client, auc_i2c_write_buf, 1, reg_val_id, 1);
 	if (i_ret < 0) {
 		return -EIO;
 	}
@@ -39,11 +39,11 @@ int fts_ctpm_upgrade_idc_init(struct i2c_client *client)
 	auc_i2c_write_buf[0] = 0x05;
 	auc_i2c_write_buf[1] = reg_val_id[0];
 	auc_i2c_write_buf[2] = 0x00;
-	fts_i2c_write(client, auc_i2c_write_buf, 3);
+	ft5435_fts_i2c_write(client, auc_i2c_write_buf, 3);
 
 	auc_i2c_write_buf[0] = 0x09;
 	auc_i2c_write_buf[1] = 0x0B;
-	fts_i2c_write(client, auc_i2c_write_buf, 2);
+	ft5435_fts_i2c_write(client, auc_i2c_write_buf, 2);
 
 	return 0;
 }
@@ -54,7 +54,7 @@ void fts_ctpm_start_pramboot(struct i2c_client *client)
 
 	FTS_INFO("[UPGRADE]**********start pramboot**********");
 	auc_i2c_write_buf[0] = 0x08;
-	fts_i2c_write(client, auc_i2c_write_buf, 1);
+	ft5435_fts_i2c_write(client, auc_i2c_write_buf, 1);
 	msleep(20);
 }
 
@@ -64,9 +64,9 @@ int fts_ctpm_start_fw_upgrade(struct i2c_client *client)
 
 	FTS_INFO("[UPGRADE]**********send 0xAA and 0x55 to FW, start upgrade**********");
 
-	i_ret = fts_i2c_write_reg(client, FTS_RST_CMD_REG1, FTS_UPGRADE_AA);
+	i_ret = ft5435_ft5435_fts_i2c_write_reg(client, FTS_RST_CMD_REG1, FTS_UPGRADE_AA);
 	msleep(10);
-	i_ret = fts_i2c_write_reg(client, FTS_RST_CMD_REG1, FTS_UPGRADE_55);
+	i_ret = ft5435_ft5435_fts_i2c_write_reg(client, FTS_RST_CMD_REG1, FTS_UPGRADE_55);
 	msleep(200);
 
 	return i_ret;
@@ -79,7 +79,7 @@ bool fts_ctpm_check_run_state(struct i2c_client *client, int rstate)
 
 	for (i = 0; i < FTS_UPGRADE_LOOP; i++)
 	{
-		cstate = fts_ctpm_get_pram_or_rom_id(client);
+		cstate = ft5435_fts_ctpm_get_pram_or_rom_id(client);
 		FTS_DEBUG( "[UPGRADE]: run state = %d", cstate);
 
 		if (cstate == rstate)
@@ -100,7 +100,7 @@ int fts_ctpm_pramboot_ecc(struct i2c_client *client)
 	FTS_INFO("[UPGRADE]******read out pramboot checksum******");
 	auc_i2c_write_buf[0] = 0xcc;
 	msleep(2);
-	fts_i2c_read(client, auc_i2c_write_buf, 1, reg_val, 1);
+	ft5435_fts_i2c_read(client, auc_i2c_write_buf, 1, reg_val, 1);
 	if (reg_val[0] != upgrade_ecc) {
 		FTS_ERROR("[UPGRADE]: checksum fail : pramboot_ecc = %X, host_ecc = %X!!", reg_val[0], upgrade_ecc);
 		return -EIO;
@@ -124,7 +124,7 @@ int fts_ctpm_upgrade_ecc(struct i2c_client *client, u32 startaddr, u32 length)
 	FTS_INFO( "[UPGRADE]**********read out checksum**********");
 
 	auc_i2c_write_buf[0] = 0x64;
-	fts_i2c_write(client, auc_i2c_write_buf, 1);
+	ft5435_fts_i2c_write(client, auc_i2c_write_buf, 1);
 	msleep(300);
 
 	auc_i2c_write_buf[0] = 0x65;
@@ -140,13 +140,13 @@ int fts_ctpm_upgrade_ecc(struct i2c_client *client, u32 startaddr, u32 length)
 
 	auc_i2c_write_buf[4] = (u8)(temp >> 8);
 	auc_i2c_write_buf[5] = (u8)(temp);
-	i_ret = fts_i2c_write(client, auc_i2c_write_buf, 6);
+	i_ret = ft5435_fts_i2c_write(client, auc_i2c_write_buf, 6);
 	msleep(length/256);
 
 	for (i = 0; i < 100; i++) {
 		auc_i2c_write_buf[0] = 0x6a;
 		reg_val[0] = reg_val[1] = 0x00;
-		fts_i2c_read(client, auc_i2c_write_buf, 1, reg_val, 2);
+		ft5435_fts_i2c_read(client, auc_i2c_write_buf, 1, reg_val, 2);
 
 		if (0xF0==reg_val[0] && 0x55==reg_val[1]) {
 			break;
@@ -164,14 +164,14 @@ int fts_ctpm_upgrade_ecc(struct i2c_client *client, u32 startaddr, u32 length)
 		temp = length-LEN_FLASH_ECC_MAX;
 		auc_i2c_write_buf[4] = (u8)(temp >> 8);
 		auc_i2c_write_buf[5] = (u8)(temp);
-		i_ret = fts_i2c_write(client, auc_i2c_write_buf, 6);
+		i_ret = ft5435_fts_i2c_write(client, auc_i2c_write_buf, 6);
 
 		msleep(length/256);
 
 		for (i = 0; i < 100; i++) {
 			auc_i2c_write_buf[0] = 0x6a;
 			reg_val[0] = reg_val[1] = 0x00;
-			fts_i2c_read(client, auc_i2c_write_buf, 1, reg_val, 2);
+			ft5435_fts_i2c_read(client, auc_i2c_write_buf, 1, reg_val, 2);
 
 			if (0xF0==reg_val[0] && 0x55==reg_val[1]) {
 				break;
@@ -181,7 +181,7 @@ int fts_ctpm_upgrade_ecc(struct i2c_client *client, u32 startaddr, u32 length)
 	}
 
 	auc_i2c_write_buf[0] = 0x66;
-	i_ret = fts_i2c_read(client, auc_i2c_write_buf, 1, reg_val, 1);
+	i_ret = ft5435_fts_i2c_read(client, auc_i2c_write_buf, 1, reg_val, 1);
 	if (reg_val[0] != upgrade_ecc) /*if check sum fail, upgrade fail*/ {
 		FTS_ERROR( "[UPGRADE]: ecc error! FW=%02x upgrade_ecc=%02x!!", reg_val[0], upgrade_ecc);
 		return -EIO;
@@ -203,13 +203,13 @@ int fts_ctpm_erase_flash(struct i2c_client *client)
 	FTS_INFO("[UPGRADE]**********erase app now**********");
 
 	auc_i2c_write_buf[0] = 0x61;
-	fts_i2c_write(client, auc_i2c_write_buf, 1);
+	ft5435_fts_i2c_write(client, auc_i2c_write_buf, 1);
 	msleep(1350);
 
 	for (i = 0; i < 15; i++) {
 		auc_i2c_write_buf[0] = 0x6a;
 		reg_val[0] = reg_val[1] = 0x00;
-		fts_i2c_read(client, auc_i2c_write_buf, 1, reg_val, 2);
+		ft5435_fts_i2c_read(client, auc_i2c_write_buf, 1, reg_val, 2);
 
 		if (0xF0==reg_val[0] && 0xAA==reg_val[1]) /*erase flash success*/ {
 			break;
@@ -261,7 +261,7 @@ int fts_ctpm_write_pramboot_for_idc(struct i2c_client *client, u32 length, u8 *r
 			packet_buf[6 + i] = readbuf[j * FTS_PACKET_LENGTH + i];
 			upgrade_ecc ^= packet_buf[6 + i];
 		}
-		fts_i2c_write(client, packet_buf, temp + 6);
+		ft5435_fts_i2c_write(client, packet_buf, temp + 6);
 	}
 
 	return 0;
@@ -308,18 +308,18 @@ int fts_ctpm_write_app_for_idc(struct i2c_client *client, u32 length, u8 *readbu
 			upgrade_ecc ^= packet_buf[6 + i];
 		}
 
-		fts_i2c_write(client, packet_buf, (writelenght + 6));
+		ft5435_fts_i2c_write(client, packet_buf, (writelenght + 6));
 
 		for (i = 0; i < 30; i++) {
 			auc_i2c_write_buf[0] = 0x6a;
 			reg_val[0] = reg_val[1] = 0x00;
-			fts_i2c_read(client, auc_i2c_write_buf, 1, reg_val, 2);
+			ft5435_fts_i2c_read(client, auc_i2c_write_buf, 1, reg_val, 2);
 
 			if ((j + 0x20+0x1000) == (((reg_val[0]) << 8) | reg_val[1])) {
 				break;
 			}
 
-			fts_ctpm_upgrade_delay(1000);
+			ft5435_fts_ctpm_upgrade_delay(1000);
 		}
 	}
 	msleep(50);

@@ -61,13 +61,13 @@ static void fts_psensor_enable(struct fts_ts_data *data, int enable)
 	if (data->client == NULL)
 		return;
 
-	fts_i2c_read_reg(data->client, FTS_REG_PSENSOR_ENABLE, &state);
+	ft5435_ft5435_fts_i2c_read_reg(data->client, FTS_REG_PSENSOR_ENABLE, &state);
 	if (enable)
 		state |= FTS_PSENSOR_ENABLE_MASK;
 	else
 		state &= ~FTS_PSENSOR_ENABLE_MASK;
 
-	ret = fts_i2c_write_reg(data->client, FTS_REG_PSENSOR_ENABLE, state);
+	ret = ft5435_ft5435_fts_i2c_write_reg(data->client, FTS_REG_PSENSOR_ENABLE, state);
 	if (ret < 0)
 		FTS_ERROR("write psensor switch command failed");
 	return;
@@ -99,7 +99,7 @@ static int fts_read_tp_psensor_data(struct fts_ts_data *data)
 	char tmp;
 	int ret = 1;
 
-	fts_i2c_read_reg(data->client,
+	ft5435_ft5435_fts_i2c_read_reg(data->client,
 					 FTS_REG_PSENSOR_STATUS, &psensor_status);
 
 	tmp = data->psensor_pdata->tp_psensor_data;

@@ -32,8 +32,8 @@ int fts_ctpm_write_pramboot_for_idc(struct i2c_client *client, u32 length, u8 *r
 int fts_writeflash(struct i2c_client *client, u32 writeaddr, u32 length, u8 *readbuf, u32 cnt);
 bool fts_check_app_bin_valid_idc(u8 *pbt_buf);
 
-int fts_ctpm_get_app_ver(void);
-int fts_ctpm_fw_upgrade(struct i2c_client *client);
-int fts_ctpm_lcd_cfg_upgrade(struct i2c_client *client);
+int ft5435_fts_ctpm_get_app_ver(void);
+int ft5435_fts_ctpm_fw_upgrade(struct i2c_client *client);
+int ft5435_fts_ctpm_lcd_cfg_upgrade(struct i2c_client *client);
 
 #endif

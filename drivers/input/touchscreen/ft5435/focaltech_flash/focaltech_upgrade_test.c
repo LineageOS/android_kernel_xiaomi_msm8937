@@ -30,7 +30,7 @@
 									} while(0)\
 
 #if (FTS_UPGRADE_STRESS_TEST)
-static int fts_ctpm_auto_upgrade_pingpong(struct i2c_client *client)
+static int ft5435_fts_ctpm_auto_upgrade_pingpong(struct i2c_client *client)
 {
 	u8 uc_tp_fm_ver;
 	int i_ret = 0;
@@ -42,14 +42,14 @@ static int fts_ctpm_auto_upgrade_pingpong(struct i2c_client *client)
 	do {
 		uc_upgrade_times++;
 
-		i_ret = fts_ctpm_fw_upgrade(client);
+		i_ret = ft5435_fts_ctpm_fw_upgrade(client);
 
 		if (i_ret == 0) {
-			fts_i2c_read_reg(client, FTS_REG_FW_VER, &uc_tp_fm_ver);
+			ft5435_ft5435_fts_i2c_read_reg(client, FTS_REG_FW_VER, &uc_tp_fm_ver);
 			FTS_DEBUG("[UPGRADE]: upgrade to new version 0x%x", uc_tp_fm_ver);
 		} else /* upgrade fail */ {
 			FTS_INFO("[UPGRADE]: upgrade fail, reset now!!");
-			fts_ctpm_rom_or_pram_reset(client);
+			ft5435_fts_ctpm_rom_or_pram_reset(client);
 		}
 	}
 	while ((i_ret != 0) && (uc_upgrade_times < 2));
@@ -76,7 +76,7 @@ void fts_ctpm_display_upgrade_time(bool start_time)
 #endif
 }
 
-int fts_ctpm_auto_upgrade(struct i2c_client *client)
+int ft5435_fts_ctpm_auto_upgrade(struct i2c_client *client)
 {
 	int i_ret = 0;
 	static int uc_ErrorTimes = 0;
@@ -86,9 +86,9 @@ int fts_ctpm_auto_upgrade(struct i2c_client *client)
 	device_init_wakeup(&client->dev, 1);
 	pm_stay_awake(&client->dev);
 
-	g_fw_file = CTPM_FW;
-	g_fw_len = fts_getsize(FW_SIZE);
-	FTS_DEBUG("[UPGRADE]FW FILE:CTPM_FW, SIZE:%x", g_fw_len);
+	ft5435_g_fw_file = CTPM_FW;
+	ft5435_g_fw_len = ft5435_fts_getsize(FW_SIZE);
+	FTS_DEBUG("[UPGRADE]FW FILE:CTPM_FW, SIZE:%x", ft5435_g_fw_len);
 
 	do {
 		uc_UpgradeTimes++;
@@ -97,7 +97,7 @@ int fts_ctpm_auto_upgrade(struct i2c_client *client)
 
 		fts_ctpm_display_upgrade_time(true);
 
-		i_ret = fts_ctpm_auto_upgrade_pingpong(client);
+		i_ret = ft5435_fts_ctpm_auto_upgrade_pingpong(client);
 		if (i_ret == 0) {
 			fts_ctpm_display_upgrade_time(false);
 		} else {
