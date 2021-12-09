@@ -1582,6 +1582,7 @@ static int rova_landtoni_lineout_status_get(struct snd_kcontrol *kcontrol,
 	if (xiaomi_series_read() == XIAOMI_SERIES_LANDTONI)
 		return landtoni_lineout_status_get(kcontrol,ucontrol);
 #endif
+	return 0;
 }
 
 static int rova_landtoni_lineout_status_put(struct snd_kcontrol *kcontrol,
@@ -1595,6 +1596,7 @@ static int rova_landtoni_lineout_status_put(struct snd_kcontrol *kcontrol,
 	if (xiaomi_series_read() == XIAOMI_SERIES_LANDTONI)
 		return landtoni_lineout_status_put(kcontrol,ucontrol);
 #endif
+	return 0;
 }
 
 static int rova_landtoni_headset_status_get(struct snd_kcontrol *kcontrol,
@@ -1608,6 +1610,7 @@ static int rova_landtoni_headset_status_get(struct snd_kcontrol *kcontrol,
 	if (xiaomi_series_read() == XIAOMI_SERIES_LANDTONI)
 		return landtoni_headset_status_get(kcontrol,ucontrol);
 #endif
+	return 0;
 }
 
 static int rova_landtoni_headset_status_put(struct snd_kcontrol *kcontrol,
@@ -1621,6 +1624,7 @@ static int rova_landtoni_headset_status_put(struct snd_kcontrol *kcontrol,
 	if (xiaomi_series_read() == XIAOMI_SERIES_LANDTONI)
 		return landtoni_headset_status_put(kcontrol,ucontrol);
 #endif
+	return 0;
 }
 #endif
 
