@@ -26,6 +26,7 @@ config MACH_XIAOMI_TIARE
 	bool "Xiaomi Redmi Go"
 	depends on MACH_XIAOMI
 	depends on ARCH_MSM8917
+	depends on !MACH_XIAOMI_ROVA
 	help
 	  Support for Xiaomi Redmi Go.
 
