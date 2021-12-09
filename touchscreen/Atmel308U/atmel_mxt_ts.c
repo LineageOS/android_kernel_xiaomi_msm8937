@@ -6267,7 +6267,7 @@ static void __exit mxt_exit(void)
 	i2c_del_driver(&mxt_driver);
 }
 
-late_initcall(mxt_init);
+module_init(mxt_init);
 module_exit(mxt_exit);
 
 /* Module information */
