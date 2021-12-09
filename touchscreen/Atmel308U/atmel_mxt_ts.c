@@ -668,8 +668,6 @@ struct mxt_data {
 	const  struct mxt_platform_data *pdata;
 	enum mxt_device_state state;
 	struct mxt_object *object_table;
-	struct regulator *regulator_vdd;
-	struct regulator *regulator_vddio;
 	u16 mem_size;
 	struct mxt_info info;
 	unsigned int irq;
@@ -766,6 +764,8 @@ struct mxt_data {
 	u8 T220_reportid_min;
 	u8 T220_reportid_max;
 
+	struct regulator *vdd;
+	struct regulator *vcc_i2c;
 	struct pinctrl *ts_pinctrl;
 	struct pinctrl_state *gpio_state_active;
 	struct pinctrl_state *gpio_state_suspend;
@@ -1021,6 +1021,110 @@ static void mxt_enable_irq(struct mxt_data *data)
 		data->irq_enabled = true;
 	}
 }
+
+#define ATMEL_POWER_SOURCE_CUST_EN 1
+#if ATMEL_POWER_SOURCE_CUST_EN
+#define ATMEL_VTG_MIN_UV		2600000
+#define ATMEL_VTG_MAX_UV		3300000
+#define ATMEL_I2C_VTG_MIN_UV	1800000
+#define ATMEL_I2C_VTG_MAX_UV	1800000
+#endif
+/*****************************************************************************
+ * Power Control (Kanged from focaltech_touch)
+ *****************************************************************************/
+#if ATMEL_POWER_SOURCE_CUST_EN
+static int mxt_power_source_init(struct mxt_data *data)
+{
+	int rc;
+
+	data->vdd = regulator_get(&data->client->dev, "vdd");
+	if (IS_ERR(data->vdd)) {
+		rc = PTR_ERR(data->vdd);
+		CTP_ERROR("Regulator get failed vdd rc=%d", rc);
+	}
+
+	if (regulator_count_voltages(data->vdd) > 0) {
+		rc = regulator_set_voltage(data->vdd, ATMEL_VTG_MIN_UV,
+				ATMEL_VTG_MAX_UV);
+		if (rc) {
+			CTP_ERROR("Regulator set_vtg failed vdd rc=%d", rc);
+			goto reg_vdd_put;
+		}
+	}
+
+	data->vcc_i2c = regulator_get(&data->client->dev, "vcc_i2c");
+	if (IS_ERR(data->vcc_i2c)) {
+		rc = PTR_ERR(data->vcc_i2c);
+		CTP_ERROR("Regulator get failed vcc_i2c rc=%d", rc);
+		goto reg_vdd_set_vtg;
+	}
+
+	if (regulator_count_voltages(data->vcc_i2c) > 0) {
+		rc = regulator_set_voltage(data->vcc_i2c, ATMEL_I2C_VTG_MIN_UV,
+				ATMEL_I2C_VTG_MAX_UV);
+		if (rc) {
+			CTP_ERROR("Regulator set_vtg failed vcc_i2c rc=%d",
+					rc);
+			goto reg_vcc_i2c_put;
+		}
+	}
+
+	return 0;
+
+reg_vcc_i2c_put:
+	regulator_put(data->vcc_i2c);
+reg_vdd_set_vtg:
+	if (regulator_count_voltages(data->vdd) > 0)
+		regulator_set_voltage(data->vdd, 0, ATMEL_VTG_MAX_UV);
+reg_vdd_put:
+	regulator_put(data->vdd);
+	return rc;
+}
+
+static int mxt_power_source_ctrl(struct mxt_data *data, int enable)
+{
+	int rc;
+
+	if (enable) {
+		rc = regulator_enable(data->vdd);
+		if (rc)
+			CTP_ERROR("Regulator vdd enable failed rc=%d", rc);
+
+		rc = regulator_enable(data->vcc_i2c);
+		if (rc)
+			CTP_ERROR("Regulator vcc_i2c enable failed rc=%d", rc);
+	} else {
+		rc = regulator_disable(data->vdd);
+		if (rc)
+			CTP_ERROR("Regulator vdd disable failed rc=%d", rc);
+
+		rc = regulator_disable(data->vcc_i2c);
+		if (rc)
+			CTP_ERROR("Regulator vcc_i2c disable failed rc=%d",
+							rc);
+	}
+	return 0;
+}
+
+static int mxt_power_source_exit(struct mxt_data *data)
+{
+	mxt_power_source_ctrl(data, 0);
+
+	if (!IS_ERR_OR_NULL(data->vdd)) {
+		if (regulator_count_voltages(data->vdd) > 0)
+			regulator_set_voltage(data->vdd, 0, ATMEL_VTG_MAX_UV);
+		regulator_put(data->vdd);
+	}
+
+	if (!IS_ERR_OR_NULL(data->vcc_i2c)) {
+		if (regulator_count_voltages(data->vcc_i2c) > 0)
+			regulator_set_voltage(data->vcc_i2c, 0, ATMEL_I2C_VTG_MAX_UV);
+		regulator_put(data->vcc_i2c);
+	}
+
+	return 0;
+}
+#endif
 
 static u8 mxt_read_chg(struct mxt_data *data)
 {
@@ -5216,7 +5320,6 @@ static int mxt_suspend(struct device *dev)
 	struct i2c_client *client = to_i2c_client(dev);
 	struct mxt_data *data = i2c_get_clientdata(client);
 	struct input_dev *input_dev = data->input_dev;
-	int ret;
 
 	if (data->pdata->cut_off_power) {
 		cancel_delayed_work_sync(&data->resume_delayed_work);
@@ -5231,17 +5334,7 @@ static int mxt_suspend(struct device *dev)
 
 		mxt_clear_touch_event(data);
 
-		if (data->regulator_vddio) {
-			ret = regulator_disable(data->regulator_vddio);
-			if (ret < 0)
-				dev_err(dev, "regulator disable for vddio failed: %d\n", ret);
-		}
-
-		if (data->regulator_vdd) {
-			ret = regulator_disable(data->regulator_vdd);
-			if (ret < 0)
-				dev_err(dev, "regulator disable for vdd failed: %d\n", ret);
-		}
+		mxt_power_source_ctrl(data, 0);
 
 		data->is_stopped = 1;
 		mutex_unlock(&input_dev->mutex);
@@ -5271,7 +5364,6 @@ static int mxt_resume(struct device *dev)
 	struct i2c_client *client = to_i2c_client(dev);
 	struct mxt_data *data = i2c_get_clientdata(client);
 	struct input_dev *input_dev = data->input_dev;
-	int ret;
 
 	if (data->pdata->cut_off_power) {
 		mutex_lock(&input_dev->mutex);
@@ -5280,17 +5372,7 @@ static int mxt_resume(struct device *dev)
 			return 0;
 		}
 
-		if (data->regulator_vddio) {
-			ret = regulator_enable(data->regulator_vddio);
-			if (ret < 0)
-				dev_err(dev, "regulator enable for vddio failed: %d\n", ret);
-		}
-
-		if (data->regulator_vdd) {
-			ret = regulator_enable(data->regulator_vdd);
-			if (ret < 0)
-				dev_err(dev, "regulator enable for vdd failed: %d\n", ret);
-		}
+		mxt_power_source_ctrl(data, 1);
 
 		mdelay(1);
 		gpio_set_value(data->pdata->reset_gpio, 1);
@@ -5978,6 +6060,14 @@ static int mxt_probe(struct i2c_client *client,
 	cmcs_data = data;
 
 	CTP_DEBUG("step 2: Power on . ");
+#if ATMEL_POWER_SOURCE_CUST_EN
+	error = mxt_power_source_init(data);
+	if (error)
+		goto err_free_regulator;
+	error = mxt_power_source_ctrl(data, 1);
+	if (error)
+		goto err_free_regulator;
+#endif
 	error = mxt_initialize_pinctrl(data);
 	if (error || !data->ts_pinctrl) {
 		dev_err(&client->dev, "Initialize pinctrl failed\n");
@@ -6156,11 +6246,11 @@ err_pinctrl_sleep:
 			dev_err(&client->dev, "Cannot get idle pinctrl state\n");
 		devm_pinctrl_put(data->ts_pinctrl);
 	}
-/*
+#if ATMEL_POWER_SOURCE_CUST_EN
 err_free_regulator:
-	mxt_configure_regulator(data, false);
-err_free_data:
-*/
+	mxt_power_source_exit(data);
+#endif
+//err_free_data:
 	kfree(data);
 
 	return error;
@@ -6199,6 +6289,10 @@ static int mxt_remove(struct i2c_client *client)
 			dev_err(&data->client->dev, "Cannot get idle pinctrl state\n");
 		devm_pinctrl_put(data->ts_pinctrl);
 	}
+
+#if ATMEL_POWER_SOURCE_CUST_EN
+	mxt_power_source_exit(data);
+#endif
 
 	kfree(data);
 	data = NULL;
