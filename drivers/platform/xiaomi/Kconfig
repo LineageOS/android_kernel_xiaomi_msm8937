@@ -1,30 +1,28 @@
-config MACH_XIAOMI
-	bool "Xiaomi"
+menuconfig MACH_XIAOMI
+	bool "Xiaomi devices"
+
+if MACH_XIAOMI
 
 config MACH_XIAOMI_LAND
 	bool "Xiaomi Redmi 3S"
-	depends on MACH_XIAOMI
 	depends on ARCH_MSM8937
 	help
 	  Support for Xiaomi Redmi 3S.
 
 config MACH_XIAOMI_ROVA
 	bool "Xiaomi Redmi 4A / 5A (Unified)"
-	depends on MACH_XIAOMI
 	depends on ARCH_MSM8917
 	help
 	  Support for Xiaomi Redmi 4A / 5A (Unified).
 
 config MACH_XIAOMI_SANTONI
 	bool "Xiaomi Redmi 4X"
-	depends on MACH_XIAOMI
 	depends on ARCH_MSM8940
 	help
 	  Support for Xiaomi Redmi 4X.
 
 config MACH_XIAOMI_TIARE
 	bool "Xiaomi Redmi Go"
-	depends on MACH_XIAOMI
 	depends on ARCH_MSM8917
 	depends on !MACH_XIAOMI_ROVA
 	help
@@ -32,8 +30,9 @@ config MACH_XIAOMI_TIARE
 
 config MACH_XIAOMI_ULYSSE
 	bool "Xiaomi Redmi Note 5A (Unified)"
-	depends on MACH_XIAOMI
 	depends on ARCH_MSM8917
 	depends on ARCH_MSM8940
 	help
 	  Support for Xiaomi Redmi Note 5A (Unified).
+
+endif
