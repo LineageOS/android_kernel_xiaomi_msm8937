@@ -2,7 +2,7 @@
 
 #include <linux/xiaomi_device.h>
 
-int xiaomi_device = 0;
+int xiaomi_device = XIAOMI_DEVICE_MAX;
 
 int xiaomi_device_get(void)
 {
@@ -15,10 +15,9 @@ int xiaomi_device_get(void)
 		printk("Xiaomi device = %s\n",xiaomi_device_str);
 	else {
 		printk("error reading xiaomi device from FDT, ret=%d\n",ret);
-		return -EINVAL;
+		ret = XIAOMI_DEVICE_UNKNOWN;
+		goto exit;
 	};
-
-	ret = 0;
 
 	if (strcmp(xiaomi_device_str, "ugglite") == 0)
 		ret = XIAOMI_DEVICE_UGGLITE;
@@ -37,6 +36,7 @@ int xiaomi_device_get(void)
 	else
 		ret = XIAOMI_DEVICE_UNKNOWN;
 
+exit:
 	xiaomi_device = ret;
 
 	return ret;
@@ -46,7 +46,7 @@ int xiaomi_device_read(void)
 {
 	int ret = 0;
 
-	if (xiaomi_device == 0)
+	if (xiaomi_device == XIAOMI_DEVICE_MAX)
 		ret = xiaomi_device_get();
 	else
 		ret = xiaomi_device;
