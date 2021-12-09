@@ -1612,7 +1612,7 @@ static void mxt_proc_t15_messages(struct mxt_data *data, u8 *msg)
 
 			input_mt_report_slot_state(data->input_dev, MT_TOOL_FINGER, true);
 
-			input_report_abs(data->input_dev, ABS_MT_POSITION_X, 2*fhd_key_dim_x[key + 1]);
+			input_report_abs(data->input_dev, ABS_MT_POSITION_X, 2*atmel_fhd_key_dim_x[key + 1]);
 			input_report_abs(data->input_dev, ABS_MT_POSITION_Y, 2*FHD_KEY_Y);
 
 		} else if (curr_state && !new_state) {

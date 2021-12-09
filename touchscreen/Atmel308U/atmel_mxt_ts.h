@@ -39,7 +39,7 @@
 #define FHD_MENU_KEY_X              180
 #define FHD_HOME_KEY_X              540
 #define FHD_BACK_KEY_X              900
-int fhd_key_dim_x[] = { 0, FHD_MENU_KEY_X, FHD_HOME_KEY_X, FHD_BACK_KEY_X, };
+int atmel_fhd_key_dim_x[] = { 0, FHD_MENU_KEY_X, FHD_HOME_KEY_X, FHD_BACK_KEY_X, };
 
 /*IC Maker*/
 #define TP_BIEL        0x31
