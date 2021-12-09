@@ -1419,7 +1419,7 @@ MODULE_DEVICE_TABLE(i2c, fts_ts_id);
 
 static struct of_device_id fts_match_table[] =
 {
-	{ .compatible = "focaltech,fts", },
+	{ .compatible = "focaltech,ft5435", },
 	{ },
 };
 
