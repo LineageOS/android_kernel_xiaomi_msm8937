@@ -13,8 +13,10 @@ int xiaomi_series_get(void)
 
 	if (!ret)
 		printk("Xiaomi series = %s\n",xiaomi_series_str);
-	else
+	else {
 		printk("error reading xiaomi series from FDT, ret=%d\n",ret);
+		return -EINVAL;
+	}
 
 	ret = 0;
 

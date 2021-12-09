@@ -13,8 +13,10 @@ int xiaomi_device_get(void)
 
 	if (!ret)
 		printk("Xiaomi device = %s\n",xiaomi_device_str);
-	else
+	else {
 		printk("error reading xiaomi device from FDT, ret=%d\n",ret);
+		return -EINVAL;
+	};
 
 	ret = 0;
 
