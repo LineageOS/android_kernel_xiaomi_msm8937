@@ -6140,6 +6140,7 @@ err_free_irq:
 err_free_input_device:
 	input_unregister_device(data->input_dev);
 err_free_object:
+	i2c_set_clientdata(data->client, NULL);
 	kfree(data->msg_buf);
 	kfree(data->object_table);
 err_reset_gpio_req:
@@ -6153,6 +6154,7 @@ err_pinctrl_sleep:
 	if (data->ts_pinctrl) {
 		if (mxt_pinctrl_select(data, false) < 0)
 			dev_err(&client->dev, "Cannot get idle pinctrl state\n");
+		devm_pinctrl_put(data->ts_pinctrl);
 	}
 /*
 err_free_regulator:
@@ -6180,6 +6182,7 @@ static int mxt_remove(struct i2c_client *client)
 	sysfs_remove_group(&client->dev.kobj, &mxt_attr_group);
 	free_irq(data->irq, data);
 	input_unregister_device(data->input_dev);
+	i2c_set_clientdata(data->client, NULL);
 	kfree(data->msg_buf);
 	data->msg_buf = NULL;
 	kfree(data->object_table);
@@ -6190,6 +6193,13 @@ static int mxt_remove(struct i2c_client *client)
 
 	if (gpio_is_valid(pdata->reset_gpio))
 		gpio_free(pdata->reset_gpio);
+
+	if (data->ts_pinctrl) {
+		if (mxt_pinctrl_select(data, false) < 0)
+			dev_err(&data->client->dev, "Cannot get idle pinctrl state\n");
+		devm_pinctrl_put(data->ts_pinctrl);
+	}
+
 	kfree(data);
 	data = NULL;
 
