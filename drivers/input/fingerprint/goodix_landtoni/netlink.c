@@ -10,10 +10,10 @@
 #define MAX_MSGSIZE 4*1024
 int stringlength(char *s);
 void landtoni_sendnlmsg(char *message);
-int pid;
-int err;
+static int pid;
+static int err;
 struct sock *landtoni_nl_sk = NULL;
-int flag = 0;
+static int flag = 0;
 
 
 struct gf_uk_channel{
