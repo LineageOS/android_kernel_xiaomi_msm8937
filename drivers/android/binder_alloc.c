@@ -9,7 +9,7 @@
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
 
 #include <linux/list.h>
-#include <linux/sched/mm.h>
+#include <linux/mm.h>
 #include <linux/module.h>
 #include <linux/rtmutex.h>
 #include <linux/rbtree.h>
@@ -1019,7 +1019,7 @@ enum lru_status binder_alloc_free_page(struct list_head *item,
 	if (vma) {
 		trace_binder_unmap_user_start(alloc, index);
 
-		zap_page_range(vma, page_addr, PAGE_SIZE);
+		zap_page_range(vma, page_addr, PAGE_SIZE, NULL);
 
 		trace_binder_unmap_user_end(alloc, index);
 	}
