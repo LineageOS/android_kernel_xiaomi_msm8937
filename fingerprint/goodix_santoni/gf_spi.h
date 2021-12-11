@@ -87,7 +87,7 @@ struct gf_dev {
 	struct notifier_block gf_notifier;
 	char device_available;
 	char fb_black;
-	struct wakeup_source ttw_wl;
+	struct wakeup_source *ttw_wl;
 };
 
 int xiaomi_santoni_gf_parse_dts(struct gf_dev *gf_dev);

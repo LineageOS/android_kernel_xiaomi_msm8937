@@ -71,7 +71,7 @@ static int SPIDEV_MAJOR;
 static DECLARE_BITMAP(minors, N_SPI_MINORS);
 static LIST_HEAD(device_list);
 static DEFINE_MUTEX(device_list_lock);
-static struct wakeup_source fp_wakelock;
+static struct wakeup_source *fp_wakelock;
 static struct gf_dev gf;
 
 static struct proc_dir_entry *proc_entry;
@@ -491,7 +491,7 @@ static irqreturn_t gf_irq(int irq, void *handle)
 {
 #if defined(GF_NETLINK_ENABLE)
 	char temp = GF_NET_EVENT_IRQ;
-	__pm_wakeup_event(&fp_wakelock, WAKELOCK_HOLD_TIME);
+	__pm_wakeup_event(fp_wakelock, WAKELOCK_HOLD_TIME);
 	xiaomi_ugg_sendnlmsg(&temp);
 #elif defined (GF_FASYNC)
 	struct gf_dev *gf_dev = &gf;
@@ -743,7 +743,7 @@ static int gf_probe(struct platform_device *pdev)
 
 	gf_dev->irq = xiaomi_ugg_gf_irq_num(gf_dev);
 
-	wakeup_source_init(&fp_wakelock, "fp_wakelock");
+	fp_wakelock = wakeup_source_register(NULL, "fp_wakelock");
 	status = request_threaded_irq(gf_dev->irq, NULL, gf_irq,
 			IRQF_TRIGGER_RISING | IRQF_ONESHOT,
 			"gf", gf_dev);
@@ -804,7 +804,7 @@ static int gf_remove(struct platform_device *pdev)
 {
 	struct gf_dev *gf_dev = &gf;
 
-	wakeup_source_trash(&fp_wakelock);
+	wakeup_source_unregister(fp_wakelock);
 	if (gf_dev->irq)
 		free_irq(gf_dev->irq, gf_dev);
 

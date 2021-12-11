@@ -415,7 +415,7 @@ static irqreturn_t gf_irq(int irq, void *handle)
 	char temp = GF_NET_EVENT_IRQ;
 	gf_dbg("enter irq %s\n", __func__);
 
-	__pm_wakeup_event(&gf_dev->ttw_wl, 1000);
+	__pm_wakeup_event(gf_dev->ttw_wl, 1000);
 
 	xiaomi_santoni_sendnlmsg(&temp);
 #elif defined (GF_FASYNC)
@@ -726,7 +726,7 @@ static int gf_probe(struct platform_device *pdev)
 
 		gf_reg_key_kernel(gf_dev);
 
-		wakeup_source_init(&gf_dev->ttw_wl, "goodix_ttw_wl");
+		gf_dev->ttw_wl = wakeup_source_register(NULL, "goodix_ttw_wl");
 
 
 
@@ -787,7 +787,7 @@ static int gf_remove(struct platform_device *pdev)
 
 		 mutex_unlock(&device_list_lock);
 
-	wakeup_source_trash(&gf_dev->ttw_wl);
+	wakeup_source_unregister(gf_dev->ttw_wl);
 
 	FUNC_EXIT();
 	return 0;
