@@ -39,6 +39,7 @@
 #include <linux/gpio/consumer.h>
 #include <linux/debugfs.h>
 #include <linux/qpnp/qpnp-adc.h>
+#include <linux/iio/consumer.h>
 #include <linux/alarmtimer.h>
 #include <xiaomi-msm8937/mach.h>
 #include "bqfs_cmd_type.h"
@@ -291,7 +292,7 @@ struct bq_fg_chip {
 	struct power_supply *fg_psy;
 	struct power_supply_desc fg_psy_d;
 
-	struct qpnp_vadc_chip	*vadc_dev;
+	struct iio_channel	*batt_id_chan;
 	struct regulator *vcc_i2c;
 	struct regulator		*vdd;
 	u32	connected_rid;
@@ -1892,7 +1893,7 @@ static int fg_parse_batt_id(struct bq_fg_chip *bq)
 	int rc = 0, rpull = 0, vref = 0;
 	int64_t denom, batt_id_uv;
 	struct device_node *node = bq->dev->of_node;
-	struct qpnp_vadc_result result;
+	int res = 0;
 
 	bq->vdd = regulator_get(bq->dev, "vdd");
 	if (IS_ERR(bq->vdd)) {
@@ -1927,15 +1928,15 @@ static int fg_parse_batt_id(struct bq_fg_chip *bq)
 	}
 	pr_err("fg_parse_batt_id begin read battery ID \n");
 	/* read battery ID */
-	rc = qpnp_vadc_read(bq->vadc_dev, P_MUX2_1_1, &result);
-	if (rc) {
+	rc = iio_read_channel_processed(bq->batt_id_chan, &res);
+	if (rc < 0) {
 		pr_err("error reading batt id channel = %d, rc = %d\n",
 					LR_MUX2_BAT_ID, rc);
 		return rc; 
 	}
 
 	
-	batt_id_uv = result.physical;
+	batt_id_uv = res;
 	
 
 	pr_err("fg_parse_batt_id  batt_id_uv = %lld\n",batt_id_uv);
@@ -1969,17 +1970,17 @@ static int fg_get_battid_resister_xiaomi_riva(struct bq_fg_chip *bq)
 {
 	int rc = 0;
 	int bq_battid_resister = 0;
-	struct qpnp_vadc_result results;
+	int res = 0;
 
-	rc = qpnp_vadc_read(bq->vadc_dev, P_MUX4_1_1, &results);
-	if (rc) {
-		pr_debug("Unable to read batt resister rc=%d\n", rc);
+	rc = iio_read_channel_processed(bq->batt_id_chan, &res);
+	if (rc < 0) {
+		pr_err("Unable to read batt resister rc=%d\n", rc);
 		bq->connected_rid = 45;
 		return 45; // DEFAULT_RESISTER
 	}
 
 	bq_battid_resister =
-	    (results.physical) * 100 / (1800000 - results.physical);
+	    (res) * 100 / (1800000 - res);
 
 	bq->connected_rid = bq_battid_resister;
 	return bq_battid_resister;
@@ -2074,13 +2075,13 @@ static int bq_fg_probe(struct i2c_client *client,
 	bq->resume_completed = true;
 	bq->irq_waiting = false;
 
-	bq->vadc_dev = qpnp_get_vadc(bq->dev, "batt_id");
-	if (IS_ERR(bq->vadc_dev)) {
-		ret = PTR_ERR(bq->vadc_dev);
+	bq->batt_id_chan = iio_channel_get(bq->dev, "batt_id");
+	if (IS_ERR(bq->batt_id_chan)) {
+		ret = PTR_ERR(bq->batt_id_chan);
 		if (ret == -EPROBE_DEFER)
-			pr_err("vadc not found - defer rc=%d\n", ret);
+			pr_err("batt_id channel not found - defer rc=%d\n", ret);
 		else
-			pr_err("vadc property missing, rc=%d\n", ret);
+			pr_err("batt_id property missing, rc=%d\n", ret);
 
 		return ret;
 	}
