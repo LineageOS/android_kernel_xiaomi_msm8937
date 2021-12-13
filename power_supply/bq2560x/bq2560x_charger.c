@@ -1449,10 +1449,8 @@ static struct bq2560x_platform_data* bq2560x_parse_dt(struct device *dev,
 		return NULL;
 	}
 	
-	ret = of_property_read_u32(np, "ti,bq2560x,chip-enable-gpio", &bq->gpio_ce);
-    if(ret) {
-		pr_err("Failed to read node of ti,bq2560x,chip-enable-gpio\n");
-	}
+	bq->gpio_ce = of_get_named_gpio(np,
+					"ti,bq2560x,chip-enable-gpio", 0);
 
     ret = of_property_read_u32(np,"ti,bq2560x,usb-vlim",&pdata->usb.vlim);
     if(ret) {
