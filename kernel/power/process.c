@@ -196,20 +196,32 @@ int freeze_kernel_threads(void)
 void thaw_fingerprintd(void)
 {
 	struct task_struct *p;
+	bool fp_hidl_thawed, gx_fpd_thawed = false;
 
 	pm_freezing = false;
 	pm_nosig_freezing = false;
 
 	read_lock(&tasklist_lock);
 	for_each_process(p) {
-		if ((!memcmp(p->comm, "android.hardware.biometrics.fingerprint@2.1-service", 13)) ||
-			(!memcmp(p->comm,"android.hardware.biometrics.fingerprint@2.1-service.xiaomi_landtoni", 13)) ||
-			(!memcmp(p->comm,"android.hardware.biometrics.fingerprint@2.1-service.xiaomi_ulysse", 13)) ||
-			(!memcmp(p->comm,"land_gx_fpd", 13)) ||
-			(!memcmp(p->comm,"santoni_gx_fpd", 13)) ||
-			(!memcmp(p->comm,"gx_fpd", 13))) {
-			__thaw_task(p);
+		if (fp_hidl_thawed && gx_fpd_thawed)
 			break;
+		if (!fp_hidl_thawed) {
+			if ((!memcmp(p->comm, "android.hardware.biometrics.fingerprint@2.1-service", 13)) ||
+				(!memcmp(p->comm,"android.hardware.biometrics.fingerprint@2.1-service.xiaomi_landtoni", 13)) ||
+				(!memcmp(p->comm,"android.hardware.biometrics.fingerprint@2.1-service.xiaomi_ulysse", 13))) {
+				__thaw_task(p);
+				fp_hidl_thawed = true;
+				continue;
+			}
+		}
+		if (!gx_fpd_thawed) {
+			if ((!memcmp(p->comm, "gx_fpd", 13)) ||
+				(!memcmp(p->comm,"land_gx_fpd", 13)) ||
+				(!memcmp(p->comm,"santoni_gx_fpd", 13))) {
+				__thaw_task(p);
+				gx_fpd_thawed = true;
+				continue;
+			}
 		}
 	}
 	read_unlock(&tasklist_lock);
