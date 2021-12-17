@@ -2065,6 +2065,7 @@ static const struct attribute_group ft5x06_ts_attr_group = {
 	.attrs = ft5x06_ts_attrs,
 };
 
+#if CTP_PROC_INTERFACE
 static int ft5x06_proc_init(struct ft5x06_ts_data *data)
 {
        struct i2c_client *client = data->client;
@@ -2099,7 +2100,7 @@ static int ft5x06_proc_init(struct ft5x06_ts_data *data)
        kfree(key_disabler_sysfs_node);
        return ret;
 }
-
+#endif
 
 #if CTP_PROC_INTERFACE
 static ssize_t ctp_lockdown_proc_read(struct file *file, char __user *buf, size_t count, loff_t *ppos)
@@ -2911,7 +2912,9 @@ static int ft5x06_ts_probe(struct i2c_client *client,
 		goto free_reset_gpio;
         }
 
+#if CTP_PROC_INTERFACE
         ft5x06_proc_init(data);
+#endif
 	enable_irq(data->client->irq);
 
 	return 0;
