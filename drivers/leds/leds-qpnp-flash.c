@@ -18,6 +18,7 @@
 #include <linux/leds.h>
 #include <linux/slab.h>
 #include <linux/of_device.h>
+#include <linux/of_gpio.h>
 #include <linux/spmi.h>
 #include <linux/platform_device.h>
 #include <linux/err.h>
@@ -2467,7 +2468,11 @@ static int qpnp_flash_led_probe(struct platform_device *pdev)
 	led->pdev = pdev;
 	led->current_addr = FLASH_LED0_CURRENT(led->base);
 	led->current2_addr = FLASH_LED1_CURRENT(led->base);
-	qpnp_flash_led_prepare = qpnp_flash_led_prepare_v1;
+	rc = qpnp_flash_register_led_prepare(&pdev->dev, qpnp_flash_led_prepare_v1);
+	if (rc < 0) {
+		pr_err("Failed to register flash_led_prepare, rc=%d\n", rc);
+		return rc;
+	}
 
 	led->pdata = devm_kzalloc(&pdev->dev, sizeof(*led->pdata), GFP_KERNEL);
 	if (!led->pdata)
