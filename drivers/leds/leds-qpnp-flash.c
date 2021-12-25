@@ -29,6 +29,7 @@
 #include <linux/leds-qpnp-flash.h>
 #include <linux/qpnp/qpnp-adc.h>
 #include <linux/qpnp/qpnp-revid.h>
+#include <linux/iio/consumer.h>
 #include <linux/debugfs.h>
 #include <linux/uaccess.h>
 #include "leds.h"
@@ -249,7 +250,7 @@ struct qpnp_flash_led {
 	struct flash_node_data		*flash_node;
 	struct power_supply		*battery_psy;
 	struct workqueue_struct		*ordered_workq;
-	struct qpnp_vadc_chip		*vadc_dev;
+	struct iio_channel		*iio_chan;
 	struct mutex			flash_led_lock;
 	struct dentry			*dbgfs_root;
 	int				num_leds;
@@ -616,16 +617,15 @@ static int qpnp_flash_led_get_allowed_die_temp_curr(struct qpnp_flash_led *led,
 
 static int64_t qpnp_flash_led_get_die_temp(struct qpnp_flash_led *led)
 {
-	struct qpnp_vadc_result die_temp_result;
-	int rc;
+	int die_temp_result, rc;
 
-	rc = qpnp_vadc_read(led->vadc_dev, SPARE2, &die_temp_result);
+	rc = iio_read_channel_processed(led->iio_chan, &die_temp_result);
 	if (rc) {
 		pr_err("failed to read the die temp\n");
 		return -EINVAL;
 	}
 
-	return die_temp_result.physical;
+	return die_temp_result;
 }
 
 static int qpnp_get_pmic_revid(struct qpnp_flash_led *led)
@@ -2330,8 +2330,8 @@ static int qpnp_flash_led_parse_common_dt(
 					"qcom,die-current-derate-enabled");
 
 	if (led->pdata->die_current_derate_en) {
-		led->vadc_dev = qpnp_get_vadc(&led->pdev->dev, "die-temp");
-		if (IS_ERR(led->vadc_dev)) {
+		led->iio_chan = iio_channel_get(&led->pdev->dev, "die-temp");
+		if (IS_ERR(led->iio_chan)) {
 			pr_err("VADC channel property Missing\n");
 			return -EINVAL;
 		}
