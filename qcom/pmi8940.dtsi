@@ -479,6 +479,8 @@
 			qcom,headroom-sense-ch0-enabled;
 			qcom,headroom-sense-ch1-enabled;
 			qcom,pmic-revid = <&pmi8940_revid>;
+			io-channels = <&pmi8940_vadc VADC_SPARE2>;
+			io-channel-names = "die-temp";
 
 			pmi8940_flash0: qcom,flash_0 {
 				label = "flash";
