@@ -870,14 +870,13 @@ static int cw_get_battery_profile(struct cw_battery *cw_bat)
 	const char *data;
 	int data_len = 0;
 	int i = 0;
-	char bms = "bms";
 
 	batt_node = of_parse_phandle(cw_bat->dev->of_node, "qcom,battery-data", 0);
 	if (!batt_node) {
 		pr_err("cw2017: No Batterydata is available\n");
 		return -ENODATA;
 	}
-	batt_data_node = of_batterydata_get_best_profile(batt_node, bms, NULL);
+	batt_data_node = of_batterydata_get_best_profile(batt_node, cw_bat->battery_id, NULL);
 	if (!batt_data_node) {
 		pr_err("cw2017: couldn't find battery profile handle\n");
 		return -ENODATA;
