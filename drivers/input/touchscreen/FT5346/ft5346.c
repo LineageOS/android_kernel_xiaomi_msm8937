@@ -1233,6 +1233,7 @@ static int ft5x06_fw_upgrade_start(struct i2c_client *client,
 	return 0;
 }
 
+#if TPD_AUTO_UPGRADE || WT_ADD_CTP_INFO
 static void fts_get_upgrade_array(struct i2c_client *client)
 {
 
@@ -1371,6 +1372,7 @@ static void fts_ctpm_read_lockdown(struct i2c_client *client, struct ft5x06_ts_d
 	dev_info(&client->dev, "WT: Project_Id = 0x%x\n", Project_Id);
 
 }
+#endif
 
 #if TPD_AUTO_UPGRADE
 
@@ -2757,7 +2759,7 @@ static int fts_input_event(struct input_dev *dev,
 	return 0;
 }
 
-
+#if TPD_AUTO_UPGRADE
 static int get_boot_mode(struct i2c_client *client)
 {
 		int ret;
@@ -2784,6 +2786,7 @@ static int get_boot_mode(struct i2c_client *client)
 	dev_err(&client->dev, "has no androidboot.mode \n");
 	return 0;
 }
+#endif
 
 #ifdef CONFIG_MACH_XIAOMI
 extern bool xiaomi_ts_probed;
