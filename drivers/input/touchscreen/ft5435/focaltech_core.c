@@ -732,10 +732,13 @@ static void fts_report_value(struct fts_ts_data *data)
 		return;
 	}
 
-	if(data->key_state) {
-		if(data->key_state && (~0x01)) input_report_key(data->input_dev, data->pdata->keys[0], 0);
-		if(data->key_state && (~0x02)) input_report_key(data->input_dev, data->pdata->keys[1], 0);
-		if(data->key_state && (~0x04)) input_report_key(data->input_dev, data->pdata->keys[2], 0);
+	if (data->key_state) {
+		if (data->key_state & (~0x01))
+			input_report_key(data->input_dev, data->pdata->keys[0], 0);
+		if (data->key_state & (~0x02))
+			input_report_key(data->input_dev, data->pdata->keys[1], 0);
+		if (data->key_state & (~0x04))
+			input_report_key(data->input_dev, data->pdata->keys[2], 0);
 		input_sync(data->input_dev);
 		data->key_state = 0;
 	}
