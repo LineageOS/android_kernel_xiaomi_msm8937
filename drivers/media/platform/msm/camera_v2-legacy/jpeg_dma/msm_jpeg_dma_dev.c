@@ -21,7 +21,7 @@
 #include <media/v4l2-event.h>
 #include <media/videobuf2-core.h>
 #include <media/v4l2-mem2mem.h>
-#include <media/msm_jpeg_dma.h>
+#include <media/msm_jpeg_dma-legacy.h>
 
 #ifdef CONFIG_MACH_XIAOMI
 #include <linux/xiaomi_device.h>
