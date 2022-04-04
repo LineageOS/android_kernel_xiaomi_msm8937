@@ -19,6 +19,9 @@
 /* Index to preemption scratch buffer to store KMD postamble */
 #define KMD_POSTAMBLE_IDX 100
 
+/* Index to preemption scratch buffer to store KMD postamble */
+#define KMD_POSTAMBLE_IDX 100
+
 /* ADRENO_DEVICE - Given a kgsl_device return the adreno device struct */
 #define ADRENO_DEVICE(device) \
 		container_of(device, struct adreno_device, dev)
