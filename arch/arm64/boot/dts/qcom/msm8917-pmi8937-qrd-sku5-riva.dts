@@ -30,4 +30,6 @@
 
 	xiaomi,series = "rova";
 	xiaomi,device = "riva";
+
+	xiaomi,bootloader = "Nougat";
 };

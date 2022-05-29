@@ -31,6 +31,8 @@
 
 	xiaomi,series = "rova";
 	xiaomi,device = "riva";
+
+	xiaomi,bootloader = "Oreo";
 };
 
 &other_ext_mem {
