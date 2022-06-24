@@ -347,6 +347,7 @@ long compat_blkdev_ioctl(struct file *file, unsigned cmd, unsigned long arg)
 		return compat_put_uint(arg, 0);
 	case BLKFLSBUF:
 	case BLKROSET:
+	case BLKROSET_PERMANENT:
 	case BLKDISCARD:
 	case BLKSECDISCARD:
 	case BLKZEROOUT:

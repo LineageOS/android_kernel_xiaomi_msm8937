@@ -206,6 +206,9 @@ static int blk_ioctl_discard(struct block_device *bdev, fmode_t mode,
 	struct address_space *mapping = bdev->bd_inode->i_mapping;
 
 
+	if (bdev->bd_part->policy_locked)
+		return -EPERM;
+
 	if (!(mode & FMODE_WRITE))
 		return -EBADF;
 
@@ -455,6 +458,20 @@ static int blkdev_roset(struct block_device *bdev, fmode_t mode,
 	return 0;
 }
 
+static int blkdev_roset_permanent(struct block_device *bdev, fmode_t mode,
+		unsigned cmd, unsigned long arg)
+{
+	int ret, n;
+
+	ret = __blkdev_driver_ioctl(bdev, mode, cmd, arg);
+	if (!is_unrecognized_ioctl(ret))
+		return ret;
+	if (!capable(CAP_SYS_ADMIN))
+		return -EACCES;
+	set_device_ro_permanent(bdev);
+	return 0;
+}
+
 static int blkdev_getgeo(struct block_device *bdev,
 		struct hd_geometry __user *argp)
 {
@@ -521,6 +538,8 @@ int blkdev_ioctl(struct block_device *bdev, fmode_t mode, unsigned cmd,
 		return blkdev_flushbuf(bdev, mode, cmd, arg);
 	case BLKROSET:
 		return blkdev_roset(bdev, mode, cmd, arg);
+	case BLKROSET_PERMANENT:
+		return blkdev_roset_permanent(bdev, mode, cmd, arg);
 	case BLKDISCARD:
 		return blk_ioctl_discard(bdev, mode, arg, 0);
 	case BLKSECDISCARD:
