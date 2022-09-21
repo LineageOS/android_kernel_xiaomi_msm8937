@@ -19,6 +19,15 @@
 	};
 };*/
 
+&spmi_bus {
+	qcom,pmi632@2 {
+		pmi632_tz: qcom,temp-alarm@2400 {
+			io-channels = <&pmi632_vadc ADC_DIE_TEMP>;
+			io-channel-names = "thermal";
+		};
+	};
+};
+
 /* From stock pmi632.dtsi */
 &pmi632_charger {
 	qcom,chg-term-src = <1>;
