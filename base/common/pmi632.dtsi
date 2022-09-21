@@ -1,35 +1,25 @@
-/* From stock pmi632.dtsi */
-&pmi632_vadc {
-	/* WARNING: Redefine node */
-	/delete-node/ chan@53;
-	chan@13 {
+/*&pmi632_vadc {
+// TODO: find the corect ADC channel for xiaomi sdm439
+	quiet_therm {
+		reg = <ADC_GPIO2_PU2>;
 		label = "quiet_therm";
-		reg = <0x13>;
-		qcom,decimation = <2>;
-		qcom,pre-div-channel-scaling = <0>;
-		qcom,calibration-type = "ratiometric";
-		qcom,scale-function = <2>;
-		qcom,hw-settle-time = <0>;
-		qcom,fast-avg-setup = <0>;
-		qcom,cal-val = <0>;
+		qcom,ratiometric;
+		qcom,hw-settle-time = <200>;
+		qcom,pre-scaling = <1 1>;
 	};
 };
 
 &pmi632_adc_tm {
-	/* WARNING: Redefine node */
-	/delete-node/ chan@53;
-	chan@13 {
-		label = "quiet_therm";
-		reg = <0x13>;
-		qcom,pre-div-channel-scaling = <0>;
-		qcom,calibration-type = "ratiometric";
-		qcom,scale-function = <2>;
-		qcom,hw-settle-time = <0>;
-		qcom,btm-channel-number = <0x60>;
-		qcom,thermal-node;
-	};
-};
+	io-channels = <&pmi632_vadc ADC_GPIO2_PU2>;
 
+	quiet_therm {
+		reg = <ADC_GPIO2_PU2>;
+		qcom,ratiometric;
+		qcom,hw-settle-time = <200>;
+	};
+};*/
+
+/* From stock pmi632.dtsi */
 &pmi632_charger {
 	qcom,chg-term-src = <1>;
 	qcom,chg-term-current-ma = <(-200)>;
