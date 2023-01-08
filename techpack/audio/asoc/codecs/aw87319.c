@@ -69,7 +69,7 @@ struct pinctrl_state *aw87319_rst_low = NULL;
 
 
 
-char Spk_Pa_Flag[] = " ";
+//char Spk_Pa_Flag[] = " ";
 
 static void aw87319_pa_pwron(void)
 {
@@ -373,7 +373,7 @@ static int aw87319_i2c_probe(struct i2c_client *client, const struct i2c_device_
 	if (!cnt) {
 		err = -ENODEV;
 		aw87319_hw_off();
-		strncpy(Spk_Pa_Flag, "S88537A12", 9);
+//		strncpy(Spk_Pa_Flag, "S88537A12", 9);
 		pr_err("%s:can not find AW87319, board  is S88537A12\n!", __func__);
 		goto exit_create_singlethread;
 	}
