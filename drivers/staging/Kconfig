@@ -106,6 +106,4 @@ source "drivers/staging/greybus/Kconfig"
 
 source "drivers/staging/vc04_services/Kconfig"
 
-source "drivers/staging/qcacld-3.0/Kconfig"
-
 endif # STAGING
