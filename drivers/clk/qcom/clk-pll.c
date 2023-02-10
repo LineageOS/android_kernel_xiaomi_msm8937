@@ -29,44 +29,6 @@
 #define PLL_BYPASSNL		BIT(1)
 #define PLL_RESET_N		BIT(2)
 
-static void spm_event(void __iomem *base, u32 offset, u32 bit, bool enable)
-{
-	uint32_t val;
-
-	if (!base)
-		return;
-
-	if (enable) {
-		/* L2_SPM_FORCE_EVENT_EN */
-		val = readl_relaxed(base + offset);
-		val |= BIT(bit);
-		writel_relaxed(val, (base + offset));
-		/* Ensure that the write above goes through. */
-		mb();
-
-		/* L2_SPM_FORCE_EVENT */
-		val = readl_relaxed(base + offset + 0x4);
-		val |= BIT(bit);
-		writel_relaxed(val, (base + offset + 0x4));
-		/* Ensure that the write above goes through. */
-		mb();
-	} else {
-		/* L2_SPM_FORCE_EVENT */
-		val = readl_relaxed(base + offset + 0x4);
-		val &= ~BIT(bit);
-		writel_relaxed(val, (base + offset + 0x4));
-		/* Ensure that the write above goes through. */
-		mb();
-
-		/* L2_SPM_FORCE_EVENT_EN */
-		val = readl_relaxed(base + offset);
-		val &= ~BIT(bit);
-		writel_relaxed(val, (base + offset));
-		/* Ensure that the write above goes through. */
-		mb();
-	}
-}
-
 static int clk_pll_enable(struct clk_hw *hw)
 {
 	struct clk_pll *pll = to_clk_pll(hw);
@@ -113,9 +75,6 @@ static void clk_pll_disable(struct clk_hw *hw)
 	struct clk_pll *pll = to_clk_pll(hw);
 	u32 mask;
 	u32 val;
-
-	spm_event(pll->spm_ctrl.spm_base, pll->spm_ctrl.offset,
-			pll->spm_ctrl.event_bit, true);
 
 	regmap_read(pll->clkr.regmap, pll->mode_reg, &val);
 	/* Skip if in FSM mode */
@@ -260,7 +219,7 @@ static int wait_for_pll(struct clk_pll *pll)
 	const char *name = clk_hw_get_name(&pll->clkr.hw);
 
 	/* Wait for pll to enable. */
-	for (count = 500; count > 0; count--) {
+	for (count = 200; count > 0; count--) {
 		ret = regmap_read(pll->clkr.regmap, pll->status_reg, &val);
 		if (ret)
 			return ret;
@@ -269,8 +228,7 @@ static int wait_for_pll(struct clk_pll *pll)
 		udelay(1);
 	}
 
-	WARN_CLK(pll->clkr.hw.core, name, 1,
-			"didn't enable after voting for it!\n");
+	WARN(1, "%s didn't enable after voting for it!\n", name);
 	return -ETIMEDOUT;
 }
 
@@ -343,9 +301,6 @@ static int clk_pll_sr2_enable(struct clk_hw *hw)
 	int ret;
 	u32 mode;
 
-	spm_event(pll->spm_ctrl.spm_base, pll->spm_ctrl.offset,
-			pll->spm_ctrl.event_bit, false);
-
 	ret = regmap_read(pll->clkr.regmap, pll->mode_reg, &mode);
 	if (ret)
 		return ret;
@@ -367,10 +322,6 @@ static int clk_pll_sr2_enable(struct clk_hw *hw)
 				 PLL_RESET_N);
 	if (ret)
 		return ret;
-
-	/* Make sure De-assert active-low PLL reset request goes through */
-	mb();
-	udelay(50);
 
 	ret = wait_for_pll(pll);
 	if (ret)
