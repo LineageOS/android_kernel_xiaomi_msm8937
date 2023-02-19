@@ -206,18 +206,18 @@ void thaw_fingerprintd(void)
 		if (fp_hidl_thawed && gx_fpd_thawed)
 			break;
 		if (!fp_hidl_thawed) {
-			if ((!memcmp(p->comm, "android.hardware.biometrics.fingerprint@2.1-service", 13)) ||
-				(!memcmp(p->comm,"android.hardware.biometrics.fingerprint@2.1-service.xiaomi_landtoni", 13)) ||
-				(!memcmp(p->comm,"android.hardware.biometrics.fingerprint@2.1-service.xiaomi_ulysse", 13))) {
+			if ((!memcmp(p->comm, "android.hardware.biometrics.fingerprint@2.1-service", 52)) ||
+				(!memcmp(p->comm,"android.hardware.biometrics.fingerprint@2.1-service.xiaomi_landtoni", 68)) ||
+				(!memcmp(p->comm,"android.hardware.biometrics.fingerprint@2.1-service.xiaomi_ulysse", 66))) {
 				__thaw_task(p);
 				fp_hidl_thawed = true;
 				continue;
 			}
 		}
 		if (!gx_fpd_thawed) {
-			if ((!memcmp(p->comm, "gx_fpd", 13)) ||
-				(!memcmp(p->comm,"land_gx_fpd", 13)) ||
-				(!memcmp(p->comm,"santoni_gx_fpd", 13))) {
+			if ((!memcmp(p->comm, "gx_fpd", 7)) ||
+				(!memcmp(p->comm,"land_gx_fpd", 12)) ||
+				(!memcmp(p->comm,"santoni_gx_fpd", 15))) {
 				__thaw_task(p);
 				gx_fpd_thawed = true;
 				continue;
