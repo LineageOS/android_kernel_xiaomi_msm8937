@@ -61,6 +61,7 @@
 #define _FT8016             0x8016081D
 
 
+#define _FT5336             0x53360402
 #define _FT5416             0x54160402
 #define _FT5426             0x54260402
 #define _FT5435             0x54350402

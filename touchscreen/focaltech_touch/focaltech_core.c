@@ -1479,7 +1479,7 @@ static int fts_get_chip_types(
 	struct ft_chip_t ctype[] = FTS_CHIP_TYPE_MAPPING;
 	u32 ctype_entries = sizeof(ctype) / sizeof(struct ft_chip_t);
 
-	if ((0x0 == id_h) || (0x0 == id_l)) {
+	if ((0x0 == id_h) || ((0x0 == id_l) && (0x14 != id_h))) {
 		FTS_ERROR("id_h/id_l is 0");
 		return -EINVAL;
 	}
@@ -1560,7 +1560,7 @@ static int fts_get_ic_information(struct fts_ts_data *ts_data)
 	do {
 		ret = fts_read_reg(FTS_REG_CHIP_ID, &chip_id[0]);
 		ret = fts_read_reg(FTS_REG_CHIP_ID2, &chip_id[1]);
-		if ((ret < 0) || (0x0 == chip_id[0]) || (0x0 == chip_id[1])) {
+		if ((ret < 0) || (0x0 == chip_id[0]) || ((0x0 == chip_id[1]) && (0x14 != chip_id[0]))) {
 			FTS_DEBUG("i2c read invalid, read:0x%02x%02x",
 				chip_id[0], chip_id[1]);
 		} else {
