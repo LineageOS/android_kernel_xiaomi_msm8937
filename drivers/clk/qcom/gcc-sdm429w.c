@@ -4437,6 +4437,7 @@ static const struct of_device_id gcc_sdm429w_match_table[] = {
 	{ .compatible = "qcom,gcc-sdm429w" },
 	{ .compatible = "qcom,gcc-qm215" },
 	{ .compatible = "qcom,gcc-sdm439" },
+	{ .compatible = "qcom,gcc-msm8917" },
 	{ .compatible = "qcom,gcc-msm8937" },
 	{ .compatible = "qcom,gcc-msm8940" },
 	{ }
@@ -4448,13 +4449,16 @@ static int gcc_sdm429w_probe(struct platform_device *pdev)
 	struct regmap *regmap;
 	struct clk *clk;
 	int ret, speed_bin;
-	bool qm215, is_sdm439, msm8937, msm8940;
+	bool qm215, is_sdm439, msm8917, msm8937, msm8940;
 
 	qm215 = of_device_is_compatible(pdev->dev.of_node,
 						"qcom,gcc-qm215");
 
 	is_sdm439 = of_device_is_compatible(pdev->dev.of_node,
 						"qcom,gcc-sdm439");
+
+	msm8917 = of_device_is_compatible(pdev->dev.of_node,
+						"qcom,gcc-msm8917");
 
 	msm8937 = of_device_is_compatible(pdev->dev.of_node,
 						"qcom,gcc-msm8937");
@@ -4481,7 +4485,7 @@ static int gcc_sdm429w_probe(struct platform_device *pdev)
 	if (IS_ERR(regmap))
 		return PTR_ERR(regmap);
 
-	if (qm215) {
+	if (qm215 || msm8917) {
 		speed_bin = 0;
 		get_speed_bin(pdev, &speed_bin);
 		fixup_for_qm215(pdev, regmap, speed_bin);
