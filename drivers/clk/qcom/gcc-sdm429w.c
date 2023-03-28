@@ -25,7 +25,7 @@
 
 #define F_SLEW(f, s, h, m, n, sf) { (f), (s), (2 * (h) - 1), (m), (n), (sf) }
 
-static DEFINE_VDD_REGULATORS(vdd_cx, VDD_NUM - 1, 1, vdd_corner);
+static DEFINE_VDD_REGULATORS(vdd_cx, VDD_NUM, 1, vdd_corner);
 
 enum {
 	P_BI_TCXO,
@@ -1820,7 +1820,7 @@ static const struct freq_tbl ftbl_oxili_gfx3d_clk_src_msm8937[] = {
 	{ }
 };
 
-static const struct freq_tbl ftbl_oxili_gfx3d_clk_src_msm8940[] = {
+static const struct freq_tbl ftbl_oxili_gfx3d_clk_src_msm8937_475MHz[] = {
 	F_SLEW(19200000, P_BI_TCXO, 1, 0, 0, FIXED_FREQ_SRC),
 	F_SLEW(50000000, P_GPLL0_OUT_MAIN, 16, 0, 0, FIXED_FREQ_SRC),
 	F_SLEW(80000000, P_GPLL0_OUT_MAIN, 10, 0, 0, FIXED_FREQ_SRC),
@@ -1837,6 +1837,27 @@ static const struct freq_tbl ftbl_oxili_gfx3d_clk_src_msm8940[] = {
 	F_SLEW(400000000, P_GPLL0_OUT_MAIN, 2, 0, 0, FIXED_FREQ_SRC),
 	F_SLEW(450000000, P_GPLL3_OUT_MAIN_DIV, 1, 0, 0, 900000000),
 	F_SLEW(475000000, P_GPLL3_OUT_MAIN_DIV, 1, 0, 0, 950000000),
+	{ }
+};
+
+static const struct freq_tbl ftbl_oxili_gfx3d_clk_src_msm8940_500MHz[] = {
+	F_SLEW(19200000, P_BI_TCXO, 1, 0, 0, FIXED_FREQ_SRC),
+	F_SLEW(50000000, P_GPLL0_OUT_MAIN, 16, 0, 0, FIXED_FREQ_SRC),
+	F_SLEW(80000000, P_GPLL0_OUT_MAIN, 10, 0, 0, FIXED_FREQ_SRC),
+	F_SLEW(100000000, P_GPLL0_OUT_MAIN, 8, 0, 0, FIXED_FREQ_SRC),
+	F_SLEW(160000000, P_GPLL0_OUT_MAIN, 5, 0, 0, FIXED_FREQ_SRC),
+	F_SLEW(200000000, P_GPLL0_OUT_MAIN, 4, 0, 0, FIXED_FREQ_SRC),
+	F_SLEW(216000000, P_GPLL6_OUT_AUX, 5, 0, 0, FIXED_FREQ_SRC),
+	F_SLEW(228570000, P_GPLL0_OUT_MAIN, 3.5, 0, 0, FIXED_FREQ_SRC),
+	F_SLEW(240000000, P_GPLL6_OUT_AUX, 4.5, 0, 0, FIXED_FREQ_SRC),
+	F_SLEW(266670000, P_GPLL0_OUT_MAIN, 3, 0, 0, FIXED_FREQ_SRC),
+	F_SLEW(300000000, P_GPLL3_OUT_MAIN_DIV, 1, 0, 0, 600000000),
+	F_SLEW(320000000, P_GPLL0_OUT_MAIN, 2.5, 0, 0, FIXED_FREQ_SRC),
+	F_SLEW(375000000, P_GPLL3_OUT_MAIN_DIV, 1, 0, 0, 750000000),
+	F_SLEW(400000000, P_GPLL0_OUT_MAIN, 2, 0, 0, FIXED_FREQ_SRC),
+	F_SLEW(450000000, P_GPLL3_OUT_MAIN_DIV, 1, 0, 0, 900000000),
+	F_SLEW(475000000, P_GPLL3_OUT_MAIN_DIV, 1, 0, 0, 950000000),
+	F_SLEW(500000000, P_GPLL3_OUT_MAIN_DIV, 1, 0, 0, 1000000000),
 	{ }
 };
 
@@ -3811,13 +3832,14 @@ static struct clk_branch gcc_oxili_gfx3d_clk = {
 			.flags = CLK_SET_RATE_PARENT,
 			.ops = &clk_branch2_ops,
 			.vdd_class = &vdd_cx,
-			.num_rate_max = VDD_NUM - 1,
-			.rate_max = (unsigned long[VDD_NUM - 1]) {
+			.num_rate_max = VDD_NUM,
+			.rate_max = (unsigned long[VDD_NUM]) {
 				[VDD_LOW] = 320000000,
 				[VDD_LOW_L1] = 400000000,
 				[VDD_NOMINAL] = 510000000,
 				[VDD_NOMINAL_L1] = 560000000,
-				[VDD_HIGH] = 650000000},
+				[VDD_HIGH] = 650000000,
+				[VDD_SUPER_TUR] = 650000000}, // may get overrided
 		},
 	},
 };
@@ -4393,7 +4415,7 @@ static void fixup_for_qm215(struct platform_device *pdev,
 }
 
 static void fixup_for_msm8937(struct platform_device *pdev,
-	struct regmap *regmap)
+	struct regmap *regmap, int speed_bin)
 {
 	gpll3_config.l = 0x30;
 	gpll3_config.alpha_hi = 0x70;
@@ -4405,12 +4427,18 @@ static void fixup_for_msm8937(struct platform_device *pdev,
 	cpp_clk_src.clkr.hw.init->rate_max[VDD_NOMINAL_L1] = 342860000;
 	cpp_clk_src.clkr.hw.init->rate_max[VDD_HIGH] = 360000000;
 
-	gfx3d_clk_src.freq_tbl = ftbl_oxili_gfx3d_clk_src_msm8937;
 	gcc_oxili_gfx3d_clk.clkr.hw.init->rate_max[VDD_LOW] = 216000000;
 	gcc_oxili_gfx3d_clk.clkr.hw.init->rate_max[VDD_LOW_L1] = 300000000;
 	gcc_oxili_gfx3d_clk.clkr.hw.init->rate_max[VDD_NOMINAL] = 375000000;
 	gcc_oxili_gfx3d_clk.clkr.hw.init->rate_max[VDD_NOMINAL_L1] = 400000000;
 	gcc_oxili_gfx3d_clk.clkr.hw.init->rate_max[VDD_HIGH] = 450000000;
+
+	if (speed_bin) {
+		gfx3d_clk_src.freq_tbl = ftbl_oxili_gfx3d_clk_src_msm8937_475MHz;
+		gcc_oxili_gfx3d_clk.clkr.hw.init->rate_max[VDD_SUPER_TUR] = 475000000;
+	} else {
+		gfx3d_clk_src.freq_tbl = ftbl_oxili_gfx3d_clk_src_msm8937;
+	}
 
 	gpll3_out_main.vco_table = gpll3_vco_msm8937;
 	gpll3_out_main.num_vco = ARRAY_SIZE(gpll3_vco_msm8937);
@@ -4427,7 +4455,7 @@ static void fixup_for_msm8937(struct platform_device *pdev,
 }
 
 static void fixup_for_msm8940(struct platform_device *pdev,
-	struct regmap *regmap)
+	struct regmap *regmap, int speed_bin)
 {
 	gpll3_config.l = 0x30;
 	gpll3_config.alpha_hi = 0x70;
@@ -4439,12 +4467,19 @@ static void fixup_for_msm8940(struct platform_device *pdev,
 	cpp_clk_src.clkr.hw.init->rate_max[VDD_NOMINAL_L1] = 342860000;
 	cpp_clk_src.clkr.hw.init->rate_max[VDD_HIGH] = 360000000;
 
-	gfx3d_clk_src.freq_tbl = ftbl_oxili_gfx3d_clk_src_msm8940;
 	gcc_oxili_gfx3d_clk.clkr.hw.init->rate_max[VDD_LOW] = 216000000;
 	gcc_oxili_gfx3d_clk.clkr.hw.init->rate_max[VDD_LOW_L1] = 300000000;
 	gcc_oxili_gfx3d_clk.clkr.hw.init->rate_max[VDD_NOMINAL] = 375000000;
 	gcc_oxili_gfx3d_clk.clkr.hw.init->rate_max[VDD_NOMINAL_L1] = 400000000;
-	gcc_oxili_gfx3d_clk.clkr.hw.init->rate_max[VDD_HIGH] = 475000000;
+	gcc_oxili_gfx3d_clk.clkr.hw.init->rate_max[VDD_HIGH] = 450000000;
+
+	if (speed_bin) {
+		gfx3d_clk_src.freq_tbl = ftbl_oxili_gfx3d_clk_src_msm8940_500MHz;
+		gcc_oxili_gfx3d_clk.clkr.hw.init->rate_max[VDD_SUPER_TUR] = 500000000;
+	} else {
+		gfx3d_clk_src.freq_tbl = ftbl_oxili_gfx3d_clk_src_msm8937_475MHz;
+		gcc_oxili_gfx3d_clk.clkr.hw.init->rate_max[VDD_SUPER_TUR] = 475000000;
+	}
 
 	gpll3_out_main.vco_table = gpll3_vco_msm8937;
 	gpll3_out_main.num_vco = ARRAY_SIZE(gpll3_vco_msm8937);
@@ -4529,7 +4564,7 @@ static int gcc_sdm429w_probe(struct platform_device *pdev)
 		regmap_write(regmap, 0x5B00C, val);
 	}
 
-	if (qm215 || msm8917)
+	if (qm215 || msm8917 || msm8937 || msm8940)
 		get_speed_bin(pdev, &speed_bin);
 
 	if (qm215 || msm8917) {
@@ -4564,10 +4599,16 @@ static int gcc_sdm429w_probe(struct platform_device *pdev)
 		fixup_for_sdm439_429();
 
 	if (msm8937)
-		fixup_for_msm8937(pdev, regmap);
+		fixup_for_msm8937(pdev, regmap, speed_bin);
 
 	if (msm8940)
-		fixup_for_msm8940(pdev, regmap);
+		fixup_for_msm8940(pdev, regmap, speed_bin);
+
+	if (!(msm8937 || msm8940) ||
+		(msm8937 && !speed_bin)) {
+		vdd_cx.num_levels = VDD_NUM - 1;
+		vdd_cx.cur_level = VDD_NUM - 1;
+	}
 
 	clk_alpha_pll_configure(&gpll3_out_main, regmap, &gpll3_config);
 
