@@ -1778,6 +1778,29 @@ static struct freq_tbl ftbl_oxili_gfx3d_clk_src_qm215[] = {
 	{ }
 };
 
+static struct freq_tbl ftbl_oxili_gfx3d_clk_src_qm215_650MHz[] = {
+	F_SLEW( 19200000, P_BI_TCXO, 1, 0, 0, FIXED_FREQ_SRC),
+	F_SLEW( 50000000, P_GPLL0_OUT_MAIN, 16, 0, 0, FIXED_FREQ_SRC),
+	F_SLEW( 80000000, P_GPLL0_OUT_MAIN, 10, 0, 0, FIXED_FREQ_SRC),
+	F_SLEW( 100000000, P_GPLL0_OUT_MAIN, 8, 0, 0, FIXED_FREQ_SRC),
+	F_SLEW( 160000000, P_GPLL0_OUT_MAIN, 5, 0, 0, FIXED_FREQ_SRC),
+	F_SLEW( 200000000, P_GPLL0_OUT_MAIN, 4, 0, 0, FIXED_FREQ_SRC),
+	F_SLEW( 228570000, P_GPLL0_OUT_MAIN, 3.5, 0, 0, FIXED_FREQ_SRC),
+	F_SLEW( 240000000, P_GPLL6_OUT_AUX, 4.5, 0, 0, FIXED_FREQ_SRC),
+	F_SLEW( 266670000, P_GPLL0_OUT_MAIN, 3, 0, 0, FIXED_FREQ_SRC),
+	F_SLEW( 270000000, P_GPLL6_OUT_AUX, 4, 0, 0, FIXED_FREQ_SRC),
+	F_SLEW( 320000000, P_GPLL0_OUT_MAIN, 2.5, 0, 0, FIXED_FREQ_SRC),
+	F_SLEW( 400000000, P_GPLL0_OUT_MAIN, 2, 0, 0, FIXED_FREQ_SRC),
+	F_SLEW( 465000000, P_GPLL3_OUT_MAIN_DIV, 1, 0, 0, 930000000),
+	F_SLEW( 484800000, P_GPLL3_OUT_MAIN_DIV, 1, 0, 0, 969600000),
+	F_SLEW( 500000000, P_GPLL3_OUT_MAIN_DIV, 1, 0, 0, 1000000000),
+	F_SLEW( 523200000, P_GPLL3_OUT_MAIN_DIV, 1, 0, 0, 1046400000),
+	F_SLEW( 550000000, P_GPLL3_OUT_MAIN_DIV, 1, 0, 0, 1100000000),
+	F_SLEW( 598000000, P_GPLL3_OUT_MAIN_DIV, 1, 0, 0, 1196000000),
+	F_SLEW( 650000000, P_GPLL3_OUT_MAIN_DIV, 1, 0, 0, 1300000000),
+	{ }
+};
+
 static const struct freq_tbl ftbl_oxili_gfx3d_clk_src_msm8937[] = {
 	F_SLEW(19200000, P_BI_TCXO, 1, 0, 0, FIXED_FREQ_SRC),
 	F_SLEW(50000000, P_GPLL0_OUT_MAIN, 16, 0, 0, FIXED_FREQ_SRC),
@@ -4303,9 +4326,9 @@ static void fixup_for_qm215(struct platform_device *pdev,
 	vcodec0_clk_src.clkr.hw.init = &vcodec0_clk_src_init;
 
 	gfx3d_clk_src.parent_map = gcc_parent_map_14_gfx3d;
-	gfx3d_clk_src.freq_tbl = ftbl_oxili_gfx3d_clk_src_qm215;
 
 	if (speed_bin) {
+		gfx3d_clk_src.freq_tbl = ftbl_oxili_gfx3d_clk_src_qm215_650MHz;
 		gcc_oxili_gfx3d_clk.clkr.hw.init->rate_max[VDD_LOW] =
 			270000000;
 		gcc_oxili_gfx3d_clk.clkr.hw.init->rate_max[VDD_LOW_L1] =
@@ -4317,6 +4340,7 @@ static void fixup_for_qm215(struct platform_device *pdev,
 		gcc_oxili_gfx3d_clk.clkr.hw.init->rate_max[VDD_HIGH] =
 			650000000;
 	} else {
+		gfx3d_clk_src.freq_tbl = ftbl_oxili_gfx3d_clk_src_qm215;
 		gcc_oxili_gfx3d_clk.clkr.hw.init->rate_max[VDD_LOW] =
 			270000000;
 		gcc_oxili_gfx3d_clk.clkr.hw.init->rate_max[VDD_LOW_L1] =
