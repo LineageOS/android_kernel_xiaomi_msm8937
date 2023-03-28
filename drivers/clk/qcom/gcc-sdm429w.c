@@ -4484,7 +4484,7 @@ static int gcc_sdm429w_probe(struct platform_device *pdev)
 {
 	struct regmap *regmap;
 	struct clk *clk;
-	int ret, speed_bin;
+	int ret, speed_bin = 0;
 	bool qm215, is_sdm439, msm8917, msm8937, msm8940;
 
 	qm215 = of_device_is_compatible(pdev->dev.of_node,
@@ -4521,9 +4521,16 @@ static int gcc_sdm429w_probe(struct platform_device *pdev)
 	if (IS_ERR(regmap))
 		return PTR_ERR(regmap);
 
-	if (qm215 || msm8917) {
-		speed_bin = 0;
+	if (qm215 || msm8917)
 		get_speed_bin(pdev, &speed_bin);
+
+	if (qm215 || msm8917) {
+		/* Configure Sleep and Wakeup cycles for GMEM clock */
+		regmap_update_bits(regmap, gcc_oxili_gmem_clk.clkr.enable_reg,
+				0xff0, 0xff0);
+	}
+
+	if (qm215 || msm8917) {
 		fixup_for_qm215(pdev, regmap, speed_bin);
 		if (msm8917) {
 			blsp1_qup2_spi_apps_clk_src.freq_tbl =
@@ -4539,10 +4546,6 @@ static int gcc_sdm429w_probe(struct platform_device *pdev)
 			blsp2_qup3_spi_apps_clk_src.freq_tbl =
 				ftbl_blsp1_qup1_spi_apps_clk_src_msm8917;
 		}
-
-		/* Configure Sleep and Wakeup cycles for GMEM clock */
-		regmap_update_bits(regmap, gcc_oxili_gmem_clk.clkr.enable_reg,
-				0xff0, 0xff0);
 	}
 
 	if (is_sdm439)
