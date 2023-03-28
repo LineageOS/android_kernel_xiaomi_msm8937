@@ -599,6 +599,18 @@ static const struct freq_tbl ftbl_blsp1_qup1_spi_apps_clk_src[] = {
 	{ }
 };
 
+static const struct freq_tbl ftbl_blsp1_qup1_spi_apps_clk_src_msm8917[] = {
+	F(960000, P_BI_TCXO, 10, 1, 2),
+	F(4800000, P_BI_TCXO, 4, 0, 0),
+	F(9600000, P_BI_TCXO, 2, 0, 0),
+	F(16000000, P_GPLL0_OUT_MAIN, 10, 1, 5),
+	F(19200000, P_BI_TCXO, 1, 0, 0),
+	F(25000000, P_GPLL0_OUT_MAIN, 16, 1, 2),
+	F(40000000, P_GPLL0_OUT_MAIN, 16, 1, 2),
+	F(50000000, P_GPLL0_OUT_MAIN, 16, 0, 0),
+	{ }
+};
+
 static struct clk_rcg2 blsp1_qup1_spi_apps_clk_src = {
 	.cmd_rcgr = 0x2024,
 	.mnd_width = 8,
@@ -4489,6 +4501,20 @@ static int gcc_sdm429w_probe(struct platform_device *pdev)
 		speed_bin = 0;
 		get_speed_bin(pdev, &speed_bin);
 		fixup_for_qm215(pdev, regmap, speed_bin);
+		if (msm8917) {
+			blsp1_qup2_spi_apps_clk_src.freq_tbl =
+				ftbl_blsp1_qup1_spi_apps_clk_src_msm8917;
+			blsp1_qup3_spi_apps_clk_src.freq_tbl =
+				ftbl_blsp1_qup1_spi_apps_clk_src_msm8917;
+			blsp1_qup4_spi_apps_clk_src.freq_tbl =
+				ftbl_blsp1_qup1_spi_apps_clk_src_msm8917;
+			blsp2_qup1_spi_apps_clk_src.freq_tbl =
+				ftbl_blsp1_qup1_spi_apps_clk_src_msm8917;
+			blsp2_qup2_spi_apps_clk_src.freq_tbl =
+				ftbl_blsp1_qup1_spi_apps_clk_src_msm8917;
+			blsp2_qup3_spi_apps_clk_src.freq_tbl =
+				ftbl_blsp1_qup1_spi_apps_clk_src_msm8917;
+		}
 
 		/* Configure Sleep and Wakeup cycles for GMEM clock */
 		regmap_update_bits(regmap, gcc_oxili_gmem_clk.clkr.enable_reg,
