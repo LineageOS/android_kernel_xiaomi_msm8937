@@ -16,6 +16,7 @@ enum vdd_levels {
 	VDD_NOMINAL,
 	VDD_NOMINAL_L1,
 	VDD_HIGH,
+	VDD_SUPER_TUR,
 	VDD_NUM
 };
 
@@ -26,6 +27,7 @@ static int vdd_corner[] = {
 	RPM_REGULATOR_LEVEL_NOM,		/* VDD_NOM */
 	RPM_REGULATOR_LEVEL_NOM_PLUS,		/* VDD_NOM_PLUS */
 	RPM_REGULATOR_LEVEL_TURBO,		/* VDD_TURBO */
+	RPM_REGULATOR_LEVEL_BINNING,		/* VDD_SUPER_TUR */
 };
 
 #endif
