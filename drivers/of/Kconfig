@@ -25,6 +25,11 @@ config OF_UNITTEST
 
 	  If unsure, say N here, but this option is safe to enable.
 
+config OF_IGNORE_QCOM_VENDOR_DTS
+	bool "Ignore Qualcomm Vendor Device Trees"
+	help
+	  This option ignores Qualcomm Vendor Device Trees.
+
 config OF_ALL_DTBS
 	bool "Build all Device Tree Blobs"
 	depends on COMPILE_TEST
