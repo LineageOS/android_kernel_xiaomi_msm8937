@@ -1,0 +1,5 @@
+menu "Tech packages"
+
+source "techpack/xiaomi-msm8937/Kconfig"
+
+endmenu
