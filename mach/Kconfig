@@ -1,0 +1,81 @@
+menu "Machine selection"
+
+# Machine families
+config MACH_FAMILY_XIAOMI_ULYSSE
+	bool
+
+config MACH_FAMILY_XIAOMI_WINGTECH
+	bool
+
+config MACH_FAMILY_XIAOMI_WINGTECH_MSM8917
+	bool
+	depends on ARCH_MSM8917
+	select MACH_FAMILY_XIAOMI_WINGTECH
+
+config MACH_FAMILY_XIAOMI_WINGTECH_MSM8937
+	bool
+	depends on ARCH_MSM8937
+	select MACH_FAMILY_XIAOMI_WINGTECH
+
+# Machines
+config MACH_XIAOMI_LAND
+	bool "Xiaomi Redmi 3S / 3X (land)"
+	select MACH_FAMILY_XIAOMI_WINGTECH_MSM8937
+	help
+	  Support for Xiaomi Redmi 3S / 3X (land).
+
+config MACH_XIAOMI_SANTONI
+	bool "Xiaomi Redmi 4 (India) / 4X (santoni)"
+	depends on ARCH_MSM8940
+	select MACH_FAMILY_XIAOMI_WINGTECH_MSM8937
+	help
+	  Support for Xiaomi Redmi 4 (India) / 4X (santoni).
+
+config MACH_XIAOMI_PRADA
+	bool "Xiaomi Redmi 4 (prada)"
+	help
+	  Support for Xiaomi Redmi 4 (prada).
+
+config MACH_XIAOMI_ROLEX
+	bool "Xiaomi Redmi 4A (rolex)"
+	select MACH_FAMILY_XIAOMI_WINGTECH_MSM8917
+	help
+	  Support for Xiaomi Redmi 4A (rolex).
+
+config MACH_XIAOMI_RIVA
+	bool "Xiaomi Redmi 5A (riva)"
+	select MACH_FAMILY_XIAOMI_WINGTECH_MSM8917
+	help
+	  Support for Xiaomi Redmi 5A (riva).
+
+config MACH_XIAOMI_RIVA_OREO
+	bool "Xiaomi Redmi 5A (riva) with Oreo bootloader"
+	default y
+	depends on MACH_XIAOMI_RIVA
+	depends on !MACH_XIAOMI_ROLEX
+	depends on !MACH_XIAOMI_TIARE
+	help
+	  Support for Xiaomi Redmi 5A (riva) with Oreo bootloader.
+
+config MACH_XIAOMI_TIARE
+	bool "Xiaomi Redmi Go (tiare)"
+	depends on !MACH_XIAOMI_ROLEX
+	select MACH_FAMILY_XIAOMI_WINGTECH_MSM8917
+	help
+	  Support for Xiaomi Redmi Go (tiare).
+
+config MACH_XIAOMI_UGGLITE
+	bool "Xiaomi Redmi Note 5A / Y1 Lite (ugglite)"
+	depends on ARCH_MSM8917
+	select MACH_FAMILY_XIAOMI_ULYSSE
+	help
+	  Support for Xiaomi Redmi Note 5A / Y1 Lite (ugglite).
+
+config MACH_XIAOMI_UGG
+	bool "Xiaomi Redmi Note 5A / Y1 Prime (ugg)"
+	depends on ARCH_MSM8940
+	select MACH_FAMILY_XIAOMI_ULYSSE
+	help
+	  Support for Xiaomi Redmi Note 5A / Y1 Prime (ugg).
+
+endmenu
