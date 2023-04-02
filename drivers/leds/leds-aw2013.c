@@ -272,7 +272,6 @@ static int aw2013_probe_dt(struct aw2013 *chip)
 	regmap_write(chip->regmap, AW2013_RSTR, AW2013_RSTR_RESET);
 
 	for_each_available_child_of_node(np, child) {
-		struct led_init_data init_data = {};
 		u32 source;
 		u32 imax;
 
@@ -287,7 +286,6 @@ static int aw2013_probe_dt(struct aw2013 *chip)
 		led = &chip->leds[i];
 		led->num = source;
 		led->chip = chip;
-		init_data.fwnode = of_fwnode_handle(child);
 
 		if (!of_property_read_u32(child, "led-max-microamp", &imax)) {
 			led->imax = min_t(u32, imax / 5000, 3);
@@ -297,11 +295,13 @@ static int aw2013_probe_dt(struct aw2013 *chip)
 				 "DT property led-max-microamp is missing\n");
 		}
 
+		led->cdev.name =
+			of_get_property(child, "label", NULL) ? : child->name;
 		led->cdev.brightness_set_blocking = aw2013_brightness_set;
 		led->cdev.blink_set = aw2013_blink_set;
 
-		ret = devm_led_classdev_register_ext(&chip->client->dev,
-						     &led->cdev, &init_data);
+		ret = devm_led_classdev_register(&chip->client->dev,
+						     &led->cdev);
 		if (ret < 0) {
 			of_node_put(child);
 			return ret;
