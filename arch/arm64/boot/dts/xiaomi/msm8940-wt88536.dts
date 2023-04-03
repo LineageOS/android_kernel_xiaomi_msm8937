@@ -22,6 +22,8 @@
 #include "common/msm8937-common.dtsi"
 #include "santoni/msm8937-S88536AA2.dtsi"
 
+#include "inline-santoni.dtsi"
+
 / {
 	model = "Qualcomm Technologies, Inc. MSM8940-PMI8950 QRD SKU7";
 	compatible = "qcom,msm8940-qrd-sku7", "qcom,msm8940-qrd",
