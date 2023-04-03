@@ -1,0 +1,11 @@
+/* From stock msm8917-pmi8937-qrd-sku5_S8850?.dtsi */
+&soc {
+	gpio-vib {
+		compatible = "gpio-vibrator";
+		vibrator {
+			gpios = <&tlmm 97 0>;
+			label = "vibrator";
+			max_timeout = <50000>;
+		};
+	};
+};

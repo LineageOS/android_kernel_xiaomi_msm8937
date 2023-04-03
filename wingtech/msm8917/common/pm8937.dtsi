@@ -1,0 +1,65 @@
+/* From stock msm-pm8937.dtsi */
+&spmi_bus {
+	qcom,pm8937@0 {
+		qcom,power-on@800 {
+			qcom,store-hard-reset-reason;
+			qcom,pon_1 {
+				qcom,support-reset = <1>;
+				qcom,s1-timer = <4480>;
+				qcom,s2-timer = <2000>;
+				qcom,s2-type = <7>;
+			};
+		};
+	};
+};
+
+/* From stock msm8917-pmi8937-qrd-sku5_S8850?.dtsi */
+&pm8937_1{
+	pm8937_pwm: pwm@bc00 {
+		status = "ok";
+		compatible = "qcom,qpnp-pwm";
+		reg = <0xbc00 0x100>;
+		reg-names = "qpnp-lpg-channel-base";
+		qcom,channel-id = <0>;
+		qcom,supported-sizes = <6>, <9>;
+		qcom,force-pwm-size = <9>;
+		#pwm-cells = <2>;
+	};
+};
+&pm8937_gpios {
+	gpio@c400 {
+		qcom,mode = <0>;
+		qcom,output-type = <0>;
+		qcom,pull = <0>;
+		qcom,vin-sel = <2>;
+		qcom,out-strength = <3>;
+		qcom,src-sel = <0>;
+		qcom,master-en = <1>;
+		status = "okay";
+	};
+	gpio@c700 {
+		reg = <0xc700 0x100>;
+		qcom,pin-num = <8>;
+		qcom,mode = <1>;       /*QPNP_PIN_MODE_DIG_OUT*/
+		qcom,output-type = <0>;       /*QPNP_PIN_OUT_BUF_CMOS*/
+		qcom,invert = <0>;     /*QPNP_PIN_INVERT_DISABLE*/
+		qcom,pull = <5>;       /*QPNP_PIN_PULL_NO*/
+		qcom,vin-sel = <0>;    /*QPNP_PIN_VIN2, VREG_S3A*/
+		qcom,out-strength = <3>;/*QPNP_PIN_OUT_STRENGTH_MED*/
+		qcom,src-sel = <5>;    /*QPNP_PIN_SEL_FUNC_2*/
+		qcom,master-en = <1>;  /*Enable GPIO by default*/
+		status = "ok";
+	};
+};
+&pm8937_vadc {
+	chan@13 {
+		label = "mpp4";
+		reg = <0x13>;
+		qcom,decimation = <0>;
+		qcom,pre-div-channel-scaling = <0>;
+		qcom,calibration-type = "absolute";
+		qcom,scale-function = <0>;
+		qcom,hw-settle-time = <2>;
+		qcom,fast-avg-setup = <0>;
+	};
+};

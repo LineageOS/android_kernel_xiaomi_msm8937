@@ -1,0 +1,157 @@
+/* From stock msm8917-camera-pinctrl.dtsi */
+&tlmm {
+	SGM3780_default: SGM3780_default {
+		mux {
+			pins = "gpio90", "gpio93";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio90", "gpio93";
+			bias-disable; /* No PULL */
+			drive-strength = <2>; /* 2 MA */
+		};
+	};
+};
+
+/* From stock msm8917-pinctrl.dtsi */
+&tlmm {
+	smb_int_pin {
+		pins = "gpio61";
+		qcom,num-grp-pins = <1>;
+		qcom,pin-func = <0>;
+		label = "smb_int_gpio";
+		smb_int_default: smb_int_default {
+			drive-strength = <2>;	/*8 MA */
+			bias-pull-up;		/* PULL UP*/
+		};
+	};
+	bq_int_default: bq_int_default {
+		mux {
+			pins = "gpio25";
+			function ="gpio";
+		};
+		config {
+			pins = "gpio25";
+			drive-strength = <2>; /* 2 MA */
+			bias-pull-up;
+			/* PULL UP*/
+			};
+	};
+	tps65132_en_default: tps65132_en_default {
+		mux {
+			pins = "gpio126", "gpio127";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio126", "gpio127";
+			drive-strength = <2>;
+			bias-pull-down;
+		};
+	};
+	gpio_led_pins {
+		gpio_led_off: gpio_led_off {
+			mux {
+				pins = "gpio45";
+				function = "gpio";
+			};
+			config {
+				pins = "gpio45";
+				drive-strength = <6>;
+				bias-pull-down;
+				output-low;
+			};
+		};
+	};
+};
+&pri_tlmm_lines_act {
+	mux {
+		pins = "gpio88";
+	};
+	config {
+		pins = "gpio88";
+	};
+};
+&pri_tlmm_lines_sus {
+	mux {
+		pins = "gpio88";
+	};
+	config {
+		pins = "gpio88";
+	};
+};
+&tlmm {
+	spi7 {
+		spi7_default: spi7_default {
+			/* active state */
+			mux {
+				/* MOSI, MISO, CLK */
+				pins = "gpio85", "gpio86", "gpio88";
+				function = "blsp_spi7";
+			};
+
+			config {
+				pins = "gpio85", "gpio86", "gpio88";
+				drive-strength = <12>; /* 12 MA */
+				bias-disable = <0>; /* No PULL */
+			};
+		};
+
+		spi7_sleep: spi7_sleep {
+			/* suspended state */
+			mux {
+				/* MOSI, MISO, CLK */
+				pins = "gpio85", "gpio86", "gpio88";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio85", "gpio86", "gpio88";
+				drive-strength = <2>; /* 2 MA */
+				bias-pull-down; /* PULL Down */
+			};
+		};
+
+		spi7_cs0_active: cs0_active {
+			/* CS */
+			mux {
+				pins = "gpio87";
+				function = "blsp_spi7";
+			};
+
+			config {
+				pins = "gpio87";
+				drive-strength = <2>;
+				bias-disable = <0>;
+			};
+		};
+
+		spi7_cs0_sleep: cs0_sleep {
+			/* CS */
+			mux {
+				pins = "gpio87";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio87";
+				drive-strength = <2>;
+				bias-disable = <0>;
+			};
+		};
+	};
+};
+&i2c_2_sleep {
+	config {
+		/delete-property/ bias-disable;
+		bias-pull-down;
+	};
+};
+&usbc_int_default {
+	mux {
+		pins = "gpio131";
+	};
+	config {
+		pins = "gpio131";
+	};
+};
