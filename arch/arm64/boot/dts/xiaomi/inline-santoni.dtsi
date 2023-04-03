@@ -1,11 +1,6 @@
-&soc {
-	boardinfo {
-		compatible = "wt:boardinfo";
-	};
-};
+#include "inline-common.dtsi"
 
 &i2c_3 {
-	status = "ok";
 	ftech@38 {
 		/delete-property/ ftech,button-map;
 		/delete-property/ ftech,button-x-coords;
@@ -18,7 +13,6 @@
 		vdd-supply = <&pm8937_l10>;
 	};
 };
-
 
 &sdc2_cmd_on {
 	config {
@@ -38,52 +32,12 @@
 	};
 };
 
-&spmi_bus {
-	qcom,pm8937@0 {
-		qcom,power-on@800 {
-			/delete-property/ qcom,store-hard-reset-reason;
-		};
-	};
-};
-
-&pmi8950_charger {
-	/delete-property/ qcom,autoadjust-vfloat;
-};
-
 &apc_vreg_corner {
 	/delete-property/ qcom,cpr-enable;
 };
 
 &sdhc_1 {
 	qcom,vdd-always-on;
-};
-
-&soc {
-	sn_fuse: snfuse@0xa0128 {
-		compatible = "qcom,sn-fuse";
-		reg = <0xa0128 0x4>;
-		reg-names = "sn-base";
-	};
-
-	sec_boot_fuse: secbootfuse@0xa41d0 {
-		compatible = "qcom,sec-boot-fuse";
-		reg = <0xa41d0 0x4>;
-		reg-names = "sec-boot-base";
-	};
-};
-
-&int_codec {
-	/* Removed: \0WSA_SPK OUT\0VDD_WSA_SWITCH\0SpkrMono WSA_IN\0WSA_SPK OUT */
-	qcom,audio-routing =
-		"RX_BIAS", "MCLK",
-		"SPK_RX_BIAS", "MCLK",
-		"INT_LDO_H", "MCLK",
-		"MIC BIAS External", "Handset Mic",
-		"MIC BIAS Internal2", "Headset Mic",
-		"MIC BIAS External", "Secondary Mic",
-		"AMIC1", "MIC BIAS External",
-		"AMIC2", "MIC BIAS Internal2",
-		"AMIC3", "MIC BIAS External";
 };
 
 &eeprom2 {

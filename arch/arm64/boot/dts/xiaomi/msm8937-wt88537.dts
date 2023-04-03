@@ -36,3 +36,5 @@
 		#include "land/batterydata-qrd-feimaotui-4v4-4000mah.dtsi"
 	};
 };
+
+#include "inline-land.dtsi"
