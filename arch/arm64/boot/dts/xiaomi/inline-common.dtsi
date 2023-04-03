@@ -47,3 +47,15 @@
 		"AMIC2", "MIC BIAS Internal2",
 		"AMIC3", "MIC BIAS External";
 };
+
+&flash_led {
+	pmi8950_torch2: qcom,torch_2 {
+		label = "torch";
+		qcom,led-name = "flashlight";
+		qcom,default-led-trigger =
+				"torch2_trigger";
+		qcom,max-current = <200>;
+		qcom,id = <1>;
+		qcom,current = <100>;
+	};
+};
