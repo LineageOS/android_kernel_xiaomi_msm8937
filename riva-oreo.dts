@@ -1,0 +1,15 @@
+/dts-v1/;
+
+#include "wingtech/msm8917/common/fragments/include-qcom.dtsi"
+
+#include "wingtech/msm8917/common/common.dtsi"
+#include "wingtech/msm8917/riva/riva.dtsi"
+#include "wingtech/msm8917/riva/variant/oreo.dtsi"
+
+/* From stock msm8917-pmi8937-qrd-sku5_S88505.dts */
+/ {
+	model = "Qualcomm Technologies, Inc. MSM8917 QRD SKU5";
+	compatible = "qcom,msm8917-qrd-sku5", "qcom,msm8917-qrd",
+		   "qcom,msm8917", "qcom,qrd";
+	qcom,board-id = <0x1000b 1>;
+};
