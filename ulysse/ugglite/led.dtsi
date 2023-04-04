@@ -1,0 +1,10 @@
+/* TODO: Delete this */
+
+/* From stock msm8917-pmi8937-mtp.dts */
+&i2c_5 {
+	awinic@45 {
+		aw2013,white {
+			aw2013,id = <1>;
+		};
+	};
+};

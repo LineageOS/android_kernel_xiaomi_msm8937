@@ -1,0 +1,19 @@
+/dts-v1/;
+
+#include "../qcom/msm8917.dtsi"
+#include "../qcom/msm8917-pmi8937-mtp.dtsi"
+#include "../qcom/msm8937-regulator.dtsi" // TODO: Remove this?
+
+#define IS_MSM8917
+#include "common/include/msm8937-regulator.h"
+
+#include "ulysse/common/common.dtsi"
+#include "ulysse/ugglite/ugglite.dtsi"
+
+/* From stock msm8917-pmi8937-mtp.dts */
+/ {
+	model = "Qualcomm Technologies, Inc. MSM8917-PMI8937 MTP";
+	compatible = "qcom,msm8917-mtp", "qcom,msm8917", "qcom,mtp";
+	qcom,board-id= <8 0>;
+	qcom,pmic-id = <0x10019 0x0 0x0 0x0>;
+};

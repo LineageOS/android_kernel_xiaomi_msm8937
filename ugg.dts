@@ -1,0 +1,17 @@
+/dts-v1/;
+
+#include "../qcom/msm8940.dtsi"
+#include "../qcom/msm8940-pmi8937-mtp.dtsi"
+
+#include "common/include/msm8937-regulator.h"
+
+#include "ulysse/common/common.dtsi"
+#include "ulysse/ugg/ugg.dtsi"
+
+/* From stock msm8940-pmi8937-mtp.dts */
+/ {
+	model = "Qualcomm Technologies, Inc. MSM8940-PMI8937 MTP";
+	compatible = "qcom,msm8940-mtp", "qcom,msm8940", "qcom,mtp";
+	qcom,board-id= <8 0>;
+	qcom,pmic-id = <0x10019 0x0 0x0 0x0>;
+};

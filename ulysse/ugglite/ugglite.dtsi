@@ -1,0 +1,9 @@
+#include "pinctrl.dtsi"
+
+#include "battery_usb.dtsi"
+#include "camera.dtsi"
+#include "display.dtsi"
+#include "i2c_6.dtsi"
+#include "led.dtsi"
+#include "misc.dtsi"
+#include "pm.dtsi"

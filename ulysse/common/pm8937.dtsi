@@ -1,0 +1,66 @@
+/* From stock msm-pm8937.dtsi */
+&pm8937_pwm {
+	qcom,period = <4000000>;
+	qcom,mode-select = <0>;
+	qcom,dtest-line = <2>;
+	qcom,dtest-output = <2>;
+	status = "okay";
+	qcom,pwm {
+		qcom,duty = <2000000>;
+		label = "pwm";
+	};
+};
+&spmi_bus {
+	qcom,pm8937@0 {
+		qcom,power-on@800 {
+			qcom,pon_1 {
+				qcom,support-reset = <1>;
+				qcom,s1-timer = <4480>;
+				qcom,s2-timer = <2000>;
+				qcom,s2-type = <8>;
+			};
+			qcom,pon_3 {
+				qcom,pon-type = <3>;
+				qcom,pull-up = <1>;
+				qcom,support-reset = <1>;
+				qcom,s1-timer = <4480>;
+				qcom,s2-timer = <1000>;
+				qcom,s2-type = <1>;
+			};
+		};
+	};
+};
+
+/* From stock msm8937-mtp.dtsi */
+&pm8937_gpios{
+	gpio@c500{
+		status = "okay";
+		qcom,mode = <1>;
+		qcom,pull = <5>;
+		qcom,src-sel = <5>;
+		qcom,vin-sel = <3>;
+		qcom,master-en = <1>;
+		qcom,out-strength = <3>;
+	};
+};
+
+/* From stock msm8940-pmi8937-mtp.dts */
+&pm8937_mpps {
+	mpp@a100 { /*MPP_02 for ADC*/
+		status = "okay";
+	};
+};
+&pm8937_vadc {
+	chan@11 {
+		label = "batt_rid";
+		reg = <0x11>;
+		qcom,decimation = <0>;
+		qcom,pre-div-channel-scaling = <0>;
+		qcom,calibration-type = "ratiometric";
+		qcom,scale-function = <0>;
+		qcom,hw-settle-time = <2>;
+		qcom,fast-avg-setup = <0>;
+		/delete-property/ qcom,vadc-thermal-node;
+		status = "okay";
+	};
+};

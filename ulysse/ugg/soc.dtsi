@@ -1,0 +1,4 @@
+/* From stock msm8937.dtsi */
+&qcom_seecom {
+	qcom,appsbl-qseecom-support;
+};
