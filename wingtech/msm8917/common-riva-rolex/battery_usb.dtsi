@@ -1,0 +1,16 @@
+/* From stock msm8917.dtsi */
+&usb_otg {
+	/delete-property/ vbus_otg-supply; // WARNING: Should get redefined in device specific dtsi
+	qcom,hsusb-otg-phy-init-seq =
+			<0x53 0x80 0x32 0x81 0x07 0x82 0x13 0x83 0xffffffff>; // WARNING: Should get overridden in device specific dtsi
+	qcom,hsusb-otg-default-mode = <1>; /* peripheral mode */
+};
+
+/* From stock msm8917-pmi8937-qrd-sku5_S8850?.dtsi */
+/ {
+	qrd_batterydata: qcom,battery-data {
+		qcom,batt-id-range-pct = <15>;
+		qcom,rpull-up-kohm = <68>;
+		qcom,vref-batt-therm = <1800000>;
+	};
+};

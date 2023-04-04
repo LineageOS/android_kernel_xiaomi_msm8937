@@ -3,6 +3,7 @@
 #include "wingtech/msm8917/common/fragments/include-qcom.dtsi"
 
 #include "wingtech/msm8917/common/common.dtsi"
+#include "wingtech/msm8917/common-riva-rolex/common-riva-rolex.dtsi"
 #include "wingtech/msm8917/riva/riva.dtsi"
 
 /* From stock msm8917-pmi8937-qrd-sku5_S88505.dts */
