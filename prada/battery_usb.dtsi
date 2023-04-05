@@ -1,4 +1,6 @@
 &mtp_batterydata {
+	/delete-node/ qcom,ascent-3450mah;
+	/delete-node/ qcom,itech-3000mah;
 	#include "batterydata/coslight-4000mah.dtsi"
 	#include "batterydata/scud-4000mah.dtsi"
 };
