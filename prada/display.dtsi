@@ -2,18 +2,7 @@
 #include "panel/CTC_nt35521s_720p_video_mode_dsi_panel.dtsi"
 #include "panel/Tianma_ili9881c_720p_video_mode_dsi_panel.dtsi"
 
-&ibb_regulator {
-	qcom,qpnp-ibb-discharge-resistor = <32>;
-};
-
-&labibb {
-	status = "ok";
-	qpnp,qpnp-labibb-mode = "lcd";
-};
-
 &mdss_dsi0 {
-	lab-supply = <&lab_regulator>;
-	ibb-supply = <&ibb_regulator>;
 	qcom,dsi-pref-prim-pan = <&dsi_hx8394f_boe_720p_video>;
 	qcom,dsi-pref-sub-pan = <&dsi_ili9881c_tianma_720p_video>;
 	qcom,dsi-pref-sub1-pan = <&dsi_nt35521s_ctc_720p_video>;
