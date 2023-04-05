@@ -51,9 +51,11 @@
 	/delete-node/ qcom,torch_1;
 };
 
-&pil_mss { // 2016-07-11
-	/delete-property/ qcom,pas-id;
-	/delete-property/ qcom,pil-mss-memsetup;
+&soc {
+	qcom,mss@4080000 { // 2016-07-11
+		/delete-property/ qcom,pas-id;
+		/delete-property/ qcom,pil-mss-memsetup;
+	};
 };
 
 &slim_msm {
