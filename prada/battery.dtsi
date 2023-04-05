@@ -6,17 +6,17 @@
 	};
 };
 
-&qpnp_fg {
+&pmi8950_fg {
 	qcom,battery-data = <&mtp_batterydata>;
 };
 
-&qpnp_smbcharger {
+&pmi8950_charger {
 	qcom,battery-data = <&mtp_batterydata>;
 	qcom,chg-led-sw-controls;
 	dpdm-supply = <&usb_otg>;
 };
 
-&qpnp_fg {
+&pmi8950_fg {
 	qcom,resume-soc = <0x63>;
 	qcom,hold-soc-while-full;
 	qcom,warm-bat-decidegc = <0x1c2>;
@@ -29,7 +29,7 @@
 	qcom,fg-delta-soc = <0x1>;
 };
 
-&qpnp_smbcharger {
+&pmi8950_charger {
 	qcom,iterm-ma = <0xc8>;
 	qcom,float-voltage-mv = <0x1130>;
 	qcom,fastchg-current-comp = <0x4b0>;
