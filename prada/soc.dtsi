@@ -54,10 +54,6 @@
 };
 
 &soc {
-	cpuss_dump { // 2016-05-12
-		status = "disabled";
-	};
-
 	qcom,rmtfs_sharedmem@00000000 {
 		reg = <0x00 0xe0000>;
 	};
