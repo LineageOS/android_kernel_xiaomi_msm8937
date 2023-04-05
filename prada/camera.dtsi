@@ -11,12 +11,6 @@
  * GNU General Public License for more details.
  */
 
-&soc {
-	qcom,jpeg@1b1c000 {
-		qcom,msm-bus,vectors-KBps = <62 512 0 0>, <62 512 666675 666675>;
-	};
-};
-
 &led_flash0 {
 	/delete-property/ qcom,switch-source;
 	qcom,flash-source = <&pmi8950_flash0>;
