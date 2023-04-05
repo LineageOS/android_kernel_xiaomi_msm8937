@@ -7,8 +7,8 @@
 
 		config {
 			pins = "gpio0", "gpio1", "gpio2", "gpio3";
-			drive-strength = <0x2>;
-			bias-disable = <0x0>;
+			drive-strength = <2>;
+			bias-disable = <0>;
 		};
 	};
 
@@ -20,8 +20,8 @@
 
 		config {
 			pins = "gpio62";
-			drive-strength = <0x2>;
-			bias-disable = <0x0>;
+			drive-strength = <2>;
+			bias-disable = <0>;
 			output-low;
 		};
 	};
@@ -34,8 +34,8 @@
 
 		config {
 			pins = "gpio62";
-			drive-strength = <0x2>;
-			bias-disable = <0x0>;
+			drive-strength = <2>;
+			bias-disable = <0>;
 			output-high;
 		};
 	};
@@ -48,8 +48,8 @@
 
 		config {
 			pins = "gpio46";
-			drive-strength = <0x2>;
-			bias-disable = <0x0>;
+			drive-strength = <2>;
+			bias-disable = <0>;
 			input-enable;
 		};
 	};
@@ -62,8 +62,8 @@
 
 		config {
 			pins = "gpio62";
-			drive-strength = <0x2>;
-			bias-disable = <0x0>;
+			drive-strength = <2>;
+			bias-disable = <0>;
 			output-low;
 		};
 	};
@@ -76,8 +76,8 @@
 
 		config {
 			pins = "gpio62";
-			drive-strength = <0x2>;
-			bias-disable = <0x0>;
+			drive-strength = <2>;
+			bias-disable = <0>;
 			output-high;
 		};
 	};
@@ -90,8 +90,8 @@
 
 		config {
 			pins = "gpio46";
-			drive-strength = <0x2>;
-			bias-disable = <0x0>;
+			drive-strength = <2>;
+			bias-disable = <0>;
 			input-enable;
 		};
 	};

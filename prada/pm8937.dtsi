@@ -7,22 +7,22 @@
 			qcom,led_blue {
 				label = "mpp";
 				linux,name = "blue";
-				qcom,current-setting = <0x05>;
+				qcom,current-setting = <5>;
 				qcom,default-state = "off";
-				qcom,id = <0x06>;
-				qcom,max-current = <0x0a>;
+				qcom,id = <6>;
+				qcom,max-current = <10>;
 				qcom,mode = "manual";
-				qcom,mode-ctrl = <0x60>;
+				qcom,mode-ctrl = <96>;
 				qcom,use-blink;
 			};
 		};
 		qcom,power-on@800 {
 			qcom,store-hard-reset-reason;
 			qcom,pon_1 {
-				qcom,s1-timer = < 0x1a40 >;
-				qcom,s2-timer = < 0x00 >;
-				qcom,s2-type = < 0x07 >;
-				qcom,support-reset = < 0x01 >;
+				qcom,s1-timer = <6720>;
+				qcom,s2-timer = <0>;
+				qcom,s2-type = <7>;
+				qcom,support-reset = <1>;
 			};
 		};
 	};

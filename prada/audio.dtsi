@@ -12,8 +12,8 @@
 	qcom,pinctrl-names = "all_off", "pri_i2s_act", "quin_act", "quin_pri_i2s_act";
 
 	/delete-property/ qcom,cdc-us-euro-gpios;
-	qcom,msm-mbhc-hphl-swh = <0x1>;
-	qcom,msm-mbhc-gnd-swh = <0x1>;
+	qcom,msm-mbhc-hphl-swh = <1>;
+	qcom,msm-mbhc-gnd-swh = <1>;
 	qcom,msm-micbias2-ext-cap;
 	qcom,msm-spk-ext-pa = <&tlmm 93 0>;
 	qcom,msm-switch-headphone-en = <&tlmm 94 0>;
@@ -29,7 +29,7 @@
 	/delete-property/ qcom,msm-gpios;
 	/delete-property/ qcom,pinctrl-names;
 	/delete-property/ qcom,wsa-devs;
-	qcom,wsa-max-devs = <0x00>;
+	qcom,wsa-max-devs = <0>;
 
 	/* WARNING: Override */
 	qcom,audio-routing =

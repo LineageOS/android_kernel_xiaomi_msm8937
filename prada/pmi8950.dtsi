@@ -1,28 +1,28 @@
 &pmi8950_gpios {
 	gpio@c000 {
-		qcom,invert = < 0x00 >;
-		qcom,master-en = < 0x01 >;
-		qcom,mode = < 0x01 >;
-		qcom,out-strength = < 0x01 >;
-		qcom,out-type = < 0x00 >;
-		qcom,pin-num = < 0x01 >;
-		qcom,pull = < 0x05 >;
-		qcom,src-sel = < 0x00 >;
-		qcom,vin-sel = < 0x00 >;
-		reg = < 0xc000 0x100 >;
+		qcom,invert = <0>;
+		qcom,master-en = <1>;
+		qcom,mode = <1>;
+		qcom,out-strength = <1>;
+		qcom,out-type = <0>;
+		qcom,pin-num = <1>;
+		qcom,pull = <5>;
+		qcom,src-sel = <0>;
+		qcom,vin-sel = <0>;
+		reg = <0xc000 0x100>;
 		status = "okay";
 	};
 };
 
 &pmi8950_pwm {
 	status = "okay";
-	qcom,channel-id = <0x2>;
-	qcom,force-pwm-size = <0x9>;
-	qcom,mode-select = <0x0>;
-	qcom,ramp-index = <0x0>;
-	qcom,period = <0x1a>;
+	qcom,channel-id = <2>;
+	qcom,force-pwm-size = <9>;
+	qcom,mode-select = <0>;
+	qcom,ramp-index = <0>;
+	qcom,period = <26>;
 	qcom,pwm {
-		qcom,duty = <0xd>;
+		qcom,duty = <13>;
 		label = "pwm";
 	};
 };
@@ -62,12 +62,12 @@
 			qcom,led_green {
 				label = "mpp";
 				linux,name = "green";
-				qcom,current-setting = <0x05>;
+				qcom,current-setting = <5>;
 				qcom,default-state = "off";
-				qcom,id = <0x06>;
-				qcom,max-current = <0x0a>;
+				qcom,id = <6>;
+				qcom,max-current = <10>;
 				qcom,mode = "manual";
-				qcom,mode-ctrl = <0x60>;
+				qcom,mode-ctrl = <96>;
 				qcom,use-blink;
 			};
 		};
@@ -80,12 +80,12 @@
 			qcom,mpp_red {
 				label = "mpp";
 				linux,name = "red";
-				qcom,current-setting = <0x05>;
+				qcom,current-setting = <5>;
 				qcom,default-state = "off";
-				qcom,id = <0x06>;
-				qcom,max-current = <0x0a>;
+				qcom,id = <6>;
+				qcom,max-current = <10>;
 				qcom,mode = "manual";
-				qcom,mode-ctrl = <0x60>;
+				qcom,mode-ctrl = <96>;
 				qcom,use-blink;
 			};
 		};

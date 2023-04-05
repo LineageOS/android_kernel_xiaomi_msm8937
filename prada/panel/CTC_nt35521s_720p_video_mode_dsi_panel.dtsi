@@ -1,29 +1,29 @@
 &mdss_mdp {
 	dsi_nt35521s_ctc_720p_video: qcom,mdss_dsi_nt35521s_ctc_720p_video {
-		xiaomi,panel-id = <0x1>;
+		xiaomi,panel-id = <1>;
 		qcom,mdss-dsi-panel-name = "CTC_nt35521s_720p_video_mode_dsi_panel";
 		qcom,mdss-dsi-panel-controller = <&mdss_dsi0>;
 		qcom,mdss-dsi-panel-type = "dsi_video_mode";
 		qcom,mdss-dsi-panel-destination = "display_1";
 		qcom,mdss-dsi-panel-framerate = <0x3c>;
-		qcom,mdss-dsi-virtual-channel-id = <0x0>;
-		qcom,mdss-dsi-stream = <0x0>;
+		qcom,mdss-dsi-virtual-channel-id = <0>;
+		qcom,mdss-dsi-stream = <0>;
 		qcom,mdss-dsi-panel-width = <0x2d0>;
 		qcom,mdss-dsi-panel-height = <0x500>;
 		qcom,mdss-dsi-h-front-porch = <0x96>;
 		qcom,mdss-dsi-h-back-porch = <0x92>;
 		qcom,mdss-dsi-h-pulse-width = <0x14>;
-		qcom,mdss-dsi-h-sync-skew = <0x0>;
+		qcom,mdss-dsi-h-sync-skew = <0>;
 		qcom,mdss-dsi-v-back-porch = <0x1c>;
 		qcom,mdss-dsi-v-front-porch = <0x23>;
 		qcom,mdss-dsi-v-pulse-width = <0x2>;
-		qcom,mdss-dsi-h-left-border = <0x0>;
-		qcom,mdss-dsi-h-right-border = <0x0>;
-		qcom,mdss-dsi-v-top-border = <0x0>;
-		qcom,mdss-dsi-v-bottom-border = <0x0>;
+		qcom,mdss-dsi-h-left-border = <0>;
+		qcom,mdss-dsi-h-right-border = <0>;
+		qcom,mdss-dsi-v-top-border = <0>;
+		qcom,mdss-dsi-v-bottom-border = <0>;
 		qcom,mdss-dsi-bpp = <0x18>;
 		qcom,mdss-dsi-underflow-color = <0xff>;
-		qcom,mdss-dsi-border-color = <0x0>;
+		qcom,mdss-dsi-border-color = <0>;
 		qcom,mdss-dsi-on-command = [39 01 00 00 00 00 06 f0 55 aa 52 08 02 39 01 00 00 00 00 02 ee 00 39 01 00 00 00 00 06 f0 55 aa 52 08 00 39 01 00 00 00 00 02 51 ff 39 01 00 00 00 00 02 53 2c 39 01 00 00 00 00 02 55 00 39 01 00 00 00 00 06 f0 55 aa 52 08 00 39 01 00 00 00 00 02 c8 80 39 01 00 00 00 00 02 b1 64 39 01 00 00 00 00 06 f0 55 aa 52 00 00 39 01 00 00 00 00 05 ff aa 55 25 01 39 01 00 00 00 00 02 6f 10 39 01 00 00 00 00 02 f7 1d 39 01 00 00 00 00 05 ff aa 55 25 00 39 01 00 00 00 00 02 64 07 05 01 00 00 78 00 02 11 00 05 01 00 00 05 00 02 29 00];
 		qcom,mdss-dsi-off-command = [05 01 00 00 05 00 02 28 00 05 01 00 00 64 00 02 10 00];
 		qcom,mdss-dsi-ct-normal-command = <0x39010000 0x6f0 0x55aa5208 0x2390100 0x2 0xee003901 0x0 0x6f055aa 0x52080039 0x1000000 0x22601>;
@@ -58,7 +58,7 @@
 		qcom,mdss-dsi-cabc-on-ce-off-command-state = "dsi_lp_mode";
 		qcom,mdss-dsi-cabc-on-ce-on-command-state = "dsi_lp_mode";
 		qcom,mdss-dsi-cabc-off-ce-on-command-state = "dsi_lp_mode";
-		qcom,mdss-dsi-h-sync-pulse = <0x1>;
+		qcom,mdss-dsi-h-sync-pulse = <1>;
 		qcom,mdss-dsi-traffic-mode = "burst_mode";
 		qcom,mdss-dsi-bllp-eof-power-mode;
 		qcom,mdss-dsi-bllp-power-mode;
@@ -69,8 +69,8 @@
 		qcom,mdss-dsi-panel-timings = <0x8c201400 0x46481a22 0x18030400>;
 		qcom,mdss-dsi-t-clk-post = <0x4>;
 		qcom,mdss-dsi-t-clk-pre = <0x1c>;
-		qcom,mdss-dsi-bl-min-level = <0x1>;
-		qcom,mdss-dsi-bl-max-level = <0xfff>;
+		qcom,mdss-dsi-bl-min-level = <1>;
+		qcom,mdss-dsi-bl-max-level = <4095>;
 		qcom,mdss-dsi-dma-trigger = "trigger_sw";
 		qcom,mdss-dsi-mdp-trigger = "none";
 		qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_wled";

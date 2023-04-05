@@ -11,5 +11,5 @@
 };
 
 &lab_regulator {
-	qcom,qpnp-lab-max-precharge-time = <0x12c>;
+	qcom,qpnp-lab-max-precharge-time = <300>;
 };

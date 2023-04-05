@@ -1,5 +1,5 @@
 &soc {
         qcom,spm@b1d2000 {
-		qcom,vctl-timeout-us = <0x32>;
+		qcom,vctl-timeout-us = <50>;
 	};
 };

@@ -27,7 +27,7 @@
 
 		config {
 			pins = "gpio61";
-			drive-strength = <0x2>;
+			drive-strength = <2>;
 			bias-pull-up;
 		};
 	};
@@ -40,7 +40,7 @@
 
 		config {
 			pins = "gpio61";
-			drive-strength = <0x2>;
+			drive-strength = <2>;
 			bias-pull-up;
 		};
 	};
@@ -72,7 +72,7 @@
 		};
 		config {
 			pins = "gpio41";
-			drive-strength = <0x2>;
+			drive-strength = <2>;
 			bias-pull-up;
 		};
 	};
@@ -85,7 +85,7 @@
 
 		config {
 			pins = "gpio41";
-			drive-strength = <0x2>;
+			drive-strength = <2>;
 			bias-pull-up;
 		};
 	};
