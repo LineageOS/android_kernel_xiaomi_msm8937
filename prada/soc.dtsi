@@ -63,7 +63,3 @@
 		qcom,force-warm-reboot;
 	};
 };
-
-&apps_iommu {
-	qcom,no-aarch64;
-};
