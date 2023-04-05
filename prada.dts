@@ -14,8 +14,7 @@
 /dts-v1/;
 
 #include "../qcom/msm8937.dtsi"
-#include "../qcom/msm-pmi8950.dtsi"
-#include "../qcom/msm8937-mtp.dtsi"
+#include "../qcom/msm8937-pmi8950-mtp.dtsi"
 
 #include "prada/prada.dtsi"
 
