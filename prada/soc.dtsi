@@ -54,7 +54,7 @@
 };
 
 &soc {
-	cpuss_dump {
+	cpuss_dump { // 2016-05-12
 		status = "disabled";
 	};
 

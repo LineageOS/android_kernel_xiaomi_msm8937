@@ -25,20 +25,20 @@
 };
 
 &msm_gpu {
-	/delete-property/ qcom,snapshot-size;
+	/delete-property/ qcom,snapshot-size; // 2016-07-26
 };
 
 &mdss_mdp {
-	/delete-node/ qcom,mdss-hw-rt-bus;
+	/delete-node/ qcom,mdss-hw-rt-bus; // 2016-04-25
 };
 
 &pmi_haptic {
-	/delete-property/ vcc_pon-supply;
+	/delete-property/ vcc_pon-supply; // 2016-08-04
 };
 
 &soc {
 	qcom,ispif@1b31000 {
-		/delete-property/ qcom,clock-cntl-support;
+		/delete-property/ qcom,clock-cntl-support; // 2016-07-13
 	};
 };
 
@@ -51,7 +51,7 @@
 	/delete-node/ qcom,torch_1;
 };
 
-&pil_mss {
+&pil_mss { // 2016-07-11
 	/delete-property/ qcom,pas-id;
 	/delete-property/ qcom,pil-mss-memsetup;
 };
