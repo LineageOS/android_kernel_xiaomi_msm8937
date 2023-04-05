@@ -96,3 +96,19 @@
 		};
 	};
 };
+&gpio_key_active {
+	config {
+		pins = "gpio91";
+	};
+	mux {
+		pins = "gpio91";
+	};
+};
+&gpio_key_suspend {
+	config {
+		pins = "gpio91";
+	};
+	mux {
+		pins = "gpio91";
+	};
+};

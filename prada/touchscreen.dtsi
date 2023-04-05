@@ -1,5 +1,5 @@
 &i2c_3 {
-	status = "ok";
+	/delete-property/ status;
 
 	focaltech@38 {
 		compatible = "focaltech,fts";

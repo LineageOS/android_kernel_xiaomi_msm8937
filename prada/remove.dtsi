@@ -1,0 +1,63 @@
+&i2c_2 {
+	/delete-node/ adv7533@39;
+	/delete-node/ pericom-type-c@1d;
+	/delete-node/ wsa881x-i2c-codec@44;
+	/delete-node/ wsa881x-i2c-codec@45;
+	/delete-node/ wsa881x-i2c-codec@e;
+	/delete-node/ wsa881x-i2c-codec@f;
+};
+
+&tlmm {
+	/delete-node/ cdc_reset_ctrl;
+	/delete-node/ cross-conn-det;
+	/delete-node/ pri-tlmm-lines;
+	/delete-node/ pri-tlmm-ws-lines;
+	/delete-node/ wsa_clk;
+	/delete-node/ wsa_reset;
+	/delete-node/ wsa-vi;
+};
+
+&soc {
+	gpio_keys {
+		/delete-node/ camera_focus;
+		/delete-node/ camera_snapshot;
+	};
+};
+
+&msm_gpu {
+	/delete-property/ qcom,snapshot-size;
+};
+
+&mdss_mdp {
+	/delete-node/ qcom,mdss-hw-rt-bus;
+};
+
+&pmi_haptic {
+	/delete-property/ vcc_pon-supply;
+};
+
+&soc {
+	qcom,ispif@1b31000 {
+		/delete-property/ qcom,clock-cntl-support;
+	};
+};
+
+&flash_led {
+	/delete-property/ pinctrl-0;
+	/delete-property/ pinctrl-1;
+	/delete-property/ pinctrl-names;
+	/delete-node/ qcom,flash_1;
+	/delete-node/ qcom,switch;
+	/delete-node/ qcom,torch_1;
+};
+
+&pil_mss {
+	/delete-property/ qcom,pas-id;
+	/delete-property/ qcom,pil-mss-memsetup;
+};
+
+&slim_msm {
+	tasha_codec {
+		/delete-node/ swr_master;
+	};
+};

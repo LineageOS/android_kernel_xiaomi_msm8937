@@ -19,6 +19,7 @@
 };
 
 &pmi8950_charger {
+	/delete-property/ qcom,chg-led-support;
 	qcom,iterm-ma = <0xc8>;
 	qcom,float-voltage-mv = <0x1130>;
 	qcom,fastchg-current-comp = <0x4b0>;

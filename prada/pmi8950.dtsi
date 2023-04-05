@@ -37,6 +37,10 @@
 &pmi8950_torch0 {
 	qcom,led-name = "flashlight";
 	qcom,current = <200>;
+
+	reg0 {
+		regulator-name = "pon_spare_reg";
+	};
 };
 
 &pmi8950_flash1 {
@@ -50,4 +54,40 @@
 &wled {
 	/delete-property/ qcom,en-ext-pfet-sc-pro;
 	qcom,en-cabc;
+};
+
+&spmi_bus {
+        qcom,pmi8950@2 {
+		qcom,leds@a100 {
+			qcom,led_green {
+				label = "mpp";
+				linux,name = "green";
+				qcom,current-setting = <0x05>;
+				qcom,default-state = "off";
+				qcom,id = <0x06>;
+				qcom,max-current = <0x0a>;
+				qcom,mode = "manual";
+				qcom,mode-ctrl = <0x60>;
+				qcom,use-blink;
+			};
+		};
+
+		qcom,leds@a300 {
+			compatible = "qcom,leds-qpnp";
+			label = "mpp";
+			reg = <0xa300 0x100>;
+
+			qcom,mpp_red {
+				label = "mpp";
+				linux,name = "red";
+				qcom,current-setting = <0x05>;
+				qcom,default-state = "off";
+				qcom,id = <0x06>;
+				qcom,max-current = <0x0a>;
+				qcom,mode = "manual";
+				qcom,mode-ctrl = <0x60>;
+				qcom,use-blink;
+			};
+		};
+	};
 };

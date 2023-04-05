@@ -4,13 +4,6 @@
 
 / {
 	reserved-memory {
-		ramoops@ffc00000 {
-			compatible = "ramoops";
-			reg = <0 0xffc00000 0 0x400000>;
-			record-size = <0x200000>;
-			console-size = <0x200000>;
-		};
-
 		fih_removed_regions@0 {
 			compatible = "removed-dma-pool";
 			no-map;
@@ -53,7 +46,7 @@
 };
 
 &soc {
-	sn_fuse: snfuse@0xa0128 {
+	sn_fuse: snfuse@0xA0128 {
 		compatible = "qcom,sn-fuse";
 		reg = <0xa4128 0x4>;
 		reg-names = "sn-base";
@@ -61,7 +54,11 @@
 };
 
 &soc {
-	restart@4ab000 {
-		qcom,force-warm-reboot;
+	cpuss_dump {
+		status = "disabled";
+	};
+
+	qcom,rmtfs_sharedmem@00000000 {
+		reg = <0x00 0xe0000>;
 	};
 };

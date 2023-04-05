@@ -18,7 +18,7 @@
 	};
 
 	fpc1020 {
-		compatible = "soc:fpc1020";
+		compatible = "fpc,fpc1020";
 		interrupt-parent = <&tlmm>;
 		interrupts = <0x2e 0x0>;
 		fpc,gpio_rst = <&tlmm 62 0>;
