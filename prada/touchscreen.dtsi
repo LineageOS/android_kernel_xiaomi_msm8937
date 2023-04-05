@@ -1,5 +1,6 @@
 &i2c_3 {
 	status = "ok";
+
 	focaltech@38 {
 		compatible = "focaltech,fts";
 		reg = <0x38>;

@@ -3,6 +3,7 @@
 		mux {
 			pins = "gpio36";
 		};
+
 		config {
 			pins = "gpio36";
 		};
@@ -12,6 +13,7 @@
 		mux {
 			pins = "gpio36";
 		};
+
 		config {
 			pins = "gpio36";
 		};
@@ -47,6 +49,7 @@
 		mux {
 			pins = "gpio40";
 		};
+
 		config {
 			pins = "gpio40";
 		};
@@ -56,6 +59,7 @@
 		mux {
 			pins = "gpio40";
 		};
+
 		config {
 			pins = "gpio40";
 		};

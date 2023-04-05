@@ -1,0 +1,13 @@
+&spmi_bus {
+	qcom,pm8937@0 {
+		qcom,power-on@800 {
+			qcom,store-hard-reset-reason;
+			qcom,pon_1 {
+				qcom,s1-timer = < 0x1a40 >;
+				qcom,s2-timer = < 0x00 >;
+				qcom,s2-type = < 0x07 >;
+				qcom,support-reset = < 0x01 >;
+			};
+		};
+	};
+};

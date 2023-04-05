@@ -1,17 +1,3 @@
-&spmi_bus {
-	qcom,pm8937@0 {
-		qcom,power-on@800 {
-			qcom,store-hard-reset-reason;
-			qcom,pon_1 {		
-				qcom,s1-timer = < 0x1a40 >;
-				qcom,s2-timer = < 0x00 >;
-				qcom,s2-type = < 0x07 >;
-				qcom,support-reset = < 0x01 >;
-			};
-		};
-	};
-};
-
 &pmi8950_gpios {
 	gpio@c000 {
 		qcom,invert = < 0x00 >;
@@ -61,20 +47,7 @@
 	status = "disabled";
 };
 
-&led_flash0 {
-	/delete-property/ qcom,switch-source;
-	qcom,flash-source = <&pmi8950_flash0>;
-	qcom,torch-source = <&pmi8950_torch0>;
-};
-
 &wled {
 	/delete-property/ qcom,en-ext-pfet-sc-pro;
 	qcom,en-cabc;
-};
-
-&pmi_haptic {
-	qcom,actuator-type = <1>;
-	qcom,ilim-ma = < 0x5f >;
-	qcom,vmax-mv = < 0xaf0 >;
-	qcom,wave-play-rate-us = < 0x148f >;
 };

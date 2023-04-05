@@ -11,6 +11,12 @@
  * GNU General Public License for more details.
  */
 
+&led_flash0 {
+	/delete-property/ qcom,switch-source;
+	qcom,flash-source = <&pmi8950_flash0>;
+	qcom,torch-source = <&pmi8950_torch0>;
+};
+
 &cci {
 	actuator0: qcom,actuator@0 {
 		cell-index = <0>;

@@ -4,10 +4,10 @@
 
 &reserved_memory {
 	ramoops@ffc00000 {
-			compatible = "ramoops";
-			reg = <0 0xffc00000 0 0x400000>;
-			record-size = <0x200000>;
-			console-size = <0x200000>;
+		compatible = "ramoops";
+		reg = <0 0xffc00000 0 0x400000>;
+		record-size = <0x200000>;
+		console-size = <0x200000>;
 	};
 
 	fih_removed_regions@0 {
