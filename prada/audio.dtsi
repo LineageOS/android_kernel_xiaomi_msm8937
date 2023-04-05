@@ -70,10 +70,6 @@
 		"SpkrRight IN", "SPK2 OUT";
 };
 
-&voice {
-	qcom,vote-bms;
-};
-
 &wcd_rst_gpio {
 	/delete-property/ pinctrl-0;
 	/delete-property/ pinctrl-1;

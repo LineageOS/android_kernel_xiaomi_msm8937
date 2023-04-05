@@ -5,11 +5,3 @@
 &mdss_dsi0 {
 	qcom,dsi-pref-prim-pan = <&dsi_hx8394f_boe_720p_video>;
 };
-
-&mdss_dsi1 {
-	status = "disabled";
-};
-
-&lab_regulator {
-	qcom,qpnp-lab-max-precharge-time = <300>;
-};
