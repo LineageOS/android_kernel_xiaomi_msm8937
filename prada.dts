@@ -13,10 +13,11 @@
 
 /dts-v1/;
 
-#include "../msm8937.dtsi"
-#include "../pmi8950.dtsi"
-#include "../msm8937-mtp.dtsi"
-#include "prada.dtsi"
+#include "../qcom/msm8937.dtsi"
+#include "../qcom/pmi8950.dtsi"
+#include "../qcom/msm8937-mtp.dtsi"
+
+#include "prada/prada.dtsi"
 
 / {
 	model = "Qualcomm Technologies, Inc. MSM8937-PMI8950 MTP";
