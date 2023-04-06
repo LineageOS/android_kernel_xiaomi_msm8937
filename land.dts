@@ -13,13 +13,13 @@
 
 /dts-v1/;
 
-#include "../../../qcom/msm8937.dtsi"
-#include "../../../qcom/msm-pmi8950.dtsi"
-#include "../../../qcom/msm8937-qrd.dtsi"
-#include "../../../qcom/msm8937-mdss-panels.dtsi"
+#include "../qcom/msm8937.dtsi"
+#include "../qcom/msm-pmi8950.dtsi"
+#include "../qcom/msm8937-qrd.dtsi"
+#include "../qcom/msm8937-mdss-panels.dtsi"
 
-#include "common/common.dtsi"
-#include "land/land.dtsi"
+#include "wingtech/msm8937/common/common.dtsi"
+#include "wingtech/msm8937/land/land.dtsi"
 
 / {
 	model = "Qualcomm Technologies, Inc. MSM8937-PMI8950 QRD SKU1";
