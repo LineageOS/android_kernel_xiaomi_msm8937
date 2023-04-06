@@ -1,5 +1,3 @@
-#include "inline-common.dtsi"
-
 / {
 	/* Changed: qcom,msm8937-pmi8950-qrd-sku1 => qcom,msm8937-pmi8950-qrd-wt88537_64 */
 	compatible = "qcom,msm8937-pmi8950-qrd-wt88537_64",

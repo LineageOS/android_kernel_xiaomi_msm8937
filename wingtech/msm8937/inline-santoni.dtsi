@@ -1,5 +1,3 @@
-#include "inline-common.dtsi"
-
 &i2c_3 {
 	ftech@38 {
 		/delete-property/ ftech,button-map;

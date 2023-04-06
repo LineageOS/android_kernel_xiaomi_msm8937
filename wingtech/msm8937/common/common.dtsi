@@ -1,11 +1,13 @@
 #include "pinctrl.dtsi"
 
 #include "audio.dtsi"
+#include "battery_usb.dtsi"
 #include "fingerprint.dtsi"
 #include "ir.dtsi"
 #include "led.dtsi"
 #include "misc.dtsi"
 #include "pm8937.dtsi"
+#include "pmi8950.dtsi"
 #include "regulator.dtsi"
 #include "soc.dtsi"
 #include "touchscreen.dtsi"

@@ -1,0 +1,3 @@
+&pmi8950_charger {
+	/delete-property/ qcom,autoadjust-vfloat;
+};

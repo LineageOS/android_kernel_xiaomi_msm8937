@@ -3,3 +3,9 @@
 		status = "disabled";
 	};
 };
+
+&soc {
+	boardinfo {
+		compatible = "wt:boardinfo";
+	};
+};
