@@ -2,6 +2,10 @@
 #include "panel/dsi-panel-nt35521s-ebbg-720p-video.dtsi"
 #include "panel/dsi-panel-ili9881c-tianma-720p-video.dtsi"
 
+&dsi_hx8394f_720p_video {
+	qcom,mdss-dsi-underflow-color = <0x00>;
+};
+
 &dsi_hx8394f_boe_720_vid {
 	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
 };
@@ -12,6 +16,32 @@
 
 &dsi_ili9881c_tianma_720p_video {
 	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+};
+
+&dsi_panel_pwr_supply {
+	qcom,panel-supply-entry@2 {
+		reg = <2>;
+		qcom,supply-name = "lab";
+		qcom,supply-min-voltage = <4600000>;
+		qcom,supply-max-voltage = <6000000>;
+		qcom,supply-enable-load = <100000>;
+		qcom,supply-disable-load = <100>;
+	};
+
+	qcom,panel-supply-entry@3 {
+		reg = <3>;
+		qcom,supply-name = "ibb";
+		qcom,supply-min-voltage = <4600000>;
+		qcom,supply-max-voltage = <6000000>;
+		qcom,supply-enable-load = <100000>;
+		qcom,supply-disable-load = <100>;
+		qcom,supply-post-on-sleep = <20>;
+	};
+};
+
+&labibb {
+	status = "ok";
+	qpnp,qpnp-labibb-mode = "lcd";
 };
 
 &lab_regulator {
@@ -31,4 +61,20 @@
 
 	qcom,regulator-ldo-mode;
 	qcom,platform-regulator-settings = [ 00 01 01 00 20 07 00];
+
+	lab-supply = <&lab_regulator>;
+	ibb-supply = <&ibb_regulator>;
+	pinctrl-names = "mdss_default", "mdss_sleep";
+	pinctrl-0 = <&mdss_dsi_active &mdss_te_active>;
+	pinctrl-1 = <&mdss_dsi_suspend &mdss_te_suspend>;
+	qcom,platform-te-gpio = <&tlmm 24 0>;
+	qcom,platform-reset-gpio = <&tlmm 60 0>;
+};
+
+&mdss_dsi1 {
+	status = "disabled";
+};
+
+&mdss_mdp {
+	qcom,mdss-pref-prim-intf = "dsi";
 };

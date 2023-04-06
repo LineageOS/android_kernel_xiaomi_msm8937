@@ -17,7 +17,7 @@
 		compatible = "qcom,camera-flash";
 		qcom,flash-type = <1>;
 		qcom,flash-source = <&pmi8950_flash0 &pmi8950_flash1>;
-		qcom,torch-source = <&pmi8950_torch0 &pmi8950_torch1>;
+		qcom,torch-source = <&pmi8950_torch0 &pmi8950_torch1 &pmi8950_torch2>;
 		qcom,switch-source = <&pmi8950_switch>;
 	};
 };
@@ -203,7 +203,6 @@
 		clocks = <&clock_gcc clk_mclk2_clk_src>,
 			<&clock_gcc clk_gcc_camss_mclk2_clk>;
 		clock-names = "cam_src_clk", "cam_clk";
-		qcom,clock-rates = <19200000 0>;
 	};
 
 	eeprom4: qcom,eeprom@4 {

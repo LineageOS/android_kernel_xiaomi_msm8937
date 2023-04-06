@@ -9,17 +9,10 @@
 };
 
 &pmi8950_charger {
-	qcom,qpnp-smbcharger {
-		/delete-property/qcom,float-voltage-mv;
-		qcom,thermal-mitigation = <2000 1000 800 800>;
-		/delete-property/ qcom,parallel-usb-min-current-ma;
-		/delete-property/ qcom,parallel-usb-9v-min-current-ma;
-		/delete-property/ qcom,parallel-allowed-lowering-ma;
-		/delete-property/ qcom,autoadjust-vfloat;
-	};
-};
+	/delete-property/ qcom,parallel-allowed-lowering-ma;
+	/delete-property/ qcom,parallel-usb-9v-min-current-ma;
+	/delete-property/ qcom,parallel-usb-min-current-ma;
 
-&pmi8950_charger {
 	qcom,battery-data = <&qrd_batterydata>;
 	qcom,float-voltage-mv = <4400>;
 	qcom,thermal-mitigation = <2000 1500 1200 800 800>;

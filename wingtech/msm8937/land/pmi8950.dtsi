@@ -27,11 +27,25 @@
 	qcom,current = <100>;
 };
 
+&pmi8950_switch {
+	reg0 {
+		regulator-name = "pon_spare_reg";
+	};
+};
+
 &spmi_bus {
 	qcom,pmi8950@2 {
 		qcom,leds@a100 {
 			/delete-property/ status;
 			/delete-node/ qcom,led_mpp_2;
+		};
+
+		qcom,power-on@800 {
+			pon_perph_reg: qcom,pon_perph_reg {
+				regulator-name = "pon_spare_reg";
+				qcom,pon-spare-reg-addr = <0x8c>;
+				qcom,pon-spare-reg-bit = <1>;
+			};
 		};
 	};
 };
