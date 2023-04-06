@@ -19,8 +19,9 @@
 #include "../../../qcom/msm8937-qrd.dtsi"
 #include "../../../qcom/msm8937-mdss-panels.dtsi"
 #include "../../../qcom/msm8940-pinctrl.dtsi"
+
 #include "common/common.dtsi"
-#include "santoni/msm8937-S88536AA2.dtsi"
+#include "santoni/santoni.dtsi"
 
 #include "inline-santoni.dtsi"
 
@@ -30,14 +31,4 @@
 			"qcom,msm8940", "qcom,qrd";
 	qcom,board-id= <0x1000b 1>, <0x2000b 1>;
 	qcom,pmic-id = <0x10019 0x010011 0x0 0x0>;
-};
-
-/ {
-	qrd_batterydata: qcom,battery-data {
-		qcom,batt-id-range-pct = <15>;
-		#include "santoni/batterydata-qrd-Desay-4v4-4100mah.dtsi"
-		#include "santoni/batterydata-qrd-Atl-4v4-4100mah.dtsi"
-		#include "santoni/batterydata-qrd-Coslight-4v4-4100mah.dtsi"
-		#include "santoni/batterydata-qrd-Default-4v4-4100mah.dtsi"
-	};
 };
