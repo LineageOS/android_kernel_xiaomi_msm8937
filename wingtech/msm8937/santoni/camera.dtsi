@@ -22,10 +22,6 @@
 	qcom,torch-source = <&pmi8950_torch0 &pmi8950_torch2>;
 };
 
-&eeprom2 {
-	/delete-property/ cam_vaf-supply;
-};
-
 &cci {
 	actuator0: qcom,actuator@0 {
 		cell-index = <0>;
