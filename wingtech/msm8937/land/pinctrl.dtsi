@@ -1,0 +1,5 @@
+&sdc2_cd_off {
+	config {
+		bias-pull-up;
+	};
+};

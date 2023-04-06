@@ -1,0 +1,3 @@
+&sdhc_1 {
+	qcom,vdd-always-on;
+};
