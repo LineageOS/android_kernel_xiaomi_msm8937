@@ -1,8 +1,3 @@
-&soc {
-	led_flash0: qcom,camera-flash {
-		cell-index = <0>;
-		compatible = "qcom,camera-flash";
-		qcom,flash-type = <1>;
-		qcom,switch-source = <&pmi8950_switch>;
-	};
+&led_flash0 {
+	qcom,switch-source = <&pmi8950_switch>;
 };

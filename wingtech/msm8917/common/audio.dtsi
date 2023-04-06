@@ -1,8 +1,3 @@
-/* From stock msm-audio.dtsi */
-&int_codec {
-	headset-gpio = <&tlmm 129 0>;
-};
-
 /* From stock msm8917-pmi8937-qrd-sku5_S8850?.dts */
 &int_codec {
 	qcom,model = "msm8917-sku5-snd-card";

@@ -49,17 +49,11 @@
 			bias-pull-down;
 		};
 	};
-	gpio_led_pins {
-		gpio_led_off: gpio_led_off {
-			mux {
-				function = "gpio";
-			};
-			config {
-				drive-strength = <6>;
-				bias-pull-down;
-				output-low;
-			};
-		};
+};
+&gpio_led_off {
+	config {
+		bias-pull-down;
+		output-low;
 	};
 };
 &tlmm {

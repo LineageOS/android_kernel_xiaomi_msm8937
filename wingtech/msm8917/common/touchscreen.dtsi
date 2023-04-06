@@ -1,6 +1,5 @@
 /* From stock msm8917-pmi8937-qrd-sku5_S8850?.dtsi */
 &i2c_3 { /* BLSP1 QUP3 */
-	status = "ok";
 	ftech@38 {
 		compatible = "focaltech,5336";
 		reg = <0x38>;

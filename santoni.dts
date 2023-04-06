@@ -20,6 +20,7 @@
 #include "../qcom/msm8937-mdss-panels.dtsi"
 #include "../qcom/msm8940-pinctrl.dtsi"
 
+#include "wingtech/common/common.dtsi"
 #include "wingtech/msm8937/common/common.dtsi"
 #include "wingtech/msm8937/santoni/santoni.dtsi"
 

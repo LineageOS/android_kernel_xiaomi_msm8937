@@ -1,6 +1,5 @@
 &i2c_3 {
 	qcom,clk-freq-out = <100000>;
-	status = "ok";
 };
 
 &soc {

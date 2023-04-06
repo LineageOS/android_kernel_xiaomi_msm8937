@@ -13,13 +13,10 @@
 		linux,name = "flashlight";
 		linux,default-trigger = "flashlight-trigger";
 	};
-	led_flash0: qcom,camera-flash {
-		cell-index = <0>;
-		compatible = "qcom,camera-flash";
-		qcom,flash-type = <1>; // WARNING: Overridden by msm8917-pmi8937-qrd-sku5_S8850?.dtsi, Original value is 3
-		qcom,flash-source = <&flash_SGM3780>;
-		qcom,torch-source = <&flash_SGM3780>;
-	};
+};
+&led_flash0 {
+	qcom,flash-source = <&flash_SGM3780>;
+	qcom,torch-source = <&flash_SGM3780>;
 };
 &cci {
 	actuator0: qcom,actuator@0 {
