@@ -1,7 +1,3 @@
-&other_ext_mem {
-	reg = <0x0 0x84F00000 0x0 0x1900000>;
-};
-
 / {
 	reserved-memory {
 		fih_removed_regions@0 {
@@ -11,6 +7,10 @@
 			label = "fih_memory_hole";
 		};
 	};
+};
+
+&other_ext_mem {
+	reg = <0x0 0x84F00000 0x0 0x1900000>;
 };
 
 &soc {
@@ -43,9 +43,7 @@
 				"iface_clk", "bus_clk";
 		qcom,ce-opp-freq = <100000000>;
 	};
-};
 
-&soc {
 	sn_fuse: snfuse@0xA0128 {
 		compatible = "qcom,sn-fuse";
 		reg = <0xa4128 0x4>;

@@ -12,8 +12,8 @@
 	qcom,pinctrl-names = "all_off", "pri_i2s_act", "quin_act", "quin_pri_i2s_act";
 
 	/delete-property/ qcom,cdc-us-euro-gpios;
-	qcom,msm-mbhc-hphl-swh = <1>;
 	qcom,msm-mbhc-gnd-swh = <1>;
+	qcom,msm-mbhc-hphl-swh = <1>;
 	qcom,msm-micbias2-ext-cap;
 	qcom,msm-spk-ext-pa = <&tlmm 93 0>;
 	qcom,msm-switch-headphone-en = <&tlmm 94 0>;
@@ -36,7 +36,7 @@
 		"AIF4 VI", "MCLK",
 		"AIF4 VI", "MICBIAS_REGULATOR",
 		"RX_BIAS", "MCLK",
-/*
+/* // Removed by Xiaomi
 		"MADINPUT", "MCLK",
 		"AIF4 MAD", "MICBIAS_REGULATOR",
 */

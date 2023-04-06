@@ -5,3 +5,8 @@
 &mdss_dsi0 {
 	qcom,dsi-pref-prim-pan = <&dsi_hx8394f_boe_720p_video>;
 };
+
+&wled {
+	/delete-property/ qcom,en-ext-pfet-sc-pro;
+	qcom,en-cabc;
+};

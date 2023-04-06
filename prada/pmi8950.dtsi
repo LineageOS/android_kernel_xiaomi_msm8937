@@ -1,3 +1,27 @@
+&pmi8950_flash0 {
+	qcom,current = <1000>;
+	reg0 {
+		regulator-name = "pon_spare_reg";
+	};
+};
+
+&pmi8950_torch0 {
+	qcom,led-name = "flashlight";
+	qcom,current = <200>;
+
+	reg0 {
+		regulator-name = "pon_spare_reg";
+	};
+};
+
+&pmi8950_flash1 {
+	status = "disabled";
+};
+
+&pmi8950_torch1 {
+	status = "disabled";
+};
+
 &pmi8950_gpios {
 	gpio@c000 {
 		qcom,invert = <0>;
@@ -27,37 +51,8 @@
 	};
 };
 
-&pmi8950_flash0 {
-	qcom,current = <1000>;
-	reg0 {
-		regulator-name = "pon_spare_reg";
-	};
-};
-
-&pmi8950_torch0 {
-	qcom,led-name = "flashlight";
-	qcom,current = <200>;
-
-	reg0 {
-		regulator-name = "pon_spare_reg";
-	};
-};
-
-&pmi8950_flash1 {
-	status = "disabled";
-};
-
-&pmi8950_torch1 {
-	status = "disabled";
-};
-
-&wled {
-	/delete-property/ qcom,en-ext-pfet-sc-pro;
-	qcom,en-cabc;
-};
-
 &spmi_bus {
-        qcom,pmi8950@2 {
+	qcom,pmi8950@2 {
 		qcom,leds@a100 {
 			qcom,led_green {
 				label = "mpp";
