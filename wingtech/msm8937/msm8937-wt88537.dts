@@ -17,7 +17,7 @@
 #include "../../../qcom/msm-pmi8950.dtsi"
 #include "../../../qcom/msm8937-qrd.dtsi"
 #include "../../../qcom/msm8937-mdss-panels.dtsi"
-#include "common/msm8937-common.dtsi"
+#include "common/common.dtsi"
 #include "land/msm8937-land.dtsi"
 
 / {

@@ -1,20 +1,4 @@
 &soc {
-	gpio-leds {
-		compatible = "gpio-leds";
-		status = "okay";
-		pinctrl-names = "default";
-		pinctrl-0 = <&gpio_led_off>;
-
-		infred {
-			gpios = <&tlmm 45 0>;
-			label = "infrared";
-			linux,default-trigger = "infra-red";
-			default-state = "off";
-			retain-state-suspended;
-		};
-
-	};
-
 	fpc1020 {
 		compatible = "soc:fpc1020";
 
@@ -71,10 +55,5 @@
 		pinctrl-1 = <&goodix_reset_reset>;
 		pinctrl-2 = <&goodix_reset_active>;
 		pinctrl-3 = <&goodix_irq_active>;
-	};
-
-	i2c@78b7000 {
-		qcom,clk-freq-out = <100000>;
-		status = "okay";
 	};
 };

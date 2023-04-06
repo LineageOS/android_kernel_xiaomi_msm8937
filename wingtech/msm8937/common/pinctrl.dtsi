@@ -1,20 +1,4 @@
 &tlmm {
-	gpio_led_pins {
-		gpio_led_off: gpio_led_off {
-			mux {
-				pins = "gpio45";
-				function = "gpio";
-			};
-
-			config {
-				pins = "gpio45";
-				drive-strength = <6>;
-				bias-disable;
-				output-high;
-			};
-		};
-	};
-
 	fpc_spi_active: fpc_spi_active {
 		mux {
 			pins = "gpio20", "gpio21", "gpio22", "gpio23";
@@ -122,6 +106,22 @@
 			drive-strength = <2>;
 			bias-disable = <0>;
 			input-enable;
+		};
+	};
+
+	gpio_led_pins {
+		gpio_led_off: gpio_led_off {
+			mux {
+				pins = "gpio45";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio45";
+				drive-strength = <6>;
+				bias-disable;
+				output-high;
+			};
 		};
 	};
 };

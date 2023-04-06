@@ -1,11 +1,3 @@
-&apc_vreg_corner {
-	qcom,cpr-voltage-floor = <1150000 1150000 1250000>;
-};
-
-&pm8937_l6 {
-	regulator-always-on;
-};
-
 &spmi_bus {
 	qcom,pm8937@0 {
 		qcom,power-on@800 {
