@@ -1,0 +1,5 @@
+&soc {
+	qcom,msm-thermal {
+		/delete-property/ qcom,therm-reset-temp;
+	};
+};

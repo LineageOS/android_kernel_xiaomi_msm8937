@@ -1,5 +1,5 @@
 &apc_vreg_corner {
-	/delete-property/ qcom.cpr-enable;
+	/delete-property/ qcom,cpr-enable;
 };
 
 &pm8937_s5 {

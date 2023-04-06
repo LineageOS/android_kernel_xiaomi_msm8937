@@ -18,9 +18,10 @@
 		ftech,irq-gpio = <&tlmm 65 0x2008>;
 		ftech,display-coords = <0 0 720 1280>;
 		ftech,panel-coords = <0 0 720 1280>;
-		ftech,button-map= <139 172 158>; /* APP_SWITCH HOME BACK just like stock rom */
-		ftech,button-y-coord = <2040>;
-		ftech,button-x-coords = <120 500 900>;
+
+		ftech,virtual-key1 = <139 140 2000>;/*menu*/
+		ftech,virtual-key2 = <172 360 2000>;/*home*/
+		ftech,virtual-key3 = <158 580 2000>;/*back*/
 		ftech,no-force-update;
 		ftech,i2c-pull-up;
 		ftech,group-id = <1>;
@@ -35,5 +36,9 @@
 		ftech,fw-delay-era-flsh-ms = <2000>;
 		ftech,fw-auto-cal;
 		ftech,ignore-id-check;
+	};
+
+	synaptics@4b {
+		vdd-supply = <&pm8937_l10>;
 	};
 };

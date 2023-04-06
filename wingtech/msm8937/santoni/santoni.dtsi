@@ -7,5 +7,7 @@
 #include "pm8937.dtsi"
 #include "pmi8950.dtsi"
 #include "regulator.dtsi"
+#include "soc.dtsi"
+#include "storage.dtsi"
 #include "touchscreen.dtsi"
 #include "vibrator.dtsi"
