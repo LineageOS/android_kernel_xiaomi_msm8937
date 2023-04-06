@@ -1,3 +1,0 @@
-&pmi8950_torch0 {
-	qcom,current = <100>;
-};
