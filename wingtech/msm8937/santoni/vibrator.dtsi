@@ -1,4 +1,3 @@
 &pmi_haptic {
 	/delete-property/ qcom,en-brake;
-	qcom,vmax-mv = <2700>;
 };
