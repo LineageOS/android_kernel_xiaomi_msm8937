@@ -14,29 +14,16 @@
 	/delete-property/ qcom,parallel-usb-min-current-ma;
 
 	qcom,battery-data = <&qrd_batterydata>;
-	qcom,float-voltage-mv = <4400>;
 	qcom,thermal-mitigation = <2000 1500 1200 800 800>;
-	status = "okay";
 };
 
 &pmi8950_fg {
 	qcom,battery-data = <&qrd_batterydata>;
-	qcom,cold-bat-decidegc = <(0)>;
 	qcom,cool-bat-decidegc = <(100)>;
 	qcom,hot-bat-decidegc = <600>;
-	qcom,warm-bat-decidegc = <450>;
-	qcom,warm-bat-india-decidegc = <500>;
 	qcom,fg-iterm-ma = <200>;
 	qcom,fg-chg-iterm-ma = <150>;
-	qcom,resume-soc = <99>;
 	qcom,fg-cutoff-voltage-mv = <3500>;
-	qcom,cl-max-increment-deciperc = <1>;
-	qcom,cl-max-decrement-deciperc = <1>;
-	qcom,fg-delta-soc = <1>;
-	qcom,bad-battery-detection-enable;
-	qcom,hold-soc-while-full;
-
-	qcom,fg-cc-cv-threshold-mv = <4390>;
 };
 
 &usb_otg {

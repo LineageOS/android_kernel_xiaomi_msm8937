@@ -1,3 +1,18 @@
 &pmi8950_charger {
 	/delete-property/ qcom,autoadjust-vfloat;
+	qcom,float-voltage-mv = <4400>;
+	status = "okay";
+};
+
+&pmi8950_fg {
+	qcom,bad-battery-detection-enable;
+	qcom,cl-max-increment-deciperc = <1>;
+	qcom,cl-max-decrement-deciperc = <1>;
+	qcom,cold-bat-decidegc = <(0)>;
+	qcom,fg-cc-cv-threshold-mv = <4390>;
+	qcom,fg-delta-soc = <1>;
+	qcom,hold-soc-while-full;
+	qcom,resume-soc = <99>;
+	qcom,warm-bat-decidegc = <450>;
+	qcom,warm-bat-india-decidegc = <500>;
 };
