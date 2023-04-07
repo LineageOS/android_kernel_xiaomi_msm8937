@@ -17,6 +17,9 @@
 #include "camera.h"
 #include "msm_cci.h"
 #include "msm_camera_dt_util.h"
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
+#include <xiaomi-msm8937/mach.h>
+#endif
 
 /* Logging macro */
 #undef CDBG
@@ -823,6 +826,10 @@ int32_t legacy_m_msm_sensor_driver_probe(void *setting,
 	camera_info->sensor_id_reg_addr =
 		slave_info->sensor_id_info.sensor_id_reg_addr;
 	camera_info->sensor_id = slave_info->sensor_id_info.sensor_id;
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_PRADA)
+	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_PRADA)
+		camera_info->sensor_id = slave_info->sensor_id_info.sensor_id - 1;
+#endif
 	camera_info->sensor_id_mask = slave_info->sensor_id_info.sensor_id_mask;
 
 	/* Fill CCI master, slave address and CCI default params */
