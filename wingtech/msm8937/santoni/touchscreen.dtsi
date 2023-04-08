@@ -37,8 +37,4 @@
 		ftech,fw-auto-cal;
 		ftech,ignore-id-check;
 	};
-
-	synaptics@4b {
-		vdd-supply = <&pm8937_l10>;
-	};
 };
