@@ -27,25 +27,6 @@
 	reg = <0x00 0x85b00000 0x00 0xd00000>;
 };
 
-&soc {
-	/* TODO: Remove */
-	gpio-leds {
-		compatible = "gpio-leds";
-		status = "okay";
-		pinctrl-names = "default";
-		pinctrl-0 = <&gpio_led_off>;
-
-		infred {
-			gpios = <&tlmm 39 0>;
-			label = "infrared";
-			linux,default-trigger = "infra-red";
-			default-state = "off";
-			retain-state-suspended;
-		};
-
-	};
-};
-
 &gpio_led_off {
 	config {
 		pins = "gpio39";
