@@ -4,4 +4,3 @@
 #include "camera.dtsi"
 #include "fingerprint.dtsi"
 #include "pm.dtsi"
-#include "soc.dtsi"
