@@ -80,10 +80,9 @@
 };
 
 /* From stock msm8937-audio-mtp.dtsi */
-/* TODO: disable => disabled */
 &wsa881x_i2c_e {
-	status = "disable";
+	status = "disabled";
 };
 &wsa881x_i2c_f {
-	status = "disable";
+	status = "disabled";
 };

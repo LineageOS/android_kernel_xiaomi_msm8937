@@ -5,7 +5,6 @@
 &soc {
 	qcom,bcl {
 		/delete-property/ qcom,bcl-enable;
-		#qcom,bcl-enable; // TODO: Remove this line
 	};
 
 	qcom,wdt@b017000 {
