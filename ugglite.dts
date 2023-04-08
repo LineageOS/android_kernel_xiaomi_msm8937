@@ -15,7 +15,7 @@
 /* From stock msm8917-pmi8937-mtp.dts */
 / {
 	model = "Qualcomm Technologies, Inc. MSM8917-PMI8937 MTP";
-	compatible = "qcom,msm8917-mtp", "qcom,msm8917", "qcom,mtp";
+	compatible = "qcom,msm8917-mtp", "qcom,msm8917", "qcom,mtp", "xiaomi,ugglite";
 	qcom,board-id= <8 0>;
 	qcom,pmic-id = <0x10019 0x0 0x0 0x0>;
 };
