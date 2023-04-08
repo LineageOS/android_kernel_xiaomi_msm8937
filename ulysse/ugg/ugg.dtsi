@@ -2,7 +2,6 @@
 
 #include "battery_usb.dtsi"
 #include "camera.dtsi"
-#include "display.dtsi"
 #include "fingerprint.dtsi"
 #include "pm.dtsi"
 #include "soc.dtsi"

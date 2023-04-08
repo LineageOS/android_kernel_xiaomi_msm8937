@@ -1,4 +1,0 @@
-/* From stock msm8937-mtp.dtsi */
-&mdss_dsi1 {
-	/delete-property/ qcom,platform-enable-gpio;
-};

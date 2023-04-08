@@ -1,0 +1,5 @@
+#ifndef IS_MSM8917
+&mdss_dsi1 {
+	status = "disabled";
+};
+#endif
