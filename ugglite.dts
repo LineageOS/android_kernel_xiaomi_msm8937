@@ -2,7 +2,6 @@
 
 #include "../qcom/msm8917.dtsi"
 #include "../qcom/msm8917-pmi8937-mtp.dtsi"
-#include "../qcom/msm8937-regulator.dtsi" // TODO: Remove this?
 
 #include "common/fragments/delete-msm89x7-camera-sensor-mtp.dtsi"
 
