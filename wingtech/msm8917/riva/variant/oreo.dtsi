@@ -54,15 +54,6 @@
 	};
 };
 
-&usbc_int_default {
-	mux {
-		pins = "gpio97", "gpio131";
-	};
-	config {
-		pins = "gpio97", "gpio131";
-	};
-};
-
 &eeprom2 {
 	qcom,cam-power-seq-cfg-val = <0 0 1 1 1 24000000 1 1>;
 	qcom,cam-power-seq-delay = <1 1 5 5 5 1 10 10>;

@@ -1,6 +1,4 @@
 &i2c_2 {
-	/delete-node/ adv7533@39;
-	/delete-node/ pericom-type-c@1d;
 	/delete-node/ wsa881x-i2c-codec@44;
 	/delete-node/ wsa881x-i2c-codec@45;
 	/delete-node/ wsa881x-i2c-codec@e;
@@ -15,13 +13,6 @@
 	/delete-node/ wsa_clk;
 	/delete-node/ wsa_reset;
 	/delete-node/ wsa-vi;
-};
-
-&soc {
-	gpio_keys {
-		/delete-node/ camera_focus;
-		/delete-node/ camera_snapshot;
-	};
 };
 
 &flash_led {

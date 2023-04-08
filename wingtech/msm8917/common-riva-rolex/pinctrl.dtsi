@@ -23,11 +23,3 @@
 		pins = "gpio88";
 	};
 };
-&usbc_int_default {
-	mux {
-		pins = "gpio131";
-	};
-	config {
-		pins = "gpio131";
-	};
-};
