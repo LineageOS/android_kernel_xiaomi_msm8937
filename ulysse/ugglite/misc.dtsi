@@ -1,9 +1,0 @@
-/* TODO: Commonize this */
-
-/* From stock msm8917-mtp.dtsi */
-&soc {
-	/delete-node/ hbtp;
-	gpio_keys {
-		/delete-node/ camera_snapshot;
-	};
-};

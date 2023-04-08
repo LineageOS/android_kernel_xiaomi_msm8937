@@ -1,3 +1,11 @@
+/* From stock msm8917-mtp.dtsi */
+&soc {
+	/delete-node/ hbtp;
+	gpio_keys {
+		/delete-node/ camera_snapshot;
+	};
+};
+
 /* From stock msm8937-mtp.dtsi */
 &soc {
 	ant_check {
