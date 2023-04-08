@@ -4,6 +4,7 @@
 
 #include "common/fragments/delete-msm89x7-camera-sensor-qrd.dtsi"
 
+#include "common/common.dtsi"
 #include "wingtech/common/common.dtsi"
 #include "wingtech/msm8917/common/common.dtsi"
 #include "wingtech/msm8917/tiare/tiare.dtsi"

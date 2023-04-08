@@ -18,6 +18,7 @@
 
 #include "common/fragments/delete-msm89x7-camera-sensor-mtp.dtsi"
 
+#include "common/common.dtsi"
 #include "prada/prada.dtsi"
 
 / {

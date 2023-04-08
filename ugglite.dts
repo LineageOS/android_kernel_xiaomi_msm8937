@@ -8,6 +8,7 @@
 #define IS_MSM8917
 #include "common/include/msm8937-regulator.h"
 
+#include "common/common.dtsi"
 #include "ulysse/common/common.dtsi"
 #include "ulysse/ugglite/ugglite.dtsi"
 
