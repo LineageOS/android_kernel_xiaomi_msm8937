@@ -3,4 +3,3 @@
 #include "display.dtsi"
 #include "ir.dtsi"
 #include "regulator.dtsi"
-#include "touchscreen.dtsi"

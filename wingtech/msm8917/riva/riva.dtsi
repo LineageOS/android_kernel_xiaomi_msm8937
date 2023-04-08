@@ -3,4 +3,3 @@
 #include "camera.dtsi"
 #include "display.dtsi"
 #include "ir.dtsi"
-#include "touchscreen.dtsi"

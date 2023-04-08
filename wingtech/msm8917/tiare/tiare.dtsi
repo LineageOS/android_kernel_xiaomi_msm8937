@@ -8,4 +8,3 @@
 #include "pm8937.dtsi"
 #include "regulator.dtsi"
 #include "soc.dtsi"
-#include "touchscreen.dtsi"
