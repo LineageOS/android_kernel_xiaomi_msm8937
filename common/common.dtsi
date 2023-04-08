@@ -1,2 +1,3 @@
+#include "android.dtsi"
 #include "delete-unused-peripherals.dtsi"
 #include "display.dtsi"
