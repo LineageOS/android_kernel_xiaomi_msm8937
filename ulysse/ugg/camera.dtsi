@@ -1,33 +1,5 @@
 /* From stock msm8937-camera-sensor-mtp.dtsi */
 &soc {
-	/* TODO: Commonize this */
-	flash_GPIO:flashlight_back {
-		compatible = "qcom,leds-back-gpio-flash";
-		status = "okay";
-		pinctrl-names = "flash_default", "flash_sleep";
-		pinctrl-0 = <&cam_flash_front0_default>;
-		pinctrl-1 = <&cam_flash_front0_sleep>;
-		qcom,flash-en = <&tlmm 33 0>;
-		qcom,flash-now = <&tlmm 34 0>;
-		qcom,op-seq = "flash_en", "flash_now";
-		qcom,torch-seq-val = <0 1>;
-		qcom,flash-seq-val = <1 0>;
-		qcom,max-current = <800>;
-		qcom,duration = <1280>;
-		qcom,current = <400>;
-		linux,name = "flashlight";
-		linux,default-trigger = "flashlight-trigger";
-	};
-
-	led_flash_back: qcom,camera-flash@0 {
-		cell-index = <0>;
-		compatible = "qcom,camera-flash";
-		qcom,flash-type = <3>;
-		qcom,flash-source = <&flash_GPIO>;
-		qcom,torch-source = <&flash_GPIO>;
-	};
-};
-&soc {
 	flash_front_GPIO:flashlight {
 		compatible = "qcom,leds-gpio-flash";
 		status = "okay";
@@ -206,7 +178,6 @@
 	};
 
 	qcom,camera@0 {
-		qcom,led-flash-src = <&led_flash_back>;
 		qcom,eeprom-src = <&eeprom0 &eeprom1>;
 	};
 
