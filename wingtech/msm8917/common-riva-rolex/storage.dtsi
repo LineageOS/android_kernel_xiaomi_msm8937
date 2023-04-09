@@ -1,4 +1,0 @@
-/* From stock msm8917-qrd.dtsi */
-&sdhc_1 {
-	qcom,vdd-always-on;
-};

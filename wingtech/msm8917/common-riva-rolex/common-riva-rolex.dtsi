@@ -4,4 +4,3 @@
 #include "battery_usb.dtsi"
 #include "camera.dtsi"
 #include "soc.dtsi"
-#include "storage.dtsi"

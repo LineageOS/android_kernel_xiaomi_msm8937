@@ -29,10 +29,6 @@
 	};
 };
 
-&sdhc_1 {
-	/delete-property/ qcom,vdd-always-on;
-};
-
 &soc {
 	/* WARNING: Redefine node */
 	/delete-node/ secbootfuse@0xa41d0;
