@@ -14,15 +14,6 @@
 	};
 };
 
-&qrd_batterydata {
-	/delete-property/ qcom,rpull-up-kohm;
-	/delete-property/ qcom,vref-batt-therm;
-	/delete-node/ qcom,Wingtech4000-batterydata;
-	/delete-node/ qcom,wingtech-desai-4v4-4000mah-data;
-	/delete-node/ qcom,wingtech-feimaotui-4v4-4000mah-data;
-	/delete-node/ qcom,wingtech-xingwangda-4v4-4000mah-data;
-};
-
 &other_ext_mem {
 	reg = <0x00 0x85b00000 0x00 0xd00000>;
 };
