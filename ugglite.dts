@@ -6,6 +6,7 @@
 #include "common/fragments/delete-msm89x7-camera-sensor-mtp.dtsi"
 
 #define IS_MSM8917
+
 #include "common/include/msm8937-regulator.h"
 
 #include "common/common.dtsi"

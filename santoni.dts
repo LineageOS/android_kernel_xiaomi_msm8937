@@ -22,6 +22,8 @@
 
 #include "common/fragments/delete-msm89x7-camera-sensor-qrd.dtsi"
 
+#include "common/include/msm8937-regulator.h"
+
 #include "common/common.dtsi"
 #include "wingtech/common/common.dtsi"
 #include "wingtech/msm8937/common/common.dtsi"
