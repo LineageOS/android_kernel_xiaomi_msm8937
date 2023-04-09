@@ -123,22 +123,6 @@
 		"sensor_gpio_reset";
 };
 
-&dsi_hx8394f_720p_video {
-	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
-};
-
-&dsi_hx8394f_boe_720_vid {
-	/delete-property/ qcom,mdss-dsi-panel-model;
-};
-
-&dsi_ili9881c_ebbg_720p_video {
-	/delete-property/ qcom,mdss-dsi-panel-model;
-};
-
-&dsi_ili9881c_tianma_720p_video {
-	/delete-property/ qcom,mdss-dsi-panel-model;
-};
-
 &soc {
 	qcom,msm-thermal {
 		qcom,therm-reset-temp = <115>;
