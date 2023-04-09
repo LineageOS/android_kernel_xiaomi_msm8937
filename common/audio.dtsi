@@ -1,0 +1,3 @@
+&soc {
+	/delete-node/ sound-9335;
+};

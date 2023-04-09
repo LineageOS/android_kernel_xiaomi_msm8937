@@ -20,56 +20,6 @@
 	qcom,msm-switch-headphone-in = <&tlmm 95 0>;
 };
 
-&ext_codec {
-	/delete-property/ pinctrl-0;
-	/delete-property/ pinctrl-1;
-	/delete-property/ pinctrl-2;
-	/delete-property/ pinctrl-3;
-	/delete-property/ pinctrl-names;
-	/delete-property/ qcom,msm-gpios;
-	/delete-property/ qcom,pinctrl-names;
-	/delete-property/ qcom,wsa-devs;
-	qcom,wsa-max-devs = <0>;
-
-	/* WARNING: Override */
-	qcom,audio-routing =
-		"AIF4 VI", "MCLK",
-		"AIF4 VI", "MICBIAS_REGULATOR",
-		"RX_BIAS", "MCLK",
-/* // Removed by Xiaomi
-		"MADINPUT", "MCLK",
-		"AIF4 MAD", "MICBIAS_REGULATOR",
-*/
-		"AMIC2", "MIC BIAS2",
-		"MIC BIAS2", "Headset Mic",
-		"AMIC3", "MIC BIAS2",
-		"MIC BIAS2", "ANCRight Headset Mic",
-		"AMIC4", "MIC BIAS2",
-		"MIC BIAS2", "ANCLeft Headset Mic",
-		"AMIC5", "MIC BIAS3",
-		"MIC BIAS3", "Handset Mic",
-		"AMIC6", "MIC BIAS4",
-		"MIC BIAS4", "Analog Mic6",
-		"DMIC0", "MIC BIAS1",
-		"MIC BIAS1", "Digital Mic0",
-		"DMIC1", "MIC BIAS1",
-		"MIC BIAS1", "Digital Mic1",
-		"DMIC2", "MIC BIAS3",
-		"MIC BIAS3", "Digital Mic2",
-		"DMIC3", "MIC BIAS3",
-		"MIC BIAS3", "Digital Mic3",
-		"DMIC4", "MIC BIAS4",
-		"MIC BIAS4", "Digital Mic4",
-		"DMIC5", "MIC BIAS4",
-		"MIC BIAS4", "Digital Mic5",
-		"MIC BIAS1", "MICBIAS_REGULATOR",
-		"MIC BIAS2", "MICBIAS_REGULATOR",
-		"MIC BIAS3", "MICBIAS_REGULATOR",
-		"MIC BIAS4", "MICBIAS_REGULATOR",
-		"SpkrLeft IN", "SPK1 OUT",
-		"SpkrRight IN", "SPK2 OUT";
-};
-
 &wcd_rst_gpio {
 	/delete-property/ pinctrl-0;
 	/delete-property/ pinctrl-1;

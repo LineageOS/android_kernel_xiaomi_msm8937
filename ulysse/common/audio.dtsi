@@ -12,15 +12,6 @@
 	/delete-property/ pinctrl-7;
 };
 
-&ext_codec {
-	/delete-property/ qcom,pinctrl-names;
-	/delete-property/ pinctrl-names;
-	/delete-property/ pinctrl-0;
-	/delete-property/ pinctrl-1;
-	/delete-property/ pinctrl-2;
-	/delete-property/ pinctrl-3;
-};
-
 /* From stock msm8937-wsa881x.dtsi */
 &wsa881x_211 {
 	qcom,spkr-sd-n-gpio = <&tlmm 1 0>;
