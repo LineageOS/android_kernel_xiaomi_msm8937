@@ -1,3 +1,3 @@
-ccflags-y += -Idrivers/media/platform/msm/camera_v2
-ccflags-y += -Idrivers/media/platform/msm/camera_v2/sensor/io
+ccflags-y += -Itechpack/camera-legacy-m
+ccflags-y += -Itechpack/camera-legacy-m/sensor/io
 obj-$(CONFIG_MSMB_CAMERA) += msm_vpe.o
