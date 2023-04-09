@@ -21,7 +21,7 @@
 #include <linux/delay.h>
 #include <linux/avtimer_kernel.h>
 #include <media/v4l2-subdev.h>
-#include <media/msmb_isp.h>
+#include <media/msmb_isp-legacy-m.h>
 #include <linux/msm-bus.h>
 #include <linux/msm-bus-board.h>
 
