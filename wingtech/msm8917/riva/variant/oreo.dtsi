@@ -3,24 +3,6 @@
 	reg = <0x00 0x85b00000 0x00 0xd00000>;
 };
 
-&pri_tlmm_lines_act {
-	mux {
-		pins = "gpio85", "gpio88";
-	};
-	config {
-		pins = "gpio85", "gpio88";
-	};
-};
-
-&pri_tlmm_lines_sus {
-	mux {
-		pins = "gpio85", "gpio88";
-	};
-	config {
-		pins = "gpio85", "gpio88";
-	};
-};
-
 &eeprom2 {
 	qcom,cam-power-seq-cfg-val = <0 0 1 1 1 24000000 1 1>;
 	qcom,cam-power-seq-delay = <1 1 5 5 5 1 10 10>;
