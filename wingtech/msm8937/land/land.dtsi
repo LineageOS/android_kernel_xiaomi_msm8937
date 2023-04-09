@@ -6,4 +6,5 @@
 #include "display.dtsi"
 #include "pm8937.dtsi"
 #include "pmi8950.dtsi"
+#include "soc.dtsi"
 #include "touchscreen.dtsi"

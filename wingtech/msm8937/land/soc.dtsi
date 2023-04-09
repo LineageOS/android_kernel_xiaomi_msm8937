@@ -1,0 +1,3 @@
+&cont_splash_mem {
+	reg = <0x0 0x8dd00000 0x0 0x1400000>;
+};
