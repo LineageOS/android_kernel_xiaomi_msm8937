@@ -55,7 +55,6 @@ MODULE_DEVICE_TABLE(of, msm_vfe_dt_match);
 #define OVERFLOW_BUFFER_LENGTH 64
 static char stat_line[OVERFLOW_LENGTH];
 
-struct msm_isp_statistics stats;
 struct msm_isp_ub_info ub_info;
 
 static int msm_isp_enable_debugfs(struct vfe_device *vfe_dev,
