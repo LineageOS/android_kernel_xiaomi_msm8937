@@ -1,5 +1,5 @@
 &i2c_3 {
-	/delete-property/ status;
+	status = "okay";
 	
 	atmel_mxt_ts@4a {
 		compatible = "atmel,mxt-ts";
