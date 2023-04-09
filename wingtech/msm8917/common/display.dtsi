@@ -49,10 +49,6 @@
 	};
 };
 
-&mdss_dsi {
-	hw-config = "single_dsi";
-};
-
 &mdss_dsi0 {
 	pinctrl-names = "mdss_default", "mdss_sleep";
 	pinctrl-0 = <&mdss_dsi_active>;

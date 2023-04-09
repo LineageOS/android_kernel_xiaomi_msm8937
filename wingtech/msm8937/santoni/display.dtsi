@@ -36,10 +36,6 @@
 	qcom,qpnp-ibb-init-lcd-voltage = <5500000>;
 };
 
-&mdss_dsi {
-	hw-config = "single_dsi";
-};
-
 &mdss_dsi0 {
 	qcom,dsi-pref-prim-pan = <&dsi_hx8394f_boe_720_vid>;
 	qcom,dsi-pref-sub-pan = <&dsi_ili9881c_ebbg_720p_video>;
