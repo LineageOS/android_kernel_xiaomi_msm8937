@@ -12,20 +12,6 @@
 	/delete-property/ pinctrl-7;
 };
 
-/* From stock msm8937-wsa881x.dtsi */
-&wsa881x_211 {
-	qcom,spkr-sd-n-gpio = <&tlmm 1 0>;
-};
-&wsa881x_212 {
-	qcom,spkr-sd-n-gpio = <&tlmm 1 0>;
-};
-&wsa881x_213 {
-	qcom,spkr-sd-n-gpio = <&tlmm 1 0>;
-};
-&wsa881x_214 {
-	qcom,spkr-sd-n-gpio = <&tlmm 1 0>;
-};
-
 /* From stock msm8937-audio.dtsi */
 &int_codec {
 	/delete-property/ qcom,cdc-us-euro-gpios;
@@ -68,12 +54,4 @@
 		"AMIC1", "MIC BIAS External",
 		"AMIC2", "MIC BIAS External2",
 		"AMIC3", "MIC BIAS External";
-};
-
-/* From stock msm8937-audio-mtp.dtsi */
-&wsa881x_i2c_e {
-	status = "disabled";
-};
-&wsa881x_i2c_f {
-	status = "disabled";
 };

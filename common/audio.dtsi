@@ -1,3 +1,22 @@
+&i2c_2 {
+	/delete-node/ wsa881x-i2c-codec@44;
+	/delete-node/ wsa881x-i2c-codec@45;
+	/delete-node/ wsa881x-i2c-codec@e;
+	/delete-node/ wsa881x-i2c-codec@f;
+};
+
 &soc {
 	/delete-node/ sound-9335;
+};
+
+&slim_msm {
+	tasha_codec {
+		/delete-node/ swr_master;
+	};
+};
+
+&tlmm {
+	/delete-node/ wsa_clk;
+	/delete-node/ wsa_reset;
+	/delete-node/ wsa-vi;
 };
