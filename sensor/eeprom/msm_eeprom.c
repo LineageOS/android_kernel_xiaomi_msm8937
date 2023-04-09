@@ -436,7 +436,7 @@ static int msm_eeprom_power_up(struct msm_eeprom_ctrl_t *e_ctrl,
 	struct msm_camera_power_ctrl_t *power_info) {
 	int32_t rc = 0;
 
-	rc = msm_camera_fill_vreg_params(
+	rc = legacy_m_msm_camera_fill_vreg_params(
 		power_info->cam_vreg, power_info->num_vreg,
 		power_info->power_setting, power_info->power_setting_size);
 	if (rc < 0) {
@@ -446,17 +446,17 @@ static int msm_eeprom_power_up(struct msm_eeprom_ctrl_t *e_ctrl,
 	}
 
 	/* Parse and fill vreg params for powerdown settings*/
-	rc = msm_camera_fill_vreg_params(
+	rc = legacy_m_msm_camera_fill_vreg_params(
 		power_info->cam_vreg, power_info->num_vreg,
 		power_info->power_down_setting,
 		power_info->power_down_setting_size);
 	if (rc < 0) {
-		pr_err("%s:%d failed msm_camera_fill_vreg_params for PDOWN rc %d",
+		pr_err("%s:%d failed legacy_m_msm_camera_fill_vreg_params for PDOWN rc %d",
 			__func__, __LINE__, rc);
 		return rc;
 	}
 
-	rc = msm_camera_power_up(power_info, e_ctrl->eeprom_device_type,
+	rc = legacy_m_msm_camera_power_up(power_info, e_ctrl->eeprom_device_type,
 			&e_ctrl->i2c_client);
 	if (rc) {
 		pr_err("%s:%d failed in eeprom Power up rc %d\n",
@@ -564,7 +564,7 @@ static int eeprom_init_config(struct msm_eeprom_ctrl_t *e_ctrl,
 		pr_err("%s::%d memory map parse failed\n", __func__, __LINE__);
 	}
 
-	rc = msm_camera_power_down(power_info, e_ctrl->eeprom_device_type,
+	rc = legacy_m_msm_camera_power_down(power_info, e_ctrl->eeprom_device_type,
 		&e_ctrl->i2c_client);
 	if (rc < 0) {
 		pr_err("%s:%d Power down failed rc %d\n",
@@ -715,31 +715,31 @@ static long msm_eeprom_subdev_ioctl(struct v4l2_subdev *sd,
 }
 
 static struct msm_camera_i2c_fn_t msm_eeprom_cci_func_tbl = {
-	.i2c_read = msm_camera_cci_i2c_read,
-	.i2c_read_seq = msm_camera_cci_i2c_read_seq,
-	.i2c_write = msm_camera_cci_i2c_write,
-	.i2c_write_seq = msm_camera_cci_i2c_write_seq,
-	.i2c_write_table = msm_camera_cci_i2c_write_table,
-	.i2c_write_seq_table = msm_camera_cci_i2c_write_seq_table,
+	.i2c_read = legacy_m_msm_camera_cci_i2c_read,
+	.i2c_read_seq = legacy_m_msm_camera_cci_i2c_read_seq,
+	.i2c_write = legacy_m_msm_camera_cci_i2c_write,
+	.i2c_write_seq = legacy_m_msm_camera_cci_i2c_write_seq,
+	.i2c_write_table = legacy_m_msm_camera_cci_i2c_write_table,
+	.i2c_write_seq_table = legacy_m_msm_camera_cci_i2c_write_seq_table,
 	.i2c_write_table_w_microdelay =
-	msm_camera_cci_i2c_write_table_w_microdelay,
-	.i2c_util = msm_sensor_cci_i2c_util,
-	.i2c_poll = msm_camera_cci_i2c_poll,
+	legacy_m_msm_camera_cci_i2c_write_table_w_microdelay,
+	.i2c_util = legacy_m_msm_sensor_cci_i2c_util,
+	.i2c_poll = legacy_m_msm_camera_cci_i2c_poll,
 };
 
 static struct msm_camera_i2c_fn_t msm_eeprom_qup_func_tbl = {
-	.i2c_read = msm_camera_qup_i2c_read,
-	.i2c_read_seq = msm_camera_qup_i2c_read_seq,
-	.i2c_write = msm_camera_qup_i2c_write,
-	.i2c_write_table = msm_camera_qup_i2c_write_table,
-	.i2c_write_seq_table = msm_camera_qup_i2c_write_seq_table,
+	.i2c_read = legacy_m_msm_camera_qup_i2c_read,
+	.i2c_read_seq = legacy_m_msm_camera_qup_i2c_read_seq,
+	.i2c_write = legacy_m_msm_camera_qup_i2c_write,
+	.i2c_write_table = legacy_m_msm_camera_qup_i2c_write_table,
+	.i2c_write_seq_table = legacy_m_msm_camera_qup_i2c_write_seq_table,
 	.i2c_write_table_w_microdelay =
-	msm_camera_qup_i2c_write_table_w_microdelay,
+	legacy_m_msm_camera_qup_i2c_write_table_w_microdelay,
 };
 
 static struct msm_camera_i2c_fn_t msm_eeprom_spi_func_tbl = {
-	.i2c_read = msm_camera_spi_read,
-	.i2c_read_seq = msm_camera_spi_read_seq,
+	.i2c_read = legacy_m_msm_camera_spi_read,
+	.i2c_read_seq = legacy_m_msm_camera_spi_read_seq,
 };
 
 static int msm_eeprom_open(struct v4l2_subdev *sd,
@@ -822,13 +822,13 @@ static int msm_eeprom_i2c_probe(struct i2c_client *client,
 			e_ctrl->eboard_info->i2c_slaveaddr;
 
 	/*Get clocks information*/
-	rc = msm_camera_i2c_dev_get_clk_info(
+	rc = legacy_m_msm_camera_i2c_dev_get_clk_info(
 		&e_ctrl->i2c_client.client->dev,
 		&e_ctrl->eboard_info->power_info.clk_info,
 		&e_ctrl->eboard_info->power_info.clk_ptr,
 		&e_ctrl->eboard_info->power_info.clk_info_size);
 	if (rc < 0) {
-		pr_err("failed: msm_camera_get_clk_info rc %d", rc);
+		pr_err("failed: legacy_m_msm_camera_get_clk_info rc %d", rc);
 		goto ectrl_free;
 	}
 
@@ -843,7 +843,7 @@ static int msm_eeprom_i2c_probe(struct i2c_client *client,
 	media_entity_init(&e_ctrl->msm_sd.sd.entity, 0, NULL, 0);
 	e_ctrl->msm_sd.sd.entity.type = MEDIA_ENT_T_V4L2_SUBDEV;
 	e_ctrl->msm_sd.sd.entity.group_id = MSM_CAMERA_SUBDEV_EEPROM;
-	msm_sd_register(&e_ctrl->msm_sd);
+	legacy_m_msm_sd_register(&e_ctrl->msm_sd);
 	CDBG("%s success result=%d X\n", __func__, rc);
 	return rc;
 
@@ -874,7 +874,7 @@ static int msm_eeprom_i2c_remove(struct i2c_client *client)
 		return 0;
 	}
 
-	msm_camera_i2c_dev_put_clk_info(&e_ctrl->i2c_client.client->dev,
+	legacy_m_msm_camera_i2c_dev_put_clk_info(&e_ctrl->i2c_client.client->dev,
 		&e_ctrl->eboard_info->power_info.clk_info,
 		&e_ctrl->eboard_info->power_info.clk_ptr,
 		e_ctrl->eboard_info->power_info.clk_info_size);
@@ -931,7 +931,7 @@ static int msm_eeprom_match_id(struct msm_eeprom_ctrl_t *e_ctrl)
 	struct msm_camera_i2c_client *client = &e_ctrl->i2c_client;
 	uint8_t id[2];
 
-	rc = msm_camera_spi_query_id(client, 0, &id[0], 2);
+	rc = legacy_m_msm_camera_spi_query_id(client, 0, &id[0], 2);
 	if (rc < 0)
 		return rc;
 	CDBG("%s: read 0x%x 0x%x, check 0x%x 0x%x\n", __func__, id[0],
@@ -966,13 +966,13 @@ static int msm_eeprom_get_dt_data(struct msm_eeprom_ctrl_t *e_ctrl)
 		pr_err("%s: %d of_node is NULL\n", __func__ , __LINE__);
 		return -ENOMEM;
 	}
-	rc = msm_camera_get_dt_vreg_data(of_node, &power_info->cam_vreg,
+	rc = legacy_m_msm_camera_get_dt_vreg_data(of_node, &power_info->cam_vreg,
 					     &power_info->num_vreg);
 	if (rc < 0)
 		return rc;
 
 	if (e_ctrl->userspace_probe == 0) {
-		rc = msm_camera_get_dt_power_setting_data(of_node,
+		rc = legacy_m_msm_camera_get_dt_power_setting_data(of_node,
 			power_info->cam_vreg, power_info->num_vreg,
 			power_info);
 		if (rc < 0)
@@ -1002,14 +1002,14 @@ static int msm_eeprom_get_dt_data(struct msm_eeprom_ctrl_t *e_ctrl)
 				gpio_array[i]);
 		}
 
-		rc = msm_camera_get_dt_gpio_req_tbl(of_node, gconf,
+		rc = legacy_m_msm_camera_get_dt_gpio_req_tbl(of_node, gconf,
 			gpio_array, gpio_array_size);
 		if (rc < 0) {
 			pr_err("%s failed %d\n", __func__, __LINE__);
 			goto ERROR4;
 		}
 
-		rc = msm_camera_init_gpio_pin_tbl(of_node, gconf,
+		rc = legacy_m_msm_camera_init_gpio_pin_tbl(of_node, gconf,
 			gpio_array, gpio_array_size);
 		if (rc < 0) {
 			pr_err("%s failed %d\n", __func__, __LINE__);
@@ -1129,13 +1129,13 @@ static int msm_eeprom_spi_setup(struct spi_device *spi)
 	power_info->dev = &spi->dev;
 
 	/*Get clocks information*/
-	rc = msm_camera_i2c_dev_get_clk_info(
+	rc = legacy_m_msm_camera_i2c_dev_get_clk_info(
 		&spi->dev,
 		&power_info->clk_info,
 		&power_info->clk_ptr,
 		&power_info->clk_info_size);
 	if (rc < 0) {
-		pr_err("failed: msm_camera_get_clk_info rc %d", rc);
+		pr_err("failed: legacy_m_msm_camera_get_clk_info rc %d", rc);
 		goto board_free;
 	}
 
@@ -1162,7 +1162,7 @@ static int msm_eeprom_spi_setup(struct spi_device *spi)
 			CDBG("%s: no cal memory map\n", __func__);
 
 		/* power up eeprom for reading */
-		rc = msm_camera_power_up(power_info, e_ctrl->eeprom_device_type,
+		rc = legacy_m_msm_camera_power_up(power_info, e_ctrl->eeprom_device_type,
 			&e_ctrl->i2c_client);
 		if (rc < 0) {
 			pr_err("failed rc %d\n", rc);
@@ -1186,7 +1186,7 @@ static int msm_eeprom_spi_setup(struct spi_device *spi)
 				&e_ctrl->cal_data);
 		}
 
-		rc = msm_camera_power_down(power_info,
+		rc = legacy_m_msm_camera_power_down(power_info,
 			e_ctrl->eeprom_device_type, &e_ctrl->i2c_client);
 		if (rc < 0) {
 			pr_err("failed rc %d\n", rc);
@@ -1205,7 +1205,7 @@ static int msm_eeprom_spi_setup(struct spi_device *spi)
 	media_entity_init(&e_ctrl->msm_sd.sd.entity, 0, NULL, 0);
 	e_ctrl->msm_sd.sd.entity.type = MEDIA_ENT_T_V4L2_SUBDEV;
 	e_ctrl->msm_sd.sd.entity.group_id = MSM_CAMERA_SUBDEV_EEPROM;
-	msm_sd_register(&e_ctrl->msm_sd);
+	legacy_m_msm_sd_register(&e_ctrl->msm_sd);
 	e_ctrl->is_supported = (e_ctrl->is_supported << 1) | 1;
 	CDBG("%s success result=%d supported=%x X\n", __func__, rc,
 	     e_ctrl->is_supported);
@@ -1213,10 +1213,10 @@ static int msm_eeprom_spi_setup(struct spi_device *spi)
 	return 0;
 
 power_down:
-	msm_camera_power_down(power_info, e_ctrl->eeprom_device_type,
+	legacy_m_msm_camera_power_down(power_info, e_ctrl->eeprom_device_type,
 		&e_ctrl->i2c_client);
 caldata_free:
-	msm_camera_i2c_dev_put_clk_info(
+	legacy_m_msm_camera_i2c_dev_put_clk_info(
 		&e_ctrl->i2c_client.spi_client->spi_master->dev,
 		&e_ctrl->eboard_info->power_info.clk_info,
 		&e_ctrl->eboard_info->power_info.clk_ptr,
@@ -1271,7 +1271,7 @@ static int msm_eeprom_spi_remove(struct spi_device *sdev)
 		pr_err("%s: eboard_info is NULL\n", __func__);
 		return 0;
 	}
-	msm_camera_i2c_dev_put_clk_info(
+	legacy_m_msm_camera_i2c_dev_put_clk_info(
 		&e_ctrl->i2c_client.spi_client->spi_master->dev,
 		&e_ctrl->eboard_info->power_info.clk_info,
 		&e_ctrl->eboard_info->power_info.clk_ptr,
@@ -1460,7 +1460,7 @@ static int eeprom_init_config32(struct msm_eeprom_ctrl_t *e_ctrl,
 		goto free_mem;
 	}
 
-	rc = msm_camera_power_down(power_info,
+	rc = legacy_m_msm_camera_power_down(power_info,
 		e_ctrl->eeprom_device_type, &e_ctrl->i2c_client);
 	if (rc < 0)
 		pr_err("%s:%d Power down failed rc %d\n",
@@ -1632,18 +1632,18 @@ static int msm_eeprom_platform_probe(struct platform_device *pdev)
 	eb_info = e_ctrl->eboard_info;
 	power_info = &eb_info->power_info;
 	cci_client = e_ctrl->i2c_client.cci_client;
-	cci_client->cci_subdev = msm_cci_get_subdev();
+	cci_client->cci_subdev = legacy_m_msm_cci_get_subdev();
 	cci_client->retries = 3;
 	cci_client->id_map = 0;
 	power_info->dev = &pdev->dev;
 
 	/*Get clocks information*/
-	rc = msm_camera_get_clk_info(e_ctrl->pdev,
+	rc = legacy_m_msm_camera_get_clk_info(e_ctrl->pdev,
 		&power_info->clk_info,
 		&power_info->clk_ptr,
 		&power_info->clk_info_size);
 	if (rc < 0) {
-		pr_err("failed: msm_camera_get_clk_info rc %d", rc);
+		pr_err("failed: legacy_m_msm_camera_get_clk_info rc %d", rc);
 		goto board_free;
 	}
 
@@ -1710,7 +1710,7 @@ static int msm_eeprom_platform_probe(struct platform_device *pdev)
 		if (rc < 0)
 			goto board_free;
 
-		rc = msm_camera_power_up(power_info, e_ctrl->eeprom_device_type,
+		rc = legacy_m_msm_camera_power_up(power_info, e_ctrl->eeprom_device_type,
 			&e_ctrl->i2c_client);
 		if (rc) {
 			pr_err("failed rc %d\n", rc);
@@ -1727,7 +1727,7 @@ static int msm_eeprom_platform_probe(struct platform_device *pdev)
 
 		e_ctrl->is_supported |= msm_eeprom_match_crc(&e_ctrl->cal_data);
 
-		rc = msm_camera_power_down(power_info,
+		rc = legacy_m_msm_camera_power_down(power_info,
 			e_ctrl->eeprom_device_type, &e_ctrl->i2c_client);
 		if (rc) {
 			pr_err("failed rc %d\n", rc);
@@ -1747,10 +1747,10 @@ static int msm_eeprom_platform_probe(struct platform_device *pdev)
 	media_entity_init(&e_ctrl->msm_sd.sd.entity, 0, NULL, 0);
 	e_ctrl->msm_sd.sd.entity.type = MEDIA_ENT_T_V4L2_SUBDEV;
 	e_ctrl->msm_sd.sd.entity.group_id = MSM_CAMERA_SUBDEV_EEPROM;
-	msm_sd_register(&e_ctrl->msm_sd);
+	legacy_m_msm_sd_register(&e_ctrl->msm_sd);
 
 #ifdef CONFIG_COMPAT
-	msm_cam_copy_v4l2_subdev_fops(&msm_eeprom_v4l2_subdev_fops);
+	legacy_m_msm_cam_copy_v4l2_subdev_fops(&msm_eeprom_v4l2_subdev_fops);
 	msm_eeprom_v4l2_subdev_fops.compat_ioctl32 =
 		msm_eeprom_subdev_fops_ioctl32;
 	e_ctrl->msm_sd.sd.devnode->fops = &msm_eeprom_v4l2_subdev_fops;
@@ -1761,7 +1761,7 @@ static int msm_eeprom_platform_probe(struct platform_device *pdev)
 	return rc;
 
 power_down:
-	msm_camera_power_down(power_info, e_ctrl->eeprom_device_type,
+	legacy_m_msm_camera_power_down(power_info, e_ctrl->eeprom_device_type,
 		&e_ctrl->i2c_client);
 memdata_free:
 	kfree(e_ctrl->cal_data.mapdata);
@@ -1794,7 +1794,7 @@ static int msm_eeprom_platform_remove(struct platform_device *pdev)
 		pr_err("%s: eboard_info is NULL\n", __func__);
 		return 0;
 	}
-	msm_camera_put_clk_info(e_ctrl->pdev,
+	legacy_m_msm_camera_put_clk_info(e_ctrl->pdev,
 		&e_ctrl->eboard_info->power_info.clk_info,
 		&e_ctrl->eboard_info->power_info.clk_ptr,
 		e_ctrl->eboard_info->power_info.clk_info_size);

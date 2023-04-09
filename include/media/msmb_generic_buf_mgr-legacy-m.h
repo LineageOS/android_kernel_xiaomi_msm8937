@@ -16,7 +16,7 @@
 #include <uapi/media/msmb_generic_buf_mgr-legacy-m.h>
 #include <linux/compat.h>
 
-struct v4l2_subdev *msm_buf_mngr_get_subdev(void);
+struct v4l2_subdev *legacy_m_msm_buf_mngr_get_subdev(void);
 
 #ifdef CONFIG_COMPAT
 

@@ -84,7 +84,7 @@ static void msm_vfe48_axi_enable_wm(void __iomem *vfe_base,
 	else
 		val = (0x1 << (2 * wm_idx));
 
-	msm_camera_io_w_mb(val, vfe_base + 0xCEC);
+	legacy_m_msm_camera_io_w_mb(val, vfe_base + 0xCEC);
 }
 
 static void msm_vfe48_enable_stats_wm(struct vfe_device *vfe_dev,
@@ -107,7 +107,7 @@ static void msm_vfe48_enable_stats_wm(struct vfe_device *vfe_dev,
 static void msm_vfe48_deinit_bandwidth_mgr(
 		struct msm_isp_bandwidth_mgr *isp_bandwidth_mgr)
 {
-	msm_camera_unregister_bus_client(CAM_BUS_CLIENT_VFE);
+	legacy_m_msm_camera_unregister_bus_client(CAM_BUS_CLIENT_VFE);
 	isp_bandwidth_mgr->bus_client = 0;
 }
 
@@ -116,7 +116,7 @@ static int msm_vfe48_init_bandwidth_mgr(struct vfe_device *vfe_dev,
 {
 	int rc = 0;
 
-	rc = msm_camera_register_bus_client(vfe_dev->pdev, CAM_BUS_CLIENT_VFE);
+	rc = legacy_m_msm_camera_register_bus_client(vfe_dev->pdev, CAM_BUS_CLIENT_VFE);
 	if (rc) {
 		/*
 		 * Fallback to the older method of registration. While testing
@@ -124,11 +124,11 @@ static int msm_vfe48_init_bandwidth_mgr(struct vfe_device *vfe_dev,
 		 * enabled and hence we need to use the old api for now
 		 */
 		vfe_dev->hw_info->vfe_ops.platform_ops.init_bw_mgr =
-					msm_vfe47_init_bandwidth_mgr;
+					legacy_m_msm_vfe47_init_bandwidth_mgr;
 		vfe_dev->hw_info->vfe_ops.platform_ops.deinit_bw_mgr =
-					msm_vfe47_deinit_bandwidth_mgr;
+					legacy_m_msm_vfe47_deinit_bandwidth_mgr;
 		vfe_dev->hw_info->vfe_ops.platform_ops.update_bw =
-					msm_vfe47_update_bandwidth;
+					legacy_m_msm_vfe47_update_bandwidth;
 		return vfe_dev->hw_info->vfe_ops.platform_ops.init_bw_mgr(
 						vfe_dev, isp_bandwidth_mgr);
 	}
@@ -150,10 +150,10 @@ static int msm_vfe48_update_bandwidth(
 			ib += isp_bandwidth_mgr->client_info[i].ib;
 		}
 	}
-	rc = msm_camera_update_bus_bw(CAM_BUS_CLIENT_VFE, ab, ib);
+	rc = legacy_m_msm_camera_update_bus_bw(CAM_BUS_CLIENT_VFE, ab, ib);
 	/* Insert into circular buffer */
 	if (!rc)
-		msm_isp_update_req_history(isp_bandwidth_mgr->bus_client,
+		legacy_m_msm_isp_update_req_history(isp_bandwidth_mgr->bus_client,
 			ab, ib,
 			isp_bandwidth_mgr->client_info,
 			sched_clock());
@@ -162,7 +162,7 @@ static int msm_vfe48_update_bandwidth(
 
 static void msm_vfe48_put_clks(struct vfe_device *vfe_dev)
 {
-	msm_camera_put_clk_info_and_rates(vfe_dev->pdev, &vfe_dev->vfe_clk_info,
+	legacy_m_msm_camera_put_clk_info_and_rates(vfe_dev->pdev, &vfe_dev->vfe_clk_info,
 			&vfe_dev->vfe_clk, &vfe_dev->vfe_clk_rates,
 			vfe_dev->num_rates,
 			vfe_dev->num_clk);
@@ -176,7 +176,7 @@ static int msm_vfe48_get_clks(struct vfe_device *vfe_dev)
 	int rc;
 	int i;
 
-	rc = msm_camera_get_clk_info_and_rates(vfe_dev->pdev,
+	rc = legacy_m_msm_camera_get_clk_info_and_rates(vfe_dev->pdev,
 			&vfe_dev->vfe_clk_info, &vfe_dev->vfe_clk,
 			&vfe_dev->vfe_clk_rates,
 			&vfe_dev->num_rates,
@@ -208,116 +208,116 @@ static int msm_vfe48_get_clk_rates(struct vfe_device *vfe_dev,
 
 static int msm_vfe48_get_regulators(struct vfe_device *vfe_dev)
 {
-	return msm_camera_get_regulator_info(vfe_dev->pdev,
+	return legacy_m_msm_camera_get_regulator_info(vfe_dev->pdev,
 			&vfe_dev->regulator_info, &vfe_dev->vfe_num_regulators);
 }
 
 static void msm_vfe48_put_regulators(struct vfe_device *vfe_dev)
 {
-	msm_camera_put_regulators(vfe_dev->pdev,
+	legacy_m_msm_camera_put_regulators(vfe_dev->pdev,
 			&vfe_dev->regulator_info, vfe_dev->vfe_num_regulators);
 	vfe_dev->vfe_num_regulators = 0;
 }
 
-struct msm_vfe_hardware_info vfe48_hw_info = {
+struct msm_vfe_hardware_info legacy_m_vfe48_hw_info = {
 	.num_iommu_ctx = 1,
 	.num_iommu_secure_ctx = 0,
 	.vfe_clk_idx = VFE48_SRC_CLK_DTSI_IDX,
 	.runtime_axi_update = 1,
 	.vfe_ops = {
 		.irq_ops = {
-			.read_irq_status = msm_vfe47_read_irq_status,
-			.process_camif_irq = msm_vfe47_process_input_irq,
-			.process_reset_irq = msm_vfe47_process_reset_irq,
-			.process_halt_irq = msm_vfe47_process_halt_irq,
-			.process_reset_irq = msm_vfe47_process_reset_irq,
-			.process_reg_update = msm_vfe47_process_reg_update,
-			.process_axi_irq = msm_isp_process_axi_irq,
-			.process_stats_irq = msm_isp_process_stats_irq,
-			.process_epoch_irq = msm_vfe47_process_epoch_irq,
-			.config_irq = msm_vfe47_config_irq,
+			.read_irq_status = legacy_m_msm_vfe47_read_irq_status,
+			.process_camif_irq = legacy_m_msm_vfe47_process_input_irq,
+			.process_reset_irq = legacy_m_msm_vfe47_process_reset_irq,
+			.process_halt_irq = legacy_m_msm_vfe47_process_halt_irq,
+			.process_reset_irq = legacy_m_msm_vfe47_process_reset_irq,
+			.process_reg_update = legacy_m_msm_vfe47_process_reg_update,
+			.process_axi_irq = legacy_m_msm_isp_process_axi_irq,
+			.process_stats_irq = legacy_m_msm_isp_process_stats_irq,
+			.process_epoch_irq = legacy_m_msm_vfe47_process_epoch_irq,
+			.config_irq = legacy_m_msm_vfe47_config_irq,
 		},
 		.axi_ops = {
-			.reload_wm = msm_vfe47_axi_reload_wm,
+			.reload_wm = legacy_m_msm_vfe47_axi_reload_wm,
 			.enable_wm = msm_vfe48_axi_enable_wm,
-			.cfg_io_format = msm_vfe47_cfg_io_format,
-			.cfg_comp_mask = msm_vfe47_axi_cfg_comp_mask,
-			.clear_comp_mask = msm_vfe47_axi_clear_comp_mask,
-			.cfg_wm_irq_mask = msm_vfe47_axi_cfg_wm_irq_mask,
-			.clear_wm_irq_mask = msm_vfe47_axi_clear_wm_irq_mask,
-			.cfg_framedrop = msm_vfe47_cfg_framedrop,
-			.clear_framedrop = msm_vfe47_clear_framedrop,
-			.cfg_wm_reg = msm_vfe47_axi_cfg_wm_reg,
-			.clear_wm_reg = msm_vfe47_axi_clear_wm_reg,
-			.cfg_wm_xbar_reg = msm_vfe47_axi_cfg_wm_xbar_reg,
-			.clear_wm_xbar_reg = msm_vfe47_axi_clear_wm_xbar_reg,
-			.cfg_ub = msm_vfe47_cfg_axi_ub,
+			.cfg_io_format = legacy_m_msm_vfe47_cfg_io_format,
+			.cfg_comp_mask = legacy_m_msm_vfe47_axi_cfg_comp_mask,
+			.clear_comp_mask = legacy_m_msm_vfe47_axi_clear_comp_mask,
+			.cfg_wm_irq_mask = legacy_m_msm_vfe47_axi_cfg_wm_irq_mask,
+			.clear_wm_irq_mask = legacy_m_msm_vfe47_axi_clear_wm_irq_mask,
+			.cfg_framedrop = legacy_m_msm_vfe47_cfg_framedrop,
+			.clear_framedrop = legacy_m_msm_vfe47_clear_framedrop,
+			.cfg_wm_reg = legacy_m_msm_vfe47_axi_cfg_wm_reg,
+			.clear_wm_reg = legacy_m_msm_vfe47_axi_clear_wm_reg,
+			.cfg_wm_xbar_reg = legacy_m_msm_vfe47_axi_cfg_wm_xbar_reg,
+			.clear_wm_xbar_reg = legacy_m_msm_vfe47_axi_clear_wm_xbar_reg,
+			.cfg_ub = legacy_m_msm_vfe47_cfg_axi_ub,
 			.read_wm_ping_pong_addr =
-				msm_vfe47_read_wm_ping_pong_addr,
+				legacy_m_msm_vfe47_read_wm_ping_pong_addr,
 			.update_ping_pong_addr =
-				msm_vfe47_update_ping_pong_addr,
-			.get_comp_mask = msm_vfe47_get_comp_mask,
-			.get_wm_mask = msm_vfe47_get_wm_mask,
-			.get_pingpong_status = msm_vfe47_get_pingpong_status,
-			.halt = msm_vfe47_axi_halt,
-			.restart = msm_vfe47_axi_restart,
+				legacy_m_msm_vfe47_update_ping_pong_addr,
+			.get_comp_mask = legacy_m_msm_vfe47_get_comp_mask,
+			.get_wm_mask = legacy_m_msm_vfe47_get_wm_mask,
+			.get_pingpong_status = legacy_m_msm_vfe47_get_pingpong_status,
+			.halt = legacy_m_msm_vfe47_axi_halt,
+			.restart = legacy_m_msm_vfe47_axi_restart,
 			.update_cgc_override =
-				msm_vfe47_axi_update_cgc_override,
+				legacy_m_msm_vfe47_axi_update_cgc_override,
 		},
 		.core_ops = {
-			.reg_update = msm_vfe47_reg_update,
-			.cfg_input_mux = msm_vfe47_cfg_input_mux,
-			.update_camif_state = msm_vfe47_update_camif_state,
-			.start_fetch_eng = msm_vfe47_start_fetch_engine,
-			.cfg_rdi_reg = msm_vfe47_cfg_rdi_reg,
-			.reset_hw = msm_vfe47_reset_hardware,
-			.init_hw = msm_vfe47_init_hardware,
-			.init_hw_reg = msm_vfe47_init_hardware_reg,
-			.clear_status_reg = msm_vfe47_clear_status_reg,
-			.release_hw = msm_vfe47_release_hardware,
-			.get_error_mask = msm_vfe47_get_error_mask,
-			.get_overflow_mask = msm_vfe47_get_overflow_mask,
-			.get_rdi_wm_mask = msm_vfe47_get_rdi_wm_mask,
-			.get_irq_mask = msm_vfe47_get_irq_mask,
+			.reg_update = legacy_m_msm_vfe47_reg_update,
+			.cfg_input_mux = legacy_m_msm_vfe47_cfg_input_mux,
+			.update_camif_state = legacy_m_msm_vfe47_update_camif_state,
+			.start_fetch_eng = legacy_m_msm_vfe47_start_fetch_engine,
+			.cfg_rdi_reg = legacy_m_msm_vfe47_cfg_rdi_reg,
+			.reset_hw = legacy_m_msm_vfe47_reset_hardware,
+			.init_hw = legacy_m_msm_vfe47_init_hardware,
+			.init_hw_reg = legacy_m_msm_vfe47_init_hardware_reg,
+			.clear_status_reg = legacy_m_msm_vfe47_clear_status_reg,
+			.release_hw = legacy_m_msm_vfe47_release_hardware,
+			.get_error_mask = legacy_m_msm_vfe47_get_error_mask,
+			.get_overflow_mask = legacy_m_msm_vfe47_get_overflow_mask,
+			.get_rdi_wm_mask = legacy_m_msm_vfe47_get_rdi_wm_mask,
+			.get_irq_mask = legacy_m_msm_vfe47_get_irq_mask,
 			.get_halt_restart_mask =
-				msm_vfe47_get_halt_restart_mask,
-			.process_error_status = msm_vfe47_process_error_status,
+				legacy_m_msm_vfe47_get_halt_restart_mask,
+			.process_error_status = legacy_m_msm_vfe47_process_error_status,
 			.is_module_cfg_lock_needed =
-				msm_vfe47_is_module_cfg_lock_needed,
+				legacy_m_msm_vfe47_is_module_cfg_lock_needed,
 		},
 		.stats_ops = {
-			.get_stats_idx = msm_vfe47_get_stats_idx,
-			.check_streams = msm_vfe47_stats_check_streams,
-			.cfg_comp_mask = msm_vfe47_stats_cfg_comp_mask,
-			.cfg_wm_irq_mask = msm_vfe47_stats_cfg_wm_irq_mask,
-			.clear_wm_irq_mask = msm_vfe47_stats_clear_wm_irq_mask,
-			.cfg_wm_reg = msm_vfe47_stats_cfg_wm_reg,
-			.clear_wm_reg = msm_vfe47_stats_clear_wm_reg,
-			.cfg_ub = msm_vfe47_stats_cfg_ub,
-			.enable_module = msm_vfe47_stats_enable_module,
+			.get_stats_idx = legacy_m_msm_vfe47_get_stats_idx,
+			.check_streams = legacy_m_msm_vfe47_stats_check_streams,
+			.cfg_comp_mask = legacy_m_msm_vfe47_stats_cfg_comp_mask,
+			.cfg_wm_irq_mask = legacy_m_msm_vfe47_stats_cfg_wm_irq_mask,
+			.clear_wm_irq_mask = legacy_m_msm_vfe47_stats_clear_wm_irq_mask,
+			.cfg_wm_reg = legacy_m_msm_vfe47_stats_cfg_wm_reg,
+			.clear_wm_reg = legacy_m_msm_vfe47_stats_clear_wm_reg,
+			.cfg_ub = legacy_m_msm_vfe47_stats_cfg_ub,
+			.enable_module = legacy_m_msm_vfe47_stats_enable_module,
 			.update_ping_pong_addr =
-				msm_vfe47_stats_update_ping_pong_addr,
-			.get_comp_mask = msm_vfe47_stats_get_comp_mask,
-			.get_wm_mask = msm_vfe47_stats_get_wm_mask,
-			.get_frame_id = msm_vfe47_stats_get_frame_id,
-			.get_pingpong_status = msm_vfe47_get_pingpong_status,
+				legacy_m_msm_vfe47_stats_update_ping_pong_addr,
+			.get_comp_mask = legacy_m_msm_vfe47_stats_get_comp_mask,
+			.get_wm_mask = legacy_m_msm_vfe47_stats_get_wm_mask,
+			.get_frame_id = legacy_m_msm_vfe47_stats_get_frame_id,
+			.get_pingpong_status = legacy_m_msm_vfe47_get_pingpong_status,
 			.update_cgc_override =
-				msm_vfe47_stats_update_cgc_override,
+				legacy_m_msm_vfe47_stats_update_cgc_override,
 			.enable_stats_wm = msm_vfe48_enable_stats_wm,
 		},
 		.platform_ops = {
-			.get_platform_data = msm_vfe47_get_platform_data,
-			.enable_regulators = msm_vfe47_enable_regulators,
+			.get_platform_data = legacy_m_msm_vfe47_get_platform_data,
+			.enable_regulators = legacy_m_msm_vfe47_enable_regulators,
 			.get_regulators = msm_vfe48_get_regulators,
 			.put_regulators = msm_vfe48_put_regulators,
-			.enable_clks = msm_vfe47_enable_clks,
+			.enable_clks = legacy_m_msm_vfe47_enable_clks,
 			.update_bw = msm_vfe48_update_bandwidth,
 			.init_bw_mgr = msm_vfe48_init_bandwidth_mgr,
 			.deinit_bw_mgr = msm_vfe48_deinit_bandwidth_mgr,
 			.get_clks = msm_vfe48_get_clks,
 			.put_clks = msm_vfe48_put_clks,
-			.set_clk_rate = msm_vfe47_set_clk_rate,
-			.get_max_clk_rate = msm_vfe47_get_max_clk_rate,
+			.set_clk_rate = legacy_m_msm_vfe47_set_clk_rate,
+			.get_max_clk_rate = legacy_m_msm_vfe47_get_max_clk_rate,
 			.get_clk_rates = msm_vfe48_get_clk_rates,
 		},
 	},
@@ -325,12 +325,12 @@ struct msm_vfe_hardware_info vfe48_hw_info = {
 	.axi_hw_info = &msm_vfe48_axi_hw_info,
 	.stats_hw_info = &msm_vfe48_stats_hw_info,
 };
-EXPORT_SYMBOL(vfe48_hw_info);
+EXPORT_SYMBOL(legacy_m_vfe48_hw_info);
 
 static const struct of_device_id msm_vfe48_dt_match[] = {
 	{
 		.compatible = "qcom,vfe48",
-		.data = &vfe48_hw_info,
+		.data = &legacy_m_vfe48_hw_info,
 	},
 	{}
 };
@@ -338,7 +338,7 @@ static const struct of_device_id msm_vfe48_dt_match[] = {
 MODULE_DEVICE_TABLE(of, msm_vfe48_dt_match);
 
 static struct platform_driver vfe48_driver = {
-	.probe = vfe_hw_probe,
+	.probe = legacy_m_vfe_hw_probe,
 	.driver = {
 		.name = "msm_vfe48",
 		.owner = THIS_MODULE,

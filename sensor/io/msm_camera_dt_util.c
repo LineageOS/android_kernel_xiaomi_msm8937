@@ -25,7 +25,7 @@
 #undef CDBG
 #define CDBG(fmt, args...) pr_debug(fmt, ##args)
 
-int msm_camera_fill_vreg_params(struct camera_vreg_t *cam_vreg,
+int legacy_m_msm_camera_fill_vreg_params(struct camera_vreg_t *cam_vreg,
 	int num_vreg, struct msm_sensor_power_setting *power_setting,
 	uint16_t power_setting_size)
 {
@@ -186,7 +186,7 @@ int msm_camera_fill_vreg_params(struct camera_vreg_t *cam_vreg,
 	return 0;
 }
 
-int msm_sensor_get_sub_module_index(struct device_node *of_node,
+int legacy_m_msm_sensor_get_sub_module_index(struct device_node *of_node,
 				    struct  msm_sensor_info_t **s_info)
 {
 	int rc = 0, i = 0;
@@ -373,7 +373,7 @@ ERROR:
 	return rc;
 }
 
-int msm_sensor_get_dt_actuator_data(struct device_node *of_node,
+int legacy_m_msm_sensor_get_dt_actuator_data(struct device_node *of_node,
 				    struct msm_actuator_info **act_info)
 {
 	int rc = 0;
@@ -411,7 +411,7 @@ ERROR:
 	return rc;
 }
 
-int msm_sensor_get_dt_csi_data(struct device_node *of_node,
+int legacy_m_msm_sensor_get_dt_csi_data(struct device_node *of_node,
 	struct msm_camera_csi_lane_params **csi_lane_params)
 {
 	int rc = 0;
@@ -447,7 +447,7 @@ ERROR:
 	return rc;
 }
 
-int msm_camera_get_dt_power_setting_data(struct device_node *of_node,
+int legacy_m_msm_camera_get_dt_power_setting_data(struct device_node *of_node,
 	struct camera_vreg_t *cam_vreg, int num_vreg,
 	struct msm_camera_power_ctrl_t *power_info)
 {
@@ -663,7 +663,7 @@ ERROR1:
 	return rc;
 }
 
-int msm_camera_get_dt_gpio_req_tbl(struct device_node *of_node,
+int legacy_m_msm_camera_get_dt_gpio_req_tbl(struct device_node *of_node,
 	struct msm_camera_gpio_conf *gconf, uint16_t *gpio_array,
 	uint16_t gpio_array_size)
 {
@@ -747,7 +747,7 @@ ERROR1:
 	return rc;
 }
 
-int msm_camera_init_gpio_pin_tbl(struct device_node *of_node,
+int legacy_m_msm_camera_init_gpio_pin_tbl(struct device_node *of_node,
 	struct msm_camera_gpio_conf *gconf, uint16_t *gpio_array,
 	uint16_t gpio_array_size)
 {
@@ -1018,7 +1018,7 @@ ERROR:
 	return rc;
 }
 
-int msm_camera_get_dt_vreg_data(struct device_node *of_node,
+int legacy_m_msm_camera_get_dt_vreg_data(struct device_node *of_node,
 	struct camera_vreg_t **cam_vreg, int *num_vreg)
 {
 	int rc = 0, i = 0;
@@ -1188,7 +1188,7 @@ static int msm_camera_disable_i2c_mux(struct msm_camera_i2c_conf *i2c_conf)
 	return 0;
 }
 
-int msm_camera_pinctrl_init(
+int legacy_m_msm_camera_pinctrl_init(
 	struct msm_pinctrl_info *sensor_pctrl, struct device *dev) {
 
 	sensor_pctrl->pinctrl = devm_pinctrl_get(dev);
@@ -1216,7 +1216,7 @@ int msm_camera_pinctrl_init(
 	return 0;
 }
 
-int msm_cam_sensor_handle_reg_gpio(int seq_val,
+int legacy_m_msm_cam_sensor_handle_reg_gpio(int seq_val,
 	struct msm_camera_gpio_conf *gconf, int val) {
 
 	int gpio_offset = -1;
@@ -1270,7 +1270,7 @@ int msm_cam_sensor_handle_reg_gpio(int seq_val,
 	return 0;
 }
 
-int32_t msm_sensor_driver_get_gpio_data(
+int32_t legacy_m_msm_sensor_driver_get_gpio_data(
 	struct msm_camera_gpio_conf **gpio_conf,
 	struct device_node *of_node)
 {
@@ -1305,17 +1305,17 @@ int32_t msm_sensor_driver_get_gpio_data(
 		gpio_array[i] = of_get_gpio(of_node, i);
 		CDBG("gpio_array[%d] = %d", i, gpio_array[i]);
 	}
-	rc = msm_camera_get_dt_gpio_req_tbl(of_node, gconf, gpio_array,
+	rc = legacy_m_msm_camera_get_dt_gpio_req_tbl(of_node, gconf, gpio_array,
 		gpio_array_size);
 	if (rc < 0) {
-		pr_err("failed in msm_camera_get_dt_gpio_req_tbl\n");
+		pr_err("failed in legacy_m_msm_camera_get_dt_gpio_req_tbl\n");
 		goto FREE_GPIO_CONF;
 	}
 
-	rc = msm_camera_init_gpio_pin_tbl(of_node, gconf, gpio_array,
+	rc = legacy_m_msm_camera_init_gpio_pin_tbl(of_node, gconf, gpio_array,
 		gpio_array_size);
 	if (rc < 0) {
-		pr_err("failed in msm_camera_init_gpio_pin_tbl\n");
+		pr_err("failed in legacy_m_msm_camera_init_gpio_pin_tbl\n");
 		goto FREE_GPIO_REQ_TBL;
 	}
 	kfree(gpio_array);
@@ -1330,7 +1330,7 @@ FREE_GPIO_CONF:
 	return rc;
 }
 
-int msm_camera_power_up(struct msm_camera_power_ctrl_t *ctrl,
+int legacy_m_msm_camera_power_up(struct msm_camera_power_ctrl_t *ctrl,
 	enum msm_camera_device_type_t device_type,
 	struct msm_camera_i2c_client *sensor_i2c_client)
 {
@@ -1346,7 +1346,7 @@ int msm_camera_power_up(struct msm_camera_power_ctrl_t *ctrl,
 	if (ctrl->gpio_conf->cam_gpiomux_conf_tbl != NULL)
 		pr_err("%s:%d mux install\n", __func__, __LINE__);
 
-	ret = msm_camera_pinctrl_init(&(ctrl->pinctrl_info), ctrl->dev);
+	ret = legacy_m_msm_camera_pinctrl_init(&(ctrl->pinctrl_info), ctrl->dev);
 	if (ret < 0) {
 		pr_err("%s:%d Initialization of pinctrl failed\n",
 				__func__, __LINE__);
@@ -1354,7 +1354,7 @@ int msm_camera_power_up(struct msm_camera_power_ctrl_t *ctrl,
 	} else {
 		ctrl->cam_pinctrl_status = 1;
 	}
-	rc = msm_camera_request_gpio_table(
+	rc = legacy_m_msm_camera_request_gpio_table(
 		ctrl->gpio_conf->cam_gpio_req_tbl,
 		ctrl->gpio_conf->cam_gpio_req_tbl_size, 1);
 	if (rc < 0)
@@ -1381,7 +1381,7 @@ int msm_camera_power_up(struct msm_camera_power_ctrl_t *ctrl,
 			if (power_setting->config_val)
 				ctrl->clk_info[power_setting->seq_val].
 					clk_rate = power_setting->config_val;
-			rc = msm_camera_clk_enable(ctrl->dev,
+			rc = legacy_m_msm_camera_clk_enable(ctrl->dev,
 				ctrl->clk_info, ctrl->clk_ptr,
 				ctrl->clk_info_size, true);
 			if (rc < 0) {
@@ -1423,7 +1423,7 @@ int msm_camera_power_up(struct msm_camera_power_ctrl_t *ctrl,
 				goto power_up_failed;
 			}
 			if (power_setting->seq_val < ctrl->num_vreg)
-				msm_camera_config_single_vreg(ctrl->dev,
+				legacy_m_msm_camera_config_single_vreg(ctrl->dev,
 					&ctrl->cam_vreg
 					[power_setting->seq_val],
 					(struct regulator **)
@@ -1434,7 +1434,7 @@ int msm_camera_power_up(struct msm_camera_power_ctrl_t *ctrl,
 					__func__, __LINE__,
 					power_setting->seq_val, ctrl->num_vreg);
 
-			rc = msm_cam_sensor_handle_reg_gpio(
+			rc = legacy_m_msm_cam_sensor_handle_reg_gpio(
 				power_setting->seq_val,
 				ctrl->gpio_conf, 1);
 			if (rc < 0) {
@@ -1489,7 +1489,7 @@ power_up_failed:
 			break;
 		case SENSOR_VREG:
 			if (power_setting->seq_val < ctrl->num_vreg)
-				msm_camera_config_single_vreg(ctrl->dev,
+				legacy_m_msm_camera_config_single_vreg(ctrl->dev,
 					&ctrl->cam_vreg
 					[power_setting->seq_val],
 					(struct regulator **)
@@ -1500,7 +1500,7 @@ power_up_failed:
 					__func__, __LINE__,
 					power_setting->seq_val, ctrl->num_vreg);
 
-			msm_cam_sensor_handle_reg_gpio(power_setting->seq_val,
+			legacy_m_msm_cam_sensor_handle_reg_gpio(power_setting->seq_val,
 				ctrl->gpio_conf, GPIOF_OUT_INIT_LOW);
 			break;
 		case SENSOR_I2C_MUX:
@@ -1528,7 +1528,7 @@ power_up_failed:
 		devm_pinctrl_put(ctrl->pinctrl_info.pinctrl);
 	}
 	ctrl->cam_pinctrl_status = 0;
-	msm_camera_request_gpio_table(
+	legacy_m_msm_camera_request_gpio_table(
 		ctrl->gpio_conf->cam_gpio_req_tbl,
 		ctrl->gpio_conf->cam_gpio_req_tbl_size, 0);
 	return rc;
@@ -1554,7 +1554,7 @@ msm_camera_get_power_settings(struct msm_camera_power_ctrl_t *ctrl,
 	return ps;
 }
 
-int msm_camera_power_down(struct msm_camera_power_ctrl_t *ctrl,
+int legacy_m_msm_camera_power_down(struct msm_camera_power_ctrl_t *ctrl,
 	enum msm_camera_device_type_t device_type,
 	struct msm_camera_i2c_client *sensor_i2c_client)
 {
@@ -1579,7 +1579,7 @@ int msm_camera_power_down(struct msm_camera_power_ctrl_t *ctrl,
 		CDBG("%s type %d\n", __func__, pd->seq_type);
 		switch (pd->seq_type) {
 		case SENSOR_CLK:
-			msm_camera_clk_enable(ctrl->dev,
+			legacy_m_msm_camera_clk_enable(ctrl->dev,
 				ctrl->clk_info, ctrl->clk_ptr,
 				ctrl->clk_info_size, false);
 				break;
@@ -1614,7 +1614,7 @@ int msm_camera_power_down(struct msm_camera_power_ctrl_t *ctrl,
 						pd->seq_val);
 			if (ps) {
 				if (pd->seq_val < ctrl->num_vreg)
-					msm_camera_config_single_vreg(ctrl->dev,
+					legacy_m_msm_camera_config_single_vreg(ctrl->dev,
 						&ctrl->cam_vreg
 						[pd->seq_val],
 						(struct regulator **)
@@ -1627,7 +1627,7 @@ int msm_camera_power_down(struct msm_camera_power_ctrl_t *ctrl,
 			} else
 				pr_err("%s error in power up/down seq data\n",
 								__func__);
-			ret = msm_cam_sensor_handle_reg_gpio(pd->seq_val,
+			ret = legacy_m_msm_cam_sensor_handle_reg_gpio(pd->seq_val,
 				ctrl->gpio_conf, GPIOF_OUT_INIT_LOW);
 			if (ret < 0)
 				pr_err("ERR:%s Error while disabling VREG GPIO\n",
@@ -1658,7 +1658,7 @@ int msm_camera_power_down(struct msm_camera_power_ctrl_t *ctrl,
 		devm_pinctrl_put(ctrl->pinctrl_info.pinctrl);
 	}
 	ctrl->cam_pinctrl_status = 0;
-	msm_camera_request_gpio_table(
+	legacy_m_msm_camera_request_gpio_table(
 		ctrl->gpio_conf->cam_gpio_req_tbl,
 		ctrl->gpio_conf->cam_gpio_req_tbl_size, 0);
 	CDBG("%s exit\n", __func__);

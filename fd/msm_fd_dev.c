@@ -192,10 +192,10 @@ static int msm_fd_queue_setup(struct vb2_queue *q,
 }
 
 /*
- * msm_fd_buf_init - vb2_ops buf_init callback.
+ * legacy_m_msm_fd_buf_init - vb2_ops buf_init callback.
  * @vb: Pointer to vb2 buffer struct.
  */
-int msm_fd_buf_init(struct vb2_buffer *vb)
+int legacy_m_msm_fd_buf_init(struct vb2_buffer *vb)
 {
 	struct msm_fd_buffer *fd_buffer =
 		(struct msm_fd_buffer *)vb;
@@ -219,10 +219,10 @@ static void msm_fd_buf_queue(struct vb2_buffer *vb)
 	fd_buffer->format = ctx->format;
 	fd_buffer->settings = ctx->settings;
 	fd_buffer->work_addr = ctx->work_buf.addr;
-	msm_fd_hw_add_buffer(ctx->fd_device, fd_buffer);
+	legacy_m_msm_fd_hw_add_buffer(ctx->fd_device, fd_buffer);
 
 	if (vb->vb2_queue->streaming)
-		msm_fd_hw_schedule_and_start(ctx->fd_device);
+		legacy_m_msm_fd_hw_schedule_and_start(ctx->fd_device);
 
 	return;
 }
@@ -242,13 +242,13 @@ static int msm_fd_start_streaming(struct vb2_queue *q, unsigned int count)
 		return -EINVAL;
 	}
 
-	ret = msm_fd_hw_get(ctx->fd_device, ctx->settings.speed);
+	ret = legacy_m_msm_fd_hw_get(ctx->fd_device, ctx->settings.speed);
 	if (ret < 0) {
 		dev_err(ctx->fd_device->dev, "Can not acquire fd hw\n");
 		goto out;
 	}
 
-	ret = msm_fd_hw_schedule_and_start(ctx->fd_device);
+	ret = legacy_m_msm_fd_hw_schedule_and_start(ctx->fd_device);
 	if (ret < 0)
 		dev_err(ctx->fd_device->dev, "Can not start fd hw\n");
 
@@ -265,15 +265,15 @@ static void msm_fd_stop_streaming(struct vb2_queue *q)
 	struct fd_ctx *ctx = vb2_get_drv_priv(q);
 
 	mutex_lock(&ctx->fd_device->recovery_lock);
-	msm_fd_hw_remove_buffers_from_queue(ctx->fd_device, q);
-	msm_fd_hw_put(ctx->fd_device);
+	legacy_m_msm_fd_hw_remove_buffers_from_queue(ctx->fd_device, q);
+	legacy_m_msm_fd_hw_put(ctx->fd_device);
 	mutex_unlock(&ctx->fd_device->recovery_lock);
 }
 
 /* Videobuf2 queue callbacks. */
 static struct vb2_ops msm_fd_vb2_q_ops = {
 	.queue_setup     = msm_fd_queue_setup,
-	.buf_init        = msm_fd_buf_init,
+	.buf_init        = legacy_m_msm_fd_buf_init,
 	.buf_queue       = msm_fd_buf_queue,
 	.start_streaming = msm_fd_start_streaming,
 	.stop_streaming  = msm_fd_stop_streaming,
@@ -297,7 +297,7 @@ static void *msm_fd_get_userptr(void *alloc_ctx,
 	if (!buf)
 		return ERR_PTR(-ENOMEM);
 
-	ret = msm_fd_hw_map_buffer(pool, vaddr, buf);
+	ret = legacy_m_msm_fd_hw_map_buffer(pool, vaddr, buf);
 	if (ret < 0 || buf->size < size)
 		goto error;
 
@@ -316,7 +316,7 @@ static void msm_fd_put_userptr(void *buf_priv)
 	if (IS_ERR_OR_NULL(buf_priv))
 		return;
 
-	msm_fd_hw_unmap_buffer(buf_priv);
+	legacy_m_msm_fd_hw_unmap_buffer(buf_priv);
 
 	kzfree(buf_priv);
 }
@@ -358,11 +358,11 @@ static int msm_fd_vbif_error_handler(void *handle, uint32_t error)
 		fd->recovery_mode = 1;
 
 		/* Halt and reset */
-		msm_fd_hw_put(fd);
-		msm_fd_hw_get(fd, ctx->settings.speed);
+		legacy_m_msm_fd_hw_put(fd);
+		legacy_m_msm_fd_hw_get(fd, ctx->settings.speed);
 
 		/* Get active buffer */
-		active_buf = msm_fd_hw_get_active_buffer(fd);
+		active_buf = legacy_m_msm_fd_hw_get_active_buffer(fd);
 
 		if (active_buf == NULL) {
 			dev_dbg(fd->dev, "no active buffer, return\n");
@@ -374,10 +374,10 @@ static int msm_fd_vbif_error_handler(void *handle, uint32_t error)
 		dev_dbg(fd->dev, "Active Buffer present.. Start re-schedule\n");
 
 		/* Queue the buffer again */
-		msm_fd_hw_add_buffer(fd, active_buf);
+		legacy_m_msm_fd_hw_add_buffer(fd, active_buf);
 
 		/* Schedule and restart */
-		ret = msm_fd_hw_schedule_next_buffer(fd);
+		ret = legacy_m_msm_fd_hw_schedule_next_buffer(fd);
 		if (ret) {
 			dev_err(fd->dev, "Cannot reschedule buffer, recovery failed\n");
 			fd->recovery_mode = 0;
@@ -447,7 +447,7 @@ static int msm_fd_open(struct file *file)
 		goto error_stats_vmalloc;
 	}
 
-	ret = cam_config_ahb_clk(NULL, 0, CAM_AHB_CLIENT_FD,
+	ret = legacy_m_cam_config_ahb_clk(NULL, 0, CAM_AHB_CLIENT_FD,
 			CAM_AHB_SVS_VOTE);
 	if (ret < 0) {
 		pr_err("%s: failed to vote for AHB\n", __func__);
@@ -455,7 +455,7 @@ static int msm_fd_open(struct file *file)
 	}
 
 	/* Register with CPP VBIF error handler */
-	msm_cpp_vbif_register_error_handler((void *)ctx,
+	legacy_m_msm_cpp_vbif_register_error_handler((void *)ctx,
 		VBIF_CLIENT_FD, msm_fd_vbif_error_handler);
 
 	return 0;
@@ -480,7 +480,7 @@ static int msm_fd_release(struct file *file)
 	struct fd_ctx *ctx = msm_fd_ctx_from_fh(file->private_data);
 
 	/* Un-register with CPP VBIF error handler */
-	msm_cpp_vbif_register_error_handler((void *)ctx,
+	legacy_m_msm_cpp_vbif_register_error_handler((void *)ctx,
 		VBIF_CLIENT_FD, NULL);
 
 	mutex_lock(&ctx->lock);
@@ -490,14 +490,14 @@ static int msm_fd_release(struct file *file)
 	vfree(ctx->stats);
 
 	if (ctx->work_buf.fd != -1)
-		msm_fd_hw_unmap_buffer(&ctx->work_buf);
+		legacy_m_msm_fd_hw_unmap_buffer(&ctx->work_buf);
 
 	v4l2_fh_del(&ctx->fh);
 	v4l2_fh_exit(&ctx->fh);
 
 	kfree(ctx);
 
-	if (cam_config_ahb_clk(NULL, 0, CAM_AHB_CLIENT_FD,
+	if (legacy_m_cam_config_ahb_clk(NULL, 0, CAM_AHB_CLIENT_FD,
 		CAM_AHB_SUSPEND_VOTE) < 0)
 		pr_err("%s: failed to remove vote for AHB\n", __func__);
 
@@ -1066,9 +1066,9 @@ static int msm_fd_s_ctrl(struct file *file, void *fh, struct v4l2_control *a)
 	case V4L2_CID_FD_WORK_MEMORY_FD:
 		mutex_lock(&ctx->fd_device->recovery_lock);
 		if (ctx->work_buf.fd != -1)
-			msm_fd_hw_unmap_buffer(&ctx->work_buf);
+			legacy_m_msm_fd_hw_unmap_buffer(&ctx->work_buf);
 		if (a->value >= 0) {
-			ret = msm_fd_hw_map_buffer(&ctx->mem_pool,
+			ret = legacy_m_msm_fd_hw_map_buffer(&ctx->mem_pool,
 				a->value, &ctx->work_buf);
 			if (ret < 0) {
 				mutex_unlock(&ctx->fd_device->recovery_lock);
@@ -1200,14 +1200,14 @@ static void msm_fd_fill_results(struct msm_fd_device *fd,
 {
 	int half_face_size;
 
-	msm_fd_hw_get_result_angle_pose(fd, idx, &face->angle, &face->pose);
+	legacy_m_msm_fd_hw_get_result_angle_pose(fd, idx, &face->angle, &face->pose);
 
-	msm_fd_hw_get_result_conf_size(fd, idx, &face->confidence,
+	legacy_m_msm_fd_hw_get_result_conf_size(fd, idx, &face->confidence,
 		&face->face.width);
 	face->face.height = face->face.width;
 
-	face->face.left = msm_fd_hw_get_result_x(fd, idx);
-	face->face.top = msm_fd_hw_get_result_y(fd, idx);
+	face->face.left = legacy_m_msm_fd_hw_get_result_x(fd, idx);
+	face->face.top = legacy_m_msm_fd_hw_get_result_y(fd, idx);
 
 	half_face_size = (face->face.width >> 1);
 	if (face->face.left > half_face_size)
@@ -1246,7 +1246,7 @@ static void msm_fd_wq_handler(struct work_struct *work)
 
 	fd = container_of(work, struct msm_fd_device, work);
 
-	active_buf = msm_fd_hw_get_active_buffer(fd);
+	active_buf = legacy_m_msm_fd_hw_get_active_buffer(fd);
 	if (!active_buf) {
 		/* This should never happen, something completely wrong */
 		dev_err(fd->dev, "Oops no active buffer empty queue\n");
@@ -1265,7 +1265,7 @@ static void msm_fd_wq_handler(struct work_struct *work)
 	/* First mark stats as invalid */
 	atomic_set(&stats->frame_id, 0);
 
-	stats->face_cnt = msm_fd_hw_get_face_count(fd);
+	stats->face_cnt = legacy_m_msm_fd_hw_get_face_count(fd);
 	for (i = 0; i < stats->face_cnt; i++)
 		msm_fd_fill_results(fd, &stats->face_data[i], i);
 
@@ -1279,7 +1279,7 @@ static void msm_fd_wq_handler(struct work_struct *work)
 	}
 
 	/* We have the data from fd hw, we can start next processing */
-	msm_fd_hw_schedule_next_buffer(fd);
+	legacy_m_msm_fd_hw_schedule_next_buffer(fd);
 
 	/* Return buffer to vb queue */
 	active_buf->vb.v4l2_buf.sequence = ctx->fh.sequence;
@@ -1295,7 +1295,7 @@ static void msm_fd_wq_handler(struct work_struct *work)
 	v4l2_event_queue_fh(&ctx->fh, &event);
 
 	/* Release buffer from the device */
-	msm_fd_hw_buffer_done(fd, active_buf);
+	legacy_m_msm_fd_hw_buffer_done(fd, active_buf);
 }
 
 /*
@@ -1321,43 +1321,43 @@ static int fd_probe(struct platform_device *pdev)
 	fd->dev = &pdev->dev;
 
 	/* Get resources */
-	ret = msm_fd_hw_get_mem_resources(pdev, fd);
+	ret = legacy_m_msm_fd_hw_get_mem_resources(pdev, fd);
 	if (ret < 0) {
 		dev_err(&pdev->dev, "Fail get resources\n");
 		ret = -ENODEV;
 		goto error_mem_resources;
 	}
 
-	ret = msm_camera_get_regulator_info(pdev, &fd->vdd_info,
+	ret = legacy_m_msm_camera_get_regulator_info(pdev, &fd->vdd_info,
 		&fd->num_reg);
 	if (ret < 0) {
 		dev_err(&pdev->dev, "Fail to get regulators\n");
 		goto error_get_regulator;
 	}
-	ret = msm_camera_get_clk_info_and_rates(pdev, &fd->clk_info,
+	ret = legacy_m_msm_camera_get_clk_info_and_rates(pdev, &fd->clk_info,
 		&fd->clk, &fd->clk_rates, &fd->clk_rates_num, &fd->clk_num);
 	if (ret < 0) {
 		dev_err(&pdev->dev, "Fail to get clocks\n");
 		goto error_get_clocks;
 	}
 
-	ret = msm_camera_register_bus_client(pdev, CAM_BUS_CLIENT_FD);
+	ret = legacy_m_msm_camera_register_bus_client(pdev, CAM_BUS_CLIENT_FD);
 	if (ret < 0) {
 		dev_err(&pdev->dev, "Fail to get bus\n");
 		goto error_get_bus;
 	}
 
 	/* Get face detect hw before read engine revision */
-	ret = msm_fd_hw_get(fd, 0);
+	ret = legacy_m_msm_fd_hw_get(fd, 0);
 	if (ret < 0) {
 		dev_err(&pdev->dev, "Fail to get hw\n");
 		goto error_hw_get_request_irq;
 	}
-	fd->hw_revision = msm_fd_hw_get_revision(fd);
+	fd->hw_revision = legacy_m_msm_fd_hw_get_revision(fd);
 
-	msm_fd_hw_put(fd);
+	legacy_m_msm_fd_hw_put(fd);
 
-	ret = msm_fd_hw_request_irq(pdev, fd, msm_fd_wq_handler);
+	ret = legacy_m_msm_fd_hw_request_irq(pdev, fd, msm_fd_wq_handler);
 	if (ret < 0) {
 		dev_err(&pdev->dev, "Fail request irq\n");
 		goto error_hw_get_request_irq;
@@ -1395,16 +1395,16 @@ static int fd_probe(struct platform_device *pdev)
 error_video_register:
 	v4l2_device_unregister(&fd->v4l2_dev);
 error_v4l2_register:
-	msm_fd_hw_release_irq(fd);
+	legacy_m_msm_fd_hw_release_irq(fd);
 error_hw_get_request_irq:
-	msm_camera_unregister_bus_client(CAM_BUS_CLIENT_FD);
+	legacy_m_msm_camera_unregister_bus_client(CAM_BUS_CLIENT_FD);
 error_get_bus:
-	msm_camera_put_clk_info_and_rates(pdev, &fd->clk_info,
+	legacy_m_msm_camera_put_clk_info_and_rates(pdev, &fd->clk_info,
 		&fd->clk, &fd->clk_rates, fd->clk_rates_num, fd->clk_num);
 error_get_clocks:
-	msm_camera_put_regulators(pdev, &fd->vdd_info, fd->num_reg);
+	legacy_m_msm_camera_put_regulators(pdev, &fd->vdd_info, fd->num_reg);
 error_get_regulator:
-	msm_fd_hw_release_mem_resources(fd);
+	legacy_m_msm_fd_hw_release_mem_resources(fd);
 error_mem_resources:
 	kfree(fd);
 	return ret;
@@ -1425,12 +1425,12 @@ static int fd_device_remove(struct platform_device *pdev)
 	}
 	video_unregister_device(&fd->video);
 	v4l2_device_unregister(&fd->v4l2_dev);
-	msm_fd_hw_release_irq(fd);
-	msm_camera_unregister_bus_client(CAM_BUS_CLIENT_FD);
-	msm_camera_put_clk_info_and_rates(pdev, &fd->clk_info,
+	legacy_m_msm_fd_hw_release_irq(fd);
+	legacy_m_msm_camera_unregister_bus_client(CAM_BUS_CLIENT_FD);
+	legacy_m_msm_camera_put_clk_info_and_rates(pdev, &fd->clk_info,
 		&fd->clk, &fd->clk_rates, fd->clk_rates_num, fd->clk_num);
-	msm_camera_put_regulators(pdev, &fd->vdd_info, fd->num_reg);
-	msm_fd_hw_release_mem_resources(fd);
+	legacy_m_msm_camera_put_regulators(pdev, &fd->vdd_info, fd->num_reg);
+	legacy_m_msm_fd_hw_release_mem_resources(fd);
 	kfree(fd);
 
 	return 0;

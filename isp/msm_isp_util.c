@@ -30,7 +30,7 @@ static uint64_t msm_isp_cpp_clk_rate;
 
 #define VFE40_8974V2_VERSION 0x1001001A
 
-void msm_isp_print_fourcc_error(const char *origin, uint32_t fourcc_format)
+void legacy_m_msm_isp_print_fourcc_error(const char *origin, uint32_t fourcc_format)
 {
 	int i;
 	char text[5];
@@ -48,7 +48,7 @@ void msm_isp_print_fourcc_error(const char *origin, uint32_t fourcc_format)
 	return;
 }
 
-int msm_isp_init_bandwidth_mgr(struct vfe_device *vfe_dev,
+int legacy_m_msm_isp_init_bandwidth_mgr(struct vfe_device *vfe_dev,
 			enum msm_isp_hw_client client)
 {
 	int rc = 0;
@@ -79,7 +79,7 @@ int msm_isp_init_bandwidth_mgr(struct vfe_device *vfe_dev,
 	return rc;
 }
 
-int msm_isp_update_bandwidth(enum msm_isp_hw_client client,
+int legacy_m_msm_isp_update_bandwidth(enum msm_isp_hw_client client,
 	uint64_t ab, uint64_t ib)
 {
 	int rc;
@@ -101,7 +101,7 @@ int msm_isp_update_bandwidth(enum msm_isp_hw_client client,
 	return 0;
 }
 
-void msm_isp_deinit_bandwidth_mgr(enum msm_isp_hw_client client)
+void legacy_m_msm_isp_deinit_bandwidth_mgr(enum msm_isp_hw_client client)
 {
 	if (client >= MAX_ISP_CLIENT) {
 		pr_err("invalid Client id %d", client);
@@ -130,7 +130,7 @@ void msm_isp_deinit_bandwidth_mgr(enum msm_isp_hw_client client)
 	mutex_unlock(&bandwidth_mgr_mutex);
 }
 
-void msm_isp_util_get_bandwidth_stats(struct vfe_device *vfe_dev,
+void legacy_m_msm_isp_util_get_bandwidth_stats(struct vfe_device *vfe_dev,
 				      struct msm_isp_statistics *stats)
 {
 	stats->isp_vfe0_active = isp_bandwidth_mgr.client_info[ISP_VFE0].active;
@@ -150,12 +150,12 @@ void msm_isp_util_get_bandwidth_stats(struct vfe_device *vfe_dev,
 	stats->cpp_clk_rate = msm_isp_cpp_clk_rate;
 }
 
-void msm_isp_util_update_clk_rate(long clock_rate)
+void legacy_m_msm_isp_util_update_clk_rate(long clock_rate)
 {
 	msm_isp_cpp_clk_rate = clock_rate;
 }
 
-uint32_t msm_isp_get_framedrop_period(
+uint32_t legacy_m_msm_isp_get_framedrop_period(
 	enum msm_vfe_frame_skip_pattern frame_skip_pattern)
 {
 	switch (frame_skip_pattern) {
@@ -182,13 +182,13 @@ uint32_t msm_isp_get_framedrop_period(
 	return 1;
 }
 
-void msm_isp_get_timestamp(struct msm_isp_timestamp *time_stamp,
+void legacy_m_msm_isp_get_timestamp(struct msm_isp_timestamp *time_stamp,
 	struct vfe_device *vfe_dev)
 {
 	struct timespec ts;
 	do_gettimeofday(&(time_stamp->event_time));
 	if (vfe_dev->vt_enable) {
-		msm_isp_get_avtimer_ts(time_stamp);
+		legacy_m_msm_isp_get_avtimer_ts(time_stamp);
 		time_stamp->buf_time.tv_sec    = time_stamp->vt_time.tv_sec;
 		time_stamp->buf_time.tv_usec   = time_stamp->vt_time.tv_usec;
 	} else	{
@@ -333,13 +333,13 @@ static inline int msm_isp_process_event_subscription(struct v4l2_fh *fh,
 	return rc;
 }
 
-int msm_isp_subscribe_event(struct v4l2_subdev *sd, struct v4l2_fh *fh,
+int legacy_m_msm_isp_subscribe_event(struct v4l2_subdev *sd, struct v4l2_fh *fh,
 	struct v4l2_event_subscription *sub)
 {
 	return msm_isp_process_event_subscription(fh, sub, true);
 }
 
-int msm_isp_unsubscribe_event(struct v4l2_subdev *sd, struct v4l2_fh *fh,
+int legacy_m_msm_isp_unsubscribe_event(struct v4l2_subdev *sd, struct v4l2_fh *fh,
 	struct v4l2_event_subscription *sub)
 {
 	return msm_isp_process_event_subscription(fh, sub, false);
@@ -387,9 +387,9 @@ static int msm_isp_start_fetch_engine_multi_pass(struct vfe_device *vfe_dev,
 		}
 		vfe_dev->hw_info->vfe_ops.core_ops.reset_hw(vfe_dev,
 			0, 1);
-		msm_isp_reset_framedrop(vfe_dev, stream_info);
+		legacy_m_msm_isp_reset_framedrop(vfe_dev, stream_info);
 
-		rc = msm_isp_cfg_offline_ping_pong_address(vfe_dev, stream_info,
+		rc = legacy_m_msm_isp_cfg_offline_ping_pong_address(vfe_dev, stream_info,
 			VFE_PING_FLAG, fe_cfg->output_buf_idx);
 		if (rc < 0) {
 			pr_err("%s: Fetch engine config failed\n", __func__);
@@ -410,7 +410,7 @@ static int msm_isp_start_fetch_engine_multi_pass(struct vfe_device *vfe_dev,
 		start_fetch_eng_multi_pass(vfe_dev, arg);
 }
 
-void msm_isp_fetch_engine_done_notify(struct vfe_device *vfe_dev,
+void legacy_m_msm_isp_fetch_engine_done_notify(struct vfe_device *vfe_dev,
 	struct msm_vfe_fetch_engine_info *fetch_engine_info)
 {
 	struct msm_isp_event_data fe_rd_done_event;
@@ -429,7 +429,7 @@ void msm_isp_fetch_engine_done_notify(struct vfe_device *vfe_dev,
 	ISP_DBG("%s:VFE%d ISP_EVENT_FE_READ_DONE buf_idx %d\n",
 		__func__, vfe_dev->pdev->id, fetch_engine_info->buf_idx);
 	fetch_engine_info->is_busy = 0;
-	msm_isp_send_event(vfe_dev, ISP_EVENT_FE_READ_DONE, &fe_rd_done_event);
+	legacy_m_msm_isp_send_event(vfe_dev, ISP_EVENT_FE_READ_DONE, &fe_rd_done_event);
 }
 
 static int msm_isp_cfg_pix(struct vfe_device *vfe_dev,
@@ -503,7 +503,7 @@ static int msm_isp_cfg_rdi(struct vfe_device *vfe_dev,
 	return rc;
 }
 
-int msm_isp_cfg_input(struct vfe_device *vfe_dev, void *arg)
+int legacy_m_msm_isp_cfg_input(struct vfe_device *vfe_dev, void *arg)
 {
 	int rc = 0;
 	struct msm_vfe_input_cfg *input_cfg = arg;
@@ -649,7 +649,7 @@ static int msm_isp_proc_cmd_list_unlocked(struct vfe_device *vfe_dev, void *arg)
 		return -EINVAL;
 	}
 
-	rc = msm_isp_proc_cmd(vfe_dev, &proc_cmd->cfg_cmd);
+	rc = legacy_m_msm_isp_proc_cmd(vfe_dev, &proc_cmd->cfg_cmd);
 	if (rc < 0)
 		pr_err("%s:%d failed: rc %d", __func__, __LINE__, rc);
 
@@ -674,7 +674,7 @@ static int msm_isp_proc_cmd_list_unlocked(struct vfe_device *vfe_dev, void *arg)
 			continue;
 		}
 
-		rc = msm_isp_proc_cmd(vfe_dev, &cmd_next.cfg_cmd);
+		rc = legacy_m_msm_isp_proc_cmd(vfe_dev, &cmd_next.cfg_cmd);
 		if (rc < 0) {
 			pr_err("%s:%d failed: rc %d", __func__, __LINE__, rc);
 			break;
@@ -728,7 +728,7 @@ static int msm_isp_proc_cmd_list_compat(struct vfe_device *vfe_dev, void *arg)
 		return -EINVAL;
 	}
 	msm_isp_compat_to_proc_cmd(&current_cmd, &proc_cmd->cfg_cmd);
-	rc = msm_isp_proc_cmd(vfe_dev, &current_cmd);
+	rc = legacy_m_msm_isp_proc_cmd(vfe_dev, &current_cmd);
 	if (rc < 0)
 		pr_err("%s:%d failed: rc %d", __func__, __LINE__, rc);
 
@@ -754,7 +754,7 @@ static int msm_isp_proc_cmd_list_compat(struct vfe_device *vfe_dev, void *arg)
 		}
 
 		msm_isp_compat_to_proc_cmd(&current_cmd, &cmd_next.cfg_cmd);
-		rc = msm_isp_proc_cmd(vfe_dev, &current_cmd);
+		rc = legacy_m_msm_isp_proc_cmd(vfe_dev, &current_cmd);
 		if (rc < 0)
 			pr_err("%s:%d failed: rc %d", __func__, __LINE__, rc);
 
@@ -803,7 +803,7 @@ static long msm_isp_ioctl_unlocked(struct v4l2_subdev *sd,
 	switch (cmd) {
 	case VIDIOC_MSM_VFE_REG_CFG: {
 		mutex_lock(&vfe_dev->realtime_mutex);
-		rc = msm_isp_proc_cmd(vfe_dev, arg);
+		rc = legacy_m_msm_isp_proc_cmd(vfe_dev, arg);
 		mutex_unlock(&vfe_dev->realtime_mutex);
 		break;
 	}
@@ -821,7 +821,7 @@ static long msm_isp_ioctl_unlocked(struct v4l2_subdev *sd,
 		/* fallthrough */
 	case VIDIOC_MSM_ISP_UNMAP_BUF: {
 		mutex_lock(&vfe_dev->buf_mgr->lock);
-		rc = msm_isp_proc_buf_cmd(vfe_dev->buf_mgr, cmd, arg);
+		rc = legacy_m_msm_isp_proc_buf_cmd(vfe_dev->buf_mgr, cmd, arg);
 		mutex_unlock(&vfe_dev->buf_mgr->lock);
 		break;
 	}
@@ -832,36 +832,36 @@ static long msm_isp_ioctl_unlocked(struct v4l2_subdev *sd,
 			return rc;
 		}
 		mutex_lock(&vfe_dev->buf_mgr->lock);
-		rc = msm_isp_proc_buf_cmd(vfe_dev->buf_mgr, cmd, arg);
+		rc = legacy_m_msm_isp_proc_buf_cmd(vfe_dev->buf_mgr, cmd, arg);
 		mutex_unlock(&vfe_dev->buf_mgr->lock);
 		break;
 	}
 	case VIDIOC_MSM_ISP_REQUEST_STREAM:
 		mutex_lock(&vfe_dev->core_mutex);
-		rc = msm_isp_request_axi_stream(vfe_dev, arg);
+		rc = legacy_m_msm_isp_request_axi_stream(vfe_dev, arg);
 		mutex_unlock(&vfe_dev->core_mutex);
 		break;
 	case VIDIOC_MSM_ISP_RELEASE_STREAM:
 		mutex_lock(&vfe_dev->core_mutex);
-		rc = msm_isp_release_axi_stream(vfe_dev, arg);
+		rc = legacy_m_msm_isp_release_axi_stream(vfe_dev, arg);
 		mutex_unlock(&vfe_dev->core_mutex);
 		break;
 	case VIDIOC_MSM_ISP_CFG_STREAM:
 		mutex_lock(&vfe_dev->core_mutex);
-		rc = msm_isp_cfg_axi_stream(vfe_dev, arg);
+		rc = legacy_m_msm_isp_cfg_axi_stream(vfe_dev, arg);
 		mutex_unlock(&vfe_dev->core_mutex);
 		break;
 	case VIDIOC_MSM_ISP_AXI_HALT:
 		mutex_lock(&vfe_dev->core_mutex);
-		rc = msm_isp_axi_halt(vfe_dev, arg);
+		rc = legacy_m_msm_isp_axi_halt(vfe_dev, arg);
 		mutex_unlock(&vfe_dev->core_mutex);
 		break;
 	case VIDIOC_MSM_ISP_AXI_RESET:
 		mutex_lock(&vfe_dev->core_mutex);
 		if (atomic_read(&vfe_dev->error_info.overflow_state)
 			!= HALT_ENFORCED) {
-			rc = msm_isp_stats_reset(vfe_dev);
-			rc2 = msm_isp_axi_reset(vfe_dev, arg);
+			rc = legacy_m_msm_isp_stats_reset(vfe_dev);
+			rc2 = legacy_m_msm_isp_axi_reset(vfe_dev, arg);
 			if (!rc && rc2)
 				rc = rc2;
 		} else {
@@ -874,8 +874,8 @@ static long msm_isp_ioctl_unlocked(struct v4l2_subdev *sd,
 		mutex_lock(&vfe_dev->core_mutex);
 		if (atomic_read(&vfe_dev->error_info.overflow_state)
 			!= HALT_ENFORCED) {
-			rc = msm_isp_stats_restart(vfe_dev);
-			rc2 = msm_isp_axi_restart(vfe_dev, arg);
+			rc = legacy_m_msm_isp_stats_restart(vfe_dev);
+			rc2 = legacy_m_msm_isp_axi_restart(vfe_dev, arg);
 			if (!rc && rc2)
 				rc = rc2;
 		} else {
@@ -886,7 +886,7 @@ static long msm_isp_ioctl_unlocked(struct v4l2_subdev *sd,
 		break;
 	case VIDIOC_MSM_ISP_INPUT_CFG:
 		mutex_lock(&vfe_dev->core_mutex);
-		rc = msm_isp_cfg_input(vfe_dev, arg);
+		rc = legacy_m_msm_isp_cfg_input(vfe_dev, arg);
 		mutex_unlock(&vfe_dev->core_mutex);
 		break;
 	case VIDIOC_MSM_ISP_AHB_CLK_CFG:
@@ -926,37 +926,37 @@ static long msm_isp_ioctl_unlocked(struct v4l2_subdev *sd,
 		break;
 	case VIDIOC_MSM_ISP_SET_SRC_STATE:
 		mutex_lock(&vfe_dev->core_mutex);
-		rc = msm_isp_set_src_state(vfe_dev, arg);
+		rc = legacy_m_msm_isp_set_src_state(vfe_dev, arg);
 		mutex_unlock(&vfe_dev->core_mutex);
 		break;
 	case VIDIOC_MSM_ISP_REQUEST_STATS_STREAM:
 		mutex_lock(&vfe_dev->core_mutex);
-		rc = msm_isp_request_stats_stream(vfe_dev, arg);
+		rc = legacy_m_msm_isp_request_stats_stream(vfe_dev, arg);
 		mutex_unlock(&vfe_dev->core_mutex);
 		break;
 	case VIDIOC_MSM_ISP_RELEASE_STATS_STREAM:
 		mutex_lock(&vfe_dev->core_mutex);
-		rc = msm_isp_release_stats_stream(vfe_dev, arg);
+		rc = legacy_m_msm_isp_release_stats_stream(vfe_dev, arg);
 		mutex_unlock(&vfe_dev->core_mutex);
 		break;
 	case VIDIOC_MSM_ISP_CFG_STATS_STREAM:
 		mutex_lock(&vfe_dev->core_mutex);
-		rc = msm_isp_cfg_stats_stream(vfe_dev, arg);
+		rc = legacy_m_msm_isp_cfg_stats_stream(vfe_dev, arg);
 		mutex_unlock(&vfe_dev->core_mutex);
 		break;
 	case VIDIOC_MSM_ISP_UPDATE_STATS_STREAM:
 		mutex_lock(&vfe_dev->core_mutex);
-		rc = msm_isp_update_stats_stream(vfe_dev, arg);
+		rc = legacy_m_msm_isp_update_stats_stream(vfe_dev, arg);
 		mutex_unlock(&vfe_dev->core_mutex);
 		break;
 	case VIDIOC_MSM_ISP_UPDATE_STREAM:
 		mutex_lock(&vfe_dev->core_mutex);
-		rc = msm_isp_update_axi_stream(vfe_dev, arg);
+		rc = legacy_m_msm_isp_update_axi_stream(vfe_dev, arg);
 		mutex_unlock(&vfe_dev->core_mutex);
 		break;
 	case VIDIOC_MSM_ISP_SMMU_ATTACH:
 		mutex_lock(&vfe_dev->core_mutex);
-		rc = msm_isp_smmu_attach(vfe_dev->buf_mgr, arg);
+		rc = legacy_m_msm_isp_smmu_attach(vfe_dev->buf_mgr, arg);
 		mutex_unlock(&vfe_dev->core_mutex);
 		break;
 	case MSM_SD_NOTIFY_FREEZE:
@@ -969,7 +969,7 @@ static long msm_isp_ioctl_unlocked(struct v4l2_subdev *sd,
 		break;
 	case MSM_SD_SHUTDOWN:
 		while (vfe_dev->vfe_open_cnt != 0)
-			msm_isp_close_node(sd, NULL);
+			legacy_m_msm_isp_close_node(sd, NULL);
 		break;
 
 	default:
@@ -1003,7 +1003,7 @@ static long msm_isp_ioctl_compat(struct v4l2_subdev *sd,
 		mutex_lock(&vfe_dev->realtime_mutex);
 		msm_isp_compat_to_proc_cmd(&proc_cmd,
 			(struct msm_vfe_cfg_cmd2_32 *) arg);
-		rc = msm_isp_proc_cmd(vfe_dev, &proc_cmd);
+		rc = legacy_m_msm_isp_proc_cmd(vfe_dev, &proc_cmd);
 		mutex_unlock(&vfe_dev->realtime_mutex);
 		break;
 	}
@@ -1020,13 +1020,13 @@ static long msm_isp_ioctl_compat(struct v4l2_subdev *sd,
 	return rc;
 }
 
-long msm_isp_ioctl(struct v4l2_subdev *sd,
+long legacy_m_msm_isp_ioctl(struct v4l2_subdev *sd,
 	unsigned int cmd, void *arg)
 {
 	return msm_isp_ioctl_compat(sd, cmd, arg);
 }
 #else /* CONFIG_COMPAT */
-long msm_isp_ioctl(struct v4l2_subdev *sd,
+long legacy_m_msm_isp_ioctl(struct v4l2_subdev *sd,
 	unsigned int cmd, void *arg)
 {
 	return msm_isp_ioctl_unlocked(sd, cmd, arg);
@@ -1140,14 +1140,14 @@ static int msm_isp_send_hw_cmd(struct vfe_device *vfe_dev,
 
 	switch (reg_cfg_cmd->cmd_type) {
 	case VFE_WRITE: {
-		msm_camera_io_memcpy(vfe_dev->vfe_base +
+		legacy_m_msm_camera_io_memcpy(vfe_dev->vfe_base +
 			reg_cfg_cmd->u.rw_info.reg_offset,
 			cfg_data + reg_cfg_cmd->u.rw_info.cmd_data_offset/4,
 			reg_cfg_cmd->u.rw_info.len);
 		break;
 	}
 	case VFE_WRITE_MB: {
-		msm_camera_io_memcpy_mb(vfe_dev->vfe_base +
+		legacy_m_msm_camera_io_memcpy_mb(vfe_dev->vfe_base +
 			reg_cfg_cmd->u.rw_info.reg_offset,
 			cfg_data + reg_cfg_cmd->u.rw_info.cmd_data_offset/4,
 			reg_cfg_cmd->u.rw_info.len);
@@ -1171,12 +1171,12 @@ static int msm_isp_send_hw_cmd(struct vfe_device *vfe_dev,
 			u.mask_info.reg_offset);
 		if (grab_lock)
 			spin_lock_irqsave(&vfe_dev->shared_data_lock, flags);
-		temp = msm_camera_io_r(vfe_dev->vfe_base +
+		temp = legacy_m_msm_camera_io_r(vfe_dev->vfe_base +
 			reg_cfg_cmd->u.mask_info.reg_offset);
 
 		temp &= ~reg_cfg_cmd->u.mask_info.mask;
 		temp |= reg_cfg_cmd->u.mask_info.val;
-		msm_camera_io_w(temp, vfe_dev->vfe_base +
+		legacy_m_msm_camera_io_w(temp, vfe_dev->vfe_base +
 			reg_cfg_cmd->u.mask_info.reg_offset);
 		if (grab_lock)
 			spin_unlock_irqrestore(&vfe_dev->shared_data_lock,
@@ -1203,17 +1203,17 @@ static int msm_isp_send_hw_cmd(struct vfe_device *vfe_dev,
 			if (reg_cfg_cmd->cmd_type == VFE_WRITE_DMI_16BIT) {
 				lo_val1 = lo_val & 0x0000FFFF;
 				lo_val = (lo_val & 0xFFFF0000)>>16;
-				msm_camera_io_w(lo_val1, vfe_dev->vfe_base +
+				legacy_m_msm_camera_io_w(lo_val1, vfe_dev->vfe_base +
 					vfe_dev->hw_info->dmi_reg_offset + 0x4);
 			} else if (reg_cfg_cmd->cmd_type ==
 					   VFE_WRITE_DMI_64BIT) {
 				lo_tbl_ptr++;
 				hi_val = *hi_tbl_ptr;
 				hi_tbl_ptr = hi_tbl_ptr + 2;
-				msm_camera_io_w(hi_val, vfe_dev->vfe_base +
+				legacy_m_msm_camera_io_w(hi_val, vfe_dev->vfe_base +
 					vfe_dev->hw_info->dmi_reg_offset);
 			}
-			msm_camera_io_w(lo_val, vfe_dev->vfe_base +
+			legacy_m_msm_camera_io_w(lo_val, vfe_dev->vfe_base +
 				vfe_dev->hw_info->dmi_reg_offset + 0x4);
 		}
 		break;
@@ -1237,17 +1237,17 @@ static int msm_isp_send_hw_cmd(struct vfe_device *vfe_dev,
 				reg_cfg_cmd->u.dmi_info.len / 2;
 
 		for (i = 0; i < reg_cfg_cmd->u.dmi_info.len/4; i++) {
-			lo_val = msm_camera_io_r(vfe_dev->vfe_base +
+			lo_val = legacy_m_msm_camera_io_r(vfe_dev->vfe_base +
 					vfe_dev->hw_info->dmi_reg_offset + 0x4);
 
 			if (reg_cfg_cmd->cmd_type == VFE_READ_DMI_16BIT) {
-				lo_val1 = msm_camera_io_r(vfe_dev->vfe_base +
+				lo_val1 = legacy_m_msm_camera_io_r(vfe_dev->vfe_base +
 					vfe_dev->hw_info->dmi_reg_offset + 0x4);
 				lo_val |= lo_val1 << 16;
 			}
 			*lo_tbl_ptr++ = lo_val;
 			if (reg_cfg_cmd->cmd_type == VFE_READ_DMI_64BIT) {
-				hi_val = msm_camera_io_r(vfe_dev->vfe_base +
+				hi_val = legacy_m_msm_camera_io_r(vfe_dev->vfe_base +
 					vfe_dev->hw_info->dmi_reg_offset);
 				*hi_tbl_ptr = hi_val;
 				hi_tbl_ptr += 2;
@@ -1292,7 +1292,7 @@ static int msm_isp_send_hw_cmd(struct vfe_device *vfe_dev,
 				(sizeof(*data_ptr) * (data_ptr - cfg_data) >=
 				 cmd_len))
 				return -EINVAL;
-			*data_ptr++ = msm_camera_io_r(vfe_dev->vfe_base +
+			*data_ptr++ = legacy_m_msm_camera_io_r(vfe_dev->vfe_base +
 				reg_cfg_cmd->u.rw_info.reg_offset);
 			reg_cfg_cmd->u.rw_info.reg_offset += 4;
 		}
@@ -1372,7 +1372,7 @@ static int msm_isp_send_hw_cmd(struct vfe_device *vfe_dev,
 	return 0;
 }
 
-int msm_isp_proc_cmd(struct vfe_device *vfe_dev, void *arg)
+int legacy_m_msm_isp_proc_cmd(struct vfe_device *vfe_dev, void *arg)
 {
 	int rc = 0, i;
 	struct msm_vfe_cfg_cmd2 *proc_cmd = arg;
@@ -1433,7 +1433,7 @@ reg_cfg_failed:
 	return rc;
 }
 
-int msm_isp_send_event(struct vfe_device *vfe_dev,
+int legacy_m_msm_isp_send_event(struct vfe_device *vfe_dev,
 	uint32_t event_type,
 	struct msm_isp_event_data *event_data)
 {
@@ -1449,7 +1449,7 @@ int msm_isp_send_event(struct vfe_device *vfe_dev,
 
 #define CAL_WORD(width, M, N) ((width * M + N - 1) / N)
 
-int msm_isp_cal_word_per_line(uint32_t output_format,
+int legacy_m_msm_isp_cal_word_per_line(uint32_t output_format,
 	uint32_t pixel_per_line)
 {
 	int val = -1;
@@ -1540,13 +1540,13 @@ int msm_isp_cal_word_per_line(uint32_t output_format,
 	break;
 		/*TD: Add more image format*/
 	default:
-		msm_isp_print_fourcc_error(__func__, output_format);
+		legacy_m_msm_isp_print_fourcc_error(__func__, output_format);
 		break;
 	}
 	return val;
 }
 
-enum msm_isp_pack_fmt msm_isp_get_pack_format(uint32_t output_format)
+enum msm_isp_pack_fmt legacy_m_msm_isp_get_pack_format(uint32_t output_format)
 {
 	switch (output_format) {
 	case V4L2_PIX_FMT_SBGGR8:
@@ -1600,13 +1600,13 @@ enum msm_isp_pack_fmt msm_isp_get_pack_format(uint32_t output_format)
 	case V4L2_PIX_FMT_P16RGGB10:
 		return PLAIN16;
 	default:
-		msm_isp_print_fourcc_error(__func__, output_format);
+		legacy_m_msm_isp_print_fourcc_error(__func__, output_format);
 		break;
 	}
 	return -EINVAL;
 }
 
-int msm_isp_get_bit_per_pixel(uint32_t output_format)
+int legacy_m_msm_isp_get_bit_per_pixel(uint32_t output_format)
 {
 	switch (output_format) {
 	case V4L2_PIX_FMT_Y4:
@@ -1701,14 +1701,14 @@ int msm_isp_get_bit_per_pixel(uint32_t output_format)
 		return 24;
 		/*TD: Add more image format*/
 	default:
-		msm_isp_print_fourcc_error(__func__, output_format);
+		legacy_m_msm_isp_print_fourcc_error(__func__, output_format);
 		pr_err("%s: Invalid output format %x\n",
 			__func__, output_format);
 		return -EINVAL;
 	}
 }
 
-void msm_isp_update_error_frame_count(struct vfe_device *vfe_dev)
+void legacy_m_msm_isp_update_error_frame_count(struct vfe_device *vfe_dev)
 {
 	struct msm_vfe_error_info *error_info = &vfe_dev->error_info;
 	error_info->info_dump_frame_count++;
@@ -1722,13 +1722,13 @@ static int msm_isp_process_iommu_page_fault(struct vfe_device *vfe_dev)
 	pr_err("%s:%d] VFE%d Handle Page fault! vfe_dev %pK\n", __func__,
 		__LINE__,  vfe_dev->pdev->id, vfe_dev);
 
-	msm_isp_halt_send_error(vfe_dev, ISP_EVENT_IOMMU_P_FAULT);
+	legacy_m_msm_isp_halt_send_error(vfe_dev, ISP_EVENT_IOMMU_P_FAULT);
 
 	if (vfe_dev->buf_mgr->pagefault_debug_disable == 0) {
 		vfe_dev->buf_mgr->pagefault_debug_disable = 1;
 		vfe_dev->buf_mgr->ops->buf_mgr_debug(vfe_dev->buf_mgr,
 			vfe_dev->page_fault_addr);
-		msm_isp_print_ping_pong_address(vfe_dev,
+		legacy_m_msm_isp_print_ping_pong_address(vfe_dev,
 			vfe_dev->page_fault_addr);
 		vfe_dev->hw_info->vfe_ops.axi_ops.
 			read_wm_ping_pong_addr(vfe_dev);
@@ -1736,7 +1736,7 @@ static int msm_isp_process_iommu_page_fault(struct vfe_device *vfe_dev)
 	return rc;
 }
 
-void msm_isp_process_error_info(struct vfe_device *vfe_dev)
+void legacy_m_msm_isp_process_error_info(struct vfe_device *vfe_dev)
 {
 	struct msm_vfe_error_info *error_info = &vfe_dev->error_info;
 
@@ -1759,7 +1759,7 @@ static inline void msm_isp_update_error_info(struct vfe_device *vfe_dev,
 	vfe_dev->error_info.error_count++;
 }
 
-void msm_isp_process_overflow_irq(
+void legacy_m_msm_isp_process_overflow_irq(
 	struct vfe_device *vfe_dev,
 	uint32_t *irq_status0, uint32_t *irq_status1,
 	uint32_t force_overflow)
@@ -1849,13 +1849,13 @@ void msm_isp_process_overflow_irq(
 				vfe_dev->axi_data.src_info[VFE_PIX_0].frame_id;
 			error_event.u.error_info.err_type =
 				ISP_ERROR_BUS_OVERFLOW;
-			msm_isp_send_event(vfe_dev,
+			legacy_m_msm_isp_send_event(vfe_dev,
 				ISP_EVENT_ERROR, &error_event);
 		}
 	}
 }
 
-void msm_isp_reset_burst_count_and_frame_drop(
+void legacy_m_msm_isp_reset_burst_count_and_frame_drop(
 	struct vfe_device *vfe_dev, struct msm_vfe_axi_stream *stream_info)
 {
 	if (stream_info->state != ACTIVE ||
@@ -1863,7 +1863,7 @@ void msm_isp_reset_burst_count_and_frame_drop(
 		return;
 	}
 	if (stream_info->num_burst_capture != 0)
-		msm_isp_reset_framedrop(vfe_dev, stream_info);
+		legacy_m_msm_isp_reset_framedrop(vfe_dev, stream_info);
 }
 
 static void msm_isp_enqueue_tasklet_cmd(struct vfe_device *vfe_dev,
@@ -1885,7 +1885,7 @@ static void msm_isp_enqueue_tasklet_cmd(struct vfe_device *vfe_dev,
 	queue_cmd->vfeInterruptStatus0 = irq_status0;
 	queue_cmd->vfeInterruptStatus1 = irq_status1;
 	queue_cmd->vfePingPongStatus = ping_pong_status;
-	msm_isp_get_timestamp(&queue_cmd->ts, vfe_dev);
+	legacy_m_msm_isp_get_timestamp(&queue_cmd->ts, vfe_dev);
 	queue_cmd->cmd_used = 1;
 	vfe_dev->taskletq_idx = (vfe_dev->taskletq_idx + 1) %
 		MSM_VFE_TASKLETQ_SIZE;
@@ -1894,7 +1894,7 @@ static void msm_isp_enqueue_tasklet_cmd(struct vfe_device *vfe_dev,
 	tasklet_schedule(&vfe_dev->vfe_tasklet);
 }
 
-irqreturn_t msm_isp_process_irq(int irq_num, void *data)
+irqreturn_t legacy_m_msm_isp_process_irq(int irq_num, void *data)
 {
 	struct vfe_device *vfe_dev = (struct vfe_device *) data;
 	uint32_t irq_status0, irq_status1, ping_pong_status;
@@ -1910,7 +1910,7 @@ irqreturn_t msm_isp_process_irq(int irq_num, void *data)
 	}
 	ping_pong_status = vfe_dev->hw_info->vfe_ops.axi_ops.
 		get_pingpong_status(vfe_dev);
-	msm_isp_process_overflow_irq(vfe_dev,
+	legacy_m_msm_isp_process_overflow_irq(vfe_dev,
 		&irq_status0, &irq_status1, 0);
 
 	vfe_dev->hw_info->vfe_ops.core_ops.
@@ -1935,7 +1935,7 @@ irqreturn_t msm_isp_process_irq(int irq_num, void *data)
 	return IRQ_HANDLED;
 }
 
-void msm_isp_do_tasklet(unsigned long data)
+void legacy_m_msm_isp_do_tasklet(unsigned long data)
 {
 	unsigned long flags;
 	struct vfe_device *vfe_dev = (struct vfe_device *) data;
@@ -1980,7 +1980,7 @@ void msm_isp_do_tasklet(unsigned long data)
 				__func__);
 			continue;
 		}
-		msm_isp_process_error_info(vfe_dev);
+		legacy_m_msm_isp_process_error_info(vfe_dev);
 		irq_ops->process_stats_irq(vfe_dev,
 			irq_status0, irq_status1,
 			pingpong_status, &ts);
@@ -1996,7 +1996,7 @@ void msm_isp_do_tasklet(unsigned long data)
 	}
 }
 
-int msm_isp_set_src_state(struct vfe_device *vfe_dev, void *arg)
+int legacy_m_msm_isp_set_src_state(struct vfe_device *vfe_dev, void *arg)
 {
 	struct msm_vfe_axi_src_state *src_state = arg;
 	if (src_state->input_src >= VFE_SRC_MAX)
@@ -2043,7 +2043,7 @@ end:
 	return;
 }
 
-int msm_isp_open_node(struct v4l2_subdev *sd, struct v4l2_subdev_fh *fh)
+int legacy_m_msm_isp_open_node(struct v4l2_subdev *sd, struct v4l2_subdev_fh *fh)
 {
 	struct vfe_device *vfe_dev = v4l2_get_subdevdata(sd);
 	long rc = 0;
@@ -2088,7 +2088,7 @@ int msm_isp_open_node(struct v4l2_subdev *sd, struct v4l2_subdev_fh *fh)
 
 	vfe_dev->hw_info->vfe_ops.core_ops.clear_status_reg(vfe_dev);
 
-	vfe_dev->vfe_hw_version = msm_camera_io_r(vfe_dev->vfe_base);
+	vfe_dev->vfe_hw_version = legacy_m_msm_camera_io_r(vfe_dev->vfe_base);
 	ISP_DBG("%s: HW Version: 0x%x\n", __func__, vfe_dev->vfe_hw_version);
 	rc = vfe_dev->hw_info->vfe_ops.core_ops.reset_hw(vfe_dev, 1, 1);
 	if (rc <= 0) {
@@ -2118,7 +2118,7 @@ int msm_isp_open_node(struct v4l2_subdev *sd, struct v4l2_subdev_fh *fh)
 	vfe_dev->reg_update_requested = 0;
 	/* Register page fault handler */
 	vfe_dev->buf_mgr->pagefault_debug_disable = 0;
-	cam_smmu_reg_client_page_fault_handler(
+	legacy_m_cam_smmu_reg_client_page_fault_handler(
 			vfe_dev->buf_mgr->iommu_hdl,
 			msm_vfe_iommu_fault_handler, vfe_dev);
 	mutex_unlock(&vfe_dev->core_mutex);
@@ -2127,18 +2127,18 @@ int msm_isp_open_node(struct v4l2_subdev *sd, struct v4l2_subdev_fh *fh)
 }
 
 #ifdef CONFIG_MSM_AVTIMER
-void msm_isp_end_avtimer(void)
+void legacy_m_msm_isp_end_avtimer(void)
 {
 	avcs_core_disable_power_collapse(0);
 }
 #else
-void msm_isp_end_avtimer(void)
+void legacy_m_msm_isp_end_avtimer(void)
 {
 	pr_err("AV Timer is not supported\n");
 }
 #endif
 
-int msm_isp_close_node(struct v4l2_subdev *sd, struct v4l2_subdev_fh *fh)
+int legacy_m_msm_isp_close_node(struct v4l2_subdev *sd, struct v4l2_subdev_fh *fh)
 {
 	long rc = 0;
 	int wm;
@@ -2162,7 +2162,7 @@ int msm_isp_close_node(struct v4l2_subdev *sd, struct v4l2_subdev_fh *fh)
 		return 0;
 	}
 	/* Unregister page fault handler */
-	cam_smmu_reg_client_page_fault_handler(
+	legacy_m_cam_smmu_reg_client_page_fault_handler(
 		vfe_dev->buf_mgr->iommu_hdl,
 		NULL, vfe_dev);
 
@@ -2185,7 +2185,7 @@ int msm_isp_close_node(struct v4l2_subdev *sd, struct v4l2_subdev_fh *fh)
 	vfe_dev->hw_info->vfe_ops.core_ops.release_hw(vfe_dev);
 	vfe_dev->buf_mgr->ops->buf_mgr_deinit(vfe_dev->buf_mgr);
 	if (vfe_dev->vt_enable) {
-		msm_isp_end_avtimer();
+		legacy_m_msm_isp_end_avtimer();
 		vfe_dev->vt_enable = 0;
 	}
 	vfe_dev->is_split = 0;
@@ -2195,7 +2195,7 @@ int msm_isp_close_node(struct v4l2_subdev *sd, struct v4l2_subdev_fh *fh)
 	return 0;
 }
 
-void msm_isp_flush_tasklet(struct vfe_device *vfe_dev)
+void legacy_m_msm_isp_flush_tasklet(struct vfe_device *vfe_dev)
 {
 	unsigned long flags;
 	struct msm_vfe_tasklet_queue_cmd *queue_cmd;
@@ -2217,7 +2217,7 @@ void msm_isp_flush_tasklet(struct vfe_device *vfe_dev)
 	return;
 }
 
-void msm_isp_save_framedrop_values(struct vfe_device *vfe_dev,
+void legacy_m_msm_isp_save_framedrop_values(struct vfe_device *vfe_dev,
 				enum msm_vfe_input_src frame_src)
 {
 	struct msm_vfe_axi_stream *stream_info = NULL;

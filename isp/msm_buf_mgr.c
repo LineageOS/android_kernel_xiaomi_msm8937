@@ -76,7 +76,7 @@ static int msm_buf_check_head_sanity(struct msm_isp_bufq *bufq)
 	return rc;
 }
 
-struct msm_isp_bufq *msm_isp_get_bufq(
+struct msm_isp_bufq *legacy_m_msm_isp_get_bufq(
 	struct msm_isp_buf_mgr *buf_mgr,
 	uint32_t bufq_handle)
 {
@@ -103,7 +103,7 @@ static struct msm_isp_buffer *msm_isp_get_buf_ptr(
 	struct msm_isp_bufq *bufq = NULL;
 	struct msm_isp_buffer *buf_info = NULL;
 
-	bufq = msm_isp_get_bufq(buf_mgr, bufq_handle);
+	bufq = legacy_m_msm_isp_get_bufq(buf_mgr, bufq_handle);
 	if (!bufq) {
 		pr_err("%s: Invalid bufq\n", __func__);
 		return buf_info;
@@ -150,7 +150,7 @@ static int msm_isp_free_bufq_handle(struct msm_isp_buf_mgr *buf_mgr,
 	uint32_t bufq_handle)
 {
 	struct msm_isp_bufq *bufq =
-		msm_isp_get_bufq(buf_mgr, bufq_handle);
+		legacy_m_msm_isp_get_bufq(buf_mgr, bufq_handle);
 	if (!bufq)
 		return -EINVAL;
 
@@ -198,7 +198,7 @@ static int msm_isp_prepare_v4l2_buf(struct msm_isp_buf_mgr *buf_mgr,
 	for (i = 0; i < qbuf_buf->num_planes; i++) {
 		mapped_info = &buf_info->mapped_info[i];
 		mapped_info->buf_fd = qbuf_buf->planes[i].addr;
-		ret = cam_smmu_get_phy_addr(buf_mgr->iommu_hdl,
+		ret = legacy_m_cam_smmu_get_phy_addr(buf_mgr->iommu_hdl,
 					mapped_info->buf_fd,
 					CAM_SMMU_MAP_RW,
 					&(mapped_info->paddr),
@@ -245,7 +245,7 @@ static void msm_isp_unprepare_v4l2_buf(
 		return;
 	}
 
-	bufq = msm_isp_get_bufq(buf_mgr, buf_info->bufq_handle);
+	bufq = legacy_m_msm_isp_get_bufq(buf_mgr, buf_info->bufq_handle);
 	if (!bufq) {
 		pr_err("%s: Invalid bufq, stream id %x\n",
 			__func__, stream_id);
@@ -255,7 +255,7 @@ static void msm_isp_unprepare_v4l2_buf(
 	for (i = 0; i < buf_info->num_planes; i++) {
 		mapped_info = &buf_info->mapped_info[i];
 
-		cam_smmu_put_phy_addr(buf_mgr->iommu_hdl, mapped_info->buf_fd);
+		legacy_m_cam_smmu_put_phy_addr(buf_mgr->iommu_hdl, mapped_info->buf_fd);
 	}
 	return;
 }
@@ -271,7 +271,7 @@ static int msm_isp_map_buf(struct msm_isp_buf_mgr *buf_mgr,
 			__func__, __LINE__, buf_mgr, mapped_info);
 		return -EINVAL;
 	}
-	ret = cam_smmu_get_phy_addr(buf_mgr->iommu_hdl,
+	ret = legacy_m_cam_smmu_get_phy_addr(buf_mgr->iommu_hdl,
 				fd,
 				CAM_SMMU_MAP_RW,
 				&(mapped_info->paddr),
@@ -287,7 +287,7 @@ static int msm_isp_map_buf(struct msm_isp_buf_mgr *buf_mgr,
 
 	return rc;
 smmu_map_error:
-	cam_smmu_put_phy_addr(buf_mgr->iommu_hdl,
+	legacy_m_cam_smmu_put_phy_addr(buf_mgr->iommu_hdl,
 			fd);
 	return rc;
 }
@@ -301,7 +301,7 @@ static int msm_isp_unmap_buf(struct msm_isp_buf_mgr *buf_mgr,
 		return -EINVAL;
 	}
 
-	cam_smmu_put_phy_addr(buf_mgr->iommu_hdl,
+	legacy_m_cam_smmu_put_phy_addr(buf_mgr->iommu_hdl,
 			fd);
 
 	return 0;
@@ -323,7 +323,7 @@ static int msm_isp_buf_prepare(struct msm_isp_buf_mgr *buf_mgr,
 		return rc;
 	}
 
-	bufq = msm_isp_get_bufq(buf_mgr, buf_info->bufq_handle);
+	bufq = legacy_m_msm_isp_get_bufq(buf_mgr, buf_info->bufq_handle);
 	if (!bufq) {
 		pr_err("%s: Invalid bufq\n",
 			__func__);
@@ -371,7 +371,7 @@ static int msm_isp_buf_unprepare_all(struct msm_isp_buf_mgr *buf_mgr,
 	int rc = -1, i;
 	struct msm_isp_bufq *bufq = NULL;
 	struct msm_isp_buffer *buf_info = NULL;
-	bufq = msm_isp_get_bufq(buf_mgr, buf_handle);
+	bufq = legacy_m_msm_isp_get_bufq(buf_mgr, buf_handle);
 	if (!bufq) {
 		pr_err("%s: Invalid bufq\n", __func__);
 		return rc;
@@ -409,7 +409,7 @@ static int msm_isp_get_buf_by_index(struct msm_isp_buf_mgr *buf_mgr,
 	struct msm_isp_buffer *temp_buf_info;
 	uint32_t i = 0;
 
-	bufq = msm_isp_get_bufq(buf_mgr, bufq_handle);
+	bufq = legacy_m_msm_isp_get_bufq(buf_mgr, bufq_handle);
 	if (!bufq) {
 		pr_err("%s: Invalid bufq\n", __func__);
 		return rc;
@@ -445,7 +445,7 @@ static int msm_isp_buf_unprepare(struct msm_isp_buf_mgr *buf_mgr,
 {
 	struct msm_isp_bufq *bufq = NULL;
 	struct msm_isp_buffer *buf_info = NULL;
-	bufq = msm_isp_get_bufq(buf_mgr, buf_handle);
+	bufq = legacy_m_msm_isp_get_bufq(buf_mgr, buf_handle);
 	if (!bufq) {
 		pr_err("%s: Invalid bufq\n", __func__);
 		return -EINVAL;
@@ -487,7 +487,7 @@ static int msm_isp_get_buf(struct msm_isp_buf_mgr *buf_mgr, uint32_t id,
 		return 0;
 	}
 
-	bufq = msm_isp_get_bufq(buf_mgr, bufq_handle);
+	bufq = legacy_m_msm_isp_get_bufq(buf_mgr, bufq_handle);
 	if (!bufq) {
 		pr_err_ratelimited("%s: Invalid bufq\n", __func__);
 		return rc;
@@ -579,7 +579,7 @@ static int msm_isp_put_buf_unsafe(struct msm_isp_buf_mgr *buf_mgr,
 	struct msm_isp_bufq *bufq = NULL;
 	struct msm_isp_buffer *buf_info = NULL;
 
-	bufq = msm_isp_get_bufq(buf_mgr, bufq_handle);
+	bufq = legacy_m_msm_isp_get_bufq(buf_mgr, bufq_handle);
 	if (!bufq) {
 		pr_err("%s: Invalid bufq\n", __func__);
 		return rc;
@@ -638,7 +638,7 @@ static int msm_isp_put_buf(struct msm_isp_buf_mgr *buf_mgr,
 	struct msm_isp_bufq *bufq = NULL;
 	struct msm_isp_buffer *buf_info = NULL;
 
-	bufq = msm_isp_get_bufq(buf_mgr, bufq_handle);
+	bufq = legacy_m_msm_isp_get_bufq(buf_mgr, bufq_handle);
 	if (!bufq) {
 		pr_err("%s: Invalid bufq\n", __func__);
 		return rc;
@@ -669,7 +669,7 @@ static int msm_isp_update_put_buf_cnt_unsafe(
 	struct msm_isp_buffer *buf_info = NULL;
 	uint8_t *put_buf_mask = NULL;
 
-	bufq = msm_isp_get_bufq(buf_mgr, bufq_handle);
+	bufq = legacy_m_msm_isp_get_bufq(buf_mgr, bufq_handle);
 	if (!bufq) {
 		pr_err("Invalid bufq\n");
 		return rc;
@@ -732,7 +732,7 @@ static int msm_isp_update_put_buf_cnt(struct msm_isp_buf_mgr *buf_mgr,
 	struct msm_isp_bufq *bufq = NULL;
 	unsigned long flags;
 
-	bufq = msm_isp_get_bufq(buf_mgr, bufq_handle);
+	bufq = legacy_m_msm_isp_get_bufq(buf_mgr, bufq_handle);
 	if (!bufq) {
 		pr_err("Invalid bufq\n");
 		return rc;
@@ -760,7 +760,7 @@ static int msm_isp_buf_done(struct msm_isp_buf_mgr *buf_mgr,
 	struct msm_isp_buffer *buf_info = NULL;
 	enum msm_isp_buffer_state state;
 
-	bufq = msm_isp_get_bufq(buf_mgr, bufq_handle);
+	bufq = legacy_m_msm_isp_get_bufq(buf_mgr, bufq_handle);
 	if (!bufq) {
 		pr_err("Invalid bufq\n");
 		return -EINVAL;
@@ -814,7 +814,7 @@ static int msm_isp_flush_buf(struct msm_isp_buf_mgr *buf_mgr, uint32_t id,
 	struct msm_isp_buffer *buf_info = NULL;
 	unsigned long flags;
 
-	bufq = msm_isp_get_bufq(buf_mgr, bufq_handle);
+	bufq = legacy_m_msm_isp_get_bufq(buf_mgr, bufq_handle);
 	if (!bufq) {
 		pr_err("Invalid bufq\n");
 		return -EINVAL;
@@ -878,7 +878,7 @@ static int msm_isp_buf_enqueue(struct msm_isp_buf_mgr *buf_mgr,
 	struct msm_isp_bufq *bufq = NULL;
 	struct msm_isp_buffer *buf_info = NULL;
 
-	bufq = msm_isp_get_bufq(buf_mgr, info->handle);
+	bufq = legacy_m_msm_isp_get_bufq(buf_mgr, info->handle);
 	if (!bufq) {
 		pr_err("%s: Invalid bufq, handle 0x%x, stream id %x num_plane %d\n"
 			, __func__, info->handle, (info->handle >> 8),
@@ -990,7 +990,7 @@ static int msm_isp_get_buf_src(struct msm_isp_buf_mgr *buf_mgr,
 {
 	struct msm_isp_bufq *bufq = NULL;
 
-	bufq = msm_isp_get_bufq(buf_mgr, bufq_handle);
+	bufq = legacy_m_msm_isp_get_bufq(buf_mgr, bufq_handle);
 	if (!bufq) {
 		pr_err("%s: Invalid bufq\n",
 			__func__);
@@ -1020,7 +1020,7 @@ static int msm_isp_request_bufq(struct msm_isp_buf_mgr *buf_mgr,
 		return -EINVAL;
 	}
 
-	bufq = msm_isp_get_bufq(buf_mgr, buf_request->handle);
+	bufq = legacy_m_msm_isp_get_bufq(buf_mgr, buf_request->handle);
 	if (!bufq) {
 		pr_err("%s: Invalid bufq stream_id %x\n",
 			__func__, buf_request->stream_id);
@@ -1065,7 +1065,7 @@ static int msm_isp_release_bufq(struct msm_isp_buf_mgr *buf_mgr,
 {
 	struct msm_isp_bufq *bufq = NULL;
 	unsigned long flags;
-	bufq = msm_isp_get_bufq(buf_mgr, bufq_handle);
+	bufq = legacy_m_msm_isp_get_bufq(buf_mgr, bufq_handle);
 	if (!bufq) {
 		pr_err("Invalid bufq release\n");
 		return -EINVAL;
@@ -1115,7 +1115,7 @@ static int msm_isp_buf_put_scratch(struct msm_isp_buf_mgr *buf_mgr)
 	if (!buf_mgr->scratch_buf_addr)
 		return 0;
 
-	rc = cam_smmu_put_phy_addr_scratch(buf_mgr->iommu_hdl,
+	rc = legacy_m_cam_smmu_put_phy_addr_scratch(buf_mgr->iommu_hdl,
 				buf_mgr->scratch_buf_addr);
 	if (rc)
 		pr_err("%s: failed to put scratch buffer to img iommu: %d\n",
@@ -1145,7 +1145,7 @@ static int msm_isp_buf_get_scratch(struct msm_isp_buf_mgr *buf_mgr)
 		/* already mapped or not supported */
 		return 0;
 
-	rc = cam_smmu_get_phy_addr_scratch(
+	rc = legacy_m_cam_smmu_get_phy_addr_scratch(
 				buf_mgr->iommu_hdl,
 				CAM_SMMU_MAP_RW,
 				&buf_mgr->scratch_buf_addr,
@@ -1159,7 +1159,7 @@ static int msm_isp_buf_get_scratch(struct msm_isp_buf_mgr *buf_mgr)
 	return rc;
 }
 
-int msm_isp_smmu_attach(struct msm_isp_buf_mgr *buf_mgr,
+int legacy_m_msm_isp_smmu_attach(struct msm_isp_buf_mgr *buf_mgr,
 	void *arg)
 {
 	struct msm_vfe_smmu_attach_cmd *cmd = arg;
@@ -1175,7 +1175,7 @@ int msm_isp_smmu_attach(struct msm_isp_buf_mgr *buf_mgr,
 		 * non-secure mode
 		 */
 		if (buf_mgr->attach_ref_cnt == 0) {
-			rc = cam_smmu_ops(buf_mgr->iommu_hdl,
+			rc = legacy_m_cam_smmu_ops(buf_mgr->iommu_hdl,
 				CAM_SMMU_ATTACH);
 			if (rc < 0) {
 				pr_err("%s: img smmu attach error, rc :%d\n",
@@ -1196,7 +1196,7 @@ int msm_isp_smmu_attach(struct msm_isp_buf_mgr *buf_mgr,
 
 		if (buf_mgr->attach_ref_cnt == 0) {
 			rc = msm_isp_buf_put_scratch(buf_mgr);
-			rc |= cam_smmu_ops(buf_mgr->iommu_hdl,
+			rc |= legacy_m_cam_smmu_ops(buf_mgr->iommu_hdl,
 				CAM_SMMU_DETACH);
 			if (rc < 0) {
 				pr_err("%s: img/stats smmu detach error, rc :%d\n",
@@ -1209,7 +1209,7 @@ int msm_isp_smmu_attach(struct msm_isp_buf_mgr *buf_mgr,
 	return rc;
 
 err2:
-	if (cam_smmu_ops(buf_mgr->iommu_hdl, CAM_SMMU_DETACH))
+	if (legacy_m_cam_smmu_ops(buf_mgr->iommu_hdl, CAM_SMMU_DETACH))
 		pr_err("%s: img smmu detach error\n", __func__);
 err1:
 	mutex_unlock(&buf_mgr->lock);
@@ -1234,7 +1234,7 @@ static int msm_isp_init_isp_buf_mgr(struct msm_isp_buf_mgr *buf_mgr,
 	buf_mgr->num_buf_q = BUF_MGR_NUM_BUF_Q;
 	memset(buf_mgr->bufq, 0, sizeof(buf_mgr->bufq));
 
-	rc = cam_smmu_get_handle("vfe", &buf_mgr->iommu_hdl);
+	rc = legacy_m_cam_smmu_get_handle("vfe", &buf_mgr->iommu_hdl);
 	if (rc < 0) {
 		pr_err("vfe get handle failed\n");
 		goto get_handle_error;
@@ -1269,15 +1269,15 @@ static int msm_isp_deinit_isp_buf_mgr(
 	buf_mgr->pagefault_debug_disable = 0;
 
 	msm_isp_buf_put_scratch(buf_mgr);
-	cam_smmu_ops(buf_mgr->iommu_hdl, CAM_SMMU_DETACH);
-	cam_smmu_destroy_handle(buf_mgr->iommu_hdl);
+	legacy_m_cam_smmu_ops(buf_mgr->iommu_hdl, CAM_SMMU_DETACH);
+	legacy_m_cam_smmu_destroy_handle(buf_mgr->iommu_hdl);
 
 	buf_mgr->attach_ref_cnt = 0;
 	mutex_unlock(&buf_mgr->lock);
 	return 0;
 }
 
-int msm_isp_proc_buf_cmd(struct msm_isp_buf_mgr *buf_mgr,
+int legacy_m_msm_isp_proc_buf_cmd(struct msm_isp_buf_mgr *buf_mgr,
 	unsigned int cmd, void *arg)
 {
 	switch (cmd) {
@@ -1459,11 +1459,11 @@ static struct msm_isp_buf_ops isp_buf_ops = {
 	.buf_mgr_init = msm_isp_init_isp_buf_mgr,
 	.buf_mgr_deinit = msm_isp_deinit_isp_buf_mgr,
 	.buf_mgr_debug = msm_isp_buf_mgr_debug,
-	.get_bufq = msm_isp_get_bufq,
+	.get_bufq = legacy_m_msm_isp_get_bufq,
 	.update_put_buf_cnt = msm_isp_update_put_buf_cnt,
 };
 
-int msm_isp_create_isp_buf_mgr(
+int legacy_m_msm_isp_create_isp_buf_mgr(
 	struct msm_isp_buf_mgr *buf_mgr,
 	struct msm_sd_req_vb2_q *vb2_ops,
 	struct device *dev,

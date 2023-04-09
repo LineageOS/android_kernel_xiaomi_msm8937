@@ -248,7 +248,7 @@ static void cam_smmu_print_table(void)
 }
 
 
-int cam_smmu_query_vaddr_in_range(int handle,
+int legacy_m_cam_smmu_query_vaddr_in_range(int handle,
 	unsigned long fault_addr, unsigned long *start_addr,
 	unsigned long *end_addr, int *fd)
 {
@@ -292,7 +292,7 @@ int cam_smmu_query_vaddr_in_range(int handle,
 	mutex_unlock(&iommu_cb_set.cb_info[idx].lock);
 	return rc;
 }
-EXPORT_SYMBOL(cam_smmu_query_vaddr_in_range);
+EXPORT_SYMBOL(legacy_m_cam_smmu_query_vaddr_in_range);
 
 static void cam_smmu_check_vaddr_in_range(int idx, void *vaddr)
 {
@@ -322,7 +322,7 @@ static void cam_smmu_check_vaddr_in_range(int idx, void *vaddr)
 	return;
 }
 
-void cam_smmu_reg_client_page_fault_handler(int handle,
+void legacy_m_cam_smmu_reg_client_page_fault_handler(int handle,
 		void (*client_page_fault_handler)(struct iommu_domain *,
 		struct device *, unsigned long,
 		int, void*), void *token)
@@ -467,7 +467,7 @@ static enum dma_data_direction cam_smmu_translate_dir(
 	return DMA_NONE;
 }
 
-void cam_smmu_reset_iommu_table(enum cam_smmu_init_dir ops)
+void legacy_m_cam_smmu_reset_iommu_table(enum cam_smmu_init_dir ops)
 {
 	unsigned int i;
 	int j = 0;
@@ -907,7 +907,7 @@ static enum cam_smmu_buf_state cam_smmu_check_fd_in_list(int idx,
 	return CAM_SMMU_BUFF_NOT_EXIST;
 }
 
-int cam_smmu_get_handle(char *identifier, int *handle_ptr)
+int legacy_m_cam_smmu_get_handle(char *identifier, int *handle_ptr)
 {
 	int ret = 0;
 
@@ -929,9 +929,9 @@ int cam_smmu_get_handle(char *identifier, int *handle_ptr)
 	}
 	return ret;
 }
-EXPORT_SYMBOL(cam_smmu_get_handle);
+EXPORT_SYMBOL(legacy_m_cam_smmu_get_handle);
 
-int cam_smmu_ops(int handle, enum cam_smmu_ops_param ops)
+int legacy_m_cam_smmu_ops(int handle, enum cam_smmu_ops_param ops)
 {
 	int ret = 0, idx;
 
@@ -969,7 +969,7 @@ int cam_smmu_ops(int handle, enum cam_smmu_ops_param ops)
 	mutex_unlock(&iommu_cb_set.cb_info[idx].lock);
 	return ret;
 }
-EXPORT_SYMBOL(cam_smmu_ops);
+EXPORT_SYMBOL(legacy_m_cam_smmu_ops);
 
 static int cam_smmu_alloc_scratch_buffer_add_to_list(int idx,
 					      size_t virt_len,
@@ -1126,7 +1126,7 @@ static int cam_smmu_free_scratch_buffer_remove_from_list(
 	return rc;
 }
 
-int cam_smmu_get_phy_addr_scratch(int handle,
+int legacy_m_cam_smmu_get_phy_addr_scratch(int handle,
 				  enum cam_smmu_map_dir dir,
 				  dma_addr_t *paddr_ptr,
 				  size_t virt_len,
@@ -1211,7 +1211,7 @@ error:
 	return rc;
 }
 
-int cam_smmu_put_phy_addr_scratch(int handle,
+int legacy_m_cam_smmu_put_phy_addr_scratch(int handle,
 				  dma_addr_t paddr)
 {
 	int idx;
@@ -1262,7 +1262,7 @@ handle_err:
 	return rc;
 }
 
-int cam_smmu_get_phy_addr(int handle, int ion_fd,
+int legacy_m_cam_smmu_get_phy_addr(int handle, int ion_fd,
 		enum cam_smmu_map_dir dir, dma_addr_t *paddr_ptr,
 		size_t *len_ptr)
 {
@@ -1324,9 +1324,9 @@ get_addr_end:
 	mutex_unlock(&iommu_cb_set.cb_info[idx].lock);
 	return rc;
 }
-EXPORT_SYMBOL(cam_smmu_get_phy_addr);
+EXPORT_SYMBOL(legacy_m_cam_smmu_get_phy_addr);
 
-int cam_smmu_put_phy_addr(int handle, int ion_fd)
+int legacy_m_cam_smmu_put_phy_addr(int handle, int ion_fd)
 {
 	int idx, rc;
 	struct cam_dma_buff_info *mapping_info;
@@ -1375,9 +1375,9 @@ put_addr_end:
 	mutex_unlock(&iommu_cb_set.cb_info[idx].lock);
 	return rc;
 }
-EXPORT_SYMBOL(cam_smmu_put_phy_addr);
+EXPORT_SYMBOL(legacy_m_cam_smmu_put_phy_addr);
 
-int cam_smmu_destroy_handle(int handle)
+int legacy_m_cam_smmu_destroy_handle(int handle)
 {
 	int idx;
 
@@ -1408,10 +1408,10 @@ int cam_smmu_destroy_handle(int handle)
 	mutex_unlock(&iommu_cb_set.cb_info[idx].lock);
 	return 0;
 }
-EXPORT_SYMBOL(cam_smmu_destroy_handle);
+EXPORT_SYMBOL(legacy_m_cam_smmu_destroy_handle);
 
 /*This function can only be called after smmu driver probe*/
-int cam_smmu_get_num_of_clients(void)
+int legacy_m_cam_smmu_get_num_of_clients(void)
 {
 	return iommu_cb_set.cb_num;
 }
@@ -1526,7 +1526,7 @@ static int cam_alloc_smmu_context_banks(struct device *dev)
 		return -ENOMEM;
 	}
 
-	cam_smmu_reset_iommu_table(CAM_SMMU_TABLE_INIT);
+	legacy_m_cam_smmu_reset_iommu_table(CAM_SMMU_TABLE_INIT);
 	iommu_cb_set.cb_init_count = 0;
 
 	CDBG("no of context banks :%d\n", iommu_cb_set.cb_num);
@@ -1655,7 +1655,7 @@ static int cam_smmu_probe(struct platform_device *pdev)
 static int cam_smmu_remove(struct platform_device *pdev)
 {
 	/* release all the context banks and memory allocated */
-	cam_smmu_reset_iommu_table(CAM_SMMU_TABLE_DEINIT);
+	legacy_m_cam_smmu_reset_iommu_table(CAM_SMMU_TABLE_DEINIT);
 	if (of_device_is_compatible(pdev->dev.of_node, "qcom,msm-cam-smmu"))
 		cam_smmu_release_cb(pdev);
 	return 0;

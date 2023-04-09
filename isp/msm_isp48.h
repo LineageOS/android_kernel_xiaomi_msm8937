@@ -13,7 +13,7 @@
 #ifndef __MSM_ISP48_H__
 #define __MSM_ISP48_H__
 
-extern struct msm_vfe_hardware_info vfe48_hw_info;
+extern struct msm_vfe_hardware_info legacy_m_vfe48_hw_info;
 
 enum msm_vfe_clk_rates {
 	MSM_VFE_CLK_RATE_SVS = 0,

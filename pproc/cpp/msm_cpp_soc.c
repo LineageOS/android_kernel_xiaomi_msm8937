@@ -30,7 +30,7 @@
 		of_property_read_u32(_dev, _str, &_out); \
 	}
 
-void msm_cpp_fetch_dt_params(struct cpp_device *cpp_dev)
+void legacy_m_msm_cpp_fetch_dt_params(struct cpp_device *cpp_dev)
 {
 	int rc = 0;
 	struct device_node *of_node = cpp_dev->pdev->dev.of_node;
@@ -55,7 +55,7 @@ void msm_cpp_fetch_dt_params(struct cpp_device *cpp_dev)
 		cpp_dev->bus_master_flag = 0;
 }
 
-int msm_cpp_get_clock_index(struct cpp_device *cpp_dev, const char *clk_name)
+int legacy_m_msm_cpp_get_clock_index(struct cpp_device *cpp_dev, const char *clk_name)
 {
 	uint32_t i = 0;
 
@@ -101,12 +101,12 @@ static int cpp_get_clk_freq_tbl(struct clk *clk, struct cpp_hw_info *hw_info,
 	return 0;
 }
 
-int msm_cpp_set_micro_clk(struct cpp_device *cpp_dev)
+int legacy_m_msm_cpp_set_micro_clk(struct cpp_device *cpp_dev)
 {
 	uint32_t msm_micro_iface_idx;
 	int rc;
 
-	msm_micro_iface_idx = msm_cpp_get_clock_index(cpp_dev,
+	msm_micro_iface_idx = legacy_m_msm_cpp_get_clock_index(cpp_dev,
 		"micro_iface_clk");
 	if (msm_micro_iface_idx < 0)  {
 		pr_err("Fail to get clock index\n");
@@ -146,12 +146,12 @@ int msm_cpp_set_micro_clk(struct cpp_device *cpp_dev)
 	return 0;
 }
 
-int msm_update_freq_tbl(struct cpp_device *cpp_dev)
+int legacy_m_msm_update_freq_tbl(struct cpp_device *cpp_dev)
 {
 	uint32_t msm_cpp_core_clk_idx;
 	int rc = 0;
 
-	msm_cpp_core_clk_idx = msm_cpp_get_clock_index(cpp_dev, "cpp_core_clk");
+	msm_cpp_core_clk_idx = legacy_m_msm_cpp_get_clock_index(cpp_dev, "cpp_core_clk");
 	if (msm_cpp_core_clk_idx < 0)  {
 		pr_err("%s: fail to get clock index\n", __func__);
 		rc = msm_cpp_core_clk_idx;
@@ -167,11 +167,11 @@ int msm_update_freq_tbl(struct cpp_device *cpp_dev)
 	return rc;
 }
 
-long msm_cpp_set_core_clk(struct cpp_device *cpp_dev, long rate, int idx)
+long legacy_m_msm_cpp_set_core_clk(struct cpp_device *cpp_dev, long rate, int idx)
 {
 	long rc = 0;
 
-	rc = msm_camera_clk_set_rate(&cpp_dev->pdev->dev,
+	rc = legacy_m_msm_camera_clk_set_rate(&cpp_dev->pdev->dev,
 		cpp_dev->cpp_clk[idx], rate);
 	if (rc < 0) {
 		pr_err("%s: fail to get frequency table\n", __func__);
@@ -181,7 +181,7 @@ long msm_cpp_set_core_clk(struct cpp_device *cpp_dev, long rate, int idx)
 	return rc;
 }
 
-int msm_cpp_read_payload_params_from_dt(struct cpp_device *cpp_dev)
+int legacy_m_msm_cpp_read_payload_params_from_dt(struct cpp_device *cpp_dev)
 {
 	struct platform_device *pdev = cpp_dev->pdev;
 	struct device_node *fw_info_node = NULL, *dev_node = NULL;

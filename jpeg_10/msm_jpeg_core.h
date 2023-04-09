@@ -19,22 +19,22 @@
 
 #define msm_jpeg_core_buf msm_jpeg_hw_buf
 
-irqreturn_t msm_jpeg_core_irq(int irq_num, void *context);
-irqreturn_t msm_jpegdma_core_irq(int irq_num, void *context);
-void msm_jpeg_core_irq_install(int (*irq_handler) (int, void *, void *));
-void msm_jpeg_core_irq_remove(void);
+irqreturn_t legacy_m_msm_jpeg_core_irq(int irq_num, void *context);
+irqreturn_t legacy_m_msm_jpegdma_core_irq(int irq_num, void *context);
+void legacy_m_msm_jpeg_core_irq_install(int (*irq_handler) (int, void *, void *));
+void legacy_m_msm_jpeg_core_irq_remove(void);
 
-int msm_jpeg_core_fe_buf_update(struct msm_jpeg_device *pgmn_dev,
+int legacy_m_msm_jpeg_core_fe_buf_update(struct msm_jpeg_device *pgmn_dev,
 	struct msm_jpeg_core_buf *buf);
-int msm_jpeg_core_we_buf_update(struct msm_jpeg_device *pgmn_dev,
+int legacy_m_msm_jpeg_core_we_buf_update(struct msm_jpeg_device *pgmn_dev,
 	struct msm_jpeg_core_buf *buf);
-int msm_jpeg_core_we_buf_reset(struct msm_jpeg_device *pgmn_dev,
+int legacy_m_msm_jpeg_core_we_buf_reset(struct msm_jpeg_device *pgmn_dev,
 	struct msm_jpeg_hw_buf *buf);
 
-int msm_jpeg_core_reset(struct msm_jpeg_device *pgmn_dev, uint8_t op_mode,
+int legacy_m_msm_jpeg_core_reset(struct msm_jpeg_device *pgmn_dev, uint8_t op_mode,
 	void *base, int size);
-int msm_jpeg_core_fe_start(struct msm_jpeg_device *);
+int legacy_m_msm_jpeg_core_fe_start(struct msm_jpeg_device *);
 
-void msm_jpeg_core_release(struct msm_jpeg_device *);
-void msm_jpeg_core_init(struct msm_jpeg_device *);
+void legacy_m_msm_jpeg_core_release(struct msm_jpeg_device *);
+void legacy_m_msm_jpeg_core_init(struct msm_jpeg_device *);
 #endif /* MSM_JPEG_CORE_H */

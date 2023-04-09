@@ -21,16 +21,16 @@
 static int msm_i2c_mux_config(struct i2c_mux_device *mux_device, uint8_t *mode)
 {
 	uint32_t val;
-	val = msm_camera_io_r(mux_device->ctl_base);
+	val = legacy_m_msm_camera_io_r(mux_device->ctl_base);
 	if (*mode == MODE_DUAL) {
-		msm_camera_io_w(val | 0x3, mux_device->ctl_base);
+		legacy_m_msm_camera_io_w(val | 0x3, mux_device->ctl_base);
 	} else if (*mode == MODE_L) {
-		msm_camera_io_w(((val | 0x2) & ~(0x1)), mux_device->ctl_base);
-		val = msm_camera_io_r(mux_device->ctl_base);
+		legacy_m_msm_camera_io_w(((val | 0x2) & ~(0x1)), mux_device->ctl_base);
+		val = legacy_m_msm_camera_io_r(mux_device->ctl_base);
 		CDBG("the camio mode config left value is %d\n", val);
 	} else {
-		msm_camera_io_w(((val | 0x1) & ~(0x2)), mux_device->ctl_base);
-		val = msm_camera_io_r(mux_device->ctl_base);
+		legacy_m_msm_camera_io_w(((val | 0x1) & ~(0x2)), mux_device->ctl_base);
+		val = legacy_m_msm_camera_io_r(mux_device->ctl_base);
 		CDBG("the camio mode config right value is %d\n", val);
 	}
 	return 0;
@@ -40,8 +40,8 @@ static int msm_i2c_mux_init(struct i2c_mux_device *mux_device)
 {
 	int rc = 0, val = 0;
 	if (mux_device->use_count == 0) {
-		val = msm_camera_io_r(mux_device->rw_base);
-		msm_camera_io_w((val | 0x200), mux_device->rw_base);
+		val = legacy_m_msm_camera_io_r(mux_device->rw_base);
+		legacy_m_msm_camera_io_w((val | 0x200), mux_device->rw_base);
 	}
 	mux_device->use_count++;
 	return 0;
@@ -52,8 +52,8 @@ static int msm_i2c_mux_release(struct i2c_mux_device *mux_device)
 	int val = 0;
 	mux_device->use_count--;
 	if (mux_device->use_count == 0) {
-		val = msm_camera_io_r(mux_device->rw_base);
-		msm_camera_io_w((val & ~0x200), mux_device->rw_base);
+		val = legacy_m_msm_camera_io_r(mux_device->rw_base);
+		legacy_m_msm_camera_io_w((val & ~0x200), mux_device->rw_base);
 	}
 	return 0;
 }
@@ -110,14 +110,14 @@ static int i2c_mux_probe(struct platform_device *pdev)
 	platform_set_drvdata(pdev, &mux_device->subdev);
 	mutex_init(&mux_device->mutex);
 
-	mux_device->ctl_base = msm_camera_get_reg_base(pdev,
+	mux_device->ctl_base = legacy_m_msm_camera_get_reg_base(pdev,
 		"i2c_mux_ctl", true);
 	if (!mux_device->ctl_base) {
 		pr_err("%s: no mem resource?\n", __func__);
 		rc = -ENODEV;
 		goto ctl_base_failed;
 	}
-	mux_device->rw_base = msm_camera_get_reg_base(pdev, "i2c_mux_rw", true);
+	mux_device->rw_base = legacy_m_msm_camera_get_reg_base(pdev, "i2c_mux_rw", true);
 	if (!mux_device->rw_mem) {
 		pr_err("%s: no mem resource?\n", __func__);
 		rc = -ENODEV;
@@ -127,7 +127,7 @@ static int i2c_mux_probe(struct platform_device *pdev)
 	return 0;
 
 rw_base_failed:
-	msm_camera_put_reg_base(pdev, mux_device->ctl_base,
+	legacy_m_msm_camera_put_reg_base(pdev, mux_device->ctl_base,
 		"i2c_mux_ctl", true);
 ctl_base_failed:
 	mutex_destroy(&mux_device->mutex);
@@ -151,8 +151,8 @@ static int i2c_mux_remove(struct platform_device *pdev)
 		return 0;
 	}
 
-	msm_camera_put_reg_base(pdev, mux_device->rw_base, "i2c_mux_ctl", true);
-	msm_camera_put_reg_base(pdev, mux_device->ctl_base, "i2c_mux_rw", true);
+	legacy_m_msm_camera_put_reg_base(pdev, mux_device->rw_base, "i2c_mux_ctl", true);
+	legacy_m_msm_camera_put_reg_base(pdev, mux_device->ctl_base, "i2c_mux_rw", true);
 }
 
 static struct platform_driver i2c_mux_driver = {

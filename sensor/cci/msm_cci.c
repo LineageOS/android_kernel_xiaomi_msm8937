@@ -69,7 +69,7 @@ static void msm_cci_dump_registers(struct cci_device *cci_dev,
 	CCI_DBG(" **** %s : %d CCI TOP Registers ****\n", __func__, __LINE__);
 	for (i = 0; i < DEBUG_TOP_REG_COUNT; i++) {
 		reg_offset = DEBUG_TOP_REG_START + i * 4;
-		read_val = msm_camera_io_r_mb(cci_dev->base + reg_offset);
+		read_val = legacy_m_msm_camera_io_r_mb(cci_dev->base + reg_offset);
 		CCI_DBG("%s : %d offset = 0x%X value = 0x%X\n",
 			__func__, __LINE__, reg_offset, read_val);
 	}
@@ -81,7 +81,7 @@ static void msm_cci_dump_registers(struct cci_device *cci_dev,
 		if (i == 6)
 			continue;
 		reg_offset = DEBUG_MASTER_REG_START + master*0x100 + i * 4;
-		read_val = msm_camera_io_r_mb(cci_dev->base + reg_offset);
+		read_val = legacy_m_msm_camera_io_r_mb(cci_dev->base + reg_offset);
 		CCI_DBG("%s : %d offset = 0x%X value = 0x%X\n",
 			__func__, __LINE__, reg_offset, read_val);
 	}
@@ -92,7 +92,7 @@ static void msm_cci_dump_registers(struct cci_device *cci_dev,
 	for (i = 0; i < DEBUG_MASTER_QUEUE_REG_COUNT; i++) {
 		reg_offset = DEBUG_MASTER_QUEUE_REG_START +  master*0x200 +
 			queue*0x100 + i * 4;
-		read_val = msm_camera_io_r_mb(cci_dev->base + reg_offset);
+		read_val = legacy_m_msm_camera_io_r_mb(cci_dev->base + reg_offset);
 		CCI_DBG("%s : %d offset = 0x%X value = 0x%X\n",
 			__func__, __LINE__, reg_offset, read_val);
 	}
@@ -102,7 +102,7 @@ static void msm_cci_dump_registers(struct cci_device *cci_dev,
 		__func__, __LINE__);
 	for (i = 0; i < DEBUG_INTR_REG_COUNT; i++) {
 		reg_offset = DEBUG_INTR_REG_START + i * 4;
-		read_val = msm_camera_io_r_mb(cci_dev->base + reg_offset);
+		read_val = legacy_m_msm_camera_io_r_mb(cci_dev->base + reg_offset);
 		CCI_DBG("%s : %d offset = 0x%X value = 0x%X\n",
 			__func__, __LINE__, reg_offset, read_val);
 	}
@@ -126,33 +126,33 @@ static int32_t msm_cci_set_clk_param(struct cci_device *cci_dev,
 
 	clk_params = &cci_dev->cci_clk_params[i2c_freq_mode];
 	if (MASTER_0 == master) {
-		msm_camera_io_w_mb(clk_params->hw_thigh << 16 |
+		legacy_m_msm_camera_io_w_mb(clk_params->hw_thigh << 16 |
 			clk_params->hw_tlow,
 			cci_dev->base + CCI_I2C_M0_SCL_CTL_ADDR);
-		msm_camera_io_w_mb(clk_params->hw_tsu_sto << 16 |
+		legacy_m_msm_camera_io_w_mb(clk_params->hw_tsu_sto << 16 |
 			clk_params->hw_tsu_sta,
 			cci_dev->base + CCI_I2C_M0_SDA_CTL_0_ADDR);
-		msm_camera_io_w_mb(clk_params->hw_thd_dat << 16 |
+		legacy_m_msm_camera_io_w_mb(clk_params->hw_thd_dat << 16 |
 			clk_params->hw_thd_sta,
 			cci_dev->base + CCI_I2C_M0_SDA_CTL_1_ADDR);
-		msm_camera_io_w_mb(clk_params->hw_tbuf,
+		legacy_m_msm_camera_io_w_mb(clk_params->hw_tbuf,
 			cci_dev->base + CCI_I2C_M0_SDA_CTL_2_ADDR);
-		msm_camera_io_w_mb(clk_params->hw_scl_stretch_en << 8 |
+		legacy_m_msm_camera_io_w_mb(clk_params->hw_scl_stretch_en << 8 |
 			clk_params->hw_trdhld << 4 | clk_params->hw_tsp,
 			cci_dev->base + CCI_I2C_M0_MISC_CTL_ADDR);
 	} else if (MASTER_1 == master) {
-		msm_camera_io_w_mb(clk_params->hw_thigh << 16 |
+		legacy_m_msm_camera_io_w_mb(clk_params->hw_thigh << 16 |
 			clk_params->hw_tlow,
 			cci_dev->base + CCI_I2C_M1_SCL_CTL_ADDR);
-		msm_camera_io_w_mb(clk_params->hw_tsu_sto << 16 |
+		legacy_m_msm_camera_io_w_mb(clk_params->hw_tsu_sto << 16 |
 			clk_params->hw_tsu_sta,
 			cci_dev->base + CCI_I2C_M1_SDA_CTL_0_ADDR);
-		msm_camera_io_w_mb(clk_params->hw_thd_dat << 16 |
+		legacy_m_msm_camera_io_w_mb(clk_params->hw_thd_dat << 16 |
 			clk_params->hw_thd_sta,
 			cci_dev->base + CCI_I2C_M1_SDA_CTL_1_ADDR);
-		msm_camera_io_w_mb(clk_params->hw_tbuf,
+		legacy_m_msm_camera_io_w_mb(clk_params->hw_tbuf,
 			cci_dev->base + CCI_I2C_M1_SDA_CTL_2_ADDR);
-		msm_camera_io_w_mb(clk_params->hw_scl_stretch_en << 8 |
+		legacy_m_msm_camera_io_w_mb(clk_params->hw_scl_stretch_en << 8 |
 			clk_params->hw_trdhld << 4 | clk_params->hw_tsp,
 			cci_dev->base + CCI_I2C_M1_MISC_CTL_ADDR);
 	}
@@ -165,7 +165,7 @@ static void msm_cci_flush_queue(struct cci_device *cci_dev,
 {
 	int32_t rc = 0;
 
-	msm_camera_io_w_mb(1 << master, cci_dev->base + CCI_HALT_REQ_ADDR);
+	legacy_m_msm_camera_io_w_mb(1 << master, cci_dev->base + CCI_HALT_REQ_ADDR);
 	rc = wait_for_completion_timeout(
 		&cci_dev->cci_master_info[master].reset_complete, CCI_TIMEOUT);
 	if (rc < 0) {
@@ -178,10 +178,10 @@ static void msm_cci_flush_queue(struct cci_device *cci_dev,
 
 		/* Set proper mask to RESET CMD address based on MASTER */
 		if (master == MASTER_0)
-			msm_camera_io_w_mb(CCI_M0_RESET_RMSK,
+			legacy_m_msm_camera_io_w_mb(CCI_M0_RESET_RMSK,
 				cci_dev->base + CCI_RESET_CMD_ADDR);
 		else
-			msm_camera_io_w_mb(CCI_M1_RESET_RMSK,
+			legacy_m_msm_camera_io_w_mb(CCI_M1_RESET_RMSK,
 				cci_dev->base + CCI_RESET_CMD_ADDR);
 
 		/* wait for reset done irq */
@@ -203,7 +203,7 @@ static int32_t msm_cci_validate_queue(struct cci_device *cci_dev,
 	int32_t rc = 0;
 	uint32_t read_val = 0;
 	uint32_t reg_offset = master * 0x200 + queue * 0x100;
-	read_val = msm_camera_io_r_mb(cci_dev->base +
+	read_val = legacy_m_msm_camera_io_r_mb(cci_dev->base +
 		CCI_I2C_M0_Q0_CUR_WORD_CNT_ADDR + reg_offset);
 	CDBG("%s line %d CCI_I2C_M0_Q0_CUR_WORD_CNT_ADDR %d len %d max %d\n",
 		__func__, __LINE__, read_val, len,
@@ -213,19 +213,19 @@ static int32_t msm_cci_validate_queue(struct cci_device *cci_dev,
 		uint32_t reg_val = 0;
 		uint32_t report_val = CCI_I2C_REPORT_CMD | (1 << 8);
 		CDBG("%s:%d CCI_I2C_REPORT_CMD\n", __func__, __LINE__);
-		msm_camera_io_w_mb(report_val,
+		legacy_m_msm_camera_io_w_mb(report_val,
 			cci_dev->base + CCI_I2C_M0_Q0_LOAD_DATA_ADDR +
 			reg_offset);
 		read_val++;
 		CDBG("%s:%d CCI_I2C_M0_Q0_EXEC_WORD_CNT_ADDR %d, queue: %d\n",
 			__func__, __LINE__, read_val, queue);
-		msm_camera_io_w_mb(read_val, cci_dev->base +
+		legacy_m_msm_camera_io_w_mb(read_val, cci_dev->base +
 			CCI_I2C_M0_Q0_EXEC_WORD_CNT_ADDR + reg_offset);
 		reg_val = 1 << ((master * 2) + queue);
 		CDBG("%s:%d CCI_QUEUE_START_ADDR\n", __func__, __LINE__);
 		atomic_set(&cci_dev->cci_master_info[master].
 						done_pending[queue], 1);
-		msm_camera_io_w_mb(reg_val, cci_dev->base +
+		legacy_m_msm_camera_io_w_mb(reg_val, cci_dev->base +
 			CCI_QUEUE_START_ADDR);
 		CDBG("%s line %d wait_for_completion_timeout\n",
 			__func__, __LINE__);
@@ -269,7 +269,7 @@ static int32_t msm_cci_write_i2c_queue(struct cci_device *cci_dev,
 	CDBG("%s CCI_I2C_M0_Q0_LOAD_DATA_ADDR:val 0x%x:0x%x\n",
 		__func__, CCI_I2C_M0_Q0_LOAD_DATA_ADDR +
 		reg_offset, val);
-	msm_camera_io_w_mb(val, cci_dev->base + CCI_I2C_M0_Q0_LOAD_DATA_ADDR +
+	legacy_m_msm_camera_io_w_mb(val, cci_dev->base + CCI_I2C_M0_Q0_LOAD_DATA_ADDR +
 		reg_offset);
 	return rc;
 }
@@ -418,20 +418,20 @@ static void msm_cci_load_report_cmd(struct cci_device *cci_dev,
 	enum cci_i2c_queue_t queue)
 {
 	uint32_t reg_offset = master * 0x200 + queue * 0x100;
-	uint32_t read_val = msm_camera_io_r_mb(cci_dev->base +
+	uint32_t read_val = legacy_m_msm_camera_io_r_mb(cci_dev->base +
 		CCI_I2C_M0_Q0_CUR_WORD_CNT_ADDR + reg_offset);
 	uint32_t report_val = CCI_I2C_REPORT_CMD | (1 << 8);
 
 	CDBG("%s:%d CCI_I2C_REPORT_CMD curr_w_cnt: %d\n",
 		__func__, __LINE__, read_val);
-	msm_camera_io_w_mb(report_val,
+	legacy_m_msm_camera_io_w_mb(report_val,
 		cci_dev->base + CCI_I2C_M0_Q0_LOAD_DATA_ADDR +
 		reg_offset);
 	read_val++;
 
 	CDBG("%s:%d CCI_I2C_M0_Q0_EXEC_WORD_CNT_ADDR %d\n",
 		__func__, __LINE__, read_val);
-	msm_camera_io_w_mb(read_val, cci_dev->base +
+	legacy_m_msm_camera_io_w_mb(read_val, cci_dev->base +
 		CCI_I2C_M0_Q0_EXEC_WORD_CNT_ADDR + reg_offset);
 }
 
@@ -443,7 +443,7 @@ static int32_t msm_cci_wait_report_cmd(struct cci_device *cci_dev,
 	msm_cci_load_report_cmd(cci_dev, master, queue);
 	atomic_set(&cci_dev->cci_master_info[master].q_free[queue], 1);
 	atomic_set(&cci_dev->cci_master_info[master].done_pending[queue], 1);
-	msm_camera_io_w_mb(reg_val, cci_dev->base +
+	legacy_m_msm_camera_io_w_mb(reg_val, cci_dev->base +
 		CCI_QUEUE_START_ADDR);
 	return msm_cci_wait(cci_dev, master, queue);
 }
@@ -456,7 +456,7 @@ static void msm_cci_process_half_q(struct cci_device *cci_dev,
 	if (0 == atomic_read(&cci_dev->cci_master_info[master].q_free[queue])) {
 		msm_cci_load_report_cmd(cci_dev, master, queue);
 		atomic_set(&cci_dev->cci_master_info[master].q_free[queue], 1);
-		msm_camera_io_w_mb(reg_val, cci_dev->base +
+		legacy_m_msm_camera_io_w_mb(reg_val, cci_dev->base +
 			CCI_QUEUE_START_ADDR);
 	}
 }
@@ -542,7 +542,7 @@ static int32_t msm_cci_get_queue_free_size(struct cci_device *cci_dev,
 {
 	uint32_t read_val = 0;
 	uint32_t reg_offset = master * 0x200 + queue * 0x100;
-	read_val = msm_camera_io_r_mb(cci_dev->base +
+	read_val = legacy_m_msm_camera_io_r_mb(cci_dev->base +
 		CCI_I2C_M0_Q0_CUR_WORD_CNT_ADDR + reg_offset);
 	CDBG("%s line %d CCI_I2C_M0_Q0_CUR_WORD_CNT_ADDR %d max %d\n",
 		__func__, __LINE__, read_val,
@@ -599,7 +599,7 @@ static int32_t msm_cci_data_queue(struct cci_device *cci_dev,
 	}
 	reg_offset = master * 0x200 + queue * 0x100;
 
-	msm_camera_io_w_mb(cci_dev->cci_wait_sync_cfg.cid,
+	legacy_m_msm_camera_io_w_mb(cci_dev->cci_wait_sync_cfg.cid,
 		cci_dev->base + CCI_SET_CID_SYNC_TIMER_ADDR +
 		cci_dev->cci_wait_sync_cfg.csid *
 		CCI_SET_CID_SYNC_TIMER_OFFSET);
@@ -611,7 +611,7 @@ static int32_t msm_cci_data_queue(struct cci_device *cci_dev,
 	CDBG("%s CCI_I2C_M0_Q0_LOAD_DATA_ADDR:val 0x%x:0x%x\n",
 		__func__, CCI_I2C_M0_Q0_LOAD_DATA_ADDR +
 		reg_offset, val);
-	msm_camera_io_w_mb(val, cci_dev->base + CCI_I2C_M0_Q0_LOAD_DATA_ADDR +
+	legacy_m_msm_camera_io_w_mb(val, cci_dev->base + CCI_I2C_M0_Q0_LOAD_DATA_ADDR +
 		reg_offset);
 
 	atomic_set(&cci_dev->cci_master_info[master].q_free[queue], 0);
@@ -629,7 +629,7 @@ static int32_t msm_cci_data_queue(struct cci_device *cci_dev,
 		cmd_size < max_queue_size) {
 		val = CCI_I2C_WAIT_SYNC_CMD |
 			((cci_dev->cci_wait_sync_cfg.line) << 4);
-		msm_camera_io_w_mb(val,
+		legacy_m_msm_camera_io_w_mb(val,
 			cci_dev->base + CCI_I2C_M0_Q0_LOAD_DATA_ADDR +
 			reg_offset);
 	}
@@ -649,7 +649,7 @@ static int32_t msm_cci_data_queue(struct cci_device *cci_dev,
 			return -EINVAL;
 		}
 
-		read_val = msm_camera_io_r_mb(cci_dev->base +
+		read_val = legacy_m_msm_camera_io_r_mb(cci_dev->base +
 			CCI_I2C_M0_Q0_CUR_WORD_CNT_ADDR + reg_offset);
 		CDBG("%s line %d CUR_WORD_CNT_ADDR %d len %d max %d\n",
 			__func__, __LINE__, read_val, len, max_queue_size);
@@ -728,7 +728,7 @@ static int32_t msm_cci_data_queue(struct cci_device *cci_dev,
 		}
 		len = ((i-1)/4) + 1;
 
-		read_val = msm_camera_io_r_mb(cci_dev->base +
+		read_val = legacy_m_msm_camera_io_r_mb(cci_dev->base +
 			CCI_I2C_M0_Q0_CUR_WORD_CNT_ADDR + reg_offset);
 		for (h = 0, k = 0; h < len; h++) {
 			cmd = 0;
@@ -736,12 +736,12 @@ static int32_t msm_cci_data_queue(struct cci_device *cci_dev,
 				cmd |= (data[k++] << (j * 8));
 			CDBG("%s LOAD_DATA_ADDR 0x%x, q: %d, len:%d, cnt: %d\n",
 				__func__, cmd, queue, len, read_val);
-			msm_camera_io_w_mb(cmd, cci_dev->base +
+			legacy_m_msm_camera_io_w_mb(cmd, cci_dev->base +
 				CCI_I2C_M0_Q0_LOAD_DATA_ADDR +
 				master * 0x200 + queue * 0x100);
 
 			read_val += 1;
-			msm_camera_io_w_mb(read_val, cci_dev->base +
+			legacy_m_msm_camera_io_w_mb(read_val, cci_dev->base +
 				CCI_I2C_M0_Q0_EXEC_WORD_CNT_ADDR + reg_offset);
 		}
 
@@ -753,11 +753,11 @@ static int32_t msm_cci_data_queue(struct cci_device *cci_dev,
 			cmd |= CCI_I2C_WAIT_CMD;
 			CDBG("%s CCI_I2C_M0_Q0_LOAD_DATA_ADDR 0x%x\n",
 				__func__, cmd);
-			msm_camera_io_w_mb(cmd, cci_dev->base +
+			legacy_m_msm_camera_io_w_mb(cmd, cci_dev->base +
 				CCI_I2C_M0_Q0_LOAD_DATA_ADDR +
 				master * 0x200 + queue * 0x100);
 			read_val += 1;
-			msm_camera_io_w_mb(read_val, cci_dev->base +
+			legacy_m_msm_camera_io_w_mb(read_val, cci_dev->base +
 				CCI_I2C_M0_Q0_EXEC_WORD_CNT_ADDR + reg_offset);
 		}
 	}
@@ -881,14 +881,14 @@ static int32_t msm_cci_i2c_read(struct v4l2_subdev *sd,
 		goto ERROR;
 	}
 
-	val = msm_camera_io_r_mb(cci_dev->base + CCI_I2C_M0_Q0_CUR_WORD_CNT_ADDR
+	val = legacy_m_msm_camera_io_r_mb(cci_dev->base + CCI_I2C_M0_Q0_CUR_WORD_CNT_ADDR
 			+ master * 0x200 + queue * 0x100);
 	CDBG("%s cur word cnt 0x%x\n", __func__, val);
-	msm_camera_io_w_mb(val, cci_dev->base + CCI_I2C_M0_Q0_EXEC_WORD_CNT_ADDR
+	legacy_m_msm_camera_io_w_mb(val, cci_dev->base + CCI_I2C_M0_Q0_EXEC_WORD_CNT_ADDR
 			+ master * 0x200 + queue * 0x100);
 
 	val = 1 << ((master * 2) + queue);
-	msm_camera_io_w_mb(val, cci_dev->base + CCI_QUEUE_START_ADDR);
+	legacy_m_msm_camera_io_w_mb(val, cci_dev->base + CCI_QUEUE_START_ADDR);
 	CDBG("%s:%d E wait_for_completion_timeout\n", __func__,
 		__LINE__);
 
@@ -906,7 +906,7 @@ static int32_t msm_cci_i2c_read(struct v4l2_subdev *sd,
 		rc = 0;
 	}
 
-	read_words = msm_camera_io_r_mb(cci_dev->base +
+	read_words = legacy_m_msm_camera_io_r_mb(cci_dev->base +
 		CCI_I2C_M0_READ_BUF_LEVEL_ADDR + master * 0x100);
 	exp_words = ((read_cfg->num_byte / 4) + 1);
 	if (read_words != exp_words) {
@@ -921,7 +921,7 @@ static int32_t msm_cci_i2c_read(struct v4l2_subdev *sd,
 		read_cfg->num_byte);
 	first_byte = 0;
 	do {
-		val = msm_camera_io_r_mb(cci_dev->base +
+		val = legacy_m_msm_camera_io_r_mb(cci_dev->base +
 			CCI_I2C_M0_READ_DATA_ADDR + master * 0x100);
 		CDBG("%s read val 0x%x\n", __func__, val);
 		for (i = 0; (i < 4) && (index < read_cfg->num_byte); i++) {
@@ -1276,7 +1276,7 @@ static int32_t msm_cci_init(struct v4l2_subdev *sd,
 		return rc;
 	}
 
-	rc = cam_config_ahb_clk(NULL, 0, CAM_AHB_CLIENT_CCI,
+	rc = legacy_m_cam_config_ahb_clk(NULL, 0, CAM_AHB_CLIENT_CCI,
 			CAM_AHB_SVS_VOTE);
 	if (rc < 0) {
 		pr_err("%s: failed to vote for AHB\n", __func__);
@@ -1300,10 +1300,10 @@ static int32_t msm_cci_init(struct v4l2_subdev *sd,
 			cci_dev->cci_master_info[master].reset_pending = TRUE;
 			/* Set proper mask to RESET CMD address */
 			if (master == MASTER_0)
-				msm_camera_io_w_mb(CCI_M0_RESET_RMSK,
+				legacy_m_msm_camera_io_w_mb(CCI_M0_RESET_RMSK,
 					cci_dev->base + CCI_RESET_CMD_ADDR);
 			else
-				msm_camera_io_w_mb(CCI_M1_RESET_RMSK,
+				legacy_m_msm_camera_io_w_mb(CCI_M1_RESET_RMSK,
 					cci_dev->base + CCI_RESET_CMD_ADDR);
 			/* wait for reset done irq */
 			rc = wait_for_completion_timeout(
@@ -1325,7 +1325,7 @@ static int32_t msm_cci_init(struct v4l2_subdev *sd,
 	} else {
 		cci_dev->cci_pinctrl_status = 1;
 	}
-	rc = msm_camera_request_gpio_table(cci_dev->cci_gpio_tbl,
+	rc = legacy_m_msm_camera_request_gpio_table(cci_dev->cci_gpio_tbl,
 		cci_dev->cci_gpio_tbl_size, 1);
 	if (cci_dev->cci_pinctrl_status) {
 		ret = pinctrl_select_state(cci_dev->cci_pinctrl.pinctrl,
@@ -1339,14 +1339,14 @@ static int32_t msm_cci_init(struct v4l2_subdev *sd,
 		goto request_gpio_failed;
 	}
 
-	rc = msm_camera_config_vreg(&cci_dev->pdev->dev, cci_dev->cci_vreg,
+	rc = legacy_m_msm_camera_config_vreg(&cci_dev->pdev->dev, cci_dev->cci_vreg,
 		cci_dev->regulator_count, NULL, 0, &cci_dev->cci_reg_ptr[0], 1);
 	if (rc < 0) {
 		pr_err("%s:%d cci config_vreg failed\n", __func__, __LINE__);
 		goto clk_enable_failed;
 	}
 
-	rc = msm_camera_enable_vreg(&cci_dev->pdev->dev, cci_dev->cci_vreg,
+	rc = legacy_m_msm_camera_enable_vreg(&cci_dev->pdev->dev, cci_dev->cci_vreg,
 		cci_dev->regulator_count, NULL, 0, &cci_dev->cci_reg_ptr[0], 1);
 	if (rc < 0) {
 		pr_err("%s:%d cci enable_vreg failed\n", __func__, __LINE__);
@@ -1363,7 +1363,7 @@ static int32_t msm_cci_init(struct v4l2_subdev *sd,
 		cci_dev->cci_clk_info[i].clk_rate =
 			clk_rates[i];
 	}
-	rc = msm_camera_clk_enable(&cci_dev->pdev->dev,
+	rc = legacy_m_msm_camera_clk_enable(&cci_dev->pdev->dev,
 		cci_dev->cci_clk_info, cci_dev->cci_clk,
 		cci_dev->num_clk, true);
 	if (rc < 0) {
@@ -1376,10 +1376,10 @@ static int32_t msm_cci_init(struct v4l2_subdev *sd,
 	for (i = 0; i < NUM_QUEUES; i++)
 		reinit_completion(&cci_dev->cci_master_info[master].
 			report_q[i]);
-	rc = msm_camera_enable_irq(cci_dev->irq, true);
+	rc = legacy_m_msm_camera_enable_irq(cci_dev->irq, true);
 	if (rc < 0)
 		pr_err("%s: irq enable failed\n", __func__);
-	cci_dev->hw_version = msm_camera_io_r_mb(cci_dev->base +
+	cci_dev->hw_version = legacy_m_msm_camera_io_r_mb(cci_dev->base +
 		CCI_HW_VERSION_ADDR);
 	pr_info("%s:%d: hw_version = 0x%x\n", __func__, __LINE__,
 		cci_dev->hw_version);
@@ -1421,9 +1421,9 @@ static int32_t msm_cci_init(struct v4l2_subdev *sd,
 	}
 
 	cci_dev->cci_master_info[MASTER_0].reset_pending = TRUE;
-	msm_camera_io_w_mb(CCI_RESET_CMD_RMSK, cci_dev->base +
+	legacy_m_msm_camera_io_w_mb(CCI_RESET_CMD_RMSK, cci_dev->base +
 			CCI_RESET_CMD_ADDR);
-	msm_camera_io_w_mb(0x1, cci_dev->base + CCI_RESET_CMD_ADDR);
+	legacy_m_msm_camera_io_w_mb(0x1, cci_dev->base + CCI_RESET_CMD_ADDR);
 	rc = wait_for_completion_timeout(
 		&cci_dev->cci_master_info[MASTER_0].reset_complete,
 		CCI_TIMEOUT);
@@ -1436,11 +1436,11 @@ static int32_t msm_cci_init(struct v4l2_subdev *sd,
 	}
 	for (i = 0; i < MASTER_MAX; i++)
 		cci_dev->i2c_freq_mode[i] = I2C_MAX_MODES;
-	msm_camera_io_w_mb(CCI_IRQ_MASK_0_RMSK,
+	legacy_m_msm_camera_io_w_mb(CCI_IRQ_MASK_0_RMSK,
 		cci_dev->base + CCI_IRQ_MASK_0_ADDR);
-	msm_camera_io_w_mb(CCI_IRQ_MASK_0_RMSK,
+	legacy_m_msm_camera_io_w_mb(CCI_IRQ_MASK_0_RMSK,
 		cci_dev->base + CCI_IRQ_CLEAR_0_ADDR);
-	msm_camera_io_w_mb(0x1, cci_dev->base + CCI_IRQ_GLOBAL_CLEAR_CMD_ADDR);
+	legacy_m_msm_camera_io_w_mb(0x1, cci_dev->base + CCI_IRQ_GLOBAL_CLEAR_CMD_ADDR);
 
 	for (i = 0; i < MASTER_MAX; i++) {
 		if (!cci_dev->write_wq[i]) {
@@ -1456,11 +1456,11 @@ static int32_t msm_cci_init(struct v4l2_subdev *sd,
 	return 0;
 
 reset_complete_failed:
-	msm_camera_enable_irq(cci_dev->irq, false);
-	msm_camera_clk_enable(&cci_dev->pdev->dev, cci_dev->cci_clk_info,
+	legacy_m_msm_camera_enable_irq(cci_dev->irq, false);
+	legacy_m_msm_camera_clk_enable(&cci_dev->pdev->dev, cci_dev->cci_clk_info,
 		cci_dev->cci_clk, cci_dev->num_clk, false);
 reg_enable_failed:
-	msm_camera_config_vreg(&cci_dev->pdev->dev, cci_dev->cci_vreg,
+	legacy_m_msm_camera_config_vreg(&cci_dev->pdev->dev, cci_dev->cci_vreg,
 		cci_dev->regulator_count, NULL, 0, &cci_dev->cci_reg_ptr[0], 0);
 clk_enable_failed:
 	if (cci_dev->cci_pinctrl_status) {
@@ -1470,11 +1470,11 @@ clk_enable_failed:
 			pr_err("%s:%d cannot set pin to suspend state\n",
 				__func__, __LINE__);
 	}
-	msm_camera_request_gpio_table(cci_dev->cci_gpio_tbl,
+	legacy_m_msm_camera_request_gpio_table(cci_dev->cci_gpio_tbl,
 		cci_dev->cci_gpio_tbl_size, 0);
 request_gpio_failed:
 	cci_dev->ref_count--;
-	if (cam_config_ahb_clk(NULL, 0, CAM_AHB_CLIENT_CCI,
+	if (legacy_m_cam_config_ahb_clk(NULL, 0, CAM_AHB_CLIENT_CCI,
 		CAM_AHB_SUSPEND_VOTE) < 0)
 		pr_err("%s: failed to remove vote for AHB\n", __func__);
 	return rc;
@@ -1501,16 +1501,16 @@ static int32_t msm_cci_release(struct v4l2_subdev *sd)
 		if (cci_dev->write_wq[i])
 			flush_workqueue(cci_dev->write_wq[i]);
 
-	msm_camera_enable_irq(cci_dev->irq, false);
-	msm_camera_clk_enable(&cci_dev->pdev->dev, cci_dev->cci_clk_info,
+	legacy_m_msm_camera_enable_irq(cci_dev->irq, false);
+	legacy_m_msm_camera_clk_enable(&cci_dev->pdev->dev, cci_dev->cci_clk_info,
 		cci_dev->cci_clk, cci_dev->num_clk, false);
 
-	rc = msm_camera_enable_vreg(&cci_dev->pdev->dev, cci_dev->cci_vreg,
+	rc = legacy_m_msm_camera_enable_vreg(&cci_dev->pdev->dev, cci_dev->cci_vreg,
 		cci_dev->regulator_count, NULL, 0, &cci_dev->cci_reg_ptr[0], 0);
 	if (rc < 0)
 		pr_err("%s:%d cci disable_vreg failed\n", __func__, __LINE__);
 
-	rc = msm_camera_config_vreg(&cci_dev->pdev->dev, cci_dev->cci_vreg,
+	rc = legacy_m_msm_camera_config_vreg(&cci_dev->pdev->dev, cci_dev->cci_vreg,
 		cci_dev->regulator_count, NULL, 0, &cci_dev->cci_reg_ptr[0], 0);
 	if (rc < 0)
 		pr_err("%s:%d cci unconfig_vreg failed\n", __func__, __LINE__);
@@ -1523,7 +1523,7 @@ static int32_t msm_cci_release(struct v4l2_subdev *sd)
 				__func__, __LINE__);
 	}
 	cci_dev->cci_pinctrl_status = 0;
-	msm_camera_request_gpio_table(cci_dev->cci_gpio_tbl,
+	legacy_m_msm_camera_request_gpio_table(cci_dev->cci_gpio_tbl,
 		cci_dev->cci_gpio_tbl_size, 0);
 	for (i = 0; i < MASTER_MAX; i++)
 		cci_dev->i2c_freq_mode[i] = I2C_MAX_MODES;
@@ -1532,7 +1532,7 @@ static int32_t msm_cci_release(struct v4l2_subdev *sd)
 	cci_dev->cci_clk_src = 0;
 
 ahb_vote_suspend:
-	if (cam_config_ahb_clk(NULL, 0, CAM_AHB_CLIENT_CCI,
+	if (legacy_m_cam_config_ahb_clk(NULL, 0, CAM_AHB_CLIENT_CCI,
 		CAM_AHB_SUSPEND_VOTE) < 0)
 		pr_err("%s: failed to remove vote for AHB\n", __func__);
 	return rc;
@@ -1640,9 +1640,9 @@ static irqreturn_t msm_cci_irq(int irq_num, void *data)
 {
 	uint32_t irq;
 	struct cci_device *cci_dev = data;
-	irq = msm_camera_io_r_mb(cci_dev->base + CCI_IRQ_STATUS_0_ADDR);
-	msm_camera_io_w_mb(irq, cci_dev->base + CCI_IRQ_CLEAR_0_ADDR);
-	msm_camera_io_w_mb(0x1, cci_dev->base + CCI_IRQ_GLOBAL_CLEAR_CMD_ADDR);
+	irq = legacy_m_msm_camera_io_r_mb(cci_dev->base + CCI_IRQ_STATUS_0_ADDR);
+	legacy_m_msm_camera_io_w_mb(irq, cci_dev->base + CCI_IRQ_CLEAR_0_ADDR);
+	legacy_m_msm_camera_io_w_mb(0x1, cci_dev->base + CCI_IRQ_GLOBAL_CLEAR_CMD_ADDR);
 	CDBG("%s CCI_I2C_M0_STATUS_ADDR = 0x%x\n", __func__, irq);
 	if (irq & CCI_IRQ_STATUS_0_RST_DONE_ACK_BMSK) {
 		if (cci_dev->cci_master_info[MASTER_0].reset_pending == TRUE) {
@@ -1708,24 +1708,24 @@ static irqreturn_t msm_cci_irq(int irq_num, void *data)
 	}
 	if (irq & CCI_IRQ_STATUS_0_I2C_M0_Q0Q1_HALT_ACK_BMSK) {
 		cci_dev->cci_master_info[MASTER_0].reset_pending = TRUE;
-		msm_camera_io_w_mb(CCI_M0_RESET_RMSK,
+		legacy_m_msm_camera_io_w_mb(CCI_M0_RESET_RMSK,
 			cci_dev->base + CCI_RESET_CMD_ADDR);
 	}
 	if (irq & CCI_IRQ_STATUS_0_I2C_M1_Q0Q1_HALT_ACK_BMSK) {
 		cci_dev->cci_master_info[MASTER_1].reset_pending = TRUE;
-		msm_camera_io_w_mb(CCI_M1_RESET_RMSK,
+		legacy_m_msm_camera_io_w_mb(CCI_M1_RESET_RMSK,
 			cci_dev->base + CCI_RESET_CMD_ADDR);
 	}
 	if (irq & CCI_IRQ_STATUS_0_I2C_M0_ERROR_BMSK) {
 		pr_err("%s:%d MASTER_0 error 0x%x\n", __func__, __LINE__, irq);
 		cci_dev->cci_master_info[MASTER_0].status = -EINVAL;
-		msm_camera_io_w_mb(CCI_M0_HALT_REQ_RMSK,
+		legacy_m_msm_camera_io_w_mb(CCI_M0_HALT_REQ_RMSK,
 			cci_dev->base + CCI_HALT_REQ_ADDR);
 	}
 	if (irq & CCI_IRQ_STATUS_0_I2C_M1_ERROR_BMSK) {
 		pr_err("%s:%d MASTER_1 error 0x%x\n", __func__, __LINE__, irq);
 		cci_dev->cci_master_info[MASTER_1].status = -EINVAL;
-		msm_camera_io_w_mb(CCI_M1_HALT_REQ_RMSK,
+		legacy_m_msm_camera_io_w_mb(CCI_M1_HALT_REQ_RMSK,
 			cci_dev->base + CCI_HALT_REQ_ADDR);
 	}
 	return IRQ_HANDLED;
@@ -1990,7 +1990,7 @@ static void msm_cci_init_clk_params(struct cci_device *cci_dev)
 	return;
 }
 
-struct v4l2_subdev *msm_cci_get_subdev(void)
+struct v4l2_subdev *legacy_m_msm_cci_get_subdev(void)
 {
 	return g_cci_subdev;
 }
@@ -2016,7 +2016,7 @@ static int msm_cci_probe(struct platform_device *pdev)
 		of_property_read_u32((&pdev->dev)->of_node,
 			"cell-index", &pdev->id);
 
-	rc = msm_camera_get_clk_info_and_rates(pdev,
+	rc = legacy_m_msm_camera_get_clk_info_and_rates(pdev,
 		&new_cci_dev->cci_clk_info, &new_cci_dev->cci_clk,
 		&new_cci_dev->cci_clk_rates, &new_cci_dev->num_clk_cases,
 		&new_cci_dev->num_clk);
@@ -2027,13 +2027,13 @@ static int msm_cci_probe(struct platform_device *pdev)
 	}
 
 	new_cci_dev->ref_count = 0;
-	new_cci_dev->base = msm_camera_get_reg_base(pdev, "cci", true);
+	new_cci_dev->base = legacy_m_msm_camera_get_reg_base(pdev, "cci", true);
 	if (!new_cci_dev->base) {
 		pr_err("%s: no mem resource?\n", __func__);
 		rc = -ENODEV;
 		goto cci_no_resource;
 	}
-	new_cci_dev->irq = msm_camera_get_irq(pdev, "cci");
+	new_cci_dev->irq = legacy_m_msm_camera_get_irq(pdev, "cci");
 	if (!new_cci_dev->irq) {
 		pr_err("%s: no irq resource?\n", __func__);
 		rc = -ENODEV;
@@ -2043,7 +2043,7 @@ static int msm_cci_probe(struct platform_device *pdev)
 		__LINE__,
 		(int) new_cci_dev->irq->start,
 		(int) new_cci_dev->irq->end);
-	rc = msm_camera_register_irq(pdev, new_cci_dev->irq,
+	rc = legacy_m_msm_camera_register_irq(pdev, new_cci_dev->irq,
 		msm_cci_irq, IRQF_TRIGGER_RISING, "cci", new_cci_dev);
 	if (rc < 0) {
 		pr_err("%s: irq request fail\n", __func__);
@@ -2051,18 +2051,18 @@ static int msm_cci_probe(struct platform_device *pdev)
 		goto cci_release_mem;
 	}
 
-	msm_camera_enable_irq(new_cci_dev->irq, false);
+	legacy_m_msm_camera_enable_irq(new_cci_dev->irq, false);
 	new_cci_dev->msm_sd.close_seq = MSM_SD_CLOSE_2ND_CATEGORY | 0x6;
-	msm_sd_register(&new_cci_dev->msm_sd);
+	legacy_m_msm_sd_register(&new_cci_dev->msm_sd);
 	new_cci_dev->pdev = pdev;
 	msm_cci_init_cci_params(new_cci_dev);
 	msm_cci_init_clk_params(new_cci_dev);
 	msm_cci_init_gpio_params(new_cci_dev);
 
-	rc = msm_camera_get_dt_vreg_data(new_cci_dev->pdev->dev.of_node,
+	rc = legacy_m_msm_camera_get_dt_vreg_data(new_cci_dev->pdev->dev.of_node,
 		&(new_cci_dev->cci_vreg), &(new_cci_dev->regulator_count));
 	if (rc < 0) {
-		pr_err("%s: msm_camera_get_dt_vreg_data fail\n", __func__);
+		pr_err("%s: legacy_m_msm_camera_get_dt_vreg_data fail\n", __func__);
 		rc = -EFAULT;
 		goto cci_release_mem;
 	}
@@ -2093,7 +2093,7 @@ static int msm_cci_probe(struct platform_device *pdev)
 cci_invalid_vreg_data:
 	kfree(new_cci_dev->cci_vreg);
 cci_release_mem:
-	msm_camera_put_reg_base(pdev, new_cci_dev->base, "cci", true);
+	legacy_m_msm_camera_put_reg_base(pdev, new_cci_dev->base, "cci", true);
 cci_no_resource:
 	kfree(new_cci_dev);
 	return rc;
@@ -2105,12 +2105,12 @@ static int msm_cci_exit(struct platform_device *pdev)
 	struct cci_device *cci_dev =
 		v4l2_get_subdevdata(subdev);
 
-	msm_camera_put_clk_info_and_rates(pdev,
+	legacy_m_msm_camera_put_clk_info_and_rates(pdev,
 		&cci_dev->cci_clk_info, &cci_dev->cci_clk,
 		&cci_dev->cci_clk_rates, cci_dev->num_clk_cases,
 		cci_dev->num_clk);
 
-	msm_camera_put_reg_base(pdev, cci_dev->base, "cci", true);
+	legacy_m_msm_camera_put_reg_base(pdev, cci_dev->base, "cci", true);
 	kfree(cci_dev);
 	return 0;
 }

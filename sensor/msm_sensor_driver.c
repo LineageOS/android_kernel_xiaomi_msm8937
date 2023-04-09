@@ -42,7 +42,7 @@ static int msm_sensor_platform_remove(struct platform_device *pdev)
 		return 0;
 	}
 
-	msm_sensor_free_sensor_data(s_ctrl);
+	legacy_m_msm_sensor_free_sensor_data(s_ctrl);
 	kfree(s_ctrl->msm_sensor_mutex);
 	kfree(s_ctrl->sensor_i2c_client);
 	kfree(s_ctrl);
@@ -86,7 +86,7 @@ static int32_t msm_sensor_driver_create_i2c_v4l_subdev
 	struct i2c_client *client = s_ctrl->sensor_i2c_client->client;
 
 	CDBG("%s %s I2c probe succeeded\n", __func__, client->name);
-	rc = camera_init_v4l2(&client->dev, &session_id);
+	rc = legacy_m_camera_init_v4l2(&client->dev, &session_id);
 	if (rc < 0) {
 		pr_err("failed: camera_init_i2c_v4l2 rc %d", rc);
 		return rc;
@@ -105,15 +105,15 @@ static int32_t msm_sensor_driver_create_i2c_v4l_subdev
 	s_ctrl->msm_sd.sd.entity.name =	s_ctrl->msm_sd.sd.name;
 	s_ctrl->sensordata->sensor_info->session_id = session_id;
 	s_ctrl->msm_sd.close_seq = MSM_SD_CLOSE_2ND_CATEGORY | 0x3;
-	rc = msm_sd_register(&s_ctrl->msm_sd);
+	rc = legacy_m_msm_sd_register(&s_ctrl->msm_sd);
 	if (rc < 0) {
-		pr_err("failed: msm_sd_register rc %d", rc);
+		pr_err("failed: legacy_m_msm_sd_register rc %d", rc);
 		return rc;
 	}
 	msm_sensor_v4l2_subdev_fops = v4l2_subdev_fops;
 #ifdef CONFIG_COMPAT
 	msm_sensor_v4l2_subdev_fops.compat_ioctl32 =
-		msm_sensor_subdev_fops_ioctl;
+		legacy_m_msm_sensor_subdev_fops_ioctl;
 #endif
 	s_ctrl->msm_sd.sd.devnode->fops =
 		&msm_sensor_v4l2_subdev_fops;
@@ -127,9 +127,9 @@ static int32_t msm_sensor_driver_create_v4l_subdev
 	int32_t rc = 0;
 	uint32_t session_id = 0;
 
-	rc = camera_init_v4l2(&s_ctrl->pdev->dev, &session_id);
+	rc = legacy_m_camera_init_v4l2(&s_ctrl->pdev->dev, &session_id);
 	if (rc < 0) {
-		pr_err("failed: camera_init_v4l2 rc %d", rc);
+		pr_err("failed: legacy_m_camera_init_v4l2 rc %d", rc);
 		return rc;
 	}
 	CDBG("rc %d session_id %d", rc, session_id);
@@ -146,15 +146,15 @@ static int32_t msm_sensor_driver_create_v4l_subdev
 	s_ctrl->msm_sd.sd.entity.group_id = MSM_CAMERA_SUBDEV_SENSOR;
 	s_ctrl->msm_sd.sd.entity.name = s_ctrl->msm_sd.sd.name;
 	s_ctrl->msm_sd.close_seq = MSM_SD_CLOSE_2ND_CATEGORY | 0x3;
-	rc = msm_sd_register(&s_ctrl->msm_sd);
+	rc = legacy_m_msm_sd_register(&s_ctrl->msm_sd);
 	if (rc < 0) {
-		pr_err("failed: msm_sd_register rc %d", rc);
+		pr_err("failed: legacy_m_msm_sd_register rc %d", rc);
 		return rc;
 	}
-	msm_cam_copy_v4l2_subdev_fops(&msm_sensor_v4l2_subdev_fops);
+	legacy_m_msm_cam_copy_v4l2_subdev_fops(&msm_sensor_v4l2_subdev_fops);
 #ifdef CONFIG_COMPAT
 	msm_sensor_v4l2_subdev_fops.compat_ioctl32 =
-		msm_sensor_subdev_fops_ioctl;
+		legacy_m_msm_sensor_subdev_fops_ioctl;
 #endif
 	s_ctrl->msm_sd.sd.devnode->fops =
 		&msm_sensor_v4l2_subdev_fops;
@@ -636,7 +636,7 @@ static void msm_sensor_fill_sensor_info(struct msm_sensor_ctrl_t *s_ctrl,
 }
 
 /* static function definition */
-int32_t msm_sensor_driver_probe(void *setting,
+int32_t legacy_m_msm_sensor_driver_probe(void *setting,
 	struct msm_sensor_info_t *probed_info, char *entity_name)
 {
 	int32_t                              rc = 0;
@@ -851,25 +851,25 @@ int32_t msm_sensor_driver_probe(void *setting,
 	cci_client->i2c_freq_mode = slave_info->i2c_freq_mode;
 
 	/* Parse and fill vreg params for powerup settings */
-	rc = msm_camera_fill_vreg_params(
+	rc = legacy_m_msm_camera_fill_vreg_params(
 		s_ctrl->sensordata->power_info.cam_vreg,
 		s_ctrl->sensordata->power_info.num_vreg,
 		s_ctrl->sensordata->power_info.power_setting,
 		s_ctrl->sensordata->power_info.power_setting_size);
 	if (rc < 0) {
-		pr_err("failed: msm_camera_get_dt_power_setting_data rc %d",
+		pr_err("failed: legacy_m_msm_camera_get_dt_power_setting_data rc %d",
 			rc);
 		goto free_camera_info;
 	}
 
 	/* Parse and fill vreg params for powerdown settings*/
-	rc = msm_camera_fill_vreg_params(
+	rc = legacy_m_msm_camera_fill_vreg_params(
 		s_ctrl->sensordata->power_info.cam_vreg,
 		s_ctrl->sensordata->power_info.num_vreg,
 		s_ctrl->sensordata->power_info.power_down_setting,
 		s_ctrl->sensordata->power_info.power_down_setting_size);
 	if (rc < 0) {
-		pr_err("failed: msm_camera_fill_vreg_params for PDOWN rc %d",
+		pr_err("failed: legacy_m_msm_camera_fill_vreg_params for PDOWN rc %d",
 			rc);
 		goto free_camera_info;
 	}
@@ -1022,26 +1022,26 @@ static int32_t msm_sensor_driver_get_dt_data(struct msm_sensor_ctrl_t *s_ctrl)
 	}
 
 	/* Read subdev info */
-	rc = msm_sensor_get_sub_module_index(of_node, &sensordata->sensor_info);
+	rc = legacy_m_msm_sensor_get_sub_module_index(of_node, &sensordata->sensor_info);
 	if (rc < 0) {
 		pr_err("failed");
 		goto FREE_SENSOR_DATA;
 	}
 
 	/* Read vreg information */
-	rc = msm_camera_get_dt_vreg_data(of_node,
+	rc = legacy_m_msm_camera_get_dt_vreg_data(of_node,
 		&sensordata->power_info.cam_vreg,
 		&sensordata->power_info.num_vreg);
 	if (rc < 0) {
-		pr_err("failed: msm_camera_get_dt_vreg_data rc %d", rc);
+		pr_err("failed: legacy_m_msm_camera_get_dt_vreg_data rc %d", rc);
 		goto FREE_SUB_MODULE_DATA;
 	}
 
 	/* Read gpio information */
-	rc = msm_sensor_driver_get_gpio_data
+	rc = legacy_m_msm_sensor_driver_get_gpio_data
 		(&(sensordata->power_info.gpio_conf), of_node);
 	if (rc < 0) {
-		pr_err("failed: msm_sensor_driver_get_gpio_data rc %d", rc);
+		pr_err("failed: legacy_m_msm_sensor_driver_get_gpio_data rc %d", rc);
 		goto FREE_VREG_DATA;
 	}
 
@@ -1142,9 +1142,9 @@ static int32_t msm_sensor_driver_parse(struct msm_sensor_ctrl_t *s_ctrl)
 		ARRAY_SIZE(msm_sensor_driver_subdev_info);
 
 	/* Initialize default parameters */
-	rc = msm_sensor_init_default_params(s_ctrl);
+	rc = legacy_m_msm_sensor_init_default_params(s_ctrl);
 	if (rc < 0) {
-		pr_err("failed: msm_sensor_init_default_params rc %d", rc);
+		pr_err("failed: legacy_m_msm_sensor_init_default_params rc %d", rc);
 		goto FREE_DT_DATA;
 	}
 
@@ -1193,12 +1193,12 @@ static int32_t msm_sensor_driver_platform_probe(struct platform_device *pdev)
 	}
 
 	/* Get clocks information */
-	rc = msm_camera_get_clk_info(s_ctrl->pdev,
+	rc = legacy_m_msm_camera_get_clk_info(s_ctrl->pdev,
 		&s_ctrl->sensordata->power_info.clk_info,
 		&s_ctrl->sensordata->power_info.clk_ptr,
 		&s_ctrl->sensordata->power_info.clk_info_size);
 	if (rc < 0) {
-		pr_err("failed: msm_camera_get_clk_info rc %d", rc);
+		pr_err("failed: legacy_m_msm_camera_get_clk_info rc %d", rc);
 		goto FREE_S_CTRL;
 	}
 
@@ -1249,13 +1249,13 @@ static int32_t msm_sensor_driver_i2c_probe(struct i2c_client *client,
 		s_ctrl->sensordata->power_info.dev = &client->dev;
 	}
 	/* Get clocks information */
-	rc = msm_camera_i2c_dev_get_clk_info(
+	rc = legacy_m_msm_camera_i2c_dev_get_clk_info(
 		&s_ctrl->sensor_i2c_client->client->dev,
 		&s_ctrl->sensordata->power_info.clk_info,
 		&s_ctrl->sensordata->power_info.clk_ptr,
 		&s_ctrl->sensordata->power_info.clk_info_size);
 	if (rc < 0) {
-		pr_err("failed: msm_camera_i2c_dev_get_clk_info rc %d", rc);
+		pr_err("failed: legacy_m_msm_camera_i2c_dev_get_clk_info rc %d", rc);
 		goto FREE_S_CTRL;
 	}
 	return rc;
@@ -1276,7 +1276,7 @@ static int msm_sensor_driver_i2c_remove(struct i2c_client *client)
 	}
 
 	g_sctrl[s_ctrl->id] = NULL;
-	msm_sensor_free_sensor_data(s_ctrl);
+	legacy_m_msm_sensor_free_sensor_data(s_ctrl);
 	kfree(s_ctrl->msm_sensor_mutex);
 	kfree(s_ctrl->sensor_i2c_client);
 	kfree(s_ctrl);
