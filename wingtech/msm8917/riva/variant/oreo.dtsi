@@ -105,12 +105,6 @@
 		"sensor_gpio_reset";
 };
 
-&soc {
-	qcom,msm-thermal {
-		qcom,therm-reset-temp = <115>;
-	};
-};
-
 &spmi_bus {
 	qcom,pm8937@0 {
 		qcom,power-on@800 {

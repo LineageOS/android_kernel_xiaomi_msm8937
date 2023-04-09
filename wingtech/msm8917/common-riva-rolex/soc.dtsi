@@ -6,10 +6,6 @@
 	reg = <0x84A00000 0x1900000>;
 };
 &soc {
-	qcom,msm-thermal {
-		/delete-property/ qcom,therm-reset-temp;
-	};
-
 	sec_boot_fuse: secbootfuse@0xa41d0 {
 		compatible = "qcom,sec-boot-fuse";
 		reg = <0xa41d0 0x4>;
