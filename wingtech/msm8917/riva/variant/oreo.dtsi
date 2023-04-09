@@ -27,15 +27,6 @@
 	reg = <0x00 0x85b00000 0x00 0xd00000>;
 };
 
-&gpio_led_off {
-	config {
-		pins = "gpio39";
-	};
-	mux {
-		pins = "gpio39";
-	};
-};
-
 &pri_tlmm_lines_act {
 	mux {
 		pins = "gpio85", "gpio88";

@@ -31,13 +31,3 @@
 		pins = "gpio35";
 	};
 };
-
-/* From stock msm8917-pinctrl.dtsi */
-&gpio_led_off {
-	mux {
-		pins = "gpio39";
-	};
-	config {
-		pins = "gpio39";
-	};
-};
