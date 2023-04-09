@@ -14,14 +14,6 @@
 	};
 };
 
-&pmi8950_flash1 {
-	status = "disabled";
-};
-
-&pmi8950_torch1 {
-	status = "disabled";
-};
-
 &pmi8950_gpios {
 	gpio@c000 {
 		qcom,invert = <0>;

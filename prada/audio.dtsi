@@ -25,3 +25,10 @@
 	/delete-property/ pinctrl-1;
 	/delete-property/ pinctrl-names;
 };
+
+&tlmm {
+	/delete-node/ cdc_reset_ctrl;
+	/delete-node/ cross-conn-det;
+	/delete-node/ pri-tlmm-lines;
+	/delete-node/ pri-tlmm-ws-lines;
+};

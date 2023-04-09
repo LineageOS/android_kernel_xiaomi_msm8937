@@ -11,7 +11,6 @@
 #include "misc.dtsi"
 #include "pm8937.dtsi"
 #include "pmi8950.dtsi"
-#include "remove.dtsi"
 #include "soc.dtsi"
 #include "touchscreen.dtsi"
 #include "vibrator.dtsi"
