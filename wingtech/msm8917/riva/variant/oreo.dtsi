@@ -1,19 +1,4 @@
 /* From compare result of Nougat dtb and Oreo dtb */
-/ {
-	firmware {
-		android {
-			fstab {
-				system {
-					fsmgr_flags = "wait,verify";
-				};
-				vendor {
-					status = "disable";
-				};
-			};
-		};
-	};
-};
-
 &other_ext_mem {
 	reg = <0x00 0x85b00000 0x00 0xd00000>;
 };
