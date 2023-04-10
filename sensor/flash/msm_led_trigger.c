@@ -309,8 +309,12 @@ static struct platform_driver msm_led_trigger_driver = {
 	},
 };
 
+extern bool camera_legacy_enable;
+
 static int __init msm_led_trigger_add_driver(void)
 {
+	if (!camera_legacy_enable)
+		return -ENODEV;
 	CDBG("called\n");
 	return platform_driver_register(&msm_led_trigger_driver);
 }

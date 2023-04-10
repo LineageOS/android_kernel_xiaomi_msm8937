@@ -626,9 +626,14 @@ static struct platform_driver msm_ir_cut_platform_driver = {
 	},
 };
 
+extern bool camera_legacy_enable;
+
 static int __init msm_ir_cut_init_module(void)
 {
 	int32_t rc = 0;
+
+	if (!camera_legacy_enable)
+		return -ENODEV;
 
 	CDBG("Enter\n");
 	rc = platform_driver_register(&msm_ir_cut_platform_driver);

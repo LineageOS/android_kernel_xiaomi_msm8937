@@ -351,8 +351,12 @@ static struct platform_driver vfe48_driver = {
 	},
 };
 
+extern bool camera_legacy_enable;
+
 static int __init msm_vfe47_init_module(void)
 {
+	if (!camera_legacy_enable)
+		return -ENODEV;
 	return platform_driver_register(&vfe48_driver);
 }
 

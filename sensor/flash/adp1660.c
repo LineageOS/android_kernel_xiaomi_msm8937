@@ -116,9 +116,14 @@ static struct platform_driver adp1660_platform_driver = {
 	},
 };
 
+extern bool camera_legacy_enable;
+
 static int __init msm_flash_adp1660_init_module(void)
 {
 	int32_t rc = 0;
+
+	if (!camera_legacy_enable)
+		return -ENODEV;
 
 	rc = platform_driver_register(&adp1660_platform_driver);
 

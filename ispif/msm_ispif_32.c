@@ -1562,8 +1562,12 @@ static struct platform_driver ispif_driver = {
 	},
 };
 
+extern bool camera_legacy_enable;
+
 static int __init msm_ispif_init_module(void)
 {
+	if (!camera_legacy_enable)
+		return -ENODEV;
 	return platform_driver_register(&ispif_driver);
 }
 
