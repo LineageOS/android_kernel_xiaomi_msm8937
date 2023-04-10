@@ -1,10 +1,10 @@
-&pmi8950_charger {
+&qpnp_smbcharger {
 	/delete-property/ qcom,autoadjust-vfloat;
 	qcom,float-voltage-mv = <4400>;
 	status = "okay";
 };
 
-&pmi8950_fg {
+&qpnp_fg {
 	qcom,bad-battery-detection-enable;
 	qcom,cl-max-increment-deciperc = <1>;
 	qcom,cl-max-decrement-deciperc = <1>;

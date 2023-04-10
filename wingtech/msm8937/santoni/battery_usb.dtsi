@@ -8,7 +8,7 @@
 	};
 };
 
-&pmi8950_charger {
+&qpnp_smbcharger {
 	qcom,battery-data = <&qrd_batterydata>;
 	qcom,chg-inhibit-fg;
 	qcom,thermal-mitigation = <2000 1500 1200 700 0>;
@@ -16,7 +16,7 @@
 	qcom,vchg-adc-channel-id = <3>;
 };
 
-&pmi8950_fg {
+&qpnp_fg {
 	qcom,battery-data = <&qrd_batterydata>;
 	qcom,cool-bat-decidegc = <(150)>;
 	qcom,hot-bat-decidegc = <550>;
