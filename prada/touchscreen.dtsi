@@ -39,6 +39,7 @@
 			atmel,mult-tchthr-sensitive = <0>;
 			atmel,mult-tchthr-not-sensitive = <0>;
 			atmel,wake-up-self-adcx = <16>;
+			atmel,support-wakeup-gesture;
 		};
 	};
 
