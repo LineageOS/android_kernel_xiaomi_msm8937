@@ -1,6 +1,12 @@
-dtb-$(CONFIG_ARCH_MSM8917) += rolex.dtb riva.dtb riva-oreo.dtb tiare.dtb ugglite.dtb
-dtb-$(CONFIG_ARCH_MSM8937) += land.dtb prada.dtb
-dtb-$(CONFIG_ARCH_MSM8940) += santoni.dtb ugg.dtb
+dtb-$(CONFIG_MACH_XIAOMI_LAND) += land.dtb
+dtb-$(CONFIG_MACH_XIAOMI_PRADA) += prada.dtb
+dtb-$(CONFIG_MACH_XIAOMI_RIVA_OREO) += riva-oreo.dtb
+dtb-$(CONFIG_MACH_XIAOMI_RIVA) += riva.dtb
+dtb-$(CONFIG_MACH_XIAOMI_ROLEX) += rolex.dtb
+dtb-$(CONFIG_MACH_XIAOMI_SANTONI) += santoni.dtb
+dtb-$(CONFIG_MACH_XIAOMI_TIARE) += tiare.dtb
+dtb-$(CONFIG_MACH_XIAOMI_UGGLITE) += ugglite.dtb
+dtb-$(CONFIG_MACH_XIAOMI_UGG) += ugg.dtb
 
 always		:= $(dtb-y)
 subdir-y	:= $(dts-dirs)
