@@ -1,7 +1,7 @@
 /* From stock msm8937-camera-sensor-mtp.dtsi */
 &soc {
 	flash_GPIO:flashlight_back {
-		compatible = "qcom,leds-back-gpio-flash";
+		compatible = "qcom,leds-gpio-flash";
 		status = "okay";
 		pinctrl-names = "flash_default", "flash_sleep";
 		pinctrl-0 = <&cam_flash_front0_default>;

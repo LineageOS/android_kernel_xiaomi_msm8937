@@ -1,3 +1,4 @@
 &led_flash0 {
+	qcom,flash-type = <1>;
 	qcom,switch-source = <&pmi8950_switch>;
 };

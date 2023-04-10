@@ -8,9 +8,9 @@
 		pinctrl-1 = <&cam_flash_front1_sleep>;
 		qcom,flash-en = <&tlmm 0 0>;
 		qcom,flash-now = <&tlmm 50 0>;
-		qcom,op-seq = "flash_en";
-		qcom,torch-seq-val = <1 0>;
-		qcom,flash-seq-val = <0 1>;
+		qcom,op-seq = "flash_en", "flash_now";
+		qcom,torch-seq-val = <1 1>;
+		qcom,flash-seq-val = <1 1>;
 		qcom,max-current = <1000>;
 		qcom,duration = <1280>;
 		qcom,current = <625>;

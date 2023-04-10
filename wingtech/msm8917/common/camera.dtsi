@@ -5,16 +5,20 @@
 		status = "okay";
 		pinctrl-names = "flash_default";
 		pinctrl-0 = <&SGM3780_default>;
-		qcom,flash-en = <93>;
-		qcom,flash-now = <90>;
+		qcom,flash-en = <&tlmm 93 0>;
+		qcom,flash-now = <&tlmm 90 0>;
 		qcom,op-seq = "flash_en", "flash_now";
 		qcom,torch-seq-val = <1 0>;
 		qcom,flash-seq-val = <0 1>;
+		qcom,max-current = <800>;
+		qcom,duration = <1280>;
+		qcom,current = <400>;
 		linux,name = "flashlight";
 		linux,default-trigger = "flashlight-trigger";
 	};
 };
 &led_flash0 {
+	qcom,flash-type = <3>;
 	qcom,flash-source = <&flash_SGM3780>;
 	qcom,torch-source = <&flash_SGM3780>;
 };
