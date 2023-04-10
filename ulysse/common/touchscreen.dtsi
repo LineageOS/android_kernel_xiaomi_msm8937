@@ -64,6 +64,7 @@
 		goodix,auto-update = <1>;
 		goodix,auto-update-cfg = <0>;
 		goodix,power-off-sleep = <0>;
+		goodix,slide-wakeup = <1>;
 		goodix,cfg-group0 = [
 			52 D0 02 00 05 0A 3C CF 11 CF 32
 			0F 5A 46 05 64 00 00 00 00 24 33
