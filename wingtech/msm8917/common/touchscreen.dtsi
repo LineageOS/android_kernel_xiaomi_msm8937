@@ -1,6 +1,7 @@
 /* From stock msm8917-pmi8937-qrd-sku5_S8850?.dtsi */
 &i2c_3 { /* BLSP1 QUP3 */
 	ftech {
+		compatible = "focaltech,5346";
 		reg = <0x38>;
 		ftech,virtual-key1 = <139 140 2000>;/*menu*/
 		ftech,virtual-key2 = <172 360 2000>;/*home*/

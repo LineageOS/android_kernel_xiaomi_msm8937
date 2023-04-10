@@ -3,7 +3,7 @@
 	status = "ok";
 	clock-frequency = <400000>;
 	focaltech@38 {
-		compatible = "focaltech,fts";
+		compatible = "focaltech,ft5435";
 		reg = <0x38>;
 		interrupt-parent = <&tlmm>;
 		interrupts = <65 IRQ_TYPE_LEVEL_LOW>;
