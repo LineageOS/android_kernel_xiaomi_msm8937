@@ -164,8 +164,12 @@ static struct platform_driver i2c_mux_driver = {
 	},
 };
 
+extern bool camera_legacy_m_enable;
+
 static int __init msm_camera_i2c_mux_init_module(void)
 {
+	if (!camera_legacy_m_enable)
+		return -ENODEV;
 	return platform_driver_register(&i2c_mux_driver);
 }
 

@@ -325,9 +325,13 @@ static struct platform_driver msm_jpeg_driver = {
 	},
 };
 
+extern bool camera_legacy_m_enable;
+
 static int __init msm_jpeg_driver_init(void)
 {
 	int rc;
+	if (!camera_legacy_m_enable)
+		return -ENODEV;
 	rc = platform_driver_register(&msm_jpeg_driver);
 	return rc;
 }

@@ -21,6 +21,8 @@ LINUXINCLUDE    += \
                 -I$(srctree)/techpack/camera-legacy-m/include \
                 -I$(srctree)/techpack/camera-legacy-m/include/uapi
 
+obj-$(CONFIG_MSMB_CAMERA_LEGACY_M) += init.o
+
 obj-$(CONFIG_MSMB_CAMERA) += common/
 obj-$(CONFIG_MSMB_CAMERA) += msm.o
 obj-$(CONFIG_MSMB_CAMERA) += camera/

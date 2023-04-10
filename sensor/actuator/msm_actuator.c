@@ -2063,9 +2063,13 @@ static struct platform_driver msm_actuator_platform_driver = {
 	},
 };
 
+extern bool camera_legacy_m_enable;
+
 static int __init msm_actuator_init_module(void)
 {
 	int32_t rc = 0;
+	if (!camera_legacy_m_enable)
+		return -ENODEV;
 	CDBG("Enter\n");
 	rc = platform_driver_register(&msm_actuator_platform_driver);
 	if (!rc)

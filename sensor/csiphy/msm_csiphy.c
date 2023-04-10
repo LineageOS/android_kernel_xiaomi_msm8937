@@ -1583,8 +1583,12 @@ static struct platform_driver csiphy_driver = {
 	},
 };
 
+extern bool camera_legacy_m_enable;
+
 static int __init msm_csiphy_init_module(void)
 {
+	if (!camera_legacy_m_enable)
+		return -ENODEV;
 	return platform_driver_register(&csiphy_driver);
 }
 
