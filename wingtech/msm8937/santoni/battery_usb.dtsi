@@ -22,7 +22,6 @@
 	qcom,hot-bat-decidegc = <550>;
 	qcom,fg-iterm-ma = <180>;
 	qcom,fg-chg-iterm-ma = <130>;
-	qcom,vbat-estimate-diff-mv = <100>;
 	qcom,fg-cutoff-voltage-mv = <3400>;
 	qcom,thermal-coefficients = [B7 85 B2 49 71 35];
 };

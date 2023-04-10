@@ -13,6 +13,7 @@
 	qcom,fg-delta-soc = <1>;
 	qcom,hold-soc-while-full;
 	qcom,resume-soc-raw = <254>;
+	qcom,vbat-estimate-diff-mv = <100>;
 	qcom,warm-bat-decidegc = <450>;
 	qcom,warm-bat-india-decidegc = <500>;
 };
