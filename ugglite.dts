@@ -1,7 +1,9 @@
 /dts-v1/;
 
 #include "qcom/msm8917.dtsi"
-#include "qcom/msm8917-pmi8937-mtp.dtsi"
+#include "qcom/msm8917-audio.dtsi"
+#include "qcom/msm8917-mtp.dtsi"
+#include "qcom/msm8917-pmi8937.dtsi"
 
 #include "common/fragments/delete-msm89x7-camera-sensor-mtp.dtsi"
 
