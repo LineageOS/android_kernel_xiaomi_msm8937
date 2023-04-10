@@ -33,11 +33,6 @@
 	};
 };
 
-/* From stock msm-audio.dtsi */
-&int_codec {
-	qcom,msm-spk-ext-pa = <&tlmm 124 0>; // WARNING: Overridden by below
-};
-
 /* From stock msm8917-qrd_S88508.dtsi */
 &i2c_6 {
 	status = "ok";
@@ -49,6 +44,5 @@
 	};
 };
 &int_codec {
-	qcom,msm-spk-ext-pa;
 	qcom,msm-micbias2-ext-cap;
 };
