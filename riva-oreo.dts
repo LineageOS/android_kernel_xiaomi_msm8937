@@ -6,8 +6,6 @@
 
 #define IS_MSM8917
 
-#include "common/include/msm8937-regulator.h"
-
 #include "common/common.dtsi"
 #include "wingtech/common/common.dtsi"
 #include "wingtech/msm8917/common/common.dtsi"

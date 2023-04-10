@@ -13,10 +13,10 @@
 		qcom,poll0 = <0 0x0 2 0x0 1 0>;
 		qcom,mem0 = <7159 0x0 2 0x0 1 0>;
 
-		cam_vdig-supply = <&pm8917_l23>;
-		cam_vio-supply = <&pm8917_l6>;
-		cam_vana-supply = <&pm8917_l22>;
-		cam_vaf-supply = <&pm8917_l17>;
+		cam_vdig-supply = <&pm8937_l23>;
+		cam_vio-supply = <&pm8937_l6>;
+		cam_vana-supply = <&pm8937_l22>;
+		cam_vaf-supply = <&pm8937_l17>;
 		qcom,cam-vreg-name = "cam_vdig", "cam_vio", "cam_vana",
 							"cam_vaf";
 		qcom,cam-vreg-min-voltage = <1200000 1800000 2850000 2850000>;
@@ -72,10 +72,10 @@
 		qcom,poll0 = <0 0x0 2 0x0 1 0>;
 		qcom,mem0 = <7159 0x0 2 0x0 1 0>;
 
-		cam_vdig-supply = <&pm8917_l23>;
-		cam_vio-supply = <&pm8917_l6>;
-		cam_vana-supply = <&pm8917_l22>;
-		cam_vaf-supply = <&pm8917_l17>;
+		cam_vdig-supply = <&pm8937_l23>;
+		cam_vio-supply = <&pm8937_l6>;
+		cam_vana-supply = <&pm8937_l22>;
+		cam_vaf-supply = <&pm8937_l17>;
 		qcom,cam-vreg-name = "cam_vdig", "cam_vio", "cam_vana",
 							"cam_vaf";
 		qcom,cam-vreg-min-voltage = <1200000 1800000 2850000 2850000>;
@@ -156,9 +156,9 @@
 		qcom,poll6 =   <0 0x0A00 2 0x00 1 0>;
 		qcom,mem6 = <0 0x0 2 0 1 0>;
 
-		cam_vdig-supply = <&pm8917_l23>;
-		cam_vio-supply = <&pm8917_l6>;
-		cam_vana-supply = <&pm8917_l22>;
+		cam_vdig-supply = <&pm8937_l23>;
+		cam_vio-supply = <&pm8937_l6>;
+		cam_vana-supply = <&pm8937_l22>;
 		qcom,cam-vreg-name = "cam_vdig", "cam_vio", "cam_vana";
 		qcom,cam-vreg-min-voltage = <1200000 1800000 2850000>;
 		qcom,cam-vreg-max-voltage = <1200000 1800000 2850000>;
@@ -216,9 +216,9 @@
 		qcom,poll0 = <0 0x0 2 0x0 1 0>;
 		qcom,mem0 = <5397 0x0 2 0x0 1 0>;
 
-		cam_vdig-supply = <&pm8917_l23>;
-		cam_vio-supply = <&pm8917_l6>;
-		cam_vana-supply = <&pm8917_l22>;
+		cam_vdig-supply = <&pm8937_l23>;
+		cam_vio-supply = <&pm8937_l6>;
+		cam_vana-supply = <&pm8937_l22>;
 		qcom,cam-vreg-name = "cam_vdig", "cam_vio", "cam_vana";
 		qcom,cam-vreg-min-voltage = <1200000 1800000 2850000>;
 		qcom,cam-vreg-max-voltage = <1200000 1800000 2850000>;

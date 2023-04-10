@@ -18,8 +18,6 @@
 
 #include "common/fragments/delete-msm89x7-camera-sensor-mtp.dtsi"
 
-#include "common/include/msm8937-regulator.h"
-
 #include "common/common.dtsi"
 #include "prada/prada.dtsi"
 

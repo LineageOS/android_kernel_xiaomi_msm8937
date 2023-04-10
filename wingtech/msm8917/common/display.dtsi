@@ -3,7 +3,7 @@
 	tps65132@3e {
 		compatible = "ti,tps65132";
 		reg = <0x3e>;
-		i2c-pwr-supply = <&pm8917_l5>;
+		i2c-pwr-supply = <&pm8937_l5>;
 		ti,en-gpio-lpm;
 		pinctrl-names = "default";
 		pinctrl-0 = <&tps65132_en_default>;

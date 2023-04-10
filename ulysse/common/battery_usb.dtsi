@@ -45,7 +45,7 @@
 		interrupts = <62 2>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&bq_int_default>;
-		vdd-supply = <&PM8937_L16>;
+		vdd-supply = <&pm8937_l16>;
 		ti,battery-type-b = "feimaotui_3080mah";
 		ti,battery-type-a = "guangyu_3080mah";
 		ti,batt-profile-select;

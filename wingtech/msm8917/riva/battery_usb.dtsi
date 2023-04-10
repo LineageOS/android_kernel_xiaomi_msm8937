@@ -9,7 +9,7 @@
 		pinctrl-0 = <&smb_int_default>;
 
 		regulator-name = "bq2560x_otg_supply";
-		vdd-supply = <&pm8917_l17>;
+		vdd-supply = <&pm8937_l17>;
 
 		ti,bq2560x,chip-enable-gpio = <48>;
 		ti,bq2560x,usb-vlim = <4400>;
@@ -53,7 +53,7 @@
 		compatible = "ti,bq27426";
 		reg = <0x55>;
 
-		vcc_i2c-supply = <&pm8917_l5>;
+		vcc_i2c-supply = <&pm8937_l5>;
 		interrupt-parent = <&tlmm>;
 		interrupts = <25 2>;
 		qcom,battid-vadc = <&pm8937_vadc>;

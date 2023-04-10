@@ -3,8 +3,8 @@
 	awinic@45 {
 		compatible = "awinic,aw2013";
 		reg = <0x45>;
-		vdd-supply = <&PM8937_L10>;
-		vcc-supply = <&PM8937_L5>;
+		vdd-supply = <&pm8937_l10>;
+		vcc-supply = <&pm8937_l5>;
 
 		aw2013,white {
 			aw2013,name = "white";

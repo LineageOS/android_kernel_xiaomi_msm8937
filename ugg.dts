@@ -5,8 +5,6 @@
 
 #include "common/fragments/delete-msm89x7-camera-sensor-mtp.dtsi"
 
-#include "common/include/msm8937-regulator.h"
-
 #include "common/common.dtsi"
 #include "ulysse/common/common.dtsi"
 #include "ulysse/ugg/ugg.dtsi"

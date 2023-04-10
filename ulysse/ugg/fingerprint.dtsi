@@ -7,9 +7,9 @@
 		interrupts = <124 0x0>;
 		fpc,gpio_rst    = <&tlmm 132 0x0>;
 		fpc,gpio_irq    = <&tlmm 124 0x0>;
-		vcc_spi-supply  = <&PM8937_L6>;
-		vdd_io-supply   = <&PM8937_L6>;
-		vdd_ana-supply  = <&PM8937_L6>;
+		vcc_spi-supply  = <&pm8937_l6>;
+		vdd_io-supply   = <&pm8937_l6>;
+		vdd_ana-supply  = <&pm8937_l6>;
 
 		pinctrl-names = "fpc1020_reset_reset",
 			"fpc1020_reset_active",
@@ -23,9 +23,9 @@
 		compatible = "goodix,fingerprint";
 		interrupt-parent = <&tlmm>;
 		interrupt = <124 0x0>;
-		vcc_spi_supply = <&PM8937_L6>;
-		vcc_ana_supply = <&PM8937_L6>;
-		vdd_io-supply = <&PM8937_L6>;
+		vcc_spi_supply = <&pm8937_l6>;
+		vcc_ana_supply = <&pm8937_l6>;
+		vdd_io-supply = <&pm8937_l6>;
 		goodix,gpio_reset = <&tlmm 132 0>;
 		goodix,gpio_irq = <&tlmm 124 0>;
 		goodix,gpio_ldo = <&tlmm 128 0>;

@@ -3,8 +3,8 @@
 	cw2015: cw2015@62 {
 		compatible = "cellwise,cw2015";
 		reg = <0x62>;
-		vdd-supply = <&pm8917_l17>;
-		vcc_i2c-supply = <&pm8917_l5>;
+		vdd-supply = <&pm8937_l17>;
+		vcc_i2c-supply = <&pm8937_l5>;
 		interrupt-parent = <&tlmm>;
 		interrupts = <86 8>;
 		cw2015,irq-gpio=<86>;

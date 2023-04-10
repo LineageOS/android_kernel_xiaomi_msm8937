@@ -1,4 +1,4 @@
 /* From stock msm8917-pmi8937-qrd-sku5_S88503.dtsi */
-&pm8917_l6 {
+&pm8937_l6 {
 	regulator-always-on;
 };

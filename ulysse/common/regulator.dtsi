@@ -1,4 +1,4 @@
 /* From stock msm8937-regulator.dtsi */
-&PM8937_L22 {
+&pm8937_l22 {
 	regulator-max-microvolt = <3300000>;
 };
