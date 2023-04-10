@@ -1,5 +1,5 @@
 &pmi_haptic {
-	qcom,actuator-type = "erm";
+	qcom,actuator-type = <1>;
 	qcom,ilim-ma = <95>;
 	qcom,vmax-mv = <2800>;
 	qcom,wave-play-rate-us = <5263>;
