@@ -15,7 +15,7 @@
 
 #include "qcom/msm8937.dtsi"
 #include "qcom/pmi8950.dtsi"
-#include "qcom/msm8937-qrd.dtsi"
+#include "common/fragments/qcom/msm8937-qrd.dtsi"
 #include "qcom/msm8937-mdss-panels.dtsi"
 
 #include "common/fragments/delete-msm89x7-camera-sensor-qrd.dtsi"
