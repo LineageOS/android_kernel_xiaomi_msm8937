@@ -19,16 +19,6 @@
 	qcom,current = <595>;
 };
 
-&pmi8950_torch1 {
-	qcom,current = <100>;
-};
-
-&pmi8950_switch {
-	reg0 {
-		regulator-name = "pon_spare_reg";
-	};
-};
-
 &spmi_bus {
 	qcom,pmi8950@2 {
 		qcom,leds@a100 {

@@ -14,7 +14,6 @@
 
 &led_flash0 {
 	qcom,flash-source = <&pmi8950_flash0>;
-	qcom,torch-source = <&pmi8950_torch0 &pmi8950_torch2>;
 };
 
 &cci {
