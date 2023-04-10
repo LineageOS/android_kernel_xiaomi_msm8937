@@ -1,7 +1,7 @@
 /* From stock msm8917-pmi8937-qrd-sku5_S88503.dtsi */
 &soc {
 	gpio-leds {
-		compatible = "gpio-leds";
+		compatible = "gpio-leds-ir";
 		status = "okay";
 		pinctrl-names = "default";
 		pinctrl-0 = <&gpio_led_off>;
