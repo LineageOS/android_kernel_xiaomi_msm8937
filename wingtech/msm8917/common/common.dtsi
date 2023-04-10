@@ -6,6 +6,5 @@
 #include "display.dtsi"
 #include "led.dtsi"
 #include "pm8937.dtsi"
-#include "pm.dtsi"
 #include "touchscreen.dtsi"
 #include "vibrator.dtsi"

@@ -3,4 +3,3 @@
 #include "battery_usb.dtsi"
 #include "camera.dtsi"
 #include "fingerprint.dtsi"
-#include "pm.dtsi"
