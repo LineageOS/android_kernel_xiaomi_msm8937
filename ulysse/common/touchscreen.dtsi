@@ -52,6 +52,7 @@
 		touchscreen-size-y = <1280>;
 		touchscreen-max-w = <1024>;
 		touchscreen-max-p = <1024>;
+		touchscreen-key-map = <139 172 158>;
 		goodix,type-a-report = <0>;
 		goodix,driver-send-cfg = <1>;
 		goodix,wakeup-with-reset = <0>;
