@@ -56,11 +56,6 @@
 };
 
 /* From stock msm8940-pmi8937-mtp.dts */
-&pm8937_mpps {
-	mpp@a100 { /*MPP_02 for ADC*/
-		status = "okay";
-	};
-};
 &pm8937_vadc {
 	chan@11 {
 		label = "batt_rid";
