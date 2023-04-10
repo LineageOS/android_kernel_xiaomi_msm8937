@@ -17,6 +17,7 @@
 #include "qcom/msm8937-pmi8950-mtp.dtsi"
 
 #include "common/fragments/delete-msm89x7-camera-sensor-mtp.dtsi"
+#include "common/fragments/restore-old-msm8937-camera-pinctrl.dtsi"
 
 #include "common/common.dtsi"
 #include "prada/prada.dtsi"
