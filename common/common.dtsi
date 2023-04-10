@@ -2,5 +2,6 @@
 #include "audio.dtsi"
 #include "delete-unused-peripherals.dtsi"
 #include "display.dtsi"
+#include "led.dtsi"
 #include "ramoops.dtsi"
 #include "soc.dtsi"

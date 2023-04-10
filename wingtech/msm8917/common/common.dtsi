@@ -4,7 +4,6 @@
 #include "battery_usb.dtsi"
 #include "camera.dtsi"
 #include "display.dtsi"
-#include "led.dtsi"
 #include "pm8937.dtsi"
 #include "touchscreen.dtsi"
 #include "vibrator.dtsi"

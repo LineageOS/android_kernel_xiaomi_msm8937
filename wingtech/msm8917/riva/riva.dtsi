@@ -5,3 +5,4 @@
 #include "camera.dtsi"
 #include "display.dtsi"
 #include "ir.dtsi"
+#include "led.dtsi"

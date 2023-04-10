@@ -1,54 +1,8 @@
 &i2c_2 { /* i2c 2 */
-	aw2013@45 { /*blink */
+	led_aw2013: aw2013@45 { /*blink */
+		compatible = "awinic,aw2013";
 		reg = <0x45>;
-
-		red {
-			label = "red";
-			linux,default-trigger = "battery-red";
-			default-state = "off";
-			retain-state-suspended;
-		};
-
-		green {
-			label = "green";
-			linux,default-trigger = "battery-green";
-			default-state = "off";
-			retain-state-suspended;
-		};
-
-		blue {
-			label = "blue";
-			linux,default-trigger = "battery-blue";
-			default-state = "off";
-			retain-state-suspended;
-		};
-
-		white {
-			label = "white";
-			linux,default-trigger = "none";
-			default-state = "off";
-			retain-state-suspended;
-		};
-
-		yellow {
-			label = "yellow";
-			linux,default-trigger = "none";
-			default-state = "off";
-			retain-state-suspended;
-		};
-
-		cyan {
-			label = "cyan";
-			linux,default-trigger = "none";
-			default-state = "off";
-			retain-state-suspended;
-		};
-
-		purple {
-			label = "purple";
-			linux,default-trigger = "none";
-			default-state = "off";
-			retain-state-suspended;
-		};
+		vdd-supply = <&pm8937_l10>;
+		vcc-supply = <&pm8937_l5>;
 	};
 };

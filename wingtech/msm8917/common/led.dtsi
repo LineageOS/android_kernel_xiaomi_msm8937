@@ -1,7 +1,0 @@
-/* From stock msm8917-pmi8937-qrd-sku5_S8850?.dtsi */
-&i2c_2 { /* i2c 2 */
-	aw2013@45 { /*blink */
-		compatible = "awinc,aw2013";
-		rgb_led-supply = <&pm8937_l10>;
-	};
-};
