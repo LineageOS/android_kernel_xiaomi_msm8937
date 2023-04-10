@@ -7,7 +7,7 @@
 	qcom,smg3711-enable-gpio = <&tlmm 25 0>;
 	qcom,smg3711-in-gpio = <&tlmm 16 0>;
 
-	qcom,spk_ext_pa = <&tlmm 1 0>;
+	qcom,msm-spk-ext-pa = <&tlmm 1 0>;
 	/* WARNING: Override
 	   Changes:
 	   - Remove "WSA_SPK OUT", "VDD_WSA_SWITCH",
