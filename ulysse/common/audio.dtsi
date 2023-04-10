@@ -1,17 +1,3 @@
-/* From stock msm-audio.dtsi */
-&int_codec {
-	/delete-property/ qcom,pinctrl-names;
-	/delete-property/ pinctrl-names;
-	/delete-property/ pinctrl-0;
-	/delete-property/ pinctrl-1;
-	/delete-property/ pinctrl-2;
-	/delete-property/ pinctrl-3;
-	/delete-property/ pinctrl-4;
-	/delete-property/ pinctrl-5;
-	/delete-property/ pinctrl-6;
-	/delete-property/ pinctrl-7;
-};
-
 /* From stock msm8937-audio.dtsi */
 &int_codec {
 	/delete-property/ qcom,cdc-us-euro-gpios;
@@ -21,23 +7,6 @@
 	qcom,smg3711-enable-gpio = <&tlmm 25 0>;
 	qcom,smg3711-in-gpio = <&tlmm 16 0>;
 
-	qcom,msm-gpios =
-		"pri_i2s",
-		"spk_ext_pa-sw";
-	qcom,pinctrl-names =
-		"all_off",
-		"pri_i2s_act",
-		"spk_ext_pa_act",
-		"spk_ext_pa_sus";
-	pinctrl-names =
-		"all_off",
-		"pri_i2s_act",
-		"spk_ext_pa_act",
-		"spk_ext_pa_sus";
-	pinctrl-0 = <&cdc_pdm_lines_sus &cdc_pdm_lines_2_sus>;
-	pinctrl-1 = <&cdc_pdm_lines_act &cdc_pdm_lines_2_act>;
-	pinctrl-2 = <&spk_ext_pa_active>;
-	pinctrl-3 = <&spk_ext_pa_suspend>;
 	qcom,spk_ext_pa = <&tlmm 1 0>;
 	/* WARNING: Override
 	   Changes:

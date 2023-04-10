@@ -1,16 +1,4 @@
 &int_codec {
-	pinctrl-0 = <&cdc_pdm_lines_sus &cdc_pdm_lines_2_sus>;
-	pinctrl-1 = <&cdc_pdm_lines_act &cdc_pdm_lines_2_act>;
-	pinctrl-2 = <&cdc_pdm_lines_sus &cdc_pdm_lines_2_sus>;
-	pinctrl-3 = <&cdc_pdm_lines_act &cdc_pdm_lines_2_act>;
-	/delete-property/ pinctrl-4;
-	/delete-property/ pinctrl-5;
-	/delete-property/ pinctrl-6;
-	/delete-property/ pinctrl-7;
-	pinctrl-names = "all_off", "pri_i2s_act", "quin_act", "quin_pri_i2s_act";
-	qcom,msm-gpios = "pri_i2s", "quin_i2s";
-	qcom,pinctrl-names = "all_off", "pri_i2s_act", "quin_act", "quin_pri_i2s_act";
-
 	/delete-property/ qcom,cdc-us-eu-gpios;
 	/delete-property/ qcom,cdc-us-euro-gpios;
 	/delete-property/ qcom,quin-mi2s-gpios;
