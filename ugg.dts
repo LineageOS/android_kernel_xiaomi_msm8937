@@ -18,4 +18,7 @@
 	compatible = "qcom,msm8940-mtp", "qcom,msm8940", "qcom,mtp", "xiaomi,ugg";
 	qcom,board-id= <8 0>;
 	qcom,pmic-id = <0x10019 0x0 0x0 0x0>;
+
+	xiaomi,series = "ulysse";
+	xiaomi,device = "ugg";
 };

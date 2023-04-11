@@ -21,4 +21,7 @@
 	compatible = "qcom,msm8917-mtp", "qcom,msm8917", "qcom,mtp", "xiaomi,ugglite";
 	qcom,board-id= <8 0>;
 	qcom,pmic-id = <0x10019 0x0 0x0 0x0>;
+
+	xiaomi,series = "ulysse";
+	xiaomi,device = "ugglite";
 };

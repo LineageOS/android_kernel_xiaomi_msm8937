@@ -30,4 +30,7 @@
 	compatible = "qcom,msm8937-mtp", "qcom,msm8937", "qcom,mtp", "xiaomi,prada";
 	qcom,board-id= <8 0>;
 	qcom,pmic-id = <0x10019 0x010011 0x0 0x0>;
+
+	xiaomi,series = "prada";
+	xiaomi,device = "prada";
 };

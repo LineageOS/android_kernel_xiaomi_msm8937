@@ -21,4 +21,7 @@
 	compatible = "qcom,msm8917-qrd-sku5", "qcom,msm8917-qrd",
 		   "qcom,msm8917", "qcom,qrd", "xiaomi,riva";
 	qcom,board-id = <0x1000b 1>;
+
+	xiaomi,series = "rova";
+	xiaomi,device = "riva";
 };

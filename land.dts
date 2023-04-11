@@ -34,4 +34,7 @@
 	compatible = "qcom,msm8937-pmi8950-qrd-wt88537_64",
 		   "qcom,msm8937-qrd", "qcom,msm8937", "qcom,qrd", "xiaomi,land";
 	qcom,board-id= <0x1000b 1>, <0x2000b 1>;
+
+	xiaomi,series = "landtoni";
+	xiaomi,device = "land";
 };
