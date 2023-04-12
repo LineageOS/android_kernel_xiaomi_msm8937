@@ -265,7 +265,7 @@ static void mdss_dsi_panel_bklt_dcs(struct mdss_dsi_ctrl_pdata *ctrl, int level)
 			led_pwm1[1] = (unsigned char)level;
 			pr_debug("swb.%s ugglite and ugg use default led_pwm1\n",__func__);
 		}
-	};
+	}
 #endif
 
 	led_pwm1[1] = (unsigned char)level;
@@ -273,8 +273,10 @@ static void mdss_dsi_panel_bklt_dcs(struct mdss_dsi_ctrl_pdata *ctrl, int level)
 	memset(&cmdreq, 0, sizeof(cmdreq));
 	cmdreq.cmds = &backlight_cmd;
 #ifdef CONFIG_MACH_XIAOMI_ULYSSE
-	if((ulysse_ID0_status==0) && (ulysse_ID1_status==0))
-		cmdreq.cmds = &ulysse_backlight_cmd2;
+	if (xiaomi_series_read() == XIAOMI_SERIES_ULYSSE) {
+		if((ulysse_ID0_status==0) && (ulysse_ID1_status==0))
+			cmdreq.cmds = &ulysse_backlight_cmd2;
+	}
 #endif
 	cmdreq.cmds_cnt = 1;
 	cmdreq.flags = CMD_REQ_COMMIT;
