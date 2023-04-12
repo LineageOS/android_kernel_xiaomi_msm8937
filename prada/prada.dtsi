@@ -6,7 +6,7 @@
 #include "camera.dtsi"
 #include "display.dtsi"
 #include "fingerprint.dtsi"
-#include "ir.dtsi"
+//#include "ir.dtsi"
 #include "led.dtsi"
 #include "misc.dtsi"
 #include "pm8937.dtsi"
