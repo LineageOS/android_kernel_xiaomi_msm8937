@@ -16,12 +16,13 @@
 
 /* From stock msm8917-pinctrl.dtsi */
 &tlmm {
-	smb_int_pin {
-		pins = "gpio61";
-		qcom,num-grp-pins = <1>;
-		qcom,pin-func = <0>;
-		label = "smb_int_gpio";
-		smb_int_default: smb_int_default {
+	smb_int_default: smb_int_pin {
+		mux {
+			pins = "gpio61";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio61";
 			drive-strength = <2>;	/*8 MA */
 			bias-pull-up;		/* PULL UP*/
 		};
