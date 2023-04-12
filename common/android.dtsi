@@ -1,6 +1,16 @@
 &firmware {
 	android {
+#ifdef MI8937_V2
 		/delete-node/ fstab;
+#endif
 		/delete-node/ vbmeta;
+#ifndef MI8937_V2
+		fstab {
+			vendor {
+				dev = "/dev/block/platform/soc/7824900.sdhci/by-name/cust";
+				fsmgr_flags = "wait";
+			};
+		};
+#endif
 	};
 };
