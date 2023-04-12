@@ -1,5 +1,7 @@
 /dts-v1/;
 
+#include "common/include/config.h"
+
 #include "wingtech/msm8917/common/fragments/include-qcom.dtsi"
 
 #include "common/fragments/delete-msm89x7-camera-sensor-qrd.dtsi"

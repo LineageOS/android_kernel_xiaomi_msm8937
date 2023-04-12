@@ -1,5 +1,7 @@
 /dts-v1/;
 
+#include "common/include/config.h"
+
 #include "qcom/msm8917.dtsi"
 #include "qcom/msm8917-audio.dtsi"
 #include "qcom/msm8917-mtp.dtsi"

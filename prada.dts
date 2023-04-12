@@ -13,6 +13,8 @@
 
 /dts-v1/;
 
+#include "common/include/config.h"
+
 #include "qcom/msm8937.dtsi"
 #include "qcom/msm8937-pmi8950-mtp.dtsi"
 

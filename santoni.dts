@@ -14,6 +14,8 @@
 
 /dts-v1/;
 
+#include "common/include/config.h"
+
 #include "qcom/msm8940.dtsi"
 #include "qcom/pmi8950.dtsi"
 #include "common/fragments/qcom/msm8937-qrd.dtsi"
