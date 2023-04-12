@@ -89,7 +89,7 @@ static void led_gpio_brightness_set(struct led_classdev *led_cdev,
 	struct led_gpio_flash_data *flash_led =
 	    container_of(led_cdev, struct led_gpio_flash_data, cdev);
 
-	if (brightness > LED_HALF) {
+	if (brightness > 200) {
 		flash_en =
 			flash_led->ctrl_seq[FLASH_EN].flash_on_val;
 		flash_now =
