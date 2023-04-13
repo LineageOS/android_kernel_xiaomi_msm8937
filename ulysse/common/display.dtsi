@@ -15,5 +15,6 @@
 	qcom,ocp2131-enp-gpio = <&tlmm 12 0>;
 	qcom,ocp2131-enn-gpio = <&tlmm 13 0>;
 	qcom,platform-bklight-en-gpio = <&tlmm 93 1>;
+	qcom,platform-reset-gpio = <&tlmm 60 0>;
 	qcom,regulator-ldo-mode;
 };

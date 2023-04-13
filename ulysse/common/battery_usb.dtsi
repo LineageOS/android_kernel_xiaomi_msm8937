@@ -27,13 +27,13 @@
 		ti,bq2560x,vac-ovp-threshold = <6200>;
 		ti,bq2560x,jeita-hot-degc = <540>;
 		ti,bq2560x,jeita-warm-degc = <450>;
-		ti,bq2560x,jeita-cool-degc = <150>;
-		ti,bq2560x,jeita-cool-xiaomi-degc = <50>;
+		ti,bq2560x,jeita-cool-normal-degc = <150>;
+		ti,bq2560x,jeita-cold-cool-degc = <50>;
 		ti,bq2560x,jeita-cold-degc = <0>;
 		ti,bq2560x,jeita-hot-hysteresis = <10>;
 		ti,bq2560x,jeita-cold-hysteresis = <0>;
-		ti,bq2560x,jeita-cool-ma = <900>;
-		ti,bq2560x,jeita-cool-xiaomi-ma = <300>;
+		ti,bq2560x,jeita-cool-normal-ma = <900>;
+		ti,bq2560x,jeita-cold-cool-ma = <300>;
 		ti,bq2560x,jeita-cool-mv = <4400>;
 		ti,bq2560x,jeita-warm-ma = <900>;
 		ti,bq2560x,jeita-warm-mv = <4112>;
