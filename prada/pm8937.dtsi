@@ -15,3 +15,7 @@
 &pm8937_vadc {
 	/delete-node/ chan@11;
 };
+
+&thermal_zones {
+	/delete-node/ pa-therm1-adc;
+};

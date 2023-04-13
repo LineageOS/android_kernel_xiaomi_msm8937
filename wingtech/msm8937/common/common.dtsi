@@ -8,6 +8,7 @@
 #include "ir.dtsi"
 #include "led.dtsi"
 #include "misc.dtsi"
+#include "pm8937.dtsi"
 #include "pmi8950.dtsi"
 #include "regulator.dtsi"
 #include "soc.dtsi"

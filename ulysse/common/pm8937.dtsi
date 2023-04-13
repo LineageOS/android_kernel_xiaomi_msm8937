@@ -70,3 +70,8 @@
 		status = "okay";
 	};
 };
+
+/* Custom */
+&thermal_zones {
+	/delete-node/ pa-therm1-adc;
+};
