@@ -3040,6 +3040,15 @@ static struct device_node *mdss_dsi_find_panel_of_node(
 		if (!strcmp(panel_name, NONE_PANEL))
 			goto exit;
 
+#if defined(CONFIG_MACH_XIAOMI_ROVA)
+		if (xiaomi_device_read() == XIAOMI_DEVICE_ROLEX) {
+			if (!strcmp(panel_name, "qcom,mdss_dsi_nt35521s_ebbg_c3a_720p_video")) {
+				strlcpy(panel_name, "qcom,mdss_dsi_nt35521s_ebbg_720p_video", MDSS_MAX_PANEL_LEN);
+				pr_warn("%s: HACK: Override panel name to qcom,mdss_dsi_nt35521s_ebbg_720p_video\n", __func__);
+			}
+		}
+#endif
+
 		mdss_node = of_parse_phandle(pdev->dev.of_node,
 			"qcom,mdss-mdp", 0);
 		if (!mdss_node) {
