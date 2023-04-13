@@ -1,0 +1,3 @@
+&int_codec {
+	ext-spk-amp-gpio = <&tlmm 124 0>;
+};

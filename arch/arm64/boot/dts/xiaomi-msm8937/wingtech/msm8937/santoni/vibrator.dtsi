@@ -1,0 +1,5 @@
+&pmi_haptic {
+#ifndef CONFIG_INPUT_QTI_HAPTICS
+	/delete-property/ qcom,en-brake;
+#endif
+};

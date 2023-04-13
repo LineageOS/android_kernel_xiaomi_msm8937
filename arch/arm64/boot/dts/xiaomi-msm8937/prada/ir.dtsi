@@ -1,0 +1,7 @@
+&soc {
+	ir_transmitter {
+		compatible = "pwm-ir";
+		pwms = <&pmi8950_pwm 0 0>;
+		qcom,pwm-mpp = <&pmi8950_gpios 1 0>;
+	};
+};

@@ -1,0 +1,8 @@
+&i2c_3 {
+	ftech {
+		reg = <0x38>;
+		ftech,virtual-key1 = <139 140 2000>;/*menu*/
+		ftech,virtual-key2 = <172 360 2000>;/*home*/
+		ftech,virtual-key3 = <158 580 2000>;/*back*/
+	};
+};

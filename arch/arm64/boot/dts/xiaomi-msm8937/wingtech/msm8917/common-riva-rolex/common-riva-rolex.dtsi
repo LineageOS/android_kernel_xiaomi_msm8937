@@ -1,0 +1,6 @@
+#include "pinctrl.dtsi"
+
+#include "audio.dtsi"
+#include "battery_usb.dtsi"
+#include "camera.dtsi"
+#include "soc.dtsi"

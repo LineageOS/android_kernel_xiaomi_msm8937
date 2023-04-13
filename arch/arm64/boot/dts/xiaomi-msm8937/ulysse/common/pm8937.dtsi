@@ -1,0 +1,77 @@
+/* From stock msm-pm8937.dtsi */
+&pm8937_pwm {
+	qcom,period = <4000000>;
+	qcom,mode-select = <0>;
+	qcom,dtest-line = <2>;
+	qcom,dtest-output = <2>;
+	status = "okay";
+	qcom,pwm {
+		qcom,duty = <2000000>;
+		label = "pwm";
+	};
+};
+&spmi_bus {
+	qcom,pm8937@0 {
+		qcom,power-on@800 {
+			qcom,pon_1 {
+				qcom,support-reset = <1>;
+				qcom,s1-timer = <4480>;
+				qcom,s2-timer = <2000>;
+				qcom,s2-type = <8>;
+			};
+			qcom,pon_3 {
+				qcom,pon-type = <3>;
+				qcom,pull-up = <1>;
+				qcom,support-reset = <1>;
+				qcom,s1-timer = <4480>;
+				qcom,s2-timer = <1000>;
+				qcom,s2-type = <1>;
+			};
+		};
+	};
+};
+
+/* From stock msm8937-mtp.dtsi */
+/* Adapted for msm-4.9 */
+&pm8937_gpios {
+	interrupts = <0x0 0xc0 0 IRQ_TYPE_NONE>,
+		 <0x0 0xc1 0 IRQ_TYPE_NONE>,
+		 <0x0 0xc4 0 IRQ_TYPE_NONE>,
+		 <0x0 0xc5 0 IRQ_TYPE_NONE>,
+		 <0x0 0xc6 0 IRQ_TYPE_NONE>,
+		 <0x0 0xc7 0 IRQ_TYPE_NONE>;
+	interrupt-names = "pm8937_gpio1", "pm8937_gpio2", "pm8937_gpio5",
+			  "pm8937_gpio6", "pmi8937_gpio7", "pm8937_gpio8";
+	qcom,gpios-disallowed = <3 4>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pwm_ir_default>;
+	pwm_ir_default: pm8937_gpio6 {
+		pins = "gpio6";
+		function = "dtest2";
+		qcom,drive-strength = <2>;
+		output-low;
+		bias-disable;
+		status = "okay";
+	};
+};
+
+/* From stock msm8940-pmi8937-mtp.dts */
+&pm8937_vadc {
+	chan@11 {
+		label = "batt_rid";
+		reg = <0x11>;
+		qcom,decimation = <0>;
+		qcom,pre-div-channel-scaling = <0>;
+		qcom,calibration-type = "ratiometric";
+		qcom,scale-function = <0>;
+		qcom,hw-settle-time = <2>;
+		qcom,fast-avg-setup = <0>;
+		/delete-property/ qcom,vadc-thermal-node;
+		status = "okay";
+	};
+};
+
+/* Custom */
+&thermal_zones {
+	/delete-node/ pa-therm1-adc;
+};

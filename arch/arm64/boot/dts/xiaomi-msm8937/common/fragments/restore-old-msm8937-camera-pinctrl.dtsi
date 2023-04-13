@@ -1,0 +1,38 @@
+&tlmm {
+	/delete-node/ cam_sensor_rear_reset;
+	/delete-node/ cam_sensor_rear_reset_sleep;
+	/delete-node/ cam_sensor_rear_standby;
+	/delete-node/ cam_sensor_rear_standby_sleep;
+	/delete-node/ cam_sensor_rear_vana;
+	/delete-node/ cam_sensor_rear_vana_sleep;
+};
+
+&tlmm {
+	cam_sensor_rear_default: cam_sensor_rear_default {
+		/* RESET, STANDBY */
+		mux {
+			pins = "gpio36", "gpio35";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio36","gpio35";
+			bias-disable; /* No PULL */
+			drive-strength = <2>; /* 2 MA */
+		};
+	};
+
+	cam_sensor_rear_sleep: cam_sensor_rear_sleep {
+		/* RESET, STANDBY */
+		mux {
+			pins = "gpio36","gpio35";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio36","gpio35";
+			bias-disable; /* No PULL */
+			drive-strength = <2>; /* 2 MA */
+		};
+	};
+};

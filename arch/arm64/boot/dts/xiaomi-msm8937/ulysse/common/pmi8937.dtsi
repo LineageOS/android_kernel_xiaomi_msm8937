@@ -1,0 +1,13 @@
+/*
+  Stock msm89?7-pmi8937-mtp.dtsi removes inclusion of msm-pmi8937.dtsi
+  Remove everything defined by it, also remove all references to it
+*/
+
+&soc {
+	/delete-node/ qcom,camera-flash;
+};
+
+&spmi_bus {
+	/delete-node/ qcom,pmi8937@2;
+	/delete-node/ qcom,pmi8937@3;
+};

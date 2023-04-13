@@ -1,0 +1,9 @@
+#include "pinctrl.dtsi"
+
+#include "audio.dtsi"
+#include "battery_usb.dtsi"
+#include "camera.dtsi"
+#include "display.dtsi"
+#include "pm8937.dtsi"
+#include "touchscreen.dtsi"
+#include "vibrator.dtsi"

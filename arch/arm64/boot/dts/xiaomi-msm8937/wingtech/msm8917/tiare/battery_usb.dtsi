@@ -1,0 +1,80 @@
+/* From stock msm8917-pmi8937-qrd-sku5_S88508.dtsi */
+&i2c_5 {
+	bq2560x_otg_supply: bq2560x@6B {
+		compatible = "ti,bq25601-charger";
+		reg = <0x6B>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <61 2>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&smb_int_default>;
+
+		regulator-name = "bq2560x_otg_supply";
+		dpdm-supply = <&usb_otg>;
+		vdd-supply = <&pm8937_l17>;
+		//qcom,bms-psy-name = "bms";
+
+		ti,bq2560x,chip-enable-gpio = <48>;
+		ti,bq2560x,usb-vlim = <4400>;
+		ti,bq2560x,usb-ilim = <500>;
+		ti,bq2560x,usb-vreg = <4400>;
+		ti,bq2560x,usb-ichg = <500>;
+
+		ti,bq2560x,ta-vlim = <4400>;
+		ti,bq2560x,ta-ilim = <1000>;
+		ti,bq2560x,ta-vreg = <4400>;
+		ti,bq2560x,ta-ichg = <1000>;
+		qcom,thermal-mitigation = <1000 800 700 0>;
+
+		ti,bq2560x,precharge-current = <256>;
+		ti,bq2560x,termination-current = <180>;
+		ti,bq2560x,boost-voltage = <4998>;
+		ti,bq2560x,boost-current = <500>;
+		ti,bq2560x,enable_term;
+		ti,bq2560x,stat-pin-ctrl = <0>;
+		ti,bq2560x,vac-ovp-threshold = <6500>;
+
+		ti,bq2560x,jeita-hot-degc = <550>;
+		ti,bq2560x,jeita-warm-degc = <450>;
+		ti,bq2560x,jeita-cool-normal-degc = <150>;
+		ti,bq2560x,jeita-cold-cool-degc = <50>;
+		ti,bq2560x,jeita-cold-degc = <0>;
+
+		ti,bq2560x,jeita-hot-hysteresis = <20>;
+		ti,bq2560x,jeita-cold-hysteresis = <10>;
+
+		ti,bq2560x,jeita-cold-cool-ma = <300>;
+		ti,bq2560x,jeita-cool-normal-ma = <600>;
+		ti,bq2560x,jeita-cool-mv = <4400>;
+		ti,bq2560x,jeita-warm-ma = <1000>;
+		ti,bq2560x,jeita-warm-mv = <4100>;
+
+		ti,bq2560x,software-jeita-supported;
+	};
+
+	cw2017@63 {
+		compatible = "cellwise,cw2017";
+		reg = <0x63>;
+		//vdd-supply = <&pm8937_l5>;
+		vcc_i2c-supply = <&pm8937_l5>;
+		//interrupt-parent = <&tlmm>;
+		//interrupts = <46 2>;//cw2017 interrupt pin to gpio46, but not really use this interrupt
+		//pinctrl-names = "default";
+		//pinctrl-0 = <&cw_int_default>;
+		qcom,battid-vadc = <&pm8937_vadc>;
+		qcom,battery-data = <&qrd_batterydata>;
+	};
+};
+&usb_otg {
+	extcon = <&bq2560x_otg_supply>;
+	vbus_otg-supply = <&bq2560x_otg_supply>;
+	qcom,hsusb-otg-phy-init-seq =
+		<0x74 0x80 0x2c 0x81 0x3f 0x82 0x13 0x83 0xffffffff>;
+};
+/ {
+	qrd_batterydata: qcom,battery-data {
+		qcom,batt-id-range-pct = <10>;
+		#include "batterydata/batterydata-xwd-4v4-3000mah.dtsi"
+		#include "batterydata/batterydata-mingmei-4v4-3000mah.dtsi"
+		#include "batterydata/batterydata-default-4v4-3000mah.dtsi"
+	};
+};

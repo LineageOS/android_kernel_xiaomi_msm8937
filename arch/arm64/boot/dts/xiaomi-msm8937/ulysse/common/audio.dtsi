@@ -1,0 +1,34 @@
+/* From stock msm8937-audio.dtsi */
+&int_codec {
+	/delete-property/ qcom,cdc-us-euro-gpios;
+	qcom,msm-mbhc-hphl-swh = <1>;
+	qcom,msm-mbhc-gnd-swh = <1>;
+	qcom,msm-micbias2-ext-cap;
+	qcom,smg3711-enable-gpio = <&tlmm 25 0>;
+	qcom,smg3711-in-gpio = <&tlmm 16 0>;
+
+	qcom,spk_ext_pa = <&tlmm 1 0>;
+	/* WARNING: Override
+	   Changes:
+	   - Remove "WSA_SPK OUT", "VDD_WSA_SWITCH",
+	   - Remove "SpkrMono WSA_IN", "WSA_SPK OUT";
+	*/
+	qcom,audio-routing =
+		"RX_BIAS", "MCLK",
+		"SPK_RX_BIAS", "MCLK",
+		"INT_LDO_H", "MCLK",
+		"RX_I2S_CLK", "MCLK",
+		"TX_I2S_CLK", "MCLK",
+		"MIC BIAS External", "Handset Mic",
+		"MIC BIAS External2", "Headset Mic",
+		"MIC BIAS External", "Secondary Mic",
+		"AMIC1", "MIC BIAS External",
+		"AMIC2", "MIC BIAS External2",
+		"AMIC3", "MIC BIAS External",
+		"ADC1_IN", "ADC1_OUT",
+		"ADC2_IN", "ADC2_OUT",
+		"ADC3_IN", "ADC3_OUT",
+		"PDM_IN_RX1", "PDM_OUT_RX1",
+		"PDM_IN_RX2", "PDM_OUT_RX2",
+		"PDM_IN_RX3", "PDM_OUT_RX3";
+};

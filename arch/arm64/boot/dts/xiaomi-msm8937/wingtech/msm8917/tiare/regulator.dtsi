@@ -1,0 +1,11 @@
+/* From stock msm8917-regulator.dtsi */
+&pm8937_l6 {
+	regulator-always-on;
+};
+&pm8937_l22 {
+	regulator-max-microvolt = <2850000>;
+	qcom,init-voltage = <2850000>;
+};
+&pm8937_l23 {
+	regulator-max-microvolt = <1250000>;
+};

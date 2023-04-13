@@ -1,0 +1,12 @@
+&i2c_2 {
+	aw2013@45 {
+		compatible = "awinic,aw2013";
+		reg = <0x45>;
+		vdd-supply = <&pm8937_l10>;
+		vcc-supply = <&pm8937_l6>;
+
+		AW2013_LED(red, 0)
+		AW2013_LED(green, 1)
+		AW2013_LED(blue, 2)
+	};
+};

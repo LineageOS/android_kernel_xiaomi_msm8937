@@ -1,0 +1,19 @@
+&i2c_3 {
+	qcom,clk-freq-out = <100000>;
+	ftech {
+		compatible = "focaltech,5336";
+	};
+};
+
+&soc {
+	gen-vkey1 {
+		compatible = "qcom,gen-vkeys";
+		label = "ft5x06_720p";
+		qcom,disp-maxx = <720>;
+		qcom,disp-maxy = <1280>;
+		qcom,panel-maxx = <720>;
+		qcom,panel-maxy = <1458>;
+		qcom,key-codes = <139 172 158>;
+		qcom,y-offset = <0>;
+	};
+};

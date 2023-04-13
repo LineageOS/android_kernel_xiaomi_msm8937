@@ -1,0 +1,18 @@
+		qcom,coslight-4000mah {
+			qcom,max-voltage-uv = <4400000>;
+			qcom,nom-batt-capacity-mah = <4000>;
+			qcom,v-cutoff-uv = <3400000>;
+			qcom,chg-term-ua = <100000>;
+			qcom,batt-id-kohm = <100>;
+			qcom,battery-beta = <3435>;
+			qcom,battery-type = "coslight_4000mah";
+			qcom,chg-rslow-comp-c1 = <3470265>;
+			qcom,chg-rslow-comp-c2 = <5062687>;
+			qcom,chg-rs-to-rslow = <824395>;
+			qcom,chg-rslow-comp-thr = <168>;
+			qcom,fastchg-current-ma = <2000>;
+			qcom,fg-cc-cv-threshold-mv = <4390>;
+			qcom,checksum = <60724>;
+			qcom,gui-version = "PMI8950GUI - 2.0.0.15";
+			qcom,fg-profile-data = <0xee83497d 0x5881a277 0x5683a155 0x7781a88c 0xd82aa9a 0xcebdf3ca 0x5b0e0a88 0x177ece81 0x287c5683 0x7668417b 0xe8c4282 0xf89949bd 0x5cca5b0d 0x3c10aa5a 0x1470eefc 0x42359945 0xb400000 0x6f47df22 0xaf410000 0x0 0x0 0x8b6b6369 0x4760a989 0x5e7cc671 0x88588480 0xf975606b 0x205aa4a2 0x269060ec 0x5da0710c 0x2800ff36 0xf0113003 0xc>;
+		};

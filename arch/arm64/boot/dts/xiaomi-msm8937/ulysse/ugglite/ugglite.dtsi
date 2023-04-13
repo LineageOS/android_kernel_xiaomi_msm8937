@@ -1,0 +1,2 @@
+#include "battery_usb.dtsi"
+#include "camera.dtsi"

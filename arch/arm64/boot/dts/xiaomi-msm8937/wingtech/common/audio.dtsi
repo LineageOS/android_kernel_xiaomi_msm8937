@@ -1,0 +1,3 @@
+&int_codec {
+	headset-gpio = <&tlmm 129 0>;
+};

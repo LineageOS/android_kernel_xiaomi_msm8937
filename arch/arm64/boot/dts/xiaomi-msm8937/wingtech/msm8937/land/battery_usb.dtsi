@@ -1,0 +1,32 @@
+/ {
+	qrd_batterydata: qcom,battery-data {
+		qcom,batt-id-range-pct = <15>;
+		#include "batterydata/batterydata-qrd-Desay-4v4-4000mah.dtsi"
+		#include "batterydata/batterydata-qrd-Atl-4v4-4000mah.dtsi"
+		#include "batterydata/batterydata-qrd-Coslight-4v4-4000mah.dtsi"
+		#include "batterydata/batterydata-qrd-feimaotui-4v4-4000mah.dtsi"
+	};
+};
+
+&qpnp_smbcharger {
+	/delete-property/ qcom,parallel-allowed-lowering-ma;
+	/delete-property/ qcom,parallel-usb-9v-min-current-ma;
+	/delete-property/ qcom,parallel-usb-min-current-ma;
+
+	qcom,battery-data = <&qrd_batterydata>;
+	qcom,thermal-mitigation = <2000 1500 1200 800 800>;
+};
+
+&qpnp_fg {
+	qcom,battery-data = <&qrd_batterydata>;
+	qcom,cool-bat-decidegc = <(100)>;
+	qcom,hot-bat-decidegc = <600>;
+	qcom,fg-iterm-ma = <200>;
+	qcom,fg-chg-iterm-ma = <150>;
+	qcom,fg-cutoff-voltage-mv = <3500>;
+};
+
+&usb_otg {
+	qcom,hsusb-otg-phy-init-seq =
+		<0x53 0x80 0x32 0x81 0x07 0x82 0x13 0x83 0xffffffff>;
+};

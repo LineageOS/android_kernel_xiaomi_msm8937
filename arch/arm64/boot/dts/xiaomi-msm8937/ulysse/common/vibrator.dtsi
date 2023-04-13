@@ -1,0 +1,9 @@
+/* From stock msm8937-mtp.dtsi */
+&soc {
+	vibrator_gpio {
+		compatible = "qcom,vibrator-gpio";
+		qcom,vibrator-timeout-ms = <15000>;
+		qcom,vib-gpio_one = <&tlmm 9 0x00>;
+		label = "vibrator";
+	};
+};

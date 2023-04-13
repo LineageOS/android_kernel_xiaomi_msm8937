@@ -1,0 +1,13 @@
+#include "panel/BOE_hx8394F_720p_video_mode_dsi_panel.dtsi"
+#include "panel/CTC_nt35521s_720p_video_mode_dsi_panel.dtsi"
+#include "panel/Tianma_ili9881c_720p_video_mode_dsi_panel.dtsi"
+
+&mdss_dsi0 {
+	qcom,dsi-pref-prim-pan = <&dsi_hx8394f_boe_720p_video>;
+};
+
+&wled {
+	/delete-property/ qcom,en-ext-pfet-sc-pro;
+	qcom,en-cabc;
+	qcom,wled-stepper-en;
+};

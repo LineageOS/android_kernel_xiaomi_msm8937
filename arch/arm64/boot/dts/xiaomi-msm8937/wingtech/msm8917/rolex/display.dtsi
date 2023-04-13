@@ -1,0 +1,18 @@
+/* From stock msm8917-pmi8937-qrd-sku5_S88503.dtsi */
+#include "panel/dsi-panel-hx8394f-boe-c3a-720p-video.dtsi"
+#include "panel/dsi-panel-nt35521s-ebbg-c3a-720p-video.dtsi"
+#include "panel/dsi-panel-ili9881c-ebbg-c3a-720p-video.dtsi"
+&mdss_dsi0 {
+	qcom,dsi-pref-prim-pan = <&dsi_hx8394f_boe_720_vid>;
+	qcom,dsi-pref-sub-pan = <&dsi_nt35521s_ebbg_720_video>;
+	qcom,dsi-pref-sub1-pan = <&dsi_ili9881c_ebbg_720p_video>;
+};
+&dsi_hx8394f_boe_720_vid {
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+};
+&dsi_ili9881c_ebbg_720p_video {
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+};
+&dsi_nt35521s_ebbg_720_video {
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+};

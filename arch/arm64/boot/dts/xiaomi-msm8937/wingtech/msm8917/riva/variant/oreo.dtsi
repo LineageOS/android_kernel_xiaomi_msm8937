@@ -1,0 +1,52 @@
+/* From compare result of Nougat dtb and Oreo dtb */
+&other_ext_mem {
+	reg = <0x00 0x85b00000 0x00 0xd00000>;
+};
+
+&spmi_bus {
+	qcom,pm8937@0 {
+		qcom,power-on@800 {
+			qcom,pon_3 {
+				qcom,pon-type = <3>;
+				qcom,support-reset = <1>;
+				qcom,s1-timer = <3072>;
+				qcom,s2-timer = <500>;
+				qcom,s2-type = <1>;
+				qcom,pull-up = <1>;
+				qcom,use-bark;
+			};
+		};
+	};
+};
+
+&qcom_seecom {
+	reg = <0x85b00000 0x800000>;
+};
+
+&soc {
+	qcom,wdt@b017000 {
+		qcom,bark-time = <15000>;
+	};
+};
+
+&soc {
+	/* WARNING: Redefine node */
+	/delete-node/ secbootfuse@0xa41d0;
+	sec_boot_fuse: secbootfuse@0xA01D0 {
+		compatible = "qcom,sec-boot-fuse";
+		reg = <0xA01D0 0x4>;
+		reg-names = "sec-boot-base";
+	};
+
+	/* WARNING: Redefine node */
+	/delete-node/ snfuse@0xa0128;
+	sn_fuse: snfuse@0xA60A8 {
+		compatible = "qcom,sn-fuse";
+		reg = <0xA60A8 0x4>;
+		reg-names = "sn-base";
+	};
+};
+
+&usb_otg {
+	/delete-property/ qcom,hsusb-otg-default-mode;
+};

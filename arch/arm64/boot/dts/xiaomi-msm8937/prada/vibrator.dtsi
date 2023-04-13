@@ -1,0 +1,17 @@
+#define PRADA_VIB_VMAX_MV 2800
+
+&pmi_haptic {
+	qcom,ilim-ma = <95>;
+	qcom,vmax-mv = <PRADA_VIB_VMAX_MV>;
+#ifdef CONFIG_INPUT_QTI_HAPTICS
+	wf_0 { qcom,wf-vmax-mv = <PRADA_VIB_VMAX_MV>; };
+	wf_1 { qcom,wf-vmax-mv = <PRADA_VIB_VMAX_MV>; };
+	wf_2 { qcom,wf-vmax-mv = <PRADA_VIB_VMAX_MV>; };
+	wf_3 { qcom,wf-vmax-mv = <PRADA_VIB_VMAX_MV>; };
+	wf_4 { qcom,wf-vmax-mv = <PRADA_VIB_VMAX_MV>; };
+	wf_5 { qcom,wf-vmax-mv = <PRADA_VIB_VMAX_MV>; };
+#else
+	qcom,actuator-type = <1>;
+	qcom,wave-play-rate-us = <5263>;
+#endif
+};
