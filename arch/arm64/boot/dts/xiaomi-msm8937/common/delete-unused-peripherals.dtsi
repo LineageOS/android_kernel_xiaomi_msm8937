@@ -29,6 +29,10 @@
 	/delete-node/ qcom,mdss_dsi_icn9706_720_1440p_video;
 };
 
+&pm8937_gpios {
+	/delete-node/ nfc_clk;
+};
+
 &soc {
 	/delete-node/ hbtp;
 	gpio_keys {
@@ -42,5 +46,7 @@
 };
 
 &tlmm {
+	/delete-node/ fpc_reset_int;
+	/delete-node/ nfc;
 	/delete-node/ usbc_int_default;
 };
