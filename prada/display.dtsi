@@ -11,3 +11,10 @@
 	qcom,en-cabc;
 	qcom,wled-stepper-en;
 };
+
+/* From msm-3.18 msm8937-mtp.dtsi */
+&mdss_dsi0 {
+	qcom,platform-enable-gpio = <&tlmm 99 0>;
+	qcom,platform-reset-gpio = <&tlmm 60 0>;
+	qcom,platform-bklight-en-gpio = <&tlmm 98 0>;
+};
