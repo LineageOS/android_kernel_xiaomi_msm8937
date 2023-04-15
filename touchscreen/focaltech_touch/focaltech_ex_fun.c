@@ -287,10 +287,18 @@ proc_read_err:
 	return ret;
 }
 
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 6, 0))
 static const struct proc_ops fts_proc_fops = {
 	.proc_read  = fts_debug_read,
 	.proc_write = fts_debug_write,
 };
+#else
+static const struct file_operations fts_proc_fops = {
+	.owner = THIS_MODULE,
+	.read  = fts_debug_read,
+	.write = fts_debug_write,
+};
+#endif
 #else
 static int fts_debug_write(struct file *filp,
 	const char __user *buff, unsigned long len, void *data)

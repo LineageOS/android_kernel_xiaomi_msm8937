@@ -40,7 +40,9 @@
 #include <linux/of_irq.h>
 #include <dt-bindings/interrupt-controller/arm-gic.h>
 #include <linux/of_irq.h>
+#ifdef CONFIG_QCOM_PANEL_EVENT_NOTIFIER
 #include <linux/soc/qcom/panel_event_notifier.h>
+#endif
 #if defined(CONFIG_DRM)
 #include <drm/drm_panel.h>
 #elif defined(CONFIG_FB)
@@ -109,6 +111,7 @@ static irqreturn_t fts_irq_handler(int irq, void *data);
 static int fts_ts_probe_delayed(struct fts_ts_data *fts_data);
 static int fts_ts_enable_reg(struct fts_ts_data *ts_data, bool enable);
 
+#ifdef CONFIG_QCOM_PANEL_EVENT_NOTIFIER
 static void fts_ts_register_for_panel_events(struct device_node *dp,
 					struct fts_ts_data *ts_data)
 {
@@ -141,6 +144,7 @@ static void fts_ts_register_for_panel_events(struct device_node *dp,
 
 	ts_data->notifier_cookie = cookie;
 }
+#endif
 
 #ifdef CONFIG_FTS_TRUSTED_TOUCH
 
@@ -2923,8 +2927,10 @@ static int fts_ts_probe_entry(struct fts_ts_data *ts_data)
 	if (ts_data->ts_workqueue)
 		INIT_WORK(&ts_data->resume_work, fts_resume_work);
 
+#ifdef CONFIG_QCOM_PANEL_EVENT_NOTIFIER
 	if (!strcmp(fts_data->touch_environment, "pvm"))
 		fts_ts_register_for_panel_events(ts_data->dev->of_node, ts_data);
+#endif
 #elif defined(CONFIG_FB)
 	if (ts_data->ts_workqueue) {
 		INIT_WORK(&ts_data->resume_work, fts_resume_work);
@@ -3152,6 +3158,7 @@ static int fts_ts_resume(struct device *dev)
 *****************************************************************************/
 static int fts_ts_check_dt(struct device_node *np)
 {
+#if defined(CONFIG_DRM)
 	int i;
 	int count;
 	struct device_node *node;
@@ -3172,6 +3179,9 @@ static int fts_ts_check_dt(struct device_node *np)
 	}
 
 	return PTR_ERR(panel);
+#else
+	return 0;
+#endif
 }
 
 static int fts_ts_check_default_tp(struct device_node *dt, const char *prop)
