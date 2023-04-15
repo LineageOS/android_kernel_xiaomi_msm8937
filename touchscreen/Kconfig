@@ -1,0 +1,4 @@
+menu "Touchscreen"
+	depends on INPUT_TOUCHSCREEN
+
+endmenu
