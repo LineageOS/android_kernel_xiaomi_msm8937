@@ -1,5 +1,5 @@
 /* Copyright (c) 2012-2020, The Linux Foundation. All rights reserved.
- * Copyright (C) 2018 XiaoMi, Inc.
+ * Copyright (C) 2019 XiaoMi, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -1011,6 +1011,15 @@ static void mdss_dsi_panel_bl_ctrl(struct mdss_panel_data *pdata,
 
 	ctrl_pdata = container_of(pdata, struct mdss_dsi_ctrl_pdata,
 				panel_data);
+
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_WINGTECH)
+	if (xiaomi_msm8937_mach_get_family() == XIAOMI_MSM8937_MACH_FAMILY_WINGTECH) {
+		if (!ctrl_pdata->wingtech_is_Lcm_Present) {
+			pr_err("%s: ctrl_pdata->wingtech_is_Lcm_Present is false, Abort\n", __func__);
+			return;
+		}
+	}
+#endif
 
 	/*
 	 * Some backlight controllers specify a minimum duty cycle
@@ -2202,6 +2211,13 @@ static void mdss_dsi_parse_esd_params(struct device_node *np,
 
 	pinfo->esd_check_enabled = of_property_read_bool(np,
 		"qcom,esd-check-enabled");
+
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_WINGTECH)
+	if (xiaomi_msm8937_mach_get_family() == XIAOMI_MSM8937_MACH_FAMILY_WINGTECH) {
+		if ((!pinfo->esd_check_enabled) || (!ctrl->wingtech_is_Lcm_Present))
+			return;
+	}
+#endif
 
 	if (!pinfo->esd_check_enabled)
 		return;

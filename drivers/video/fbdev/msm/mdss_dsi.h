@@ -576,6 +576,9 @@ struct mdss_dsi_ctrl_pdata {
 	int xiaomi_ulysse_ocp2131_enp_gpio;
 	int xiaomi_ulysse_ocp2131_enn_gpio;
 #endif
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_WINGTECH)
+	bool wingtech_is_Lcm_Present;
+#endif
 };
 
 struct dsi_status_data {
