@@ -3,4 +3,9 @@
 
 #define CONFIG_INPUT_QTI_HAPTICS
 
+#define MI8937_V2
+#ifdef MI8937_V2
+#define CONFIG_REGULATOR_TPS65132_MI8937
+#endif
+
 #endif
