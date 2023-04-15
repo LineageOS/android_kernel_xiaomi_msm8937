@@ -9,6 +9,7 @@
 	};
 };
 
+#ifndef CONFIG_TOUCHSCREEN_FTS_MI8937
 &soc {
 	gen-vkey1 {
 		compatible = "qcom,gen-vkeys";
@@ -21,3 +22,4 @@
 		qcom,y-offset = <0>;
 	};
 };
+#endif

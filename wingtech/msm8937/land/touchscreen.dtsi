@@ -33,7 +33,11 @@
 
 &soc {
 	gen-vkeys_ist {
+#ifdef CONFIG_TOUCHSCREEN_FTS_MI8937
+		compatible = "qcom,gen-vkeys";
+#else
 		compatible = "qcom,gen-vkeys_ist";
+#endif
 		label = "ist30xx_ts_input";
 		qcom,disp-maxx = <1080>;
 		qcom,disp-maxy = <1920>;
