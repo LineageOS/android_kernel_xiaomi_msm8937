@@ -565,7 +565,7 @@ static int tps65132_regulator_remove(struct i2c_client *client)
 }
 
 static struct of_device_id tps65132_match_table[] = {
-	{ .compatible = "ti,tps65132", },
+	{ .compatible = "ti,tps65132-mi8937", },
 	{},
 };
 MODULE_DEVICE_TABLE(of, tps65132_match_table);
@@ -606,7 +606,7 @@ const struct dev_pm_ops tps65132_pm_ops = {
 
 static struct i2c_driver tps65132_regulator_driver = {
 	.driver = {
-		.name		= "tps65132",
+		.name		= "tps65132-mi8937",
 		.owner		= THIS_MODULE,
 		.of_match_table	= tps65132_match_table,
 	},
