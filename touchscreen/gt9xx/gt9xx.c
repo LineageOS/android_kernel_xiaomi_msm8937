@@ -23,6 +23,11 @@
 #include <linux/input/mt.h>
 #include "gt9xx.h"
 
+#define GOODIX_VTG_MIN_UV	2600000
+#define GOODIX_VTG_MAX_UV	3300000
+#define GOODIX_I2C_VTG_MIN_UV	1800000
+#define GOODIX_I2C_VTG_MAX_UV	1800000
+
 #define GOODIX_COORDS_ARR_SIZE	4
 #define PROP_NAME_SIZE		24
 #define I2C_MAX_TRANSFER_SIZE   255
@@ -686,6 +691,41 @@ void gtp_int_sync(struct goodix_ts_data *ts, s32 ms)
 	} else {
 		dev_err(&ts->client->dev, "Failed sync int pin\n");
 	}
+}
+
+void gtp_rst_output(struct goodix_ts_data *ts, int level)
+{
+	if (level == 0) {
+		if (ts->pinctrl.pinctrl)
+			pinctrl_select_state(ts->pinctrl.pinctrl,
+					     ts->pinctrl.rst_out_low);
+		else if (gpio_is_valid(ts->pdata->rst_gpio))
+			gpio_direction_output(ts->pdata->rst_gpio, 0);
+		else
+			dev_err(&ts->client->dev,
+				"Failed set rst pin output low\n");
+	} else {
+		if (ts->pinctrl.pinctrl)
+			pinctrl_select_state(ts->pinctrl.pinctrl,
+					     ts->pinctrl.rst_out_high);
+		else if (gpio_is_valid(ts->pdata->rst_gpio))
+			gpio_direction_output(ts->pdata->rst_gpio, 1);
+		else
+			dev_err(&ts->client->dev,
+				"Failed set rst pin output high\n");
+	}
+}
+
+void gtp_rst_input(struct goodix_ts_data *ts)
+{
+	if (ts->pinctrl.pinctrl)
+		pinctrl_select_state(ts->pinctrl.pinctrl,
+					 ts->pinctrl.rst_input);
+	else if (gpio_is_valid(ts->pdata->rst_gpio))
+		gpio_direction_input(ts->pdata->rst_gpio);
+	else
+		dev_err(&ts->client->dev,
+			"Failed set rst pin input\n");
 }
 
 /*******************************************************
@@ -1386,7 +1426,7 @@ static int gtp_pinctrl_init(struct goodix_ts_data *ts)
 	}
 
 	pinctrl->default_sta = pinctrl_lookup_state(pinctrl->pinctrl,
-						    "default");
+						    "gdix_ts_int_default");
 	if (IS_ERR_OR_NULL(pinctrl->default_sta)) {
 		dev_info(&ts->client->dev,
 			 "Failed get pinctrl state:default state\n");
@@ -1394,7 +1434,7 @@ static int gtp_pinctrl_init(struct goodix_ts_data *ts)
 	}
 
 	pinctrl->int_out_high = pinctrl_lookup_state(pinctrl->pinctrl,
-						     "int-output-high");
+						     "gdix_ts_int_output_high");
 	if (IS_ERR_OR_NULL(pinctrl->int_out_high)) {
 		dev_info(&ts->client->dev,
 			 "Failed get pinctrl state:output_high\n");
@@ -1402,7 +1442,7 @@ static int gtp_pinctrl_init(struct goodix_ts_data *ts)
 	}
 
 	pinctrl->int_out_low = pinctrl_lookup_state(pinctrl->pinctrl,
-						    "int-output-low");
+						    "gdix_ts_int_output_low");
 	if (IS_ERR_OR_NULL(pinctrl->int_out_low)) {
 		dev_info(&ts->client->dev,
 			 "Failed get pinctrl state:output_low\n");
@@ -1410,20 +1450,60 @@ static int gtp_pinctrl_init(struct goodix_ts_data *ts)
 	}
 
 	pinctrl->int_input = pinctrl_lookup_state(pinctrl->pinctrl,
-						  "int-input");
+						  "gdix_ts_int_input");
 	if (IS_ERR_OR_NULL(pinctrl->int_input)) {
 		dev_info(&ts->client->dev,
 			 "Failed get pinctrl state:int-input\n");
 		goto exit_pinctrl_init;
 	}
 	dev_info(&ts->client->dev, "Success init pinctrl\n");
+
+	/* RST pinctrl */
+	pinctrl->rst_default = pinctrl_lookup_state(pinctrl->pinctrl,
+						    "gdix_ts_rst_default");
+	if (IS_ERR_OR_NULL(pinctrl->rst_default)) {
+		dev_info(&ts->client->dev,
+			 "Failed get pinctrl state:RST default state\n");
+		goto exit_pinctrl_init;
+	}
+
+	pinctrl->rst_out_high = pinctrl_lookup_state(pinctrl->pinctrl,
+						     "gdix_ts_rst_output_high");
+	if (IS_ERR_OR_NULL(pinctrl->rst_out_high)) {
+		dev_info(&ts->client->dev,
+			 "Failed get pinctrl state:RST output_high\n");
+		goto exit_pinctrl_init;
+	}
+
+	pinctrl->rst_out_low = pinctrl_lookup_state(pinctrl->pinctrl,
+						    "gdix_ts_rst_output_low");
+	if (IS_ERR_OR_NULL(pinctrl->rst_out_low)) {
+		dev_info(&ts->client->dev,
+			 "Failed get pinctrl state:RST output_low\n");
+		goto exit_pinctrl_init;
+	}
+
+	pinctrl->rst_input = pinctrl_lookup_state(pinctrl->pinctrl,
+						  "gdix_ts_rst_input");
+	if (IS_ERR_OR_NULL(pinctrl->rst_input)) {
+		dev_info(&ts->client->dev,
+			 "Failed get pinctrl state:rst-input\n");
+		goto exit_pinctrl_init;
+	}
+	dev_info(&ts->client->dev, "Success init RST pinctrl\n");
+
 	return 0;
 exit_pinctrl_init:
 	devm_pinctrl_put(pinctrl->pinctrl);
 	pinctrl->pinctrl = NULL;
+	pinctrl->default_sta = NULL;
 	pinctrl->int_out_high = NULL;
 	pinctrl->int_out_low = NULL;
 	pinctrl->int_input = NULL;
+	pinctrl->rst_default = NULL;
+	pinctrl->rst_out_high = NULL;
+	pinctrl->rst_out_low = NULL;
+	pinctrl->rst_input = NULL;
 	return -EINVAL;
 }
 
@@ -1777,6 +1857,14 @@ static int gtp_power_on(struct goodix_ts_data *ts)
 	int ret = 0;
 
 	if (ts->vdd_ana) {
+		ret = regulator_set_voltage(ts->vdd_ana, GOODIX_VTG_MIN_UV,
+					    GOODIX_VTG_MAX_UV);
+		if (ret) {
+			dev_err(&ts->client->dev,
+				"Regulator set_vtg failed vdd ret=%d\n",
+				ret);
+			goto err_set_vtg_vdd_ana;
+		}
 		ret = regulator_enable(ts->vdd_ana);
 		if (ret) {
 			dev_err(&ts->client->dev,
@@ -1787,6 +1875,14 @@ static int gtp_power_on(struct goodix_ts_data *ts)
 	}
 
 	if (ts->vcc_i2c) {
+		ret = regulator_set_voltage(ts->vcc_i2c, GOODIX_I2C_VTG_MIN_UV,
+					    GOODIX_I2C_VTG_MAX_UV);
+		if (ret) {
+			dev_err(&ts->client->dev,
+				"Regulator set_vtg failed vcc_i2c ret=%d\n",
+				ret);
+			goto err_set_vtg_vcc_i2c;
+		}
 		ret = regulator_enable(ts->vcc_i2c);
 		if (ret) {
 			dev_err(&ts->client->dev,
@@ -1799,9 +1895,15 @@ static int gtp_power_on(struct goodix_ts_data *ts)
 	return 0;
 
 err_enable_vcc_i2c:
+	if (ts->vcc_i2c)
+		regulator_set_voltage(ts->vcc_i2c, 0, GOODIX_I2C_VTG_MAX_UV);
+err_set_vtg_vcc_i2c:
 	if (ts->vdd_ana)
 		regulator_disable(ts->vdd_ana);
 err_enable_vdd_ana:
+	if (ts->vdd_ana)
+		regulator_set_voltage(ts->vdd_ana, 0, GOODIX_VTG_MAX_UV);
+err_set_vtg_vdd_ana:
 	set_bit(POWER_OFF_MODE, &ts->flags);
 	return ret;
 }
@@ -1812,6 +1914,14 @@ static int gtp_power_off(struct goodix_ts_data *ts)
 
 	if (ts->vcc_i2c) {
 		set_bit(POWER_OFF_MODE, &ts->flags);
+		ret = regulator_set_voltage(ts->vcc_i2c, 0,
+					    GOODIX_I2C_VTG_MAX_UV);
+		if (ret < 0) {
+			dev_err(&ts->client->dev,
+				"Regulator vcc_i2c set_vtg failed ret=%d\n",
+				ret);
+			goto err_set_vtg_vcc_i2c;
+		}
 		ret = regulator_disable(ts->vcc_i2c);
 		if (ret) {
 			dev_err(&ts->client->dev,
@@ -1825,6 +1935,13 @@ static int gtp_power_off(struct goodix_ts_data *ts)
 
 	if (ts->vdd_ana) {
 		set_bit(POWER_OFF_MODE, &ts->flags);
+		ret = regulator_set_voltage(ts->vdd_ana, 0, GOODIX_VTG_MAX_UV);
+		if (ret < 0) {
+			dev_err(&ts->client->dev,
+					"Regulator vdd set_vtg failed ret=%d\n",
+					ret);
+			goto err_set_vtg_vdd_ana;
+		}
 		ret = regulator_disable(ts->vdd_ana);
 		if (ret) {
 			dev_err(&ts->client->dev,
@@ -1838,9 +1955,17 @@ static int gtp_power_off(struct goodix_ts_data *ts)
 	return ret;
 
 err_disable_vdd_ana:
+	if (ts->vdd_ana)
+		regulator_set_voltage(ts->vdd_ana, GOODIX_VTG_MIN_UV,
+				      GOODIX_VTG_MAX_UV);
+err_set_vtg_vdd_ana:
 	if (ts->vcc_i2c)
 		ret = regulator_enable(ts->vcc_i2c);
 err_disable_vcc_i2c:
+	if (ts->vcc_i2c)
+		regulator_set_voltage(ts->vcc_i2c, GOODIX_I2C_VTG_MIN_UV,
+				      GOODIX_I2C_VTG_MAX_UV);
+err_set_vtg_vcc_i2c:
 	clear_bit(POWER_OFF_MODE, &ts->flags);
 	return ret;
 }

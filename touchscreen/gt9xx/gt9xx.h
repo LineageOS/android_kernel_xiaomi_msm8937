@@ -128,6 +128,10 @@ struct goodix_pinctrl {
 	struct pinctrl_state *int_out_high;
 	struct pinctrl_state *int_out_low;
 	struct pinctrl_state *int_input;
+	struct pinctrl_state *rst_default;
+	struct pinctrl_state *rst_out_high;
+	struct pinctrl_state *rst_out_low;
+	struct pinctrl_state *rst_input;
 };
 
 struct goodix_fw_info {
