@@ -50,8 +50,8 @@
 		//focaltech,ic-type = <>; // Unknown
 		focaltech,keys = <139 172 158>;
 		focaltech,key-number = <3>;
-		focaltech,key-x-coords = <180 540 900>;
-		focaltech,key-y-coords = <2000 2000 2000>; // Unsure
+		focaltech,key-x-coords = <160 360 572>;
+		focaltech,key-y-coords = <1350 1350 1350>;
 		focaltech,max-touch-number = <10>;
 #else
 		compatible = "focaltech,fts";
