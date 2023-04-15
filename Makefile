@@ -405,6 +405,12 @@ LINUXINCLUDE    := \
 		$(if $(KBUILD_SRC), -I$(srctree)/include) \
 		-I$(objtree)/include
 
+USERINCLUDE     += \
+                -I$(srctree)/techpack/xiaomi-msm8937/include/uapi \
+
+LINUXINCLUDE    += \
+                -I$(srctree)/techpack/xiaomi-msm8937/include
+
 LINUXINCLUDE	+= $(filter-out $(LINUXINCLUDE),$(USERINCLUDE))
 
 KBUILD_AFLAGS   := -D__ASSEMBLY__
