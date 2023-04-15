@@ -449,7 +449,6 @@ int fts_esdcheck_init(struct fts_ts_data *ts_data)
 	fts_esdcheck_data.mode = ENABLE;
 	fts_esdcheck_data.intr = 0;
 	fts_esdcheck_data.intr_cnt = 0;
-	fts_esdcheck_switch(ENABLE);
 	fts_create_esd_sysfs(ts_data->dev);
 	FTS_FUNC_EXIT();
 	return 0;

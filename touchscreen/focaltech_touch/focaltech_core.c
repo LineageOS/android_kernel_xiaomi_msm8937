@@ -2953,6 +2953,10 @@ static int fts_ts_probe_entry(struct fts_ts_data *ts_data)
 	register_early_suspend(&ts_data->early_suspend);
 #endif
 
+#if FTS_ESDCHECK_EN
+	fts_esdcheck_switch(ENABLE);
+#endif
+
 	FTS_FUNC_EXIT();
 	return 0;
 
