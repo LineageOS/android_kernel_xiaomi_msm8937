@@ -176,7 +176,7 @@
 
 /* i2c setting */
 /* I2C Device info */
-#define IST30XX_DEV_NAME			"IST30XX"
+#define IST30XX_DEV_NAME			"IST30XX-mi8937"
 #define IST30XX_DEV_ID				(0xA0 >> 1)
 
 /* I2C Mode */

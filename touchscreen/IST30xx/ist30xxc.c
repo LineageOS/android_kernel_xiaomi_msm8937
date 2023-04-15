@@ -2409,7 +2409,7 @@ MODULE_DEVICE_TABLE(i2c, ist30xx_idtable);
 
 #ifdef CONFIG_OF
 static struct of_device_id ist30xx_match_table[] = {
-	{.compatible = "imagis,ist30xx-ts",},
+	{.compatible = "imagis,ist30xx-ts-mi8937",},
 	{},
 };
 #else
