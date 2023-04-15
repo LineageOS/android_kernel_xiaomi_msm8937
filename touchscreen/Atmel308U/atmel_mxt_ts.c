@@ -6358,7 +6358,7 @@ MODULE_DEVICE_TABLE(i2c, mxt_id);
 
 #ifdef CONFIG_OF
 static struct of_device_id mxt_match_table[] = {
-	{ .compatible = "atmel,mxt-ts",},
+	{ .compatible = "atmel,mxt-ts-mi8937",},
 	{ },
 };
 #else
@@ -6367,7 +6367,7 @@ static struct of_device_id mxt_match_table[] = {
 
 static struct i2c_driver mxt_driver = {
 	.driver = {
-		.name	= "atmel_mxt_ts",
+		.name	= "atmel_mxt_ts-mi8937",
 		.owner	= THIS_MODULE,
 		.of_match_table = mxt_match_table,
 #ifdef CONFIG_PM
