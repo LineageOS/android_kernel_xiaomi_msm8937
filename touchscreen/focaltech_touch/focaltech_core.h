@@ -127,6 +127,7 @@ struct ftxxxx_proc {
 };
 
 struct fts_ts_platform_data {
+	u32 alt_i2c_addr;
 	u32 type;
 	u32 irq_gpio;
 	u32 irq_gpio_flags;

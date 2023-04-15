@@ -2543,6 +2543,10 @@ static int fts_parse_dt(struct device *dev, struct fts_ts_platform_data *pdata)
 
 	FTS_FUNC_ENTER();
 
+	ret = of_property_read_u32(np, "focaltech,alternate-i2c-addr", &pdata->alt_i2c_addr);
+	if (ret < 0)
+		FTS_ERROR("Unable to get alternate I2C address");
+
 	ret = fts_get_dt_coords(dev, "focaltech,display-coords", pdata);
 	if (ret < 0)
 		FTS_ERROR("Unable to get display-coords");
@@ -2741,6 +2745,7 @@ static void fts_ts_late_resume(struct early_suspend *handler)
 static int fts_ts_probe_delayed(struct fts_ts_data *fts_data)
 {
 	int ret = 0;
+	u8 reg_value = 0;
 
 /* Avoid setting up hardware for TVM during probe */
 #ifdef CONFIG_FTS_TRUSTED_TOUCH
@@ -2767,6 +2772,16 @@ static int fts_ts_probe_delayed(struct fts_ts_data *fts_data)
 #endif
 
 	fts_reset_proc(200);
+
+	ret = fts_read_reg(FTS_REG_CHIP_ID, &reg_value);
+	if (ret < 0) {
+		FTS_ERROR("Failed to read FTS_REG_CHIP_ID");
+		if (fts_data->bus_type == BUS_TYPE_I2C &&
+				fts_data->pdata->alt_i2c_addr) {
+			FTS_INFO("Use alternate I2C address");
+			fts_data->client->addr = fts_data->pdata->alt_i2c_addr;
+		}
+	}
 
 	ret = fts_get_ic_information(fts_data);
 	if (ret) {
