@@ -1,4 +1,5 @@
 /* Copyright (c) 2012-2019, The Linux Foundation. All rights reserved.
+ * Copyright (C) 2018 XiaoMi, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -28,6 +29,9 @@
 #include <linux/pm_qos.h>
 #include <linux/mdss_io_util.h>
 #include <linux/dma-buf.h>
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
+#include <xiaomi-msm8937/mach.h>
+#endif
 
 #include "mdss.h"
 #include "mdss_panel.h"
@@ -452,6 +456,14 @@ static int mdss_dsi_panel_power_on(struct mdss_panel_data *pdata)
 			pr_err("%s: Panel reset failed. rc=%d\n",
 					__func__, ret);
 	}
+
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_ULYSSE)
+	if (xiaomi_msm8937_mach_get_family() == XIAOMI_MSM8937_MACH_FAMILY_ULYSSE) {
+		ctrl_pdata->xiaomi_ulysse_ID0_status = gpio_get_value(59);
+		ctrl_pdata->xiaomi_ulysse_ID1_status = gpio_get_value(66);
+		pr_info("%s: xiaomi_ulysse_ID0_status=%d, xiaomi_ulysse_ID1_status=%d\n", __func__, ctrl_pdata->xiaomi_ulysse_ID0_status, ctrl_pdata->xiaomi_ulysse_ID1_status);
+	}
+#endif
 
 	return ret;
 }
@@ -4216,6 +4228,26 @@ static int mdss_dsi_parse_gpio_params(struct platform_device *ctrl_pdev,
 		"qcom,ext-vdd-gpio", 0);
 	if (!gpio_is_valid(ctrl_pdata->vdd_ext_gpio))
 		pr_info("%s: ext vdd gpio not specified\n", __func__);
+
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_ULYSSE)
+	if (xiaomi_msm8937_mach_get_family() == XIAOMI_MSM8937_MACH_FAMILY_ULYSSE) {
+		ctrl_pdata->xiaomi_ulysse_ocp2131_enp_gpio = of_get_named_gpio(ctrl_pdev->dev.of_node,"qcom,ocp2131-enp-gpio", 0);
+		if (!gpio_is_valid(ctrl_pdata->xiaomi_ulysse_ocp2131_enp_gpio))
+			pr_info("%s: xiaomi_ulysse_ocp2131_enp_gpio not specified\n", __func__);
+
+		ctrl_pdata->xiaomi_ulysse_ocp2131_enn_gpio = of_get_named_gpio(ctrl_pdev->dev.of_node,"qcom,ocp2131-enn-gpio", 0);
+		if (!gpio_is_valid(ctrl_pdata->xiaomi_ulysse_ocp2131_enn_gpio))
+			pr_info("%s: xiaomi_ulysse_ocp2131_enn_gpio not specified\n", __func__);
+
+		ctrl_pdata->xiaomi_ulysse_lcm_vci_en_gpio = of_get_named_gpio(ctrl_pdev->dev.of_node, "qcom,lcm-vci-en-gpio", 0);
+		if(!gpio_is_valid(ctrl_pdata->xiaomi_ulysse_lcm_vci_en_gpio))
+			pr_info("%s: xiaomi_ulysse_lcm_vci_en_gpio not specified\n",__func__);
+
+		ctrl_pdata->xiaomi_ulysse_lcmio_en_gpio = of_get_named_gpio(ctrl_pdev->dev.of_node, "qcom,vddio-gpio", 0);
+		if(!gpio_is_valid(ctrl_pdata->xiaomi_ulysse_lcmio_en_gpio))
+			pr_info("%s: xiaomi_ulysse_lcmio_en_gpio not specified\n",__func__);
+	}
+#endif
 
 	ctrl_pdata->rst_gpio = of_get_named_gpio(ctrl_pdev->dev.of_node,
 			 "qcom,platform-reset-gpio", 0);
