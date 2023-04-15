@@ -602,6 +602,9 @@ struct mdss_dsi_ctrl_pdata {
 	int xiaomi_ulysse_ID0_status_gpio; // 59
 	int xiaomi_ulysse_ID1_status_gpio; // 66
 #endif
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_WINGTECH)
+	bool wingtech_is_Lcm_Present;
+#endif
 };
 
 struct dsi_status_data {
