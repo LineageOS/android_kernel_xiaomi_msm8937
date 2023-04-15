@@ -96,12 +96,6 @@ static void fts_ts_panel_notifier_callback(enum panel_event_notifier_tag tag,
 		 struct panel_event_notification *event, void *client_data);
 #endif
 
-static struct ft_chip_t ctype[] = {
-	{0x88, 0x56, 0x52, 0x00, 0x00, 0x00, 0x00, 0x56, 0xB2},
-	{0x81, 0x54, 0x52, 0x54, 0x52, 0x00, 0x00, 0x54, 0x5C},
-	{0x1C, 0x87, 0x26, 0x87, 0x20, 0x87, 0xA0, 0x00, 0x00},
-};
-
 /*****************************************************************************
 * Static function prototypes
 *****************************************************************************/
@@ -1482,6 +1476,7 @@ static int fts_get_chip_types(
 	u8 id_h, u8 id_l, bool fw_valid)
 {
 	int i = 0;
+	struct ft_chip_t ctype[] = FTS_CHIP_TYPE_MAPPING;
 	u32 ctype_entries = sizeof(ctype) / sizeof(struct ft_chip_t);
 
 	if ((0x0 == id_h) || (0x0 == id_l)) {
