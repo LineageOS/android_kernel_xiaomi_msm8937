@@ -31,7 +31,11 @@
 		focaltech,key-x-coords = <180 350 540>;
 	};
 	goodix@5d{
+#ifdef CONFIG_TOUCHSCREEN_GT9XX_MI8937
+		compatible = "goodix,gt9xx-mi8937";
+#else
 		compatible = "goodix,gt9xx";
+#endif
 		status = "okay";
 		reg = <0x5d>;
 		interrupt-parent = <&tlmm>;

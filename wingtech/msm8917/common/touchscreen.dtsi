@@ -13,7 +13,11 @@
 #endif
 	};
 	goodix_ts@5d {
+#ifdef CONFIG_TOUCHSCREEN_GT9XX_MI8937
+		compatible = "goodix,gt9xx-mi8937";
+#else
 		compatible = "goodix,gt9xx";
+#endif
 		status = "okay";
 		reg = <0x5d>;
 		vdd_ana-supply = <&pm8937_l10>;
