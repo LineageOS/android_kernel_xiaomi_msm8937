@@ -588,6 +588,15 @@ struct mdss_dsi_ctrl_pdata {
 	bool update_phy_timing; /* flag to recalculate PHY timings */
 
 	bool phy_power_off;
+
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_ULYSSE)
+	int xiaomi_ulysse_ID0_status;
+	int xiaomi_ulysse_ID1_status;
+	int xiaomi_ulysse_lcmio_en_gpio;
+	int xiaomi_ulysse_lcm_vci_en_gpio;
+	int xiaomi_ulysse_ocp2131_enp_gpio;
+	int xiaomi_ulysse_ocp2131_enn_gpio;
+#endif
 };
 
 struct dsi_status_data {
