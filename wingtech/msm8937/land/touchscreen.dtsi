@@ -3,9 +3,13 @@
 
 	ftech {
 		reg = <0x3E>;
+#ifdef CONFIG_TOUCHSCREEN_FTS_MI8937
+		focaltech,key-x-coords = <180 540 900>;
+#else
 		ftech,virtual-key1 = <139 180 2000>;/*menu*/
 		ftech,virtual-key2 = <172 540 2000>;/*home*/
 		ftech,virtual-key3 = <158 900 2000>;/*back*/
+#endif
 	};
 
 	ist30xx@50 {

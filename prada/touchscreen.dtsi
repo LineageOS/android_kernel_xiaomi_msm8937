@@ -44,7 +44,18 @@
 	};
 
 	focaltech@38 {
+#ifdef CONFIG_TOUCHSCREEN_FTS_MI8937
+		compatible = "focaltech,fts_ts-mi8937";
+		focaltech,have-key;
+		//focaltech,ic-type = <>; // Unknown
+		focaltech,keys = <139 172 158>;
+		focaltech,key-number = <3>;
+		focaltech,key-x-coords = <180 540 900>;
+		focaltech,key-y-coords = <2000 2000 2000>; // Unsure
+		focaltech,max-touch-number = <10>;
+#else
 		compatible = "focaltech,fts";
+#endif
 		reg = <0x38>;
 		interrupt-parent = <&tlmm>;
 		interrupts = <65 0x2008>;
