@@ -270,7 +270,7 @@ config your key info here */
 
 /**************************PART3:OTHER define*******************************/
 #define GTP_DRIVER_VERSION	"V2.8.1<2022/07/25>"
-#define GTP_I2C_NAME		"goodix-ts"
+#define GTP_I2C_NAME		"goodix-ts-mi8937"
 #define GT91XX_CONFIG_PROC_FILE	"gt9xx_config"
 #define GTP_POLL_TIME		10
 #define GTP_CONFIG_MIN_LENGTH	186

@@ -2484,7 +2484,7 @@ void gtp_esd_off(struct goodix_ts_data *ts)
 
 #ifdef CONFIG_OF
 static const struct of_device_id gtp_match_table[] = {
-	{.compatible = "goodix,gt9xx",},
+	{.compatible = "goodix,gt9xx-mi8937",},
 	{ },
 };
 #endif
