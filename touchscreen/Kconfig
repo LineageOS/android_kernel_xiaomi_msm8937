@@ -2,5 +2,6 @@ menu "Touchscreen"
 	depends on INPUT_TOUCHSCREEN
 
 source "techpack/xiaomi-msm8937/touchscreen/focaltech_touch/Kconfig"
+source "techpack/xiaomi-msm8937/touchscreen/gt9xx/Kconfig"
 
 endmenu

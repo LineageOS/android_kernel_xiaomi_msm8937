@@ -1,1 +1,2 @@
 obj-$(CONFIG_TOUCHSCREEN_FTS_MI8937) += focaltech_touch/
+obj-$(CONFIG_TOUCHSCREEN_GT9XX_MI8937) += gt9xx/
