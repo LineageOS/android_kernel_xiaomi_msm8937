@@ -441,6 +441,12 @@ LINUXINCLUDE    := \
 		-I$(objtree)/include \
 		$(USERINCLUDE)
 
+USERINCLUDE     += \
+                -I$(srctree)/techpack/xiaomi-msm8937/include/uapi \
+
+LINUXINCLUDE    += \
+                -I$(srctree)/techpack/xiaomi-msm8937/include
+
 KBUILD_AFLAGS   := -D__ASSEMBLY__
 KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
 		   -fno-strict-aliasing -fno-common -fshort-wchar \
