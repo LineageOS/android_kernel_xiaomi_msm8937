@@ -2790,10 +2790,6 @@ tvm_setup:
 	return ret;
 #endif
 
-	ret = fts_fwupg_init(fts_data);
-	if (ret)
-		FTS_ERROR("init fw upgrade fail");
-
 	return 0;
 
 err_irq_req:
@@ -2978,8 +2974,6 @@ static int fts_ts_remove_entry(struct fts_ts_data *ts_data)
 	fts_release_apk_debug_channel(ts_data);
 	fts_remove_sysfs(ts_data);
 	fts_ex_mode_exit(ts_data);
-
-	fts_fwupg_exit(ts_data);
 
 
 #if FTS_ESDCHECK_EN

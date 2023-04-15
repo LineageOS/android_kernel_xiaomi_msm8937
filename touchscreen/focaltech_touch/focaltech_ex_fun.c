@@ -188,12 +188,7 @@ static ssize_t fts_debug_write(
 		break;
 
 	case PROC_ENTER_TEST_ENVIRONMENT:
-		FTS_DEBUG("[APK]: PROC_ENTER_TEST_ENVIRONMENT = %x", writebuf[1]);
-		if (0 == writebuf[1]) {
-			fts_enter_test_environment(0);
-		} else {
-			fts_enter_test_environment(1);
-		}
+		FTS_ERROR("[APK]: PROC_ENTER_TEST_ENVIRONMENT = %x, Is unsupported", writebuf[1]);
 		break;
 
 	default:
@@ -406,12 +401,7 @@ static int fts_debug_write(struct file *filp,
 		break;
 
 	case PROC_ENTER_TEST_ENVIRONMENT:
-		FTS_DEBUG("[APK]: PROC_ENTER_TEST_ENVIRONMENT = %x", writebuf[1]);
-		if (0 == writebuf[1]) {
-			fts_enter_test_environment(0);
-		} else {
-			fts_enter_test_environment(1);
-		}
+		FTS_ERROR("[APK]: PROC_ENTER_TEST_ENVIRONMENT = %x, Is unsupported", writebuf[1]);
 		break;
 
 	default:
