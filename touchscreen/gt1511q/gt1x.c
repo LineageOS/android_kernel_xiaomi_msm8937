@@ -21,6 +21,8 @@
 #include <linux/input/mt.h>
 #endif
 
+#include <xiaomi-sdm439/touchscreen.h>
+
 static struct input_dev *input_dev;
 static spinlock_t irq_lock;
 static int irq_disabled;
@@ -858,6 +860,9 @@ static int gt1x_ts_probe(struct i2c_client *client, const struct i2c_device_id *
 {
 	int ret = -1;
 
+	if (xiaomi_sdm439_touchscreen_type != XIAOMI_SDM439_TOUCHSCREEN_UNKNOWN)
+		return -ENODEV;
+
 	/* do NOT remove these logs */
 	GTP_INFO("GTP Driver Version: %s, slave addr:%02xh",
 			GTP_DRIVER_VERSION, client->addr);
@@ -986,6 +991,7 @@ static int gt1x_ts_probe(struct i2c_client *client, const struct i2c_device_id *
 	gt1x_register_powermanger();
 	gt1x_irq_enable();
 	goodix_flag = 1;
+	xiaomi_sdm439_touchscreen_type = XIAOMI_SDM439_TOUCHSCREEN_GT1511Q;
 	return 0;
 
 err_irq:

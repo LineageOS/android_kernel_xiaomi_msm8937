@@ -41,6 +41,8 @@
 #include <linux/jiffies.h>
 #endif /* #if NVT_TOUCH_ESD_PROTECT */
 
+#include <xiaomi-sdm439/touchscreen.h>
+
 #if NVT_TOUCH_ESD_PROTECT
 static struct delayed_work nvt_esd_check_work;
 static struct workqueue_struct *nvt_esd_check_wq;
@@ -1571,6 +1573,9 @@ static int32_t nvt_ts_probe(struct spi_device *client)
 	int32_t retry = 0;
 #endif
 
+	if (xiaomi_sdm439_touchscreen_type != XIAOMI_SDM439_TOUCHSCREEN_UNKNOWN)
+		return -ENODEV;
+
 	NVT_LOG("start\n");
 
 	ts = kmalloc(sizeof(struct nvt_ts_data), GFP_KERNEL);
@@ -1850,6 +1855,7 @@ static int32_t nvt_ts_probe(struct spi_device *client)
 
 	nvt_irq_enable(true);
 
+	xiaomi_sdm439_touchscreen_type = XIAOMI_SDM439_TOUCHSCREEN_NT36525B;
 	return 0;
 
 #if defined(CONFIG_FB)

@@ -93,6 +93,8 @@
 #include <linux/earlysuspend.h>
 #endif
 
+#include <xiaomi-sdm439/touchscreen.h>
+
 #ifdef CONFIG_MTK_SPI
 #include "mt_spi.h"
 #include "sync_write.h"

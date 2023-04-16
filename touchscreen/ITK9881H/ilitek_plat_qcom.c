@@ -435,6 +435,7 @@ static int ilitek_plat_probe(void)
 	ilitek_plat_irq_register();
 	ilitek_plat_sleep_init();
 	is_ilitek_tp = true;
+	xiaomi_sdm439_touchscreen_type = XIAOMI_SDM439_TOUCHSCREEN_ITK9881H;
 	return 0;
 
 exit:

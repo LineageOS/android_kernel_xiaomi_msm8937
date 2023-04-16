@@ -576,6 +576,9 @@ static int ilitek_spi_probe(struct spi_device *spi)
 	container_of(to_spi_driver(spi->dev.driver),
 		struct touch_bus_info, bus_driver);
 
+	if (xiaomi_sdm439_touchscreen_type != XIAOMI_SDM439_TOUCHSCREEN_UNKNOWN)
+		return -ENODEV;
+
 	ipio_info("ilitek spi probe\n");
 
 	if (!spi) {

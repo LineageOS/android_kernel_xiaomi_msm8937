@@ -44,6 +44,7 @@
 /*Add by HQ-102007757 for sending tp hw info*/
 #include "focaltech_flash.h"
 #include <xiaomi-sdm439/hqsysfs.h>
+#include <xiaomi-sdm439/touchscreen.h>
 /*****************************************************************************
 * Private constant and macro definitions using #define
 *****************************************************************************/
@@ -1401,6 +1402,9 @@ static int fts_ts_probe(struct i2c_client *client, const struct i2c_device_id *i
 	struct fts_ts_platform_data *pdata;
 	struct fts_ts_data *ts_data;
 
+	if (xiaomi_sdm439_touchscreen_type != XIAOMI_SDM439_TOUCHSCREEN_UNKNOWN)
+		return -ENODEV;
+
 	FTS_FUNC_ENTER();
 
 	if (goodix_flag == 1) {
@@ -1591,6 +1595,8 @@ static int fts_ts_probe(struct i2c_client *client, const struct i2c_device_id *i
 		FTS_ERROR("Unable to register xiaomi_sdm439_ft5446_ctp_hw_info: %d", ret);
 	}
 	#endif
+
+	xiaomi_sdm439_touchscreen_type = XIAOMI_SDM439_TOUCHSCREEN_FT5446;
 
 	FTS_FUNC_EXIT();
 	return 0;
