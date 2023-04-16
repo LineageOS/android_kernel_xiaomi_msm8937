@@ -22,7 +22,6 @@
 		atmel,default-config = <0>;
 		atmel,irqflags = <0x2008>;
 		atmel,vendor-id-byte = [00 03];
-		atmel,cut-off-power;
 
 		atmel,cfg_1 {
 			atmel,family-id = <166>;
