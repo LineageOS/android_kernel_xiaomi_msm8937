@@ -774,6 +774,10 @@ struct mxt_data {
 #ifdef CONFIG_FB
 	struct notifier_block fb_notif;
 #endif
+
+#if IS_ENABLED(CONFIG_TOUCHSCREEN_SYSCTL_MI8937)
+	bool disable_keys;
+#endif
 };
 
 static struct mxt_suspend mxt_save[] = {
@@ -1928,6 +1932,11 @@ static void mxt_proc_t97_messages(struct mxt_data *data, u8 *msg)
 
 	if (!input_dev)
 		return;
+
+#if IS_ENABLED(CONFIG_TOUCHSCREEN_SYSCTL_MI8937)
+	if (data->disable_keys)
+		return;
+#endif
 
 	for (key = 0; key < pdata->config_array[index].key_num; key++) {
 		curr_state = test_bit(key, &data->keystatus);
@@ -6057,8 +6066,16 @@ static int mxt_mi8937_ops_enable_dt2w(struct device *dev, bool enable)
 	return 0;
 }
 
+static int mxt_mi8937_ops_disable_keys(struct device *dev, bool disable)
+{
+	struct mxt_data *data = dev_get_drvdata(dev);
+	data->disable_keys = disable;
+	return 0;
+}
+
 static struct xiaomi_msm8937_touchscreen_operations_t mxt_mi8937_ts_ops = {
 	.enable_dt2w = mxt_mi8937_ops_enable_dt2w,
+	.disable_keys = mxt_mi8937_ops_disable_keys,
 };
 #endif
 
