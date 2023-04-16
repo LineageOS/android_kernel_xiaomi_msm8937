@@ -196,6 +196,98 @@ void ist30xx_enable_irq(struct ist30xx_data *data)
 	}
 }
 
+static int ist30xx_power_source_init(struct ist30xx_data *data)
+{
+	int rc;
+
+	data->vdd = regulator_get(&data->client->dev, "vdd");
+	if (IS_ERR(data->vdd)) {
+		rc = PTR_ERR(data->vdd);
+		tsp_err("Regulator get failed vdd rc=%d", rc);
+	}
+
+	if (regulator_count_voltages(data->vdd) > 0) {
+		rc = regulator_set_voltage(data->vdd, FT_VTG_MIN_UV,
+				FT_VTG_MAX_UV);
+		if (rc) {
+			tsp_err("Regulator set_vtg failed vdd rc=%d", rc);
+			goto reg_vdd_put;
+		}
+	}
+
+	data->vcc_i2c = regulator_get(&data->client->dev, "vcc_i2c");
+	if (IS_ERR(data->vcc_i2c)) {
+		rc = PTR_ERR(data->vcc_i2c);
+		tsp_err("Regulator get failed vcc_i2c rc=%d", rc);
+		goto reg_vdd_set_vtg;
+	}
+
+	if (regulator_count_voltages(data->vcc_i2c) > 0) {
+		rc = regulator_set_voltage(data->vcc_i2c, FT_I2C_VTG_MIN_UV,
+				FT_I2C_VTG_MAX_UV);
+		if (rc) {
+			tsp_err("Regulator set_vtg failed vcc_i2c rc=%d",
+					rc);
+			goto reg_vcc_i2c_put;
+		}
+	}
+
+	return 0;
+
+reg_vcc_i2c_put:
+	regulator_put(data->vcc_i2c);
+reg_vdd_set_vtg:
+	if (regulator_count_voltages(data->vdd) > 0)
+		regulator_set_voltage(data->vdd, 0, FT_VTG_MAX_UV);
+reg_vdd_put:
+	regulator_put(data->vdd);
+	return rc;
+}
+
+static int ist30xx_power_source_ctrl(struct ist30xx_data *data, int enable)
+{
+	int rc;
+
+	if (enable) {
+		rc = regulator_enable(data->vdd);
+		if (rc)
+			tsp_err("Regulator vdd enable failed rc=%d", rc);
+
+		rc = regulator_enable(data->vcc_i2c);
+		if (rc)
+			tsp_err("Regulator vcc_i2c enable failed rc=%d", rc);
+	} else {
+		rc = regulator_disable(data->vdd);
+		if (rc)
+			tsp_err("Regulator vdd disable failed rc=%d", rc);
+
+		rc = regulator_disable(data->vcc_i2c);
+		if (rc)
+			tsp_err("Regulator vcc_i2c disable failed rc=%d",
+							rc);
+	}
+	return 0;
+}
+
+static int ist30xx_power_source_exit(struct ist30xx_data *data)
+{
+	ist30xx_power_source_ctrl(data, 0);
+
+	if (!IS_ERR_OR_NULL(data->vdd)) {
+		if (regulator_count_voltages(data->vdd) > 0)
+			regulator_set_voltage(data->vdd, 0, FT_VTG_MAX_UV);
+		regulator_put(data->vdd);
+	}
+
+	if (!IS_ERR_OR_NULL(data->vcc_i2c)) {
+		if (regulator_count_voltages(data->vcc_i2c) > 0)
+			regulator_set_voltage(data->vcc_i2c, 0, FT_I2C_VTG_MAX_UV);
+		regulator_put(data->vcc_i2c);
+	}
+
+	return 0;
+}
+
 void ist30xx_scheduled_reset(struct ist30xx_data *data)
 {
 	if (likely(data->initialized))
@@ -1979,6 +2071,13 @@ static int ist30xx_probe(struct i2c_client *client,
 		dev_err(&client->dev, "==========\n");
 	}
 
+	err = ist30xx_power_source_init(data);
+	if (err)
+		goto err_reset_gpio;
+	err = ist30xx_power_source_ctrl(data, 1);
+	if (err)
+		goto err_regulator;
+
 	/* PID info read */
 	retry = IST30XX_MAX_RETRY_CNT;
 	while (retry-- > 0) {
@@ -2246,6 +2345,8 @@ err_early_suspend:
 #ifdef CONFIG_HAS_EARLYSUSPEND
 	unregister_early_suspend(&data->early_suspend);
 #endif
+err_regulator:
+	ist30xx_power_source_exit(data);
 err_reset_gpio:
 	gpio_free(pdata->reset_gpio);
 err_irq_gpio:
