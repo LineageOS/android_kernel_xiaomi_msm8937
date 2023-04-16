@@ -3254,6 +3254,9 @@ static int fts_ts_i2c_probe(struct i2c_client *client, const struct i2c_device_i
 	struct fts_ts_data *ts_data = NULL;
 	struct device_node *dp = client->dev.of_node;
 
+	if (xiaomi_msm8937_touchscreen_is_probed)
+		return -ENODEV;
+
 	FTS_INFO("Touch Screen(I2C BUS) driver prboe...");
 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_I2C)) {
 		FTS_ERROR("I2C not supported");
@@ -3297,6 +3300,7 @@ static int fts_ts_i2c_probe(struct i2c_client *client, const struct i2c_device_i
 	}
 
 	FTS_INFO("Touch Screen(I2C BUS) driver prboe successfully");
+	xiaomi_msm8937_touchscreen_is_probed = true;
 	return 0;
 }
 

@@ -1968,6 +1968,9 @@ static int ist30xx_probe(struct i2c_client *client,
 	char ic_color[64];
 #endif
 
+	if (xiaomi_msm8937_touchscreen_is_probed)
+		return -ENODEV;
+
 	tsp_info("### IMAGIS probe(ver:%s, protocol:%X, addr:0x%02X) ###\n",
 		 IMAGIS_DD_VERSION, IMAGIS_PROTOCOL_TYPE, client->addr);
 
@@ -2316,6 +2319,7 @@ static int ist30xx_probe(struct i2c_client *client,
 			      CHECK_CHARGER_INTERVAL);
 #endif
 
+	xiaomi_msm8937_touchscreen_is_probed = true;
 	return 0;
 
 //err_init_drv:

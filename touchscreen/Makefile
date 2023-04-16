@@ -1,3 +1,4 @@
+obj-y += ts_init.o
 obj-$(CONFIG_TOUCHSCREEN_ATMEL308U_MI8937) += Atmel308U/
 obj-$(CONFIG_TOUCHSCREEN_FTS_MI8937) += focaltech_touch/
 obj-$(CONFIG_TOUCHSCREEN_GT9XX_MI8937) += gt9xx/

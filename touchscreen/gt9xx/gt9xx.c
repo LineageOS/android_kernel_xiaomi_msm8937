@@ -1989,6 +1989,9 @@ static int gtp_probe(struct i2c_client *client, const struct i2c_device_id *id)
 	struct goodix_ts_data *ts;
 	struct goodix_ts_platform_data *pdata;
 
+	if (xiaomi_msm8937_touchscreen_is_probed)
+		return -ENODEV;
+
 	/* do NOT remove these logs */
 	dev_info(&client->dev, "GTP Driver Version: %s\n", GTP_DRIVER_VERSION);
 	dev_info(&client->dev, "GTP I2C Address: 0x%02x\n", client->addr);
@@ -2132,6 +2135,7 @@ static int gtp_probe(struct i2c_client *client, const struct i2c_device_id *id)
 
 	init_wr_node(client);/*TODO judge return value */
 
+	xiaomi_msm8937_touchscreen_is_probed = true;
 	return 0;
 
 exit_powermanager:

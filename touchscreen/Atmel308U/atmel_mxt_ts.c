@@ -32,6 +32,7 @@
 #include <linux/notifier.h>
 #include <linux/fb.h>
 #endif
+#include <xiaomi-msm8937/touchscreen.h>
 
 static u8 TP_Maker, LCD_Maker, Panel_Ink;
 static u8 Fw_Version[3];
@@ -6028,6 +6029,9 @@ static int mxt_probe(struct i2c_client *client,
 	int error;
 	unsigned char val;
 
+	if (xiaomi_msm8937_touchscreen_is_probed)
+		return -ENODEV;
+
 	CTP_DEBUG("step 1: parse dts. ");
 	if (client->dev.of_node) {
 		pdata = devm_kzalloc(&client->dev,
@@ -6218,6 +6222,7 @@ static int mxt_probe(struct i2c_client *client,
 	create_ctp_proc();
 #endif
 	CTP_DEBUG("Atmel Probe done");
+	xiaomi_msm8937_touchscreen_is_probed = true;
 	return 0;
 
 err_remove_self_ref_attr:
