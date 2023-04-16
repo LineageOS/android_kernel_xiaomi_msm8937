@@ -13,7 +13,11 @@
 	};
 
 	ist30xx@50 {
+#ifdef CONFIG_TOUCHSCREEN_IST30XX_MI8937
+		compatible = "imagis,ist30xx-ts-mi8937";
+#else
 		compatible = "imagis,ist30xx-ts";
+#endif
 		reg = <0x50>;
 		interrupt-parent = <&tlmm>;
 		interrupts = <65 0x2008>;
