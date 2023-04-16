@@ -504,7 +504,7 @@ static int ist30xx_set_input_device(struct ist30xx_data *data)
 			     IST30XX_MAX_W, 0, 0);
 
 #if IST30XX_GESTURE
-	input_set_capability(data->input_dev, EV_KEY, KEY_POWER);
+	input_set_capability(data->input_dev, EV_KEY, KEY_WAKEUP);
 	input_set_capability(data->input_dev, EV_KEY, KEY_PLAYPAUSE);
 	input_set_capability(data->input_dev, EV_KEY, KEY_NEXTSONG);
 	input_set_capability(data->input_dev, EV_KEY, KEY_PREVIOUSSONG);
@@ -640,7 +640,7 @@ err_get_info:
 	 (n & SPECIAL_MESSAGE_MASK) : -EINVAL)
 #define MAX_LK_KEYCODE_NUM		(256)
 static unsigned short lk_keycode[MAX_LK_KEYCODE_NUM] = {
-	[0x01] = KEY_POWER,
+	[0x01] = KEY_WAKEUP,
 	[0x02] = KEY_PLAYPAUSE,
 	[0x03] = KEY_NEXTSONG,
 	[0x04] = KEY_PREVIOUSSONG,
@@ -697,9 +697,9 @@ void ist30xx_special_cmd(struct ist30xx_data *data, int cmd)
 
 		if ((cmd != 0x92) && (cmd != 0x94) && (cmd != 0x96)
 		    && (cmd != 0x98)) {
-			input_report_key(data->input_dev, KEY_POWER, 1);
+			input_report_key(data->input_dev, KEY_WAKEUP, 1);
 			input_sync(data->input_dev);
-			input_report_key(data->input_dev, KEY_POWER, 0);
+			input_report_key(data->input_dev, KEY_WAKEUP, 0);
 			input_sync(data->input_dev);
 
 			msleep(500);

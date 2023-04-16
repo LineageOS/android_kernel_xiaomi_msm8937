@@ -255,7 +255,7 @@ static void fts_gesture_report(struct input_dev *input_dev, int gesture_id)
 		break;
 
 	case GESTURE_DOUBLECLICK:
-		gesture = KEY_POWER;
+		gesture = KEY_WAKEUP;
 
 		break;
 
@@ -452,7 +452,7 @@ int fts_gesture_init(struct fts_ts_data *ts_data)
 	struct input_dev *input_dev = ts_data->input_dev;
 
 	FTS_FUNC_ENTER();
-	input_set_capability(input_dev, EV_KEY, KEY_POWER);
+	input_set_capability(input_dev, EV_KEY, KEY_WAKEUP);
 	input_set_capability(input_dev, EV_KEY, KEY_GESTURE_U);
 	input_set_capability(input_dev, EV_KEY, KEY_GESTURE_UP);
 	input_set_capability(input_dev, EV_KEY, KEY_GESTURE_DOWN);
