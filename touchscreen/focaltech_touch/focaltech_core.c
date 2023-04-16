@@ -2781,7 +2781,7 @@ static int fts_ts_probe_delayed(struct fts_ts_data *fts_data)
 	ret = fts_get_ic_information(fts_data);
 	if (ret) {
 		FTS_ERROR("not focal IC, unregister driver");
-		goto err_irq_req;
+		goto err_get_ic;
 	}
 
 #ifdef CONFIG_ARCH_QTI_VM
@@ -2802,15 +2802,17 @@ tvm_setup:
 
 	return 0;
 
+
 err_irq_req:
-	if (gpio_is_valid(fts_data->pdata->reset_gpio))
-		gpio_free(fts_data->pdata->reset_gpio);
-	if (gpio_is_valid(fts_data->pdata->irq_gpio))
-		gpio_free(fts_data->pdata->irq_gpio);
+err_get_ic:
 #if FTS_POWER_SOURCE_CUST_EN
 err_power_init:
 	fts_power_source_exit(fts_data);
 #endif
+	if (gpio_is_valid(fts_data->pdata->reset_gpio))
+		gpio_free(fts_data->pdata->reset_gpio);
+	if (gpio_is_valid(fts_data->pdata->irq_gpio))
+		gpio_free(fts_data->pdata->irq_gpio);
 err_gpio_config:
 	return ret;
 }
@@ -2858,6 +2860,30 @@ static int fts_ts_probe_entry(struct fts_ts_data *ts_data)
 		goto err_bus_init;
 	}
 
+#ifdef CONFIG_FTS_TRUSTED_TOUCH
+	fts_ts_trusted_touch_init(ts_data);
+	mutex_init(&(ts_data->fts_clk_io_ctrl_mutex));
+#endif
+
+#ifndef CONFIG_ARCH_QTI_VM
+	if (ts_data->pdata->type == _FT8726) {
+		atomic_set(&ts_data->delayed_vm_probe_pending, 1);
+		ts_data->suspended = true;
+	} else {
+		ret = fts_ts_probe_delayed(ts_data);
+		if (ret) {
+			FTS_ERROR("Failed to enable resources\n");
+			goto err_probe_delayed;
+		}
+	}
+#else
+	ret = fts_ts_probe_delayed(ts_data);
+	if (ret) {
+		FTS_ERROR("Failed to enable resources\n");
+		goto err_probe_delayed;
+	}
+#endif
+
 	ret = fts_input_init(ts_data);
 	if (ret) {
 		FTS_ERROR("input initialize fail");
@@ -2897,35 +2923,10 @@ static int fts_ts_probe_entry(struct fts_ts_data *ts_data)
 		FTS_ERROR("init gesture fail");
 	}
 
-
 #if FTS_ESDCHECK_EN
 	ret = fts_esdcheck_init(ts_data);
 	if (ret) {
 		FTS_ERROR("init esd check fail");
-	}
-#endif
-
-#ifdef CONFIG_FTS_TRUSTED_TOUCH
-	fts_ts_trusted_touch_init(ts_data);
-	mutex_init(&(ts_data->fts_clk_io_ctrl_mutex));
-#endif
-
-#ifndef CONFIG_ARCH_QTI_VM
-	if (ts_data->pdata->type == _FT8726) {
-		atomic_set(&ts_data->delayed_vm_probe_pending, 1);
-		ts_data->suspended = true;
-	} else {
-		ret = fts_ts_probe_delayed(ts_data);
-		if (ret) {
-			FTS_ERROR("Failed to enable resources\n");
-			goto err_probe_delayed;
-		}
-	}
-#else
-	ret = fts_ts_probe_delayed(ts_data);
-	if (ret) {
-		FTS_ERROR("Failed to enable resources\n");
-		goto err_probe_delayed;
 	}
 #endif
 
@@ -2960,17 +2961,27 @@ static int fts_ts_probe_entry(struct fts_ts_data *ts_data)
 	FTS_FUNC_EXIT();
 	return 0;
 
-err_probe_delayed:
 	kfree_safe(ts_data->point_buf);
 	kfree_safe(ts_data->events);
 err_report_buffer:
 	input_unregister_device(ts_data->input_dev);
+	input_set_drvdata(ts_data->input_dev, NULL);
+	input_free_device(ts_data->input_dev);
 err_input_init:
+	free_irq(ts_data->irq, ts_data);
+#if FTS_POWER_SOURCE_CUST_EN
+	fts_power_source_exit(fts_data);
+#endif
+	if (gpio_is_valid(fts_data->pdata->reset_gpio))
+		gpio_free(fts_data->pdata->reset_gpio);
+	if (gpio_is_valid(fts_data->pdata->irq_gpio))
+		gpio_free(fts_data->pdata->irq_gpio);
+err_probe_delayed:
+	fts_bus_exit(ts_data);
+err_bus_init:
 	if (ts_data->ts_workqueue)
 		destroy_workqueue(ts_data->ts_workqueue);
-err_bus_init:
-	kfree_safe(ts_data->bus_tx_buf);
-	kfree_safe(ts_data->bus_rx_buf);
+
 	kfree_safe(ts_data->pdata);
 
 	FTS_FUNC_EXIT();
@@ -3281,6 +3292,7 @@ static int fts_ts_i2c_probe(struct i2c_client *client, const struct i2c_device_i
 	if (ret) {
 		FTS_ERROR("Touch Screen(I2C BUS) driver probe fail");
 		kfree_safe(ts_data);
+		i2c_set_clientdata(client, NULL);
 		return ret;
 	}
 
@@ -3380,6 +3392,7 @@ static int fts_ts_spi_probe(struct spi_device *spi)
 	if (ret) {
 		FTS_ERROR("Touch Screen(SPI BUS) driver probe fail");
 		kfree_safe(ts_data);
+		spi_set_drvdata(spi, NULL);
 		return ret;
 	}
 

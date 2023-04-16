@@ -192,16 +192,21 @@ static int fts_i2c_init(struct fts_ts_data *ts_data)
 	ts_data->bus_tx_buf = kzalloc(I2C_BUF_LENGTH, GFP_KERNEL);
 	if (ts_data->bus_tx_buf == NULL) {
 		FTS_ERROR("failed to allocate memory for bus_tx_buf");
-		return -ENOMEM;
+		goto err_bus_tx_buf;
 	}
 
 	ts_data->bus_rx_buf = kzalloc(I2C_BUF_LENGTH, GFP_KERNEL);
 	if (ts_data->bus_rx_buf == NULL) {
 		FTS_ERROR("failed to allocate memory for bus_rx_buf");
-		return -ENOMEM;
+		goto err_bus_rx_buf;
 	}
 	FTS_FUNC_EXIT();
 	return 0;
+
+err_bus_rx_buf:
+	kfree_safe(ts_data->bus_tx_buf);
+err_bus_tx_buf:
+	return -ENOMEM;
 }
 
 static int fts_i2c_exit(struct fts_ts_data *ts_data)
