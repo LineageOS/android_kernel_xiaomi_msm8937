@@ -33,6 +33,7 @@
 * 1.Included header files
 *****************************************************************************/
 #include "focaltech_core.h"
+#include <xiaomi-msm8937/touchscreen.h>
 
 /******************************************************************************
 * Private constant and macro definitions using #define
@@ -99,6 +100,29 @@ static struct fts_gesture_st fts_gesture_data;
 /*****************************************************************************
 * Static function prototypes
 *****************************************************************************/
+#if IS_ENABLED(CONFIG_TOUCHSCREEN_SYSCTL_MI8937)
+static int fts_mi8937_ops_enable_dt2w(struct device *dev, bool enable)
+{
+	struct fts_ts_data *ts_data = fts_data;
+
+	mutex_lock(&ts_data->input_dev->mutex);
+	if (enable) {
+		FTS_DEBUG("enable gesture");
+		ts_data->gesture_mode = ENABLE;
+	} else {
+		FTS_DEBUG("disable gesture");
+		ts_data->gesture_mode = DISABLE;
+	}
+	mutex_unlock(&ts_data->input_dev->mutex);
+
+	return 0;
+}
+
+static struct xiaomi_msm8937_touchscreen_operations_t fts_mi8937_ts_ops = {
+	.enable_dt2w = fts_mi8937_ops_enable_dt2w,
+};
+#endif
+
 static ssize_t fts_gesture_show(
 	struct device *dev, struct device_attribute *attr, char *buf)
 {
@@ -463,6 +487,11 @@ int fts_gesture_init(struct fts_ts_data *ts_data)
 
 	memset(&fts_gesture_data, 0, sizeof(struct fts_gesture_st));
 	ts_data->gesture_mode = FTS_GESTURE_EN;
+
+#if IS_ENABLED(CONFIG_TOUCHSCREEN_SYSCTL_MI8937)
+	fts_mi8937_ts_ops.dev = ts_data->dev;
+	xiaomi_msm8937_touchscreen_register_operations(&fts_mi8937_ts_ops);
+#endif
 
 	FTS_FUNC_EXIT();
 	return 0;

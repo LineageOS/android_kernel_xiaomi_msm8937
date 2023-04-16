@@ -6021,6 +6021,47 @@ static void create_ctp_proc(void)
 }
 #endif
 
+#if IS_ENABLED(CONFIG_TOUCHSCREEN_SYSCTL_MI8937)
+static int mxt_mi8937_ops_enable_dt2w(struct device *dev, bool enable)
+{
+	struct mxt_data *data = dev_get_drvdata(dev);
+	const struct mxt_platform_data *pdata = data->pdata;
+	int index = data->current_index;
+
+	if (pdata->config_array[index].wake_up_self_adcx == 0)
+		return -EINVAL;
+
+	if (pdata->cut_off_power) {
+		dev_err(&data->client->dev, "Wakeup gesture not supported\n");
+		return -EINVAL;
+	}
+
+	data->wakeup_gesture_mode = enable;
+
+	if (data->is_stopped) {
+		/* Set wakeup gesture mode in deepsleep,
+		 * should re-set the registers */
+		if (data->wakeup_gesture_mode) {
+			mxt_enable_irq(data);
+			if (data->input_dev->users)
+				mxt_stop(data);
+		} else {
+			mxt_disable_irq(data);
+			data->is_wakeup_by_gesture = false;
+			mxt_set_gesture_wake_up(data, false);
+			mxt_enable_gesture_mode(data, false);
+			mxt_set_power_cfg(data, MXT_POWER_CFG_DEEPSLEEP);
+		}
+	}
+
+	return 0;
+}
+
+static struct xiaomi_msm8937_touchscreen_operations_t mxt_mi8937_ts_ops = {
+	.enable_dt2w = mxt_mi8937_ops_enable_dt2w,
+};
+#endif
+
 static int mxt_probe(struct i2c_client *client,
 		const struct i2c_device_id *id)
 {
@@ -6222,6 +6263,12 @@ static int mxt_probe(struct i2c_client *client,
 	create_ctp_proc();
 #endif
 	CTP_DEBUG("Atmel Probe done");
+
+#if IS_ENABLED(CONFIG_TOUCHSCREEN_SYSCTL_MI8937)
+	mxt_mi8937_ts_ops.dev = &client->dev;
+	xiaomi_msm8937_touchscreen_register_operations(&mxt_mi8937_ts_ops);
+#endif
+
 	xiaomi_msm8937_touchscreen_is_probed = true;
 	return 0;
 

@@ -1984,6 +1984,21 @@ static void gtp_shutdown(struct i2c_client *client)
 	return;
 }
 
+#if IS_ENABLED(CONFIG_TOUCHSCREEN_SYSCTL_MI8937)
+static int gtp_mi8937_ops_enable_dt2w(struct device *dev, bool enable)
+{
+	struct i2c_client *client = to_i2c_client(dev);
+	struct goodix_ts_data *ts = i2c_get_clientdata(client);
+
+	ts->pdata->slide_wakeup = enable;
+	return 0;
+}
+
+static struct xiaomi_msm8937_touchscreen_operations_t gtp_mi8937_ts_ops = {
+	.enable_dt2w = gtp_mi8937_ops_enable_dt2w,
+};
+#endif
+
 static int gtp_probe(struct i2c_client *client, const struct i2c_device_id *id)
 {
 	int ret = -1;
@@ -2135,6 +2150,12 @@ static int gtp_probe(struct i2c_client *client, const struct i2c_device_id *id)
 	gtp_work_control_enable(ts, true);
 
 	init_wr_node(client);/*TODO judge return value */
+
+
+#if IS_ENABLED(CONFIG_TOUCHSCREEN_SYSCTL_MI8937)
+	gtp_mi8937_ts_ops.dev = &client->dev;
+	xiaomi_msm8937_touchscreen_register_operations(&gtp_mi8937_ts_ops);
+#endif
 
 	xiaomi_msm8937_touchscreen_is_probed = true;
 	return 0;

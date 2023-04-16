@@ -1956,6 +1956,23 @@ static int get_boot_mode(struct i2c_client *client)
 }
 #endif
 
+#if IS_ENABLED(CONFIG_TOUCHSCREEN_SYSCTL_MI8937)
+#if IST30XX_GESTURE
+static int ist30xx_mi8937_ops_enable_dt2w(struct device *dev, bool enable)
+{
+	struct ist30xx_data *data = dev_get_drvdata(dev);
+	data->gesture = enable;
+	return 0;
+}
+#endif
+
+static struct xiaomi_msm8937_touchscreen_operations_t ist30xx_mi8937_ts_ops = {
+#if IST30XX_GESTURE
+	.enable_dt2w = ist30xx_mi8937_ops_enable_dt2w,
+#endif
+};
+#endif
+
 static int ist30xx_probe(struct i2c_client *client,
 			 const struct i2c_device_id *id)
 {
@@ -2319,6 +2336,11 @@ static int ist30xx_probe(struct i2c_client *client,
 
 	schedule_delayed_work(&ts_data->work_charger_check,
 			      CHECK_CHARGER_INTERVAL);
+#endif
+
+#if IS_ENABLED(CONFIG_TOUCHSCREEN_SYSCTL_MI8937)
+	ist30xx_mi8937_ts_ops.dev = &client->dev;
+	xiaomi_msm8937_touchscreen_register_operations(&ist30xx_mi8937_ts_ops);
 #endif
 
 	xiaomi_msm8937_touchscreen_is_probed = true;
