@@ -2,7 +2,11 @@
 	status = "okay";
 	
 	atmel_mxt_ts@4a {
+#ifdef CONFIG_TOUCHSCREEN_ATMEL308U_MI8937
+		compatible = "atmel,mxt-ts-mi8937";
+#else
 		compatible = "atmel,mxt-ts";
+#endif
 		reg = <0x4a>;
 		interrupt-parent = <&tlmm>;
 		interrupts = <65 0x2008>;
