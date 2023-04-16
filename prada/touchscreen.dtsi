@@ -10,8 +10,8 @@
 		reg = <0x4a>;
 		interrupt-parent = <&tlmm>;
 		interrupts = <65 0x2008>;
-		vddio-supply = <&pm8937_l6>;
 		vdd-supply = <&pm8937_l10>;
+		vcc_i2c-supply = <&pm8937_l6>;
 		pinctrl-names = "pmx_ts_active", "pmx_ts_suspend";
 		pinctrl-0 = <&ts_int_active &ts_reset_active>;
 		pinctrl-1 = <&ts_int_suspend &ts_reset_suspend>;
