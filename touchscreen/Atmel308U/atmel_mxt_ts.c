@@ -6133,6 +6133,8 @@ static int mxt_probe(struct i2c_client *client,
 		CTP_DEBUG("step 4 : test IC I2C.");
 	/* Initialize i2c device */
 	error = mxt_initialize(data);
+	if (error)
+		goto err_reset_gpio_req;
 
 	CTP_DEBUG("step 5 : register input device.");
 	error = mxt_initialize_input_device(data);
