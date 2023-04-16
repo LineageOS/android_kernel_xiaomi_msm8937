@@ -6385,7 +6385,7 @@ static struct i2c_driver mxt_driver = {
 	.id_table	= mxt_id,
 };
 
-static int __init mxt_init(void)
+int xiaomi_msm8937_touchscreen_mxt_init(void)
 {
 	CTP_DEBUG("mxt_init.");
 	return i2c_add_driver(&mxt_driver);
@@ -6396,7 +6396,6 @@ static void __exit mxt_exit(void)
 	i2c_del_driver(&mxt_driver);
 }
 
-module_init(mxt_init);
 module_exit(mxt_exit);
 
 /* Module information */

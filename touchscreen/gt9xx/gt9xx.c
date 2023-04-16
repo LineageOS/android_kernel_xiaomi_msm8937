@@ -21,6 +21,7 @@
 #include <linux/platform_device.h>
 #include <linux/pinctrl/consumer.h>
 #include <linux/input/mt.h>
+#include <xiaomi-msm8937/touchscreen.h>
 #include "gt9xx.h"
 
 #define GOODIX_VTG_MIN_UV	2600000
@@ -2602,7 +2603,7 @@ static struct i2c_driver goodix_ts_driver = {
 	},
 };
 
-static int __init gtp_init(void)
+int xiaomi_msm8937_touchscreen_gtp_init(void)
 {
 	s32 ret;
 
@@ -2618,7 +2619,6 @@ static void __exit gtp_exit(void)
 	i2c_del_driver(&goodix_ts_driver);
 }
 
-module_init(gtp_init);
 module_exit(gtp_exit);
 
 MODULE_DESCRIPTION("GT9 serials touch controller Driver");

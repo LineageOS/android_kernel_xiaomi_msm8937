@@ -65,6 +65,8 @@
 #include <linux/earlysuspend.h>
 #endif
 
+#include <xiaomi-msm8937/touchscreen.h>
+
 #include "ist30xxc.h"
 #include "ist30xxc_update.h"
 #include "ist30xxc_tracking.h"
@@ -2435,7 +2437,7 @@ static struct i2c_driver ist30xx_i2c_driver = {
 		   },
 };
 
-static int __init ist30xx_init(void)
+int xiaomi_msm8937_touchscreen_ist30xx_init(void)
 {
 	tsp_info("%s()\n", __func__);
 	return i2c_add_driver(&ist30xx_i2c_driver);
@@ -2447,7 +2449,6 @@ static void __exit ist30xx_exit(void)
 	i2c_del_driver(&ist30xx_i2c_driver);
 }
 
-module_init(ist30xx_init);
 module_exit(ist30xx_exit);
 
 MODULE_DESCRIPTION("Imagis IST30XX touch driver");

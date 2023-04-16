@@ -52,6 +52,7 @@
 #include <linux/earlysuspend.h>
 #define FTS_SUSPEND_LEVEL 1     /* Early-suspend level */
 #endif
+#include <xiaomi-msm8937/touchscreen.h>
 #include "focaltech_core.h"
 
 #if defined(CONFIG_FTS_TRUSTED_TOUCH)
@@ -3446,7 +3447,7 @@ static void __exit fts_ts_spi_exit(void)
 	spi_unregister_driver(&fts_ts_spi_driver);
 }
 
-static int __init fts_ts_init(void)
+int xiaomi_msm8937_touchscreen_fts_ts_init(void)
 {
 	int ret = 0;
 
@@ -3467,7 +3468,6 @@ static void __exit fts_ts_exit(void)
 	fts_ts_spi_exit();
 }
 
-module_init(fts_ts_init);
 module_exit(fts_ts_exit);
 
 MODULE_AUTHOR("FocalTech Driver Team");
