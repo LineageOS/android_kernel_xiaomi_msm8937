@@ -926,7 +926,7 @@ static void report_input_data(struct ist30xx_data *data, int finger_counts,
 						 fingers[idx].bit_field.w);
 				idx++;
 			}
-			if (key_press == true) {
+			if (key_press == true && !data->disable_keys) {
 				tsp_info("key press ( %d, %d)\n",
 					 fhd_key_dim_x[id + 1], FHD_KEY_Y);
 				input_mt_slot(data->input_dev, 0);
@@ -1965,11 +1965,18 @@ static int ist30xx_mi8937_ops_enable_dt2w(struct device *dev, bool enable)
 	return 0;
 }
 #endif
+static int ist30xx_mi8937_ops_disable_keys(struct device *dev, bool disable)
+{
+	struct ist30xx_data *data = dev_get_drvdata(dev);
+	data->disable_keys = disable;
+	return 0;
+}
 
 static struct xiaomi_msm8937_touchscreen_operations_t ist30xx_mi8937_ts_ops = {
 #if IST30XX_GESTURE
 	.enable_dt2w = ist30xx_mi8937_ops_enable_dt2w,
 #endif
+	.disable_keys = ist30xx_mi8937_ops_disable_keys,
 };
 #endif
 
@@ -2033,6 +2040,7 @@ static int ist30xx_probe(struct i2c_client *client,
 		goto err_alloc_dev;
 	}
 
+	data->disable_keys = false;
 	data->max_fingers = IST30XX_MAX_MT_FINGERS;
 	data->max_keys = IST30XX_MAX_KEYS;
 	data->irq_enabled = 1;
