@@ -1680,6 +1680,12 @@ static int fts_input_report_key(struct fts_ts_data *data, int index)
 		return -EINVAL;
 	}
 
+#if IS_ENABLED(CONFIG_TOUCHSCREEN_SYSCTL_MI8937)
+	if (data->disable_keys) {
+		return 0;
+	}
+#endif
+
 	for (i = 0; i < data->pdata->key_number; i++) {
 		if ((x >= x_dim[i] - FTS_KEY_DIM) && (x <= x_dim[i] + FTS_KEY_DIM) &&
 			(y >= y_dim[i] - FTS_KEY_DIM) && (y <= y_dim[i] + FTS_KEY_DIM)) {
@@ -2738,6 +2744,28 @@ static void fts_ts_late_resume(struct early_suspend *handler)
 }
 #endif
 
+#if IS_ENABLED(CONFIG_TOUCHSCREEN_SYSCTL_MI8937)
+static int fts_mi8937_ops_disable_keys(struct device *dev, bool disable)
+{
+	struct fts_ts_data *ts_data = fts_data;
+
+	if (disable) {
+		FTS_DEBUG("disable keys");
+		ts_data->disable_keys = true;
+	} else {
+		FTS_DEBUG("enable keys");
+		ts_data->disable_keys = false;
+	}
+
+	return 0;
+}
+
+static struct xiaomi_msm8937_touchscreen_operations_t fts_mi8937_ts_ops = {
+	.enable_dt2w = fts_mi8937_ops_enable_dt2w,
+	.disable_keys = fts_mi8937_ops_disable_keys,
+};
+#endif
+
 static int fts_ts_probe_delayed(struct fts_ts_data *fts_data)
 {
 	int ret = 0;
@@ -2957,6 +2985,11 @@ static int fts_ts_probe_entry(struct fts_ts_data *ts_data)
 
 #if FTS_ESDCHECK_EN
 	fts_esdcheck_switch(ENABLE);
+#endif
+
+#if IS_ENABLED(CONFIG_TOUCHSCREEN_SYSCTL_MI8937)
+	fts_mi8937_ts_ops.dev = ts_data->dev;
+	xiaomi_msm8937_touchscreen_register_operations(&fts_mi8937_ts_ops);
 #endif
 
 	FTS_FUNC_EXIT();

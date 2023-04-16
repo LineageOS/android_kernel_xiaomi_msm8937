@@ -101,7 +101,7 @@ static struct fts_gesture_st fts_gesture_data;
 * Static function prototypes
 *****************************************************************************/
 #if IS_ENABLED(CONFIG_TOUCHSCREEN_SYSCTL_MI8937)
-static int fts_mi8937_ops_enable_dt2w(struct device *dev, bool enable)
+int fts_mi8937_ops_enable_dt2w(struct device *dev, bool enable)
 {
 	struct fts_ts_data *ts_data = fts_data;
 
@@ -117,10 +117,6 @@ static int fts_mi8937_ops_enable_dt2w(struct device *dev, bool enable)
 
 	return 0;
 }
-
-static struct xiaomi_msm8937_touchscreen_operations_t fts_mi8937_ts_ops = {
-	.enable_dt2w = fts_mi8937_ops_enable_dt2w,
-};
 #endif
 
 static ssize_t fts_gesture_show(
@@ -487,11 +483,6 @@ int fts_gesture_init(struct fts_ts_data *ts_data)
 
 	memset(&fts_gesture_data, 0, sizeof(struct fts_gesture_st));
 	ts_data->gesture_mode = FTS_GESTURE_EN;
-
-#if IS_ENABLED(CONFIG_TOUCHSCREEN_SYSCTL_MI8937)
-	fts_mi8937_ts_ops.dev = ts_data->dev;
-	xiaomi_msm8937_touchscreen_register_operations(&fts_mi8937_ts_ops);
-#endif
 
 	FTS_FUNC_EXIT();
 	return 0;
