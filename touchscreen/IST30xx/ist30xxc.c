@@ -1936,7 +1936,10 @@ static int ist30xx_probe(struct i2c_client *client,
 	ts_data = data;
 
 	err = ist30xx_ts_pinctrl_init(data);
-	if (!err && data->ts_pinctrl) {
+	if (err) {
+		dev_err(&client->dev, "pinctrl init failed");
+		goto err_alloc_dev;
+	} else if (!err && data->ts_pinctrl) {
 		err = ist30xx_ts_pinctrl_select(data, 1);
 		if (err < 0)
 			tsp_info("here i am\n");
@@ -1946,7 +1949,7 @@ static int ist30xx_probe(struct i2c_client *client,
 		err = gpio_request(pdata->irq_gpio, "ist30xx_irq_gpio");
 		if (err) {
 			dev_err(&client->dev, "irq gpio request failed");
-			goto err_init_drv;
+			goto err_pinctrl;
 		}
 		err = gpio_direction_output(pdata->irq_gpio, 1);
 		msleep(10);
@@ -1954,6 +1957,7 @@ static int ist30xx_probe(struct i2c_client *client,
 		if (err) {
 			dev_err(&client->dev,
 				"set_direction for irq gpio failed\n");
+			goto err_irq_gpio;
 		}
 	} else {
 		dev_err(&client->dev, "--------\n");
@@ -1963,10 +1967,14 @@ static int ist30xx_probe(struct i2c_client *client,
 		err = gpio_request(pdata->reset_gpio, "ist30xx_reset_gpio");
 		if (err) {
 			dev_err(&client->dev, "reset gpio request failed");
-			goto err_init_drv;
+			goto err_irq_gpio;
 		}
-
 		err = gpio_direction_output(pdata->reset_gpio, 1);
+		if (err) {
+			dev_err(&client->dev,
+				"set_direction for reset gpio failed\n");
+			goto err_reset_gpio;
+		}
 	} else {
 		dev_err(&client->dev, "==========\n");
 	}
@@ -2011,7 +2019,7 @@ static int ist30xx_probe(struct i2c_client *client,
 				break;
 			}
 		} else if (unlikely(retry == 0)) {
-			goto err_init_drv;
+			goto err_reset_gpio;
 		}
 	}
 
@@ -2043,7 +2051,7 @@ static int ist30xx_probe(struct i2c_client *client,
 		}
 
 		if (unlikely(retry == 0))
-			goto err_init_drv;
+			goto err_early_suspend;
 	}
 
 	tsp_info("TSP IC: %x, TSP Vendor: %x\n", data->chip_id, data->tsp_type);
@@ -2055,7 +2063,7 @@ static int ist30xx_probe(struct i2c_client *client,
 				   IRQF_TRIGGER_FALLING | IRQF_ONESHOT,
 				   "ist30xx_ts", data);
 	if (unlikely(ret))
-		goto err_init_drv;
+		goto err_early_suspend;
 
 	ist30xx_disable_irq(data);
 	data->status.event_mode = false;
@@ -2134,6 +2142,8 @@ static int ist30xx_probe(struct i2c_client *client,
 	mod_timer(&event_timer, get_jiffies_64() + EVENT_TIMER_INTERVAL * 2);
 
 	ret = ist30xx_get_info(data);
+	if (unlikely(ret))
+		goto err_init_delayed_work_and_timer;
 #if CTP_LOCKDOWN_INFO
 	tp_color = Lockdown_Info_High.lockinfo[1];
 	dev_info(&client->dev,
@@ -2209,24 +2219,42 @@ static int ist30xx_probe(struct i2c_client *client,
 
 	return 0;
 
+//err_init_drv:
+	input_unregister_device(input_dev);
+	input_set_drvdata(input_dev, NULL);
+	input_free_device(input_dev);
+err_init_delayed_work_and_timer:
+	cancel_delayed_work(&data->work_debug_algorithm);
+	cancel_delayed_work(&data->work_noise_protect);
+	cancel_delayed_work(&data->work_reset_check);
+#if CTP_CHARGER_DETECT
+	cancel_delayed_work(&data->work_charger_check);
+#endif
 err_sysfs:
 	class_destroy(ist30xx_class);
-	input_unregister_device(input_dev);
-
+//err_work_fw_update:
+#if IST30XX_INTERNAL_BIN
+#if IST30XX_UPDATE_BY_WORKQUEUE
+	cancel_delayed_work(&data->work_fw_update);
+#endif /* IST30XX_UPDATE_BY_WORKQUEUE */
+#endif /* IST30XX_INTERNAL_BIN */
 err_irq:
+	data->status.event_mode = false;
 	ist30xx_disable_irq(data);
 	free_irq(client->irq, data);
-
-err_init_drv:
-	input_free_device(input_dev);
-	data->status.event_mode = false;
-	gpio_free(pdata->reset_gpio);
-	gpio_free(pdata->irq_gpio);
+err_early_suspend:
 #ifdef CONFIG_HAS_EARLYSUSPEND
 	unregister_early_suspend(&data->early_suspend);
 #endif
+err_reset_gpio:
+	gpio_free(pdata->reset_gpio);
+err_irq_gpio:
+	gpio_free(pdata->irq_gpio);
+err_pinctrl:
+	devm_pinctrl_put(data->ts_pinctrl);
 err_alloc_dev:
 	kfree(data);
+	i2c_set_clientdata(client, NULL);
 	tsp_err("Error, ist30xx init driver\n");
 	return -ENODEV;
 }
