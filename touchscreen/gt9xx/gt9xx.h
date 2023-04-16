@@ -78,6 +78,9 @@ struct goodix_config_data {
 };
 
 struct goodix_ts_platform_data {
+#if IS_ENABLED(CONFIG_TOUCHSCREEN_SYSCTL_MI8937)
+	bool disable_keys;
+#endif
 	int irq_gpio;
 	int rst_gpio;
 	u32 irq_flags;

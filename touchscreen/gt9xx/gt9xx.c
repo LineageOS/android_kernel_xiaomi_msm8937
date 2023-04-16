@@ -604,6 +604,11 @@ static void gtp_work_func(struct goodix_ts_data *ts)
 	} else if (key_value & 0x0f || pre_key & 0x0f) {
 		/* panel key */
 		for (i = 0; i < ts->pdata->key_nums; i++) {
+#if IS_ENABLED(CONFIG_TOUCHSCREEN_SYSCTL_MI8937)
+			if (ts->pdata->disable_keys)
+				dev_dbg(&ts->client->dev, "panel keys are disabled\n");
+			else
+#endif
 			if ((pre_key | key_value) & (0x01 << i))
 				input_report_key(ts->input_dev,
 						 ts->pdata->key_map[i],
@@ -1994,8 +1999,18 @@ static int gtp_mi8937_ops_enable_dt2w(struct device *dev, bool enable)
 	return 0;
 }
 
+static int gtp_mi8937_ops_disable_keys(struct device *dev, bool disable)
+{
+	struct i2c_client *client = to_i2c_client(dev);
+	struct goodix_ts_data *ts = i2c_get_clientdata(client);
+
+	ts->pdata->disable_keys = disable;
+	return 0;
+}
+
 static struct xiaomi_msm8937_touchscreen_operations_t gtp_mi8937_ts_ops = {
 	.enable_dt2w = gtp_mi8937_ops_enable_dt2w,
+	.disable_keys = gtp_mi8937_ops_disable_keys,
 };
 #endif
 
