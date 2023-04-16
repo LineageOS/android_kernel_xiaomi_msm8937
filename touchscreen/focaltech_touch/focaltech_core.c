@@ -3463,11 +3463,7 @@ static void __exit fts_ts_exit(void)
 	fts_ts_spi_exit();
 }
 
-#ifdef CONFIG_ARCH_QTI_VM
 module_init(fts_ts_init);
-#else
-late_initcall(fts_ts_init);
-#endif
 module_exit(fts_ts_exit);
 
 MODULE_AUTHOR("FocalTech Driver Team");
