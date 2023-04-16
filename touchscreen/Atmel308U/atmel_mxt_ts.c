@@ -6125,22 +6125,21 @@ static int mxt_probe(struct i2c_client *client,
 	i2c_set_clientdata(data->client, data);
 	mdelay(10);
 	mxt_wait_for_chg(data);
-	INIT_DELAYED_WORK(&data->calibration_delayed_work,
-				mxt_calibration_delayed_work);
-	INIT_DELAYED_WORK(&data->resume_delayed_work,
-				mxt_resume_delayed_work);
 
-		CTP_DEBUG("step 4 : test IC I2C.");
+	CTP_DEBUG("step 4 : test IC I2C.");
 	/* Initialize i2c device */
 	error = mxt_initialize(data);
 	if (error)
 		goto err_reset_gpio_req;
 
 	CTP_DEBUG("step 5 : register input device.");
+	INIT_DELAYED_WORK(&data->calibration_delayed_work,
+				mxt_calibration_delayed_work);
+	INIT_DELAYED_WORK(&data->resume_delayed_work,
+				mxt_resume_delayed_work);
 	error = mxt_initialize_input_device(data);
 	if (error)
 		goto err_free_object;
-
 
 	configure_sleep(data);
 
@@ -6235,6 +6234,8 @@ err_free_object:
 	i2c_set_clientdata(data->client, NULL);
 	kfree(data->msg_buf);
 	kfree(data->object_table);
+	cancel_delayed_work(&data->calibration_delayed_work);
+	cancel_delayed_work(&data->resume_delayed_work);
 err_reset_gpio_req:
 	if (gpio_is_valid(pdata->reset_gpio))
 		gpio_free(pdata->reset_gpio);
