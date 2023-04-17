@@ -21,11 +21,6 @@
 #include <linux/pm_wakeup.h>
 
 
-#undef KERNEL_VERSION
-#define KERNEL_VERSION(a, b, c) (((a) << 16) + ((b) << 8) + (c))
-#undef LINUX_VERSION_CODE
-#define LINUX_VERSION_CODE KERNEL_VERSION(3, 1, 8)
-
 #define SMB_VTG_MIN_UV		1800000
 #define SMB_VTG_MAX_UV		1800000
 
@@ -645,7 +640,7 @@ static int cw_get_usb_present(struct cw_battery *cw_bat)
 	union power_supply_propval prop = {0,};
 	int ret;
 
-	ret = cw_bat->usb_psy->get_property(cw_bat->usb_psy,
+	ret = power_supply_get_property(cw_bat->usb_psy,
 							POWER_SUPPLY_PROP_PRESENT, &prop);
 	if (ret < 0)
 		pr_err("could not read USB current_max property, ret=%d\n", ret);
@@ -913,7 +908,7 @@ static int cw_get_battery_profile(struct cw_battery *cw_bat)
 		pr_err("cw2017: No Batterydata is available\n");
 		return -ENODATA;
 	}
-	batt_data_node = of_batterydata_get_best_profile(batt_node, CW_PROPERTIES, NULL);
+	batt_data_node = of_batterydata_get_best_profile(batt_node, cw_bat->battery_id, NULL);
 	if (!batt_data_node) {
 		pr_err("cw2017: couldn't find battery profile handle\n");
 		return -ENODATA;
