@@ -71,7 +71,7 @@
 #define FG_ADC			0xB
 #define FG_MEMIF		0xC
 
-#define QPNP_FG_DEV_NAME "qcom,qpnp-fg"
+#define QPNP_FG_DEV_NAME "qcom,qpnp-fg-mi8937"
 #define MEM_IF_TIMEOUT_MS	5000
 #define FG_CYCLE_MS		1500
 #define BUCKET_COUNT		8

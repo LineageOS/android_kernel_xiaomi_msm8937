@@ -1,4 +1,4 @@
-config QPNP_FG
+config QPNP_FG_MI8937
 	tristate "QPNP fuel gauge driver"
 	depends on MFD_SPMI_PMIC
 	help
@@ -7,7 +7,7 @@ config QPNP_FG
 	  fuel gauge. The state of charge is reported through a BMS power
 	  supply property and also sends uevents when the capacity is updated.
 
-config QPNP_SMBCHARGER
+config QPNP_SMBCHARGER_MI8937
 	tristate "QPNP SMB Charger driver"
 	depends on MFD_SPMI_PMIC
 	help
