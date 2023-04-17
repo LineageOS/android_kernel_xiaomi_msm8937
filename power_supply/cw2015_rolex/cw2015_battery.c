@@ -1265,12 +1265,12 @@ static const struct i2c_device_id cw_id[] = {
 MODULE_DEVICE_TABLE(i2c, cw_id);
 
 static struct of_device_id cw2015_match_table[] = {
-	{ .compatible = "cellwise,cw2015", },
+	{ .compatible = "cellwise,cw2015-rolex", },
 	{ },
 };
 static struct i2c_driver cw_bat_driver = {
 			.driver         = {
-			.name   = "cw201x",
+			.name   = "cw201x-rolex",
 
 #ifdef CONFIG_PM
 			.pm = &cw_bat_pm_ops,

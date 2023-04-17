@@ -1,4 +1,4 @@
-config BATTERY_CW2015
+config BATTERY_CW2015_ROLEX
 	tristate "CW2015 battery driver"
 	depends on I2C
 	help
