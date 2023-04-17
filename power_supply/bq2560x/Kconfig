@@ -1,0 +1,6 @@
+config CHARGER_BQ2560X
+	tristate "TI BQ2560X battery charger driver"
+	depends on I2C
+	default y
+	help
+	  Say Y to enable support for TI bq2560X charger
