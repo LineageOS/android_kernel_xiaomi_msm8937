@@ -1,1 +1,1 @@
-obj-$(CONFIG_SMB358_CHARGER)	+= smb358-charger.o
+obj-$(CONFIG_SMB358_CHARGER_ROLEX)	+= smb358-charger.o

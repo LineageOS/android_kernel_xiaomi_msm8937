@@ -1,4 +1,4 @@
-config SMB358_CHARGER
+config SMB358_CHARGER_ROLEX
 	tristate "SMB358 Battery Charger"
 	depends on I2C
 	help

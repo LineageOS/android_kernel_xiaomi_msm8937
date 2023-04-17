@@ -3533,7 +3533,7 @@ static const struct dev_pm_ops smb358_pm_ops = {
 };
 
 static struct of_device_id smb358_match_table[] = {
-	{ .compatible = "qcom,smb358-charger",},
+	{ .compatible = "qcom,smb358-charger-rolex",},
 	{ },
 };
 
@@ -3545,7 +3545,7 @@ MODULE_DEVICE_TABLE(i2c, smb358_charger_id);
 
 static struct i2c_driver smb358_charger_driver = {
 	.driver		= {
-		.name		= "smb358-charger",
+		.name		= "smb358-charger-rolex",
 		.owner		= THIS_MODULE,
 		.of_match_table = smb358_match_table,
 		.pm		= &smb358_pm_ops,
