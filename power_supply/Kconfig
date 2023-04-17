@@ -9,6 +9,7 @@ config MSM_USB_POWER_SUPPLY_MI8937
 
 source "techpack/xiaomi-msm8937/power_supply/bq2560x/Kconfig"
 source "techpack/xiaomi-msm8937/power_supply/bq27426/Kconfig"
+source "techpack/xiaomi-msm8937/power_supply/cw2015_rolex/Kconfig"
 source "techpack/xiaomi-msm8937/power_supply/cw2017_tiare/Kconfig"
 source "techpack/xiaomi-msm8937/power_supply/qcom/Kconfig"
 
