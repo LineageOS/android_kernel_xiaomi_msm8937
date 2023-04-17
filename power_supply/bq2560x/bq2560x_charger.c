@@ -1292,7 +1292,7 @@ static int bq2560x_regulator_init(struct bq2560x *bq)
 	struct regulator_init_data *init_data;
 	struct regulator_config cfg = {};
 
-	init_data = of_get_regulator_init_data(bq->dev, bq->dev->of_node);
+	init_data = of_get_regulator_init_data(bq->dev, bq->dev->of_node, &bq->otg_vreg.rdesc);
 	if (!init_data) {
 		dev_err(bq->dev, "Unable to allocate memory\n");
 		return -ENOMEM;
@@ -1991,11 +1991,8 @@ static irqreturn_t bq2560x_charger_interrupt(int irq, void *dev_id)
 		cancel_delayed_work(&bq->discharge_jeita_work);
 
 		if (bq->software_jeita_supported) { 
-			ret = alarm_start_relative(&bq->jeita_alarm, 
+			alarm_start_relative(&bq->jeita_alarm, 
 						ns_to_ktime(1 * 1000000000LL));
-			if (ret) 
-				pr_err("start alarm for JEITA detection failed, ret=%d\n",
-							ret);
 		}
 		
 		bq2560x_set_watchdog_timer(bq, 80);
