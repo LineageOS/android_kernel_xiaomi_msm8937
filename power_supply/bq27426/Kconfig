@@ -1,4 +1,4 @@
-config FUEL_GAUGE_BQ27426
+config FUEL_GAUGE_BQ27426_MI8937
 	tristate "TI bq27426 battery gauge driver"
 	depends on I2C
 	default y

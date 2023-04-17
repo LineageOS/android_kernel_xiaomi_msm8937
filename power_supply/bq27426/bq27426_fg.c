@@ -1966,7 +1966,7 @@ static void bq_fg_shutdown(struct i2c_client *client)
 }
 
 static struct of_device_id bq_fg_match_table[] = {
-	{.compatible = "ti,bq27426",},
+	{.compatible = "ti,bq27426-mi8937",},
 	{},
 };
 MODULE_DEVICE_TABLE(of,bq_fg_match_table);
@@ -1985,7 +1985,7 @@ static const struct dev_pm_ops bq_fg_pm_ops = {
 
 static struct i2c_driver bq_fg_driver = {
 	.driver 	= {
-		.name 	= "bq_fg",
+		.name 	= "bq_fg-mi8937",
 		.owner 	= THIS_MODULE,
 		.of_match_table = bq_fg_match_table,
 		.pm		= &bq_fg_pm_ops,
