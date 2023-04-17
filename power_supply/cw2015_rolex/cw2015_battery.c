@@ -19,13 +19,13 @@
 #include <linux/gpio.h>
 #include <linux/of_gpio.h>
 #include <linux/delay.h>
-#include <linux/power/cw2015_battery.h>
 #include <linux/time.h>
 #include <linux/interrupt.h>
 #include <linux/irq.h>
 
 #include <linux/wakelock.h>
 
+#include "cw2015_battery.h"
 
 #define REG_VERSION             	0x0
 #define REG_VCELL               	0x2
