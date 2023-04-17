@@ -927,7 +927,7 @@ static int smb358_regulator_init(struct smb358_charger *chip)
 	struct regulator_init_data *init_data;
 	struct regulator_config cfg = {};
 
-	init_data = of_get_regulator_init_data(chip->dev, chip->dev->of_node);
+	init_data = of_get_regulator_init_data(chip->dev, chip->dev->of_node, &chip->otg_vreg.rdesc);
 	if (!init_data) {
 		dev_err(chip->dev, "Allocate memory failed\n");
 		return -ENOMEM;
