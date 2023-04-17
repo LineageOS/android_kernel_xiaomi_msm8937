@@ -12,5 +12,6 @@ source "techpack/xiaomi-msm8937/power_supply/bq27426/Kconfig"
 source "techpack/xiaomi-msm8937/power_supply/cw2015_rolex/Kconfig"
 source "techpack/xiaomi-msm8937/power_supply/cw2017_tiare/Kconfig"
 source "techpack/xiaomi-msm8937/power_supply/qcom/Kconfig"
+source "techpack/xiaomi-msm8937/power_supply/smb358_rolex/Kconfig"
 
 endmenu
