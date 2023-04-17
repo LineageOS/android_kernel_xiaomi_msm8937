@@ -3238,14 +3238,7 @@ static int smb358_charger_probe(struct i2c_client *client,
 
 	chip->resume_completed = true;
 
-	if (chip->bms_psy) {
-		chip->batt_psy->bms_psy_ok = 1;
-	} else {
-		chip->batt_psy->bms_psy_ok = 0;
-	}
-
 		smb358_update_power_on_state(chip);
-		chip->batt_psy->bms_psy_ok = 0;
 	chip->batt_psy = devm_power_supply_register(chip->dev, &chip->batt_psy_d, &batt_psy_cfg);
 	if (IS_ERR(chip->batt_psy)) {
 		dev_err(&client->dev, "Couldn't register batt psy rc = %d\n",
@@ -3382,10 +3375,6 @@ static int smb358_charger_probe(struct i2c_client *client,
 
 	if (chip->bms_psy_name) {
 		chip->bms_psy = power_supply_get_by_name((char *)chip->bms_psy_name);
-			if (chip->bms_psy && chip->bms_psy->bms_psy_ok == 1 && chip->power_ok) {
-			chip->batt_psy->bms_psy_ok = 1;
-			}
-
 	}
 
 	schedule_delayed_work(&chip->abnormal_detect, 0);
