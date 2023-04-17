@@ -68,8 +68,9 @@ struct cw_battery {
 
 	struct delayed_work bat_low_wakeup_work;
 	const struct cw_bat_platform_data *plat_data;
-	struct power_supply rk_bat;
+	struct power_supply *rk_bat;
 	struct power_supply	*batt_psy;
+	struct power_supply_desc rk_bat_d;
 
 
 
@@ -712,7 +713,7 @@ static void rk_bat_update_status(struct cw_battery *cw_bat)
 		cw_bat->batt_psy = power_supply_get_by_name("battery");
 	if (cw_bat->batt_psy) {
 		/* if battery has been registered, use the status property */
-		cw_bat->batt_psy->get_property(cw_bat->batt_psy,
+		power_supply_get_property(cw_bat->batt_psy,
 					POWER_SUPPLY_PROP_STATUS, &ret);
 		status = ret.intval;
 	} else{
@@ -753,7 +754,7 @@ static void cw_bat_work(struct work_struct *work)
 	rk_bat_update_time_to_empty(cw_bat);
 
 	if (cw_bat->bat_change) {
-		power_supply_changed(&cw_bat->rk_bat);
+		power_supply_changed(cw_bat->rk_bat);
 		cw_bat->bat_change = 0;
 	}
 
@@ -770,7 +771,7 @@ static int rk_battery_get_property(struct power_supply *psy,
 	int ret = 0;
 	struct cw_battery *cw_bat;
 
-	cw_bat = container_of(psy, struct cw_battery, rk_bat);
+	cw_bat = power_supply_get_drvdata(psy);
 	switch (psp) {
 	case POWER_SUPPLY_PROP_CAPACITY:
 		val->intval = cw_bat->capacity;
@@ -1086,6 +1087,7 @@ static int cw_bat_probe(struct i2c_client *client, const struct i2c_device_id *i
 {
 	struct cw_bat_platform_data *pdata = client->dev.platform_data;
 	struct cw_battery *cw_bat;
+	struct power_supply_config cw_fg_psy_cfg = {};
 	int ret;
 	int loop = 0;
 
@@ -1159,13 +1161,15 @@ static int cw_bat_probe(struct i2c_client *client, const struct i2c_device_id *i
 			return ret;
 	}
 
-	cw_bat->rk_bat.name = "rk-bat";
-	cw_bat->rk_bat.type = POWER_SUPPLY_TYPE_BATTERY;
-	cw_bat->rk_bat.properties = rk_battery_properties;
-	cw_bat->rk_bat.num_properties = ARRAY_SIZE(rk_battery_properties);
-	cw_bat->rk_bat.get_property = rk_battery_get_property;
-	ret = power_supply_register(&client->dev, &cw_bat->rk_bat);
-	if (ret < 0) {
+	cw_bat->rk_bat_d.name = "rk-bat";
+	cw_bat->rk_bat_d.type = POWER_SUPPLY_TYPE_BATTERY;
+	cw_bat->rk_bat_d.properties = rk_battery_properties;
+	cw_bat->rk_bat_d.num_properties = ARRAY_SIZE(rk_battery_properties);
+	cw_bat->rk_bat_d.get_property = rk_battery_get_property;
+	cw_fg_psy_cfg.drv_data = cw_bat;
+	cw_fg_psy_cfg.num_supplicants = 0;
+	cw_bat->rk_bat = devm_power_supply_register(&client->dev, &cw_bat->rk_bat_d, &cw_fg_psy_cfg);
+	if (IS_ERR(cw_bat->rk_bat)) {
 		dev_err(&cw_bat->client->dev, "power supply register rk_bat error\n");
 		pr_debug("rk_bat_register_fail\n");
 		goto rk_bat_register_fail;
