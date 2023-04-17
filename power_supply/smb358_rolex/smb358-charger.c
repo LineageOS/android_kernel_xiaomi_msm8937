@@ -288,7 +288,8 @@ struct smb358_charger {
 	struct power_supply	*usb_psy;
 	struct power_supply	*bms_psy;
 	struct power_supply	*rk_bat;
-	struct power_supply	batt_psy;
+	struct power_supply_desc	batt_psy_d;
+	struct power_supply	*batt_psy;
 
 	/* otg 5V regulator */
 	struct smb358_regulator	otg_vreg;
@@ -585,7 +586,7 @@ static void qpnp_lbc_temp_alarm_work_fn(struct work_struct *work)
 			}
 			smb358_charging_disable(chip, THERMAL, 1);
 			__pm_relax(&chip->wakeup_source_hightemp);
-			power_supply_changed(&chip->batt_psy);
+			power_supply_changed(chip->batt_psy);
 		}
 	} else if (((batt_temp > 450 && batt_temp <= 550) || (batt_temp > 50 && batt_temp <= 150)) && !chg_enabled1) {
 		__pm_stay_awake(&chip->wakeup_source_hightemp);
@@ -616,7 +617,7 @@ static void qpnp_lbc_temp_alarm_work_fn(struct work_struct *work)
 			smb358_chg_set_appropriate_battery_current(chip);
 			smb358_chg_set_appropriate_vddmax(chip);
 			__pm_relax(&chip->wakeup_source_hightemp);
-			power_supply_changed(&chip->batt_psy);
+			power_supply_changed(chip->batt_psy);
 		}
 	}
 
@@ -639,7 +640,7 @@ static void qpnp_lbc_temp_alarm_work_fn(struct work_struct *work)
 			smb358_chg_set_appropriate_battery_current(chip);
 			smb358_chg_set_appropriate_vddmax(chip);
 			__pm_relax(&chip->wakeup_source_hightemp);
-			power_supply_changed(&chip->batt_psy);
+			power_supply_changed(chip->batt_psy);
 		}
 	}
 
@@ -663,7 +664,7 @@ static void qpnp_lbc_temp_alarm_work_fn(struct work_struct *work)
 				smb358_chg_set_appropriate_battery_current(chip);
 				smb358_chg_set_appropriate_vddmax(chip);
 				__pm_relax(&chip->wakeup_source_hightemp);
-				power_supply_changed(&chip->batt_psy);
+				power_supply_changed(chip->batt_psy);
 			}
 		}
 	}
@@ -1000,7 +1001,7 @@ static int smb358_charging_disable(struct smb358_charger *chip,
 		return rc;
 	} else {
 	/* will not modify online status in this condition */
-		power_supply_changed(&chip->batt_psy);
+		power_supply_changed(chip->batt_psy);
 	}
 
 skip:
@@ -1212,14 +1213,14 @@ static int smb358_get_prop_batt_capacity(struct smb358_charger *chip)
 	if (!cw2015_psy)
 		cw2015_psy = power_supply_get_by_name("rk-bat");
 	if (cw2015_psy) {
-		cw2015_psy->get_property(cw2015_psy,
+		power_supply_get_property(cw2015_psy,
 				POWER_SUPPLY_PROP_CAPACITY, &ret);
 		pr_err("CW2015_BATTERY_CAPACITY IS:%d\n", ret.intval);
 		return ret.intval;
 	}
 
 	if (chip->bms_psy) {
-		chip->bms_psy->get_property(chip->bms_psy,
+		power_supply_get_property(chip->bms_psy,
 				POWER_SUPPLY_PROP_CAPACITY, &ret);
 				pr_err("BMS_BATTERY_CAPACITY IS:%d\n", ret.intval);
 		return ret.intval;
@@ -1234,7 +1235,7 @@ static int get_prop_current_now(struct smb358_charger *chip)
 {
 	union power_supply_propval ret = {0,};
 	if (chip->bms_psy) {
-		chip->bms_psy->get_property(chip->bms_psy,
+		power_supply_get_property(chip->bms_psy,
 			POWER_SUPPLY_PROP_CURRENT_NOW, &ret);
 			pr_debug("xujismbcur = %d\n", ret.intval);
 			return ret.intval;
@@ -1358,7 +1359,7 @@ smb358_get_prop_battery_voltage_now(struct smb358_charger *chip)
 	if (!cw2015_psy)
 		cw2015_psy = power_supply_get_by_name("rk-bat");
 	if (cw2015_psy) {
-		cw2015_psy->get_property(cw2015_psy,
+		power_supply_get_property(cw2015_psy,
 				POWER_SUPPLY_PROP_VOLTAGE_NOW, &ret);
 		pr_err("POWER_SUPPLY_PROP_VOLTAGE_NOW IS:%d\n", ret.intval);
 		return ret.intval;
@@ -1631,8 +1632,7 @@ static int smb358_battery_set_property(struct power_supply *psy,
 					const union power_supply_propval *val)
 {
 	int rc;
-	struct smb358_charger *chip = container_of(psy,
-				struct smb358_charger, batt_psy);
+	struct smb358_charger *chip = power_supply_get_drvdata(psy);
 
 	switch (prop) {
 	case POWER_SUPPLY_PROP_STATUS:
@@ -1655,7 +1655,7 @@ static int smb358_battery_set_property(struct power_supply *psy,
 		case POWER_SUPPLY_STATUS_DISCHARGING:
 			chip->batt_full = false;
 
-			power_supply_changed(&chip->batt_psy);
+			power_supply_changed(chip->batt_psy);
 			pr_debug("status = DISCHARGING, batt_full = %d\n",
 							chip->batt_full);
 			break;
@@ -1682,7 +1682,7 @@ static int smb358_battery_set_property(struct power_supply *psy,
 		break;
 	case POWER_SUPPLY_PROP_CAPACITY:
 		chip->fake_battery_soc = bound_soc(val->intval);
-		power_supply_changed(&chip->batt_psy);
+		power_supply_changed(chip->batt_psy);
 		break;
 	case POWER_SUPPLY_PROP_SYSTEM_TEMP_LEVEL:
 		smb358_system_temp_level_set(chip, val->intval);
@@ -1698,8 +1698,7 @@ static int smb358_battery_get_property(struct power_supply *psy,
 				      enum power_supply_property prop,
 				      union power_supply_propval *val)
 {
-	struct smb358_charger *chip = container_of(psy,
-				struct smb358_charger, batt_psy);
+	struct smb358_charger *chip = power_supply_get_drvdata(psy);
 
 	switch (prop) {
 	case POWER_SUPPLY_PROP_STATUS:
@@ -2193,7 +2192,7 @@ static int power_ok_handler(struct smb358_charger *chip, u8 rt_stat)
 {
 	chip->power_ok = !!rt_stat;
 	msleep(30);
-	power_supply_changed(&chip->batt_psy);
+	power_supply_changed(chip->batt_psy);
 	return 0;
 }
 
@@ -2419,7 +2418,7 @@ static irqreturn_t smb358_chg_stat_handler(int irq, void *dev_id)
 	pr_debug("handler count = %d\n", handler_count);
 	if (handler_count) {
 		pr_debug("batt psy changed\n");
-		power_supply_changed(&chip->batt_psy);
+		power_supply_changed(chip->batt_psy);
 	}
 	mutex_unlock(&chip->irq_complete);
 
@@ -2448,7 +2447,7 @@ static irqreturn_t smb358_chg_valid_handler(int irq, void *dev_id)
 		pr_debug("%s updating usb_psy present=%d",
 				__func__, chip->chg_present);
 		power_supply_set_present(chip->usb_psy, chip->chg_present);
-		power_supply_changed(&chip->batt_psy);
+		power_supply_changed(chip->batt_psy);
 	}
 		pr_debug("smb358_chg_valid_handler has been started\n");
 	return IRQ_HANDLED;
@@ -2456,8 +2455,7 @@ static irqreturn_t smb358_chg_valid_handler(int irq, void *dev_id)
 
 static void smb358_external_power_changed(struct power_supply *psy)
 {
-	struct smb358_charger *chip = container_of(psy,
-				struct smb358_charger, batt_psy);
+	struct smb358_charger *chip = power_supply_get_drvdata(psy);
 	union power_supply_propval prop = {0,};
 	int rc, current_limit = 0;
 	int vol;
@@ -2470,7 +2468,7 @@ static void smb358_external_power_changed(struct power_supply *psy)
 		chip->bms_psy =
 			power_supply_get_by_name((char *)chip->bms_psy_name);
 
-	rc = chip->usb_psy->get_property(chip->usb_psy,
+	rc = power_supply_get_property(chip->usb_psy,
 				POWER_SUPPLY_PROP_CURRENT_MAX, &prop);
 	if (rc)
 		dev_err(chip->dev,
@@ -3131,6 +3129,7 @@ static int smb358_charger_probe(struct i2c_client *client,
 
 	struct smb358_charger *chip;
 	struct power_supply *usb_psy;
+	struct power_supply_config batt_psy_cfg = {};
 	u8 reg = 0;
 	usb_psy = power_supply_get_by_name("usb");
 	if (!usb_psy) {
@@ -3223,30 +3222,32 @@ static int smb358_charger_probe(struct i2c_client *client,
 
 	i2c_set_clientdata(client, chip);
 
-	chip->batt_psy.name		= "battery";
-	chip->batt_psy.type		= POWER_SUPPLY_TYPE_BATTERY;
-	chip->batt_psy.get_property	= smb358_battery_get_property;
-	chip->batt_psy.set_property	= smb358_battery_set_property;
-	chip->batt_psy.property_is_writeable =
+	chip->batt_psy_d.name		= "battery";
+	chip->batt_psy_d.type		= POWER_SUPPLY_TYPE_BATTERY;
+	chip->batt_psy_d.get_property	= smb358_battery_get_property;
+	chip->batt_psy_d.set_property	= smb358_battery_set_property;
+	chip->batt_psy_d.property_is_writeable =
 					smb358_batt_property_is_writeable;
-	chip->batt_psy.properties	= smb358_battery_properties;
-	chip->batt_psy.num_properties	= ARRAY_SIZE(smb358_battery_properties);
-	chip->batt_psy.external_power_changed = smb358_external_power_changed;
-	chip->batt_psy.supplied_to = pm_batt_supplied_to;
-	chip->batt_psy.num_supplicants = ARRAY_SIZE(pm_batt_supplied_to);
+	chip->batt_psy_d.properties	= smb358_battery_properties;
+	chip->batt_psy_d.num_properties	= ARRAY_SIZE(smb358_battery_properties);
+	chip->batt_psy_d.external_power_changed = smb358_external_power_changed;
+
+	batt_psy_cfg.drv_data = chip;
+	batt_psy_cfg.supplied_to = pm_batt_supplied_to;
+	batt_psy_cfg.num_supplicants = ARRAY_SIZE(pm_batt_supplied_to);
 
 	chip->resume_completed = true;
 
 	if (chip->bms_psy) {
-		chip->batt_psy.bms_psy_ok = 1;
+		chip->batt_psy->bms_psy_ok = 1;
 	} else {
-		chip->batt_psy.bms_psy_ok = 0;
+		chip->batt_psy->bms_psy_ok = 0;
 	}
 
 		smb358_update_power_on_state(chip);
-		chip->batt_psy.bms_psy_ok = 0;
-	rc = power_supply_register(chip->dev, &chip->batt_psy);
-	if (rc < 0) {
+		chip->batt_psy->bms_psy_ok = 0;
+	chip->batt_psy = devm_power_supply_register(chip->dev, &chip->batt_psy_d, &batt_psy_cfg);
+	if (IS_ERR(chip->batt_psy)) {
 		dev_err(&client->dev, "Couldn't register batt psy rc = %d\n",
 				rc);
 		goto err_set_vtg_i2c;
@@ -3382,7 +3383,7 @@ static int smb358_charger_probe(struct i2c_client *client,
 	if (chip->bms_psy_name) {
 		chip->bms_psy = power_supply_get_by_name((char *)chip->bms_psy_name);
 			if (chip->bms_psy && chip->bms_psy->bms_psy_ok == 1 && chip->power_ok) {
-			chip->batt_psy.bms_psy_ok = 1;
+			chip->batt_psy->bms_psy_ok = 1;
 			}
 
 	}
@@ -3400,7 +3401,7 @@ fail_irq_gpio:
 fail_smb358_hw_init:
 	regulator_unregister(chip->otg_vreg.rdev);
 fail_regulator_register:
-	power_supply_unregister(&chip->batt_psy);
+	power_supply_unregister(chip->batt_psy);
 err_set_vtg_i2c:
 	if (chip->vcc_i2c)
 		if (regulator_count_voltages(chip->vcc_i2c) > 0)
@@ -3418,7 +3419,7 @@ static int smb358_charger_remove(struct i2c_client *client)
 	cold_status = 0;
 	warm_status = 0;
 	cool_status = 0;
-	power_supply_unregister(&chip->batt_psy);
+	power_supply_unregister(chip->batt_psy);
 	if (gpio_is_valid(chip->chg_valid_gpio))
 		gpio_free(chip->chg_valid_gpio);
 
