@@ -2434,8 +2434,8 @@ static void bq2560x_charger_shutdown(struct i2c_client *client)
 }
 
 static struct of_device_id bq2560x_charger_match_table[] = {
-	{.compatible = "ti,bq25600-charger",},
-	{.compatible = "ti,bq25601-charger",},
+	{.compatible = "ti,bq25600-charger-mi8937",},
+	{.compatible = "ti,bq25601-charger-mi8937",},
 	{},
 };
 MODULE_DEVICE_TABLE(of,bq2560x_charger_match_table);
@@ -2454,7 +2454,7 @@ static const struct dev_pm_ops bq2560x_pm_ops = {
 };
 static struct i2c_driver bq2560x_charger_driver = {
 	.driver 	= {
-		.name 	= "bq2560x-charger",
+		.name 	= "bq2560x-charger-mi8937",
 		.owner 	= THIS_MODULE,
 		.of_match_table = bq2560x_charger_match_table,
 		.pm		= &bq2560x_pm_ops,

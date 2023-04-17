@@ -1,4 +1,4 @@
-config CHARGER_BQ2560X
+config CHARGER_BQ2560X_MI8937
 	tristate "TI BQ2560X battery charger driver"
 	depends on I2C
 	default y
