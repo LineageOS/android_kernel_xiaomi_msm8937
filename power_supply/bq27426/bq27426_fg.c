@@ -38,6 +38,7 @@
 #include <linux/interrupt.h>
 #include <linux/gpio/consumer.h>
 #include <linux/debugfs.h>
+#include <linux/qpnp/qpnp-adc.h>
 #include <linux/alarmtimer.h>
 #include "bqfs_cmd_type.h"
 //#include "bq27426_gmfs.h"
@@ -163,6 +164,12 @@ static u8 bq27426_regs[NUM_REGS] = {
 
 struct bq_fg_chip;
 
+enum {
+	BATTERY_PROFILE_A,
+	BATTERY_PROFILE_B,
+	BATTERY_PROFILE_MAX,
+};
+
 struct bq_fg_chip {
 	struct device		*dev;
 	struct i2c_client	*client;
@@ -226,6 +233,10 @@ struct bq_fg_chip {
 
 	struct power_supply *fg_psy;
 	struct power_supply_desc fg_psy_d;
+
+	struct qpnp_vadc_chip	*vadc_dev;
+	struct regulator		*vdd;
+	u32	connected_rid;
 };
 
 
@@ -1256,6 +1267,9 @@ static int fg_get_property(struct power_supply *psy, enum power_supply_property 
 		val->intval = POWER_SUPPLY_TECHNOLOGY_LIPO;
 		break;
 
+	case POWER_SUPPLY_PROP_RESISTANCE_ID:
+		val->intval = bq->connected_rid ;
+		break;
 	case POWER_SUPPLY_PROP_UPDATE_NOW:
 		val->intval = 0;
 		break;
@@ -1776,6 +1790,105 @@ static void determine_initial_status(struct bq_fg_chip *bq)
 {
 	fg_irq_thread(bq->client->irq, bq);
 }
+static void convert_rid2battid(struct bq_fg_chip *bq)
+{
+	//TODO: here is just an example, modify it accordingly
+#if 0
+	if (bq->connected_rid > 220 && bq->connected_rid < 440) { 
+		bq->batt_id = 2;
+	} 
+	else if (bq->connected_rid > 60 && bq->connected_rid < 140) {
+		bq->batt_id = 1;
+	}
+	else if (bq->connected_rid > 10 && bq->connected_rid < 50) {
+		bq->batt_id = 0;
+	}
+	else { //default coslight
+		bq->batt_id = 1;
+	}
+#endif
+	bq->batt_id = 0;
+}
+
+
+#define SMB_VTG_MIN_UV		1800000
+#define SMB_VTG_MAX_UV		1800000
+static int fg_parse_batt_id(struct bq_fg_chip *bq)
+{
+	int rc = 0, rpull = 0, vref = 0;
+	int64_t denom, batt_id_uv;
+	struct device_node *node = bq->dev->of_node;
+	struct qpnp_vadc_result result;
+
+	bq->vdd = regulator_get(bq->dev, "vdd");
+	if (IS_ERR(bq->vdd)) {
+		pr_err("Regulator get failed vdd rc=%d\n", rc);
+		//return rc;
+	}
+
+	if (regulator_count_voltages(bq->vdd) > 0) {
+		rc = regulator_set_voltage(bq->vdd, SMB_VTG_MIN_UV,
+					   SMB_VTG_MAX_UV);
+		if (rc) {
+			pr_err("Regulator set_vtg failed vdd rc=%d\n", rc);
+		}
+	}
+
+	rc = regulator_enable(bq->vdd);
+	if (rc) {
+		pr_err("Regulator vdd enable failed rc=%d\n", rc);
+	}
+
+	rc = of_property_read_u32(node, "ti,batt-id-vref-uv", &vref);
+	if (rc < 0) {
+		pr_err("Couldn't read batt-id-vref-uv rc=%d\n", rc);
+		return rc;
+	}
+
+
+	rc = of_property_read_u32(node, "ti,batt-id-rpullup-kohm", &rpull);
+	if (rc < 0) {
+		pr_err("Couldn't read batt-id-rpullup-kohm rc=%d\n", rc);
+		return rc;
+	}
+	pr_err("fg_parse_batt_id begin read battery ID \n");
+	/* read battery ID */
+	rc = qpnp_vadc_read(bq->vadc_dev, P_MUX2_1_1, &result);
+	if (rc) {
+		pr_err("error reading batt id channel = %d, rc = %d\n",
+					LR_MUX2_BAT_ID, rc);
+		return rc; 
+	}
+
+	
+	batt_id_uv = result.physical;
+	
+
+	pr_err("fg_parse_batt_id  batt_id_uv = %lld\n",batt_id_uv);
+
+	if (batt_id_uv == 0) {
+		/* vadc not correct or batt id line grounded, report 0 kohms */
+		pr_err("batt_id_uv = 0, batt-id grounded using same profile\n");
+		return 0;
+	}
+
+	denom = div64_s64(vref * 1000000LL, batt_id_uv) - 1000000LL;
+
+	
+	pr_err("fg_parse_batt_id  denom = %lld,rpull=%d\n",denom,rpull);
+	if (denom == 0) {
+		/* batt id connector might be open, return 0 kohms */
+		pr_err("smb_parse_batt_id batt id connector might be open, return 0 kohms");
+		return 0;
+	}
+	bq->connected_rid = div64_s64(rpull * 1000000LL + denom/2, denom);
+	pr_err("batt_id_voltage = %lld, connected_rid = %d\n",
+			batt_id_uv, bq->connected_rid);
+
+	convert_rid2battid(bq);
+
+	return 0;
+}
 
 static int bq_parse_dt(struct bq_fg_chip *bq)
 {
@@ -1826,6 +1939,16 @@ static int bq_fg_probe(struct i2c_client *client,
 	bq->resume_completed = true;
 	bq->irq_waiting = false;
 
+	bq->vadc_dev = qpnp_get_vadc(bq->dev, "batt_id");
+	if (IS_ERR(bq->vadc_dev)) {
+		ret = PTR_ERR(bq->vadc_dev);
+		if (ret == -EPROBE_DEFER)
+			pr_err("vadc not found - defer rc=%d\n", ret);
+		else
+			pr_err("vadc property missing, rc=%d\n", ret);
+
+		return ret;
+	}
 	ret = bq_parse_dt(bq);
 	if (ret < 0) {
 		dev_err(&client->dev, "Unable to parse DT nodes\n");
@@ -1833,6 +1956,7 @@ static int bq_fg_probe(struct i2c_client *client,
 	}
 	INIT_WORK(&bq->update_work, fg_update_bqfs_workfunc);
 
+	fg_parse_batt_id(bq);
 
 	fg_update_bqfs(bq);
 
