@@ -19,6 +19,9 @@
 #include <linux/types.h>
 #include <linux/batterydata-lib.h>
 #include <linux/power_supply.h>
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
+#include <xiaomi-msm8937/mach.h>
+#endif
 
 static int of_batterydata_read_lut(const struct device_node *np,
 			int max_cols, int max_rows, int *ncols, int *nrows,
@@ -324,6 +327,9 @@ struct device_node *of_batterydata_get_best_profile(
 	int delta = 0, best_delta = 0, best_id_kohm = 0, id_range_pct,
 		i = 0, rc = 0, limit = 0;
 	bool in_range = false;
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
+	bool xiaomi_msm8937_no_battery_data = false;
+#endif
 
 	/* read battery id range percentage for best profile */
 	rc = of_property_read_u32(batterydata_container_node,
@@ -375,18 +381,41 @@ struct device_node *of_batterydata_get_best_profile(
 		}
 	}
 
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
+	if (xiaomi_msm8937_mach_get() && best_node == NULL) {
+		xiaomi_msm8937_no_battery_data = true;
+		pr_warn("No battery data found, Add fallback battery data\n");
+		for_each_child_of_node(batterydata_container_node, node) {
+			best_node = node;
+			best_id_kohm = batt_id_kohm;
+
+			rc = of_property_read_string(node, "qcom,battery-type",
+					&battery_type);
+			if (!rc && strcmp(battery_type, "Generic_Battery") == 0) {
+				pr_warn("Found Generic_Battery, use it as fallback battery data\n");
+				break;
+			}
+		}
+	}
+#endif
+
 	if (best_node == NULL) {
 		pr_err("No battery data found\n");
 		return best_node;
 	}
 
 	/* check that profile id is in range of the measured batt_id */
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
+	if (xiaomi_msm8937_mach_get() && xiaomi_msm8937_no_battery_data)
+		goto skip_check_id;
+#endif
 	if (abs(best_id_kohm - batt_id_kohm) >
 			((best_id_kohm * id_range_pct) / 100)) {
 		pr_err("out of range: profile id %d batt id %d pct %d",
 			best_id_kohm, batt_id_kohm, id_range_pct);
 		return NULL;
 	}
+skip_check_id:
 
 	rc = of_property_read_string(best_node, "qcom,battery-type",
 							&battery_type);
