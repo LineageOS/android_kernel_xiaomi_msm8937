@@ -79,7 +79,7 @@
 #define DEFINED_MIN_TEMP                          0
 
 #define DESIGN_CAPACITY                   3000
-#define CWFG_NAME "cw2017"
+#define CWFG_NAME "cw2017-tiare"
 #define SIZE_BATINFO    80
 
 #define FULL_CAPACITY   100
@@ -1144,7 +1144,7 @@ static const struct i2c_device_id cw2017_id_table[] = {
 };
 
 static struct of_device_id cw2017_match_table[] = {
-	{ .compatible = "cellwise,cw2017", },
+	{ .compatible = "cellwise,cw2017-tiare", },
 	{ },
 };
 
