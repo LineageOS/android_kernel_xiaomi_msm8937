@@ -36,6 +36,7 @@
 #include <linux/bitops.h>
 #include <linux/math64.h>
 #include <linux/alarmtimer.h>
+#include <xiaomi-msm8937/power_supply_legacy.h>
 
 #include "bq2560x_reg.h"
 #include "bq2560x.h"
