@@ -1,0 +1,4 @@
+menu "Power supply"
+	depends on POWER_SUPPLY
+
+endmenu

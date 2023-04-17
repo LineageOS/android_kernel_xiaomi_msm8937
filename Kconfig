@@ -9,6 +9,7 @@ config MACH_XIAOMI_MSM8937
 if MACH_XIAOMI_MSM8937
 
 source "techpack/xiaomi-msm8937/mach/Kconfig"
+source "techpack/xiaomi-msm8937/power_supply/Kconfig"
 source "techpack/xiaomi-msm8937/regulator/Kconfig"
 source "techpack/xiaomi-msm8937/touchscreen/Kconfig"
 
