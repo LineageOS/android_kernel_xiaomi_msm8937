@@ -2702,13 +2702,17 @@ static void dump_regs(struct smb358_charger *chip)
 }
 #endif
 
-extern int battery_type_id;
+int xiaomi_rolex_smb358_battery_type_id = -1;
+EXPORT_SYMBOL(xiaomi_rolex_smb358_battery_type_id);
+
 static const char *default_batt_type = "Generic_Battery";
 static int smb_parse_dt_battery(struct smb358_charger *chip)
 {
 
 	struct device_node *node = chip->dev->of_node;
 	struct device_node *batt_node, *profile_node;
+	const char *battery_type = NULL;
+	int rc = 0;
 
 	batt_node = of_find_node_by_name(node, "qcom,battery-data");
 	if (!batt_node) {
@@ -2718,7 +2722,22 @@ static int smb_parse_dt_battery(struct smb358_charger *chip)
 							smb358_get_prop_battid_resister(chip),
 							"battery");
 
-	if (battery_type_id == 1 || battery_type_id == 2)
+	rc = of_property_read_string(profile_node, "qcom,battery-type",
+							&battery_type);
+	if (!rc) {
+		if (strcmp(battery_type, "wingtech-feimaotui-4v4-3030mah") == 0) {
+			xiaomi_rolex_smb358_battery_type_id = 1;
+		} else if (strcmp(battery_type, "wingtech-xingwangda-4v4-3030mah") == 0) {
+			xiaomi_rolex_smb358_battery_type_id = 2;
+		} else {
+			xiaomi_rolex_smb358_battery_type_id = 0;
+		}
+	} else {
+		xiaomi_rolex_smb358_battery_type_id = 0;
+	}
+
+	if (xiaomi_rolex_smb358_battery_type_id == 1 ||
+			xiaomi_rolex_smb358_battery_type_id == 2)
 		of_property_read_string(profile_node, "qcom,battery-type", &chip->battery_type);
 	else {
 		chip->battery_type = default_batt_type;
