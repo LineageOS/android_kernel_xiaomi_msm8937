@@ -7,3 +7,16 @@
 	interrupts = <0 134 0>,<0 140 0>,<0 136 0>;
 	interrupt-names = "core_irq", "async_irq", "phy_irq";
 };
+
+/* Custom */
+#ifdef CONFIG_MSM_USB_POWER_SUPPLY_MI8937
+&soc {
+	usb_power_supply: usb_power_supply {
+		compatible = "qcom,msm_usb_psy-mi8937";
+		dpdm-supply = <&usb_otg>;
+	};
+};
+&usb_otg {
+	extcon = <&usb_power_supply>;
+};
+#endif
