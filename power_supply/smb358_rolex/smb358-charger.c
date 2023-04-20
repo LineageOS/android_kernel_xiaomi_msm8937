@@ -26,6 +26,7 @@
 #include <linux/regulator/consumer.h>
 #include <linux/regulator/driver.h>
 #include <linux/of.h>
+#include <linux/of_batterydata.h>
 #include <linux/of_gpio.h>
 #include <linux/mutex.h>
 #include <linux/qpnp/qpnp-adc.h>
@@ -206,12 +207,6 @@ bool recovery = false;
 int fastmmi_mode = 0;
 
 #define DEBUG
-
-extern struct device_node *of_batterydata_get_best_profile(
-		const struct device_node *batterydata_container_node,
-		const char *psy_name,  const char  *batt_type);
-
-
 
 enum {
 	USER	= BIT(0),
