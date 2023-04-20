@@ -2,7 +2,11 @@
 &i2c_2 {
 	status = "ok";
 	bq2560x_otg_supply: bq2560x@6B {
+#ifdef CONFIG_CHARGER_BQ2560X_MI8937
+		compatible = "ti,bq25601-charger-mi8937";
+#else
 		compatible = "ti,bq25601-charger";
+#endif
 		reg = <0x6B>;
 		interrupt-parent = <&tlmm>;
 		interrupts = <61 2>;
@@ -40,7 +44,11 @@
 		ti,bq2560x,software-jeita-supported;
 	};
 	bq27426@55 {
+#ifdef CONFIG_FUEL_GAUGE_BQ27426_MI8937
+		compatible = "ti,bq27426-mi8937";
+#else
 		compatible = "ti,bq27426";
+#endif
 		reg = <0x55>;
 		interrupt-parent = <&tlmm>;
 		interrupts = <62 2>;

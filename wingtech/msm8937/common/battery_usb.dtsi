@@ -1,4 +1,8 @@
 &qpnp_smbcharger {
+#ifdef CONFIG_QPNP_SMBCHARGER_MI8937
+	compatible = "qcom,qpnp-smbcharger-mi8937";
+#endif
+
 	/delete-property/ qcom,autoadjust-vfloat;
 	dpdm-supply = <&usb_otg>;
 	qcom,float-voltage-mv = <4400>;
@@ -6,6 +10,10 @@
 };
 
 &qpnp_fg {
+#ifdef CONFIG_QPNP_FG_MI8937
+	compatible = "qcom,qpnp-fg-mi8937";
+#endif
+
 	qcom,bad-battery-detection-enable;
 	qcom,cl-max-increment-deciperc = <1>;
 	qcom,cl-max-decrement-deciperc = <1>;

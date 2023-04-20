@@ -1,7 +1,11 @@
 /* From stock msm8917-pmi8937-qrd-sku5_S88508.dtsi */
 &i2c_5 {
 	bq2560x_otg_supply: bq2560x@6B {
+#ifdef CONFIG_CHARGER_BQ2560X_MI8937
+		compatible = "ti,bq25601-charger-mi8937";
+#else
 		compatible = "ti,bq25601-charger";
+#endif
 		reg = <0x6B>;
 		interrupt-parent = <&tlmm>;
 		interrupts = <61 2>;
@@ -52,7 +56,11 @@
 	};
 
 	cw2017@63 {
+#ifdef CONFIG_GAUGE_CW2017_TIARE
+		compatible = "cellwise,cw2017-tiare";
+#else
 		compatible = "cellwise,cw2017";
+#endif
 		reg = <0x63>;
 		//vdd-supply = <&pm8937_l5>;
 		vcc_i2c-supply = <&pm8937_l5>;
