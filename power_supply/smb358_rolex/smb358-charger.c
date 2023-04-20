@@ -2714,7 +2714,8 @@ static int smb_parse_dt_battery(struct smb358_charger *chip)
 		return 0;
 	}
 	profile_node = of_batterydata_get_best_profile(batt_node,
-							"battery", NULL);
+							smb358_get_prop_battid_resister(chip),
+							"battery");
 
 	if (battery_type_id == 1 || battery_type_id == 2)
 		of_property_read_string(profile_node, "qcom,battery-type", &chip->battery_type);
