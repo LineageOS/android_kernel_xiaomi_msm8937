@@ -684,10 +684,21 @@ static void rk_bat_update_vol(struct cw_battery *cw_bat)
 
 
 
-extern int power_supply_get_battery_charge_state(struct power_supply *psy);
 static struct power_supply *charge_psy;
 static u8 is_charger_plug;
 
+static int power_supply_get_battery_charge_state(struct power_supply *psy)
+{
+	union power_supply_propval ret = {0,};
+
+	if (!psy) {
+		pr_err("power supply is NULL\n");
+	}
+
+	power_supply_get_property(psy, POWER_SUPPLY_PROP_PRESENT, &ret);
+
+	return ret.intval;
+}
 
 static void rk_bat_update_status(struct cw_battery *cw_bat)
 {
