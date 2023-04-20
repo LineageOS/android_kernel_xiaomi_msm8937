@@ -1207,7 +1207,7 @@ static int smb358_get_prop_batt_capacity(struct smb358_charger *chip)
 		return chip->fake_battery_soc;
 
 	if (!cw2015_psy)
-		cw2015_psy = power_supply_get_by_name("rk-bat");
+		cw2015_psy = power_supply_get_by_name("bms");
 	if (cw2015_psy) {
 		power_supply_get_property(cw2015_psy,
 				POWER_SUPPLY_PROP_CAPACITY, &ret);
@@ -1353,7 +1353,7 @@ smb358_get_prop_battery_voltage_now(struct smb358_charger *chip)
 		return chip->fake_battery_soc;
 
 	if (!cw2015_psy)
-		cw2015_psy = power_supply_get_by_name("rk-bat");
+		cw2015_psy = power_supply_get_by_name("bms");
 	if (cw2015_psy) {
 		power_supply_get_property(cw2015_psy,
 				POWER_SUPPLY_PROP_VOLTAGE_NOW, &ret);

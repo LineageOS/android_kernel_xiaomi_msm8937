@@ -1172,7 +1172,7 @@ static int cw_bat_probe(struct i2c_client *client, const struct i2c_device_id *i
 			return ret;
 	}
 
-	cw_bat->rk_bat_d.name = "rk-bat";
+	cw_bat->rk_bat_d.name = "bms";
 	cw_bat->rk_bat_d.type = POWER_SUPPLY_TYPE_BATTERY;
 	cw_bat->rk_bat_d.properties = rk_battery_properties;
 	cw_bat->rk_bat_d.num_properties = ARRAY_SIZE(rk_battery_properties);
