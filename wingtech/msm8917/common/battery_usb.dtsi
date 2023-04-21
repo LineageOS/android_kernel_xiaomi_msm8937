@@ -14,6 +14,7 @@
 	usb_power_supply: usb_power_supply {
 		compatible = "qcom,msm_usb_psy-mi8937";
 		dpdm-supply = <&usb_otg>;
+		qcom,dpdm-regulator-always-on;
 	};
 };
 &usb_otg {
