@@ -1213,7 +1213,7 @@ static const struct wled_var_cfg wled3_boost_i_limit_cfg = {
 };
 
 static const u32 wled4_boost_i_limit_values[] = {
-	105, 280, 450, 620, 970, 1150, 1300, 1500,
+	105, 280, 450, 620, 970, 980, 1150, 1300, 1500,
 };
 
 static const struct wled_var_cfg wled4_boost_i_limit_cfg = {
@@ -1241,7 +1241,7 @@ static const struct wled_var_cfg wled3_ovp_cfg = {
 };
 
 static const u32 wled4_ovp_values[] = {
-	31100, 29600, 19600, 18100,
+	31100, 29600, 29500, 19600, 18100,
 };
 
 static const struct wled_var_cfg wled4_ovp_cfg = {
@@ -1736,6 +1736,7 @@ static int wled_remove(struct platform_device *pdev)
 
 static const struct of_device_id wled_match_table[] = {
 	{ .compatible = "qcom,pm8941-wled", .data = (void *)3 },
+	{ .compatible = "qcom,pmi8950-wled", .data = (void *)4 },
 	{ .compatible = "qcom,pmi8994-wled", .data = (void *)4 },
 	{ .compatible = "qcom,pmi8998-wled", .data = (void *)4 },
 	{ .compatible = "qcom,pm660l-wled", .data = (void *)4 },
