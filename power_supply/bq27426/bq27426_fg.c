@@ -118,7 +118,6 @@ enum {
 
 
 enum bq_fg_device {
-	BQ27X00,
 	BQ27426,
 };
 
@@ -138,11 +137,6 @@ static const struct fg_batt_profile bqfs_image[] = {
 	{ bqfs_coslight, ARRAY_SIZE(bqfs_coslight), 1 },//100
 	/* Add more entries if multiple batteries are supported */
 
-};
-
-static const unsigned char *device2str[] = {
-	"bq27x00",
-	"bq27426",
 };
 
 static const unsigned char *update_reason_str[] = {
@@ -187,7 +181,6 @@ struct bq_fg_chip {
 	int	 fw_ver;
 	int	 df_ver;
 
-	u8	chip;
 	u8	regs[NUM_REGS];
 
 	int	 batt_id;
@@ -1808,7 +1801,6 @@ static int bq_fg_probe(struct i2c_client *client,
 
 	bq->dev = &client->dev;
 	bq->client = client;
-	bq->chip = id->driver_data;
 
 	bq->batt_soc	= -ENODATA;
 	bq->batt_fcc	= -ENODATA;
@@ -1822,12 +1814,7 @@ static int bq_fg_probe(struct i2c_client *client,
 	bq->fake_soc 	= -EINVAL;
 	bq->fake_temp	= -EINVAL;
 
-	if (bq->chip == BQ27426) {
-		regs = bq27426_regs; 
-	} else {
-		pr_err("unexpected fuel gauge: %d\n", bq->chip);
-		regs = bq27426_regs;
-	}
+	regs = bq27426_regs;
 	
 	memcpy(bq->regs, regs, NUM_REGS);
 
@@ -1877,8 +1864,7 @@ static int bq_fg_probe(struct i2c_client *client,
 
 	determine_initial_status(bq);
 
-	pr_err("bq fuel gauge probe successfully, %s FW ver:%d\n", 
-			device2str[bq->chip], bq->fw_ver);
+	pr_err("bq27426 fuel gauge probe successfully, FW ver:%d\n", bq->fw_ver);
 
 	return 0;
 
