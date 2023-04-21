@@ -29,6 +29,9 @@
 #include <linux/interrupt.h>
 #include <linux/completion.h>
 #include <linux/qpnp/qpnp-adc.h>
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
+#include <xiaomi-msm8937/mach.h>
+#endif
 
 #define KELVINMIL_DEGMIL	273160
 #define QPNP_VADC_LDO_VOLTAGE_MIN	1800000
@@ -494,6 +497,121 @@ static const struct qpnp_vadc_map_pt adcmap_100k_104ef_104fb[] = {
 	{51,	120000},
 	{44,	125000}
 };
+
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_ROLEX)
+static const struct qpnp_vadc_map_pt adcmap_100k_104ef_104fb_xiaomi_rolex[] = {
+	{1707,	-30 },
+	{1701,	-29},
+	{1694,	-28},
+	{1688,	-27},
+	{1681,	-26},
+	{1674,	-25},
+	{1666,	-24},
+	{1658,	-23},
+	{1650,	-22},
+	{1641,	-21},
+	{1632,	-20},
+	{1622,	-19},
+	{1612,	-18},
+	{1602,	-17},
+	{1591,	-16},
+	{1580,	-15},
+	{1569,	-14},
+	{1557,	-13},
+	{1544,	-12},
+	{1531,	-11},
+	{1518,	-10},
+	{1505,	-9},
+	{1491,	-8},
+	{1476,	-7},
+	{1461,	-6},
+	{1446,	-5},
+	{1431,	-4},
+	{1415,	-3},
+	{1399,	-2},
+	{1382,	-1},
+	{1365,	 0},
+	{1348,	1},
+	{1330,	2 },
+	{1313,	3 },
+	{1295,	4 },
+	{1277,	5 },
+	{1258,	6 },
+	{1240,	7 },
+	{1221,	8 },
+	{1202,	9 },
+	{1183,	10},
+	{1165,	11},
+	{1146,	12},
+	{1127,	13},
+	{1108,	14},
+	{1089,	15},
+	{1070,	16},
+	{1051,	17},
+	{1032,	18},
+	{1013,	19},
+	{995,	20},
+	{976,	21},
+	{958,	22},
+	{940,	23},
+	{922,	24},
+	{905,	25},
+	{888,	26},
+	{871,	27},
+	{854,	28},
+	{837,	29},
+	{821,	30},
+	{805,	31},
+	{790,	32},
+	{774,	33},
+	{759,	34},
+	{745,	35},
+	{731,	36},
+	{717,	37},
+	{703,	38},
+	{690,	39},
+	{677,	40},
+	{664,	41},
+	{652,	42},
+	{640, 	43},
+	{628,	44},
+	{617,	45},
+	{606, 	46},
+	{595,	47},
+	{585,	48},
+	{575,	49},
+	{565,	50},
+	{556,	51},
+	{546,	52},
+	{538, 	53},
+	{529, 	54},
+	{521,	55},
+	{513,	56},
+	{505,	57},
+	{497,	58},
+	{490,	59},
+	{483,	60},
+	{476,	61},
+	{470,	62},
+	{463,	63},
+	{457,	64},
+	{451,	65},
+	{445,	66},
+	{440,	67},
+	{434,	68},
+	{429,	69},
+	{424,	70},
+	{419,	71},
+	{415,	72},
+	{410,	73},
+	{406,	74},
+	{402,	75},
+	{398,	76},
+	{394,	77},
+	{390,	78},
+	{386,	79}
+};
+#endif
 
 /* Voltage to temperature */
 static const struct qpnp_vadc_map_pt adcmap_150k_104ef_104fb[] = {
@@ -1735,6 +1853,13 @@ int32_t qpnp_adc_scale_therm_pu2(struct qpnp_vadc_chip *chip,
 		if (chan_properties->calib_type == CALIB_ABSOLUTE)
 			therm_voltage = div64_s64(therm_voltage, 1000);
 
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_ROLEX)
+		if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_ROLEX) {
+			qpnp_adc_map_voltage_temp(adcmap_100k_104ef_104fb_xiaomi_rolex,
+				ARRAY_SIZE(adcmap_100k_104ef_104fb_xiaomi_rolex),
+				therm_voltage, &adc_chan_result->physical);
+		} else
+#endif
 		qpnp_adc_map_voltage_temp(adcmap_100k_104ef_104fb,
 			ARRAY_SIZE(adcmap_100k_104ef_104fb),
 			therm_voltage, &adc_chan_result->physical);
