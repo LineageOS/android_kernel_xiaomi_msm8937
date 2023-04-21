@@ -38,6 +38,7 @@
 
 #include <linux/pm_wakeup.h>
 
+#include <xiaomi-msm8937/mach.h>
 #include <xiaomi-msm8937/power_supply_legacy.h>
 
 #define _SMB358_MASK(BITS, POS) \
@@ -3071,16 +3072,14 @@ bool disable_charging = false;
 void get_capacity_disable_charging(struct smb358_charger *chip)
 {
 	char *boardid_string = NULL;
-	char boardid_start[32] = " ";
 	int India_0;
 	int India_1;
 
-	boardid_string = strstr(saved_command_line, "board_id=");
+	boardid_string = xiaomi_msm8937_mach_get_wingtech_board_id();
 
 	if (boardid_string != NULL) {
-		strncpy(boardid_start, boardid_string+9, 9);
-		India_0 = strncmp(boardid_start, "S88503BA1", 9);
-		India_1 = strncmp(boardid_start, "S88503BB1", 9);
+		India_0 = strncmp(boardid_string, "S88503BA1", 9);
+		India_1 = strncmp(boardid_string, "S88503BB1", 9);
 	}
 	if (((India_0 == 0) || (India_1 == 0)) && (into_fastmmi_mode(chip) == 1)) {
 		disable_charging = true;
