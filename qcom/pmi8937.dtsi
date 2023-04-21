@@ -359,6 +359,23 @@
 		};
 
 		wled: qcom,leds@d800 {
+#ifdef CONFIG_BACKLIGHT_QCOM_WLED
+			compatible = "qcom,pmi8950-wled";
+			reg = <0xd800 0x100>,
+				<0xd900 0x100>;
+			reg-names = "wled-ctrl-base",
+					"wled-sink-base";
+			interrupts = <0x3 0xd8 0x2 IRQ_TYPE_EDGE_RISING>;
+			interrupt-names = "short";
+
+			qcom,current-boost-limit = <980>;	// qcom,ilim-ma
+			qcom,current-limit-microamp = <20000>;	// qcom,fs-curr-ua
+			qcom,ovp-millivolt = <29500>;		// qcom,ovp-mv
+			qcom,switching-freq = <800>;		// qcom,switch-freq-khz
+			qcom,external-pfet;			// qcom,en-ext-pfet-sc-pro;
+			qcom,enabled-strings = <0 1>;
+			status = "okay";
+#else
 			compatible = "qcom,qpnp-wled";
 			reg = <0xd800 0x100>,
 				<0xd900 0x100>;
@@ -385,6 +402,7 @@
 			qcom,en-ext-pfet-sc-pro;
 			qcom,pmic-revid = <&pmi8937_revid>;
 			qcom,cons-sync-write-delay-us = <1000>;
+#endif
 		};
 
 		flash_led: qcom,leds@d300 {
