@@ -1522,7 +1522,7 @@ static struct bq2560x_platform_data* bq2560x_parse_dt(struct device *dev,
 		pr_err("Failed to read node of ti,bq2560x,vac-ovp-threshold\n");
 	}
 
-	if (of_find_property(np, "ti,thermal-mitigation",
+	if (of_find_property(np, "qcom,thermal-mitigation",
 					&bq->thermal_levels)) {
 		bq->thermal_mitigation = devm_kzalloc(bq->dev,
 					bq->thermal_levels,
@@ -1534,7 +1534,7 @@ static struct bq2560x_platform_data* bq2560x_parse_dt(struct device *dev,
 
 		bq->thermal_levels /= sizeof(int);
 		ret = of_property_read_u32_array(np,
-				"ti,thermal-mitigation",
+				"qcom,thermal-mitigation",
 				bq->thermal_mitigation, bq->thermal_levels);
 		if (ret) {
 			pr_err("Couldn't read thermal limits ret = %d\n", ret);
