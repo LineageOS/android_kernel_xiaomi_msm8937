@@ -6318,6 +6318,10 @@ static irqreturn_t batt_hot_handler(int irq, void *_chip)
 	smbchg_read(chip, &reg, chip->bat_if_base + RT_STS, 1);
 	chip->batt_hot = !!(reg & HOT_BAT_HARD_BIT);
 	pr_smb(PR_INTERRUPT, "triggered: 0x%02x\n", reg);
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_LAND)
+	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_LAND)
+		set_property_on_fg(chip, POWER_SUPPLY_PROP_CURRENT_NOW, 0);
+#endif
 	smbchg_parallel_usb_check_ok(chip);
 	if (chip->batt_psy)
 		power_supply_changed(chip->batt_psy);
@@ -6336,6 +6340,10 @@ static irqreturn_t batt_cold_handler(int irq, void *_chip)
 	smbchg_read(chip, &reg, chip->bat_if_base + RT_STS, 1);
 	chip->batt_cold = !!(reg & COLD_BAT_HARD_BIT);
 	pr_smb(PR_INTERRUPT, "triggered: 0x%02x\n", reg);
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_LAND)
+	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_LAND)
+		set_property_on_fg(chip, POWER_SUPPLY_PROP_CURRENT_NOW, 0);
+#endif
 	smbchg_parallel_usb_check_ok(chip);
 	if (chip->batt_psy)
 		power_supply_changed(chip->batt_psy);
@@ -6354,6 +6362,13 @@ static irqreturn_t batt_warm_handler(int irq, void *_chip)
 	smbchg_read(chip, &reg, chip->bat_if_base + RT_STS, 1);
 	chip->batt_warm = !!(reg & HOT_BAT_SOFT_BIT);
 	pr_smb(PR_INTERRUPT, "triggered: 0x%02x\n", reg);
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_LAND) || IS_ENABLED(CONFIG_MACH_XIAOMI_SANTONI)
+	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_LAND ||
+		xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_SANTONI) {
+		smbchg_fastchg_current_comp_set(chip, 900); // BATT_WARM_CURRENT
+		smbchg_float_voltage_comp_set(chip, 15); // BATT_WARM_VOLTAGE
+	}
+#endif
 	smbchg_parallel_usb_check_ok(chip);
 	if (chip->batt_psy)
 		power_supply_changed(chip->batt_psy);
@@ -6370,6 +6385,23 @@ static irqreturn_t batt_cool_handler(int irq, void *_chip)
 	smbchg_read(chip, &reg, chip->bat_if_base + RT_STS, 1);
 	chip->batt_cool = !!(reg & COLD_BAT_SOFT_BIT);
 	pr_smb(PR_INTERRUPT, "triggered: 0x%02x\n", reg);
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_LAND) || IS_ENABLED(CONFIG_MACH_XIAOMI_SANTONI)
+	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_LAND ||
+		xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_SANTONI) {
+		pr_smb(PR_INTERRUPT, "batt_cool=%d\n", chip->batt_cool);
+		if (chip->batt_cool) {
+			smbchg_fastchg_current_comp_set(chip, 900); // BATT_COOL_CURRENT
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_LAND)
+			if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_LAND)
+				smbchg_float_voltage_comp_set(chip, 5); // BATT_COOL_VOLTAGE
+#endif
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SANTONI)
+			if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_SANTONI)
+				smbchg_float_voltage_comp_set(chip, 0); // BATT_COOL_VOLTAGE
+#endif
+		}
+	}
+#endif
 	smbchg_parallel_usb_check_ok(chip);
 	if (chip->batt_psy)
 		power_supply_changed(chip->batt_psy);
