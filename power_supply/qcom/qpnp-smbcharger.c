@@ -486,6 +486,11 @@ module_param_named(
 	int, 00600
 );
 
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_LAND)
+static int xiaomi_land_rerun_usb_insertion = 0;
+static void xiaomi_land_usb_type_check_work_fn(struct smbchg_chip *chip);
+#endif
+
 #define pr_smb(reason, fmt, ...)				\
 	do {							\
 		if (smbchg_debug_mask & (reason))		\
@@ -3782,6 +3787,21 @@ static void smbchg_external_power_changed(struct power_supply *psy)
 	struct smbchg_chip *chip = power_supply_get_drvdata(psy);
 	int rc, soc;
 
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_LAND)
+	char *xiaomi_land_usb_type_name = "null";
+	enum power_supply_type xiaomi_land_usb_supply_type;
+
+	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_LAND) {
+		read_usb_type(chip, &xiaomi_land_usb_type_name, &xiaomi_land_usb_supply_type);
+		if ((xiaomi_land_usb_supply_type == POWER_SUPPLY_TYPE_USB) &&
+				(chip->usb_present) &&
+				(xiaomi_land_rerun_usb_insertion < 1)) {
+			msleep(1000);
+			xiaomi_land_usb_type_check_work_fn(chip);
+		}
+	}
+#endif
+
 	smbchg_aicl_deglitch_wa_check(chip);
 
 	if (is_bms_psy_present(chip)) {
@@ -4767,6 +4787,10 @@ static void handle_usb_removal(struct smbchg_chip *chip)
 	extcon_set_cable_state_(chip->extcon, EXTCON_USB, chip->usb_present);
 	smbchg_request_dpdm(chip, false);
 	schedule_work(&chip->usb_set_online_work);
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_LAND)
+	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_LAND)
+		xiaomi_land_rerun_usb_insertion = 0;
+#endif
 
 	pr_smb(PR_MISC, "setting usb psy health UNKNOWN\n");
 	chip->usb_health = POWER_SUPPLY_HEALTH_UNKNOWN;
@@ -5426,6 +5450,13 @@ static int rerun_apsd(struct smbchg_chip *chip)
 {
 	int rc = 0;
 
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_LAND)
+	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_LAND) {
+		if (xiaomi_land_rerun_usb_insertion < 2)
+			xiaomi_land_rerun_usb_insertion++;
+	}
+#endif
+
 	chip->hvdcp_3_det_ignore_uv = true;
 
 	if (chip->schg_version == QPNP_SCHG_LITE) {
@@ -5483,6 +5514,15 @@ out:
 	chip->hvdcp_3_det_ignore_uv = false;
 	return rc;
 }
+
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_LAND)
+static void xiaomi_land_usb_type_check_work_fn(struct smbchg_chip *chip)
+{
+	chip->hvdcp_3_det_ignore_uv = true;
+	rerun_apsd(chip);
+	chip->hvdcp_3_det_ignore_uv = false;
+}
+#endif
 
 #define SCHG_LITE_USBIN_HVDCP_5_9V		0x8
 #define SCHG_LITE_USBIN_HVDCP_5_9V_SEL_MASK	0x38
