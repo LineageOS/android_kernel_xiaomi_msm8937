@@ -43,6 +43,10 @@
 #include <linux/msm-bus.h>
 #include <soc/qcom/scm.h>
 
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
+#include <xiaomi-msm8937/mach.h>
+#endif
+
 /**
  * Requested USB votes for BUS bandwidth
  *
@@ -107,7 +111,9 @@ enum msm_usb_phy_type {
 	QUSB_ULPI_PHY,
 };
 
-#define IDEV_CHG_MAX	1500
+#define IDEV_CHG_MAX_DEFAULT_VALUE 1500
+static int idev_chg_max = IDEV_CHG_MAX_DEFAULT_VALUE;
+#define IDEV_CHG_MAX	idev_chg_max
 #define IUNIT		100
 #define IDEV_HVDCP_CHG_MAX	1800
 
@@ -312,7 +318,7 @@ static ssize_t debug_log_enable_store(struct device *dev,
 static DEVICE_ATTR_RW(debug_log_enable);
 
 /* Max current to be drawn for DCP charger */
-static int dcp_max_current = IDEV_CHG_MAX;
+static int dcp_max_current = IDEV_CHG_MAX_DEFAULT_VALUE;
 static ssize_t dcp_max_current_value_show(struct device *dev,
 	struct device_attribute *attr, char *buf)
 {
@@ -327,7 +333,6 @@ static ssize_t dcp_max_current_value_store(struct device *dev,
 	return count;
 }
 static DEVICE_ATTR_RW(dcp_max_current_value);
-
 
 static bool chg_detection_for_float_charger;
 static ssize_t chg_detection_for_float_charger_value_show(struct device *dev,
@@ -3174,6 +3179,10 @@ static void msm_otg_set_vbus_state(int online)
 		pr_debug("EXTCON: BSV set\n");
 		msm_otg_dbg_log_event(&motg->phy, "EXTCON: BSV SET",
 				motg->inputs, 0);
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_ULYSSE)
+		if (xiaomi_msm8937_mach_get_family() == XIAOMI_MSM8937_MACH_FAMILY_ULYSSE)
+			msleep(500);
+#endif
 		if (test_and_set_bit(B_SESS_VLD, &motg->inputs))
 			return;
 		/*
@@ -4120,6 +4129,27 @@ static int msm_otg_probe(struct platform_device *pdev)
 	int id_irq = 0;
 
 	dev_info(&pdev->dev, "msm_otg probe\n");
+
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
+	switch (xiaomi_msm8937_mach_get()) {
+		case XIAOMI_MSM8937_MACH_LAND:
+		case XIAOMI_MSM8937_MACH_PRADA: // No kernel source
+		case XIAOMI_MSM8937_MACH_SANTONI: // 1000
+		case XIAOMI_MSM8937_MACH_UGG:
+		case XIAOMI_MSM8937_MACH_UGGLITE:
+			idev_chg_max = 2000;
+			dcp_max_current = 2000;
+			break;
+		case XIAOMI_MSM8937_MACH_RIVA:
+		case XIAOMI_MSM8937_MACH_ROLEX:
+		case XIAOMI_MSM8937_MACH_TIARE:
+			idev_chg_max = 1000;
+			dcp_max_current = 1000;
+			break;
+		default:
+			break;
+	}
+#endif
 
 	motg = kzalloc(sizeof(struct msm_otg), GFP_KERNEL);
 	if (!motg)
