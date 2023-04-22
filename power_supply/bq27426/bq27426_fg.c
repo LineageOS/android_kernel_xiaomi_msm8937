@@ -235,6 +235,7 @@ struct bq_fg_chip {
 	struct power_supply_desc fg_psy_d;
 
 	struct qpnp_vadc_chip	*vadc_dev;
+	struct regulator *vcc_i2c;
 	struct regulator		*vdd;
 	u32	connected_rid;
 };
@@ -1949,6 +1950,25 @@ static int bq_fg_probe(struct i2c_client *client,
 
 		return ret;
 	}
+
+	bq->vcc_i2c = regulator_get(bq->dev, "vcc_i2c");
+	if (IS_ERR(bq->vcc_i2c)) {
+		pr_err("Regulator get failed vcc_i2c ret=%d\n", ret);
+	} else {
+		if (regulator_count_voltages(bq->vcc_i2c) > 0) {
+			ret = regulator_set_voltage(bq->vcc_i2c, SMB_VTG_MIN_UV,
+						SMB_VTG_MAX_UV);
+			if (ret) {
+				pr_err("Regulator set_vtg failed vcc_i2c ret=%d\n", ret);
+			}
+		}
+
+		ret = regulator_enable(bq->vcc_i2c);
+		if (ret) {
+			pr_err("Regulator vcc_i2c enable failed ret=%d\n", ret);
+		}
+	}
+
 	ret = bq_parse_dt(bq);
 	if (ret < 0) {
 		dev_err(&client->dev, "Unable to parse DT nodes\n");
