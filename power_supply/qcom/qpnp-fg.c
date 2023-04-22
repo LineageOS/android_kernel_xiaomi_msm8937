@@ -7003,6 +7003,14 @@ static int fg_of_init(struct fg_chip *chip)
 	u32 temp[2] = {0};
 
 	OF_READ_SETTING(FG_MEM_SOFT_HOT, "warm-bat-decidegc", rc, 1);
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_LAND)
+	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_LAND) {
+		if (strcmp(xiaomi_msm8937_mach_get_wingtech_board_id(), "S88537CA1") == 0 ||
+			strcmp(xiaomi_msm8937_mach_get_wingtech_board_id(), "S88537EC1") == 0) {
+			OF_READ_SETTING(FG_MEM_SOFT_HOT, "warm-bat-india-decidegc", rc, 1);
+		}
+	}
+#endif
 	OF_READ_SETTING(FG_MEM_SOFT_COLD, "cool-bat-decidegc", rc, 1);
 	OF_READ_SETTING(FG_MEM_HARD_HOT, "hot-bat-decidegc", rc, 1);
 	OF_READ_SETTING(FG_MEM_HARD_COLD, "cold-bat-decidegc", rc, 1);
