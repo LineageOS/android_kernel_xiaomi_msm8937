@@ -4257,9 +4257,89 @@ static void check_gain_compensation(struct fg_chip *chip)
 	}
 }
 
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_LAND) || IS_ENABLED(CONFIG_MACH_XIAOMI_SANTONI)
+#define XIAOMI_LAND_SANTONI_WARNTEMP 30
+#define XIAOMI_LAND_SANTONI_COOLTEMP 10
+
+static void xiaomi_land_santoni_fg_hysteresis_config(struct fg_chip *chip)
+{
+	int hard_hot = 0, hard_cold = 0;
+	int soft_hot = 0, soft_cold = 0;
+	soft_hot = get_prop_jeita_temp(chip, FG_MEM_SOFT_HOT);
+	soft_cold = get_prop_jeita_temp(chip, FG_MEM_SOFT_COLD);
+	hard_hot = get_prop_jeita_temp(chip, FG_MEM_HARD_HOT);
+	hard_cold = get_prop_jeita_temp(chip, FG_MEM_HARD_COLD);
+	if (chip->health == POWER_SUPPLY_HEALTH_OVERHEAT && !chip->batt_hot) {
+		/* turn down the hard hot threshold */
+		set_prop_jeita_temp(chip, FG_MEM_HARD_HOT, hard_hot - chip->hot_hysteresis);
+		chip->batt_hot = true;
+		chip->batt_warm = false;
+		chip->batt_cold = false;
+		chip->batt_cold = false;
+	}  else if (chip->health != POWER_SUPPLY_HEALTH_OVERHEAT && chip->batt_hot) {
+		/* restore the hard hot threshold */
+		set_prop_jeita_temp(chip, FG_MEM_HARD_HOT, hard_hot + chip->hot_hysteresis);
+		chip->batt_hot = false;
+		chip->batt_warm = true;
+		chip->batt_cold = false;
+		chip->batt_cool = false;
+	}  else if (chip->health == POWER_SUPPLY_HEALTH_WARM && !chip->batt_warm) {
+		/* turn down the soft hot threshold */
+		set_prop_jeita_temp(chip, FG_MEM_SOFT_HOT, soft_hot - XIAOMI_LAND_SANTONI_WARNTEMP);
+		chip->batt_hot = false;
+		chip->batt_warm = true;
+		chip->batt_cold = false;
+		chip->batt_cool = false;
+	} else if (chip->health != POWER_SUPPLY_HEALTH_WARM && chip->batt_warm) {
+		/* restore the soft hot threshold */
+		set_prop_jeita_temp(chip, FG_MEM_SOFT_HOT, soft_hot + XIAOMI_LAND_SANTONI_WARNTEMP);
+		chip->batt_warm = false;
+		chip->batt_hot = false;
+		chip->batt_cold = false;
+		chip->batt_cool = false;
+	} else if (chip->health == POWER_SUPPLY_HEALTH_COOL && !chip->batt_cool) {
+		/* turn up the soft cold threshold */
+		set_prop_jeita_temp(chip, FG_MEM_SOFT_COLD,	soft_cold + XIAOMI_LAND_SANTONI_COOLTEMP);
+		chip->batt_hot = false;
+		chip->batt_warm = false;
+		chip->batt_cold = false;
+		chip->batt_cool = true;
+	} else if (chip->health != POWER_SUPPLY_HEALTH_COOL && chip->batt_cool) {
+		/* restore the soft cold threshold */
+		set_prop_jeita_temp(chip, FG_MEM_SOFT_COLD,	soft_cold - XIAOMI_LAND_SANTONI_COOLTEMP);
+		chip->batt_cool = false;
+		chip->batt_hot = false;
+		chip->batt_warm = false;
+		chip->batt_cold = false;
+	}  else if (chip->health == POWER_SUPPLY_HEALTH_COLD && !chip->batt_cold) {
+		/* turn up the hard cold threshold */
+		set_prop_jeita_temp(chip, FG_MEM_HARD_COLD,	hard_cold + chip->cold_hysteresis);
+		chip->batt_hot = false;
+		chip->batt_warm = false;
+		chip->batt_cold = true;
+		chip->batt_cool = false;
+	}  else if (chip->health != POWER_SUPPLY_HEALTH_COLD &&
+		chip->batt_cold) {
+		/* restore the hard cold threshold */
+		set_prop_jeita_temp(chip, FG_MEM_HARD_COLD,	hard_cold - chip->cold_hysteresis);
+		chip->batt_cold = false;
+		chip->batt_hot = false;
+		chip->batt_warm = false;
+		chip->batt_cool = true;
+	}
+}
+#endif
+
 static void fg_hysteresis_config(struct fg_chip *chip)
 {
 	int hard_hot = 0, hard_cold = 0;
+
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_LAND) || IS_ENABLED(CONFIG_MACH_XIAOMI_SANTONI)
+	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_LAND ||
+		xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_SANTONI) {
+		return xiaomi_land_santoni_fg_hysteresis_config(chip);
+	}
+#endif
 
 	hard_hot = get_prop_jeita_temp(chip, FG_MEM_HARD_HOT);
 	hard_cold = get_prop_jeita_temp(chip, FG_MEM_HARD_COLD);
@@ -4329,6 +4409,13 @@ static int fg_init_batt_temp_state(struct fg_chip *chip)
 		(batt_info_sts & JEITA_HARD_HOT_RT_STS) ? true : false;
 	chip->batt_cold =
 		(batt_info_sts & JEITA_HARD_COLD_RT_STS) ? true : false;
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_LAND) || IS_ENABLED(CONFIG_MACH_XIAOMI_SANTONI)
+	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_LAND ||
+		xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_SANTONI) {
+		chip->batt_warm = false;
+		chip->batt_cool = false;
+	}
+#endif
 	if (chip->batt_hot || chip->batt_cold) {
 		if (chip->batt_hot) {
 			chip->health = POWER_SUPPLY_HEALTH_OVERHEAT;
