@@ -1831,9 +1831,7 @@ static const unsigned char* charge_stat_str[] = {
 static void bq2560x_dump_status(struct bq2560x* bq)
 {
 	u8 status;
-	u8 addr;
 	int ret;
-	u8 val;
 	union power_supply_propval batt_prop = {0,};
 	
 	ret = bq2560x_get_batt_property(bq,
@@ -1841,18 +1839,6 @@ static void bq2560x_dump_status(struct bq2560x* bq)
 
 	if (!ret)
 	 		pr_err("FG current:%d\n", batt_prop.intval);
-
-	for (addr = 0x0; addr <= 0x0B; addr++) {
-		if (addr == 0x09) {
-			pr_err("bq Reg[09] = 0x%02X\n", bq->fault_status);
-			continue;
-		}
-		ret = bq2560x_read_byte(bq, &val, addr);
-		if (!ret)
-			pr_err("bq Reg[%02X] = 0x%02X\n", addr, val);
-		else
-			pr_err("bq Reg red err\n");
-	}
 
 	ret = bq2560x_read_byte(bq, &status, BQ2560X_REG_0A);
 	if (ret) {
