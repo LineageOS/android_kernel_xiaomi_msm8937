@@ -67,7 +67,7 @@
 		vcc_i2c-supply = <&pm8937_l5>;
 		interrupt-parent = <&tlmm>;
 		interrupts = <25 2>;
-		qcom,battid-vadc = <&pm8937_vadc>;
+		qcom,batt_id-vadc = <&pm8937_vadc>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&bq_int_default>;
 	};
