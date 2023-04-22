@@ -155,15 +155,18 @@ struct bq2560x {
 	bool batt_cold;
 	bool batt_warm;
 	bool batt_cool;
+	bool batt_cool_xiaomi;
 
 	int batt_hot_degc;
 	int batt_warm_degc;
 	int batt_cool_degc;
+	int batt_cool_xiaomi_degc;
 	int batt_cold_degc;
 	int hot_temp_hysteresis;
 	int cold_temp_hysteresis;
 
 	int batt_cool_ma;
+	int batt_cool_xiaomi_ma;
 	int batt_warm_ma;
 	int batt_cool_mv;
 	int batt_warm_mv;
@@ -845,7 +848,7 @@ static int bq2560x_get_prop_health(struct bq2560x *bq)
 				ret = POWER_SUPPLY_HEALTH_OVERHEAT;
 			else if (bq->batt_warm)
 				ret = POWER_SUPPLY_HEALTH_WARM;
-			else if (bq->batt_cool)
+			else if (bq->batt_cool || bq->batt_cool_xiaomi)
 				ret = POWER_SUPPLY_HEALTH_COOL;
 			else if (bq->batt_cold)
 				ret = POWER_SUPPLY_HEALTH_COLD;
@@ -1359,6 +1362,14 @@ static int bq2560x_parse_jeita_dt(struct device *dev, struct bq2560x* bq)
 		pr_err("Failed to read ti,bq2560x,jeita-cool-degc\n");
 		return ret;
 	}
+
+	ret = of_property_read_u32(np, "ti,bq2560x,jeita-cool-xiaomi-degc",
+				   &bq->batt_cool_xiaomi_degc);
+	if (ret) {
+		pr_err("Failed to read ti,bq2560x,jeita-cool-xiaomi-degc\n");
+		return ret;
+	}
+
 	ret = of_property_read_u32(np,"ti,bq2560x,jeita-cold-degc",
 						&bq->batt_cold_degc);
     if(ret) {
@@ -1384,6 +1395,13 @@ static int bq2560x_parse_jeita_dt(struct device *dev, struct bq2560x* bq)
 						&bq->batt_cool_ma);
     if(ret) {
 		pr_err("Failed to read ti,bq2560x,jeita-cool-ma\n");
+		return ret;
+	}
+
+	ret = of_property_read_u32(np, "ti,bq2560x,jeita-cool-xiaomi-ma",
+				   &bq->batt_cool_xiaomi_ma);
+	if (ret) {
+		pr_err("Failed to read ti,bq2560x,jeita-cool-xiaomi_ma\n");
 		return ret;
 	}
 
@@ -1537,12 +1555,14 @@ static void bq2560x_init_jeita(struct bq2560x *bq)
 	bq->batt_hot_degc = 600;
 	bq->batt_warm_degc = 450;
 	bq->batt_cool_degc = 100;
+	bq->batt_cool_xiaomi_degc = 50;
 	bq->batt_cold_degc = 0;
 	
 	bq->hot_temp_hysteresis = 50;
 	bq->cold_temp_hysteresis = 50;
 
 	bq->batt_cool_ma = 400;
+	bq->batt_cool_xiaomi_ma = 400;
 	bq->batt_cool_mv = 4100;
 	bq->batt_warm_ma = 400;
 	bq->batt_warm_mv = 4100;
@@ -1621,7 +1641,7 @@ static void bq2560x_check_jeita(struct bq2560x *bq)
 {
 
 	int ret;
-	bool last_hot, last_warm, last_cool, last_cold;
+	bool last_hot, last_warm, last_cool, last_cool_xiaomi, last_cold;
 	bool chg_disabled_jeita, jeita_hot_cold;
 	union power_supply_propval batt_prop = {0,};
 	
@@ -1636,6 +1656,7 @@ static void bq2560x_check_jeita(struct bq2560x *bq)
 	last_hot = bq->batt_hot;
 	last_warm = bq->batt_warm;
 	last_cool = bq->batt_cool;
+	last_cool_xiaomi = bq->batt_cool_xiaomi;
 	last_cold = bq->batt_cold;
 
 	if (bq->batt_temp >= bq->batt_hot_degc) {/* HOT */
@@ -1643,6 +1664,7 @@ static void bq2560x_check_jeita(struct bq2560x *bq)
 			bq->batt_hot  = true;
 			bq->batt_warm = false;
 			bq->batt_cool = false;
+			bq->batt_cool_xiaomi = false;
 			bq->batt_cold = false;
 			bq->jeita_ma = 0;
 			bq->jeita_mv = 0;
@@ -1653,41 +1675,56 @@ static void bq2560x_check_jeita(struct bq2560x *bq)
 			bq->batt_hot  = false;
 			bq->batt_warm = true;
 			bq->batt_cool = false;
+			bq->batt_cool_xiaomi = false;
 			bq->batt_cold = false;
 			bq->jeita_mv = bq->batt_warm_mv;
 			bq->jeita_ma = bq->batt_warm_ma;
+		}
+	} else if (bq->batt_temp < bq->batt_cool_degc) {/* COOL */
+		if (!bq->batt_cold ||
+			(bq->batt_temp > bq->batt_cold_degc + bq->cold_temp_hysteresis)) {
+			bq->batt_hot = false;
+			bq->batt_warm = false;
+			bq->batt_cool = true;
+			bq->batt_cool_xiaomi = false;
+			bq->batt_cold = false;
+			bq->jeita_mv = bq->batt_cool_mv;
+			bq->jeita_ma = bq->batt_cool_xiaomi_ma;
+		}
+	} else if (bq->batt_temp < bq->batt_cool_xiaomi_degc) {/* COOL XIAOMI */
+		if (!bq->batt_cool) {
+			bq->batt_hot  = false;
+			bq->batt_warm = false;
+			bq->batt_cool = false;
+			bq->batt_cool_xiaomi = true;
+			bq->batt_cold = false;
+			bq->jeita_mv = bq->batt_cool_mv;
+			bq->jeita_ma = bq->batt_cool_ma;
 		}
 	} else if (bq->batt_temp < bq->batt_cold_degc) {/* COLD */
 		if (!bq->batt_cold) {
 			bq->batt_hot  = false;
 			bq->batt_warm = false;
 			bq->batt_cool = false;
+			bq->batt_cool_xiaomi = false;
 			bq->batt_cold = true;
 			bq->jeita_ma = 0;
 			bq->jeita_mv = 0;
-		}
-	} else if (bq->batt_temp < bq->batt_cool_degc) {/* COOL */
-		if (!bq->batt_cold ||
-			(bq->batt_temp > bq->batt_cold_degc + bq->cold_temp_hysteresis)) {
-			bq->batt_hot  = false;
-			bq->batt_warm = false;
-			bq->batt_cool = true;
-			bq->batt_cold = false;
-			bq->jeita_mv = bq->batt_cool_mv;
-			bq->jeita_ma = bq->batt_cool_ma;
 		}
 	} else {/* NORMAL */
 		bq->batt_hot  = false;
 		bq->batt_warm = false;
 		bq->batt_cool = false;
+		bq->batt_cool_xiaomi = false;
 		bq->batt_cold = false;
 	}
 
-	bq->jeita_active = bq->batt_cool || bq->batt_hot ||
-			   bq->batt_cold || bq->batt_warm;
+	bq->jeita_active = bq->batt_cool || bq->batt_cool_xiaomi ||
+			    bq->batt_hot || bq->batt_cold || bq->batt_warm;
 	
 	if ((last_cold != bq->batt_cold) || (last_warm != bq->batt_warm) ||
-		(last_cool != bq->batt_cool) || (last_hot != bq->batt_hot)) {
+		(last_cool != bq->batt_cool) || (last_hot != bq->batt_hot) ||
+		(last_cool_xiaomi != bq->batt_cool_xiaomi)) {
 		bq2560x_update_charging_profile(bq);
 		power_supply_changed(bq->batt_psy);
 		power_supply_changed(bq->usb_psy);
@@ -1753,7 +1790,7 @@ static int calculate_jeita_poll_interval(struct bq2560x* bq)
 
 	if (bq->batt_hot || bq->batt_cold)
 		interval = 5;
-	else if (bq->batt_warm || bq->batt_cool)
+	else if (bq->batt_warm || bq->batt_cool || bq->batt_cool_xiaomi)
 		interval = 10;
 	else
 		interval = 15;
@@ -1900,6 +1937,8 @@ static void bq2560x_dump_status(struct bq2560x* bq)
 			pr_debug("JEITA ACTIVE: WARM\n");
 		else if (bq->batt_cool)
 			pr_debug("JEITA ACTIVE: COOL\n");
+		else if (bq->batt_cool_xiaomi)
+			pr_debug("JEITA ACTIVE: COOL_XIAOMI\n");
 		else if (bq->batt_cold)
 			pr_debug("JEITA ACTIVE: COLD\n");
 	}
