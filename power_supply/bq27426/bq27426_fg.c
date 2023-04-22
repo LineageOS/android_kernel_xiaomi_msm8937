@@ -40,9 +40,17 @@
 #include <linux/debugfs.h>
 #include <linux/qpnp/qpnp-adc.h>
 #include <linux/alarmtimer.h>
+#include <xiaomi-msm8937/mach.h>
 #include "bqfs_cmd_type.h"
 //#include "bq27426_gmfs.h"
 #include "bq27426_gmfs_coslight.h"
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_RIVA)
+#include "riva/bq27426_gmfs_atl.h"
+#include "riva/bq27426_gmfs_default.h"
+#include "riva/bq27426_gmfs_desay.h"
+#include "riva/bq27426_gmfs_scud.h"
+#include "riva/bq27426_gmfs_sunwoda.h"
+#endif
 
 #if 1
 #undef pr_debug
@@ -134,11 +142,42 @@ struct fg_batt_profile {
 	u8  version;
 };
 
-static const struct fg_batt_profile bqfs_image[] = {
-	{ bqfs_coslight, ARRAY_SIZE(bqfs_coslight), 1 },//100
-	/* Add more entries if multiple batteries are supported */
-
+enum bqfs_image_ids {
+	BQFS_IMAGE_DEFAULT_COSLIGHT = 0,
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_RIVA)
+	BQFS_IMAGE_XIAOMI_RIVA_0,
+	BQFS_IMAGE_XIAOMI_RIVA_1,
+	BQFS_IMAGE_XIAOMI_RIVA_2,
+	BQFS_IMAGE_XIAOMI_RIVA_3,
+	BQFS_IMAGE_XIAOMI_RIVA_4,
+#endif
 };
+
+static const struct fg_batt_profile bqfs_image[] = {
+	[BQFS_IMAGE_DEFAULT_COSLIGHT] = { bqfs_coslight, ARRAY_SIZE(bqfs_coslight), 1 },//100
+	/* Add more entries if multiple batteries are supported */
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_RIVA)
+	[BQFS_IMAGE_XIAOMI_RIVA_0] = {bqfs_xiaomi_riva_default, ARRAY_SIZE(bqfs_xiaomi_riva_default), 1},
+	[BQFS_IMAGE_XIAOMI_RIVA_1] = {bqfs_xiaomi_riva_desay, ARRAY_SIZE(bqfs_xiaomi_riva_desay), 33},
+	[BQFS_IMAGE_XIAOMI_RIVA_2] = {bqfs_xiaomi_riva_scud, ARRAY_SIZE(bqfs_xiaomi_riva_scud), 98},
+	[BQFS_IMAGE_XIAOMI_RIVA_3] = {bqfs_xiaomi_riva_sunwoda, ARRAY_SIZE(bqfs_xiaomi_riva_sunwoda), 61},
+	[BQFS_IMAGE_XIAOMI_RIVA_4] = {bqfs_xiaomi_riva_atl, ARRAY_SIZE(bqfs_xiaomi_riva_atl), 98},
+#endif
+};
+
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_RIVA)
+struct bq_batt_ids_xiaomi_riva {
+	int kohm;
+	const char *battery_type;
+};
+
+static struct bq_batt_ids_xiaomi_riva bq_batt_ids_attr_xiaomi_riva[] = {
+    {30, "wingtech-Desay-4v4-3000mah"},
+    {68, "wingtech-Scud-4v4-3000mah"},
+    {330, "wingtech-Sunwoda-4v4-3000mah"},
+    {82, "wingtech-Atl-4v4-3000mah"},
+};
+#endif
 
 static const unsigned char *update_reason_str[] = {
 	"Reset", 
@@ -1891,6 +1930,64 @@ static int fg_parse_batt_id(struct bq_fg_chip *bq)
 	return 0;
 }
 
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_RIVA)
+static int fg_get_battid_resister_xiaomi_riva(struct bq_fg_chip *bq)
+{
+	int rc = 0;
+	int bq_battid_resister = 0;
+	struct qpnp_vadc_result results;
+
+	rc = qpnp_vadc_read(bq->vadc_dev, P_MUX4_1_1, &results);
+	if (rc) {
+		pr_debug("Unable to read batt resister rc=%d\n", rc);
+		bq->connected_rid = 45;
+		return 45; // DEFAULT_RESISTER
+	}
+
+	bq_battid_resister =
+	    (results.physical) * 100 / (1800000 - results.physical);
+
+	bq->connected_rid = bq_battid_resister;
+	return bq_battid_resister;
+}
+
+static int fg_batterydata_get_best_profile_xiaomi_riva(struct bq_fg_chip *bq)
+{
+	int delta = 0, best_id_kohm = 0, id_range_pct = 15, batt_id_kohm = 0,
+	    i = 0, limit = 0;
+
+	batt_id_kohm = fg_get_battid_resister_xiaomi_riva(bq);
+
+	for (i = 0; i < ARRAY_SIZE(bq_batt_ids_attr_xiaomi_riva); i++) {
+		delta = abs(bq_batt_ids_attr_xiaomi_riva[i].kohm - batt_id_kohm);
+		limit = (bq_batt_ids_attr_xiaomi_riva[i].kohm * id_range_pct) / 100;
+		if (delta <= limit) {
+			best_id_kohm = bq_batt_ids_attr_xiaomi_riva[i].kohm;
+			goto out;
+		}
+	}
+
+	pr_err("out of range, using default battery, best_id_kohm=%d\n",
+	       batt_id_kohm);
+
+out:
+	pr_err("%s found\n", bq_batt_ids_attr_xiaomi_riva[i].battery_type);
+
+	if (best_id_kohm == 30) {
+		bq->batt_id = BQFS_IMAGE_XIAOMI_RIVA_1;
+	} else if (best_id_kohm == 68) {
+		bq->batt_id = BQFS_IMAGE_XIAOMI_RIVA_2;
+	} else if (best_id_kohm == 330) {
+		bq->batt_id = BQFS_IMAGE_XIAOMI_RIVA_3;
+	} else if (best_id_kohm == 82) {
+		bq->batt_id = BQFS_IMAGE_XIAOMI_RIVA_4;
+	} else
+		bq->batt_id = BQFS_IMAGE_XIAOMI_RIVA_0;
+
+	return 0;
+}
+#endif
+
 static int bq_parse_dt(struct bq_fg_chip *bq)
 {
 	return 0;
@@ -1976,6 +2073,11 @@ static int bq_fg_probe(struct i2c_client *client,
 	}
 	INIT_WORK(&bq->update_work, fg_update_bqfs_workfunc);
 
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_RIVA)
+	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_RIVA)
+		fg_batterydata_get_best_profile_xiaomi_riva(bq);
+	else
+#endif
 	fg_parse_batt_id(bq);
 
 	fg_update_bqfs(bq);
