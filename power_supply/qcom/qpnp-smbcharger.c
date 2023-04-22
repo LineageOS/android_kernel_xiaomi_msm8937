@@ -7561,6 +7561,13 @@ static int smb_parse_dt(struct smbchg_chip *chip)
 			"fastchg-current-ma", rc, 1);
 	if (chip->cfg_fastchg_current_ma == -EINVAL)
 		chip->cfg_fastchg_current_ma = DEFAULT_FCC_MA;
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SANTONI)
+	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_SANTONI) {
+		if (strcmp(xiaomi_msm8937_mach_get_wingtech_board_id(), "S88536CA2") == 0) {
+			chip->cfg_fastchg_current_ma = 1500; // INDIA_DEFAULT_FCC_MA
+		}
+	}
+#endif
 	OF_PROP_READ(chip, chip->vfloat_mv, "float-voltage-mv", rc, 1);
 	OF_PROP_READ(chip, chip->safety_time, "charging-timeout-mins", rc, 1);
 	OF_PROP_READ(chip, chip->vled_max_uv, "vled-max-uv", rc, 1);
@@ -8762,6 +8769,23 @@ static struct platform_driver smbchg_driver = {
 
 static int __init smbchg_init(void)
 {
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_LAND)
+	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_LAND)
+		smbchg_default_dcp_icl_ma = 2000;
+#endif
+
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SANTONI)
+	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_SANTONI) {
+		smbchg_default_hvdcp_icl_ma = 1200;
+		smbchg_default_hvdcp3_icl_ma = 2000;
+		smbchg_default_dcp_icl_ma = 2000;
+		if (strcmp(xiaomi_msm8937_mach_get_wingtech_board_id(), "S88536CA2") == 0) {
+			smbchg_default_hvdcp3_icl_ma = 1500;
+			smbchg_default_dcp_icl_ma = 1500;
+		}
+	}
+#endif
+
 	return platform_driver_register(&smbchg_driver);
 }
 
