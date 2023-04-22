@@ -3876,6 +3876,9 @@ struct regulator_ops smbchg_otg_reg_ops = {
 #define USBIN_ADAPTER_9V		0x3
 #define USBIN_ADAPTER_5V_9V_CONT	0x2
 #define USBIN_ADAPTER_5V_UNREGULATED_9V	0x5
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_LAND) || IS_ENABLED(CONFIG_MACH_XIAOMI_SANTONI)
+#define XIAOMI_LAND_SANTONI_USBIN_ADAPTER_5V_UNREGULATED_9V	0x6
+#endif
 static int smbchg_external_otg_regulator_enable(struct regulator_dev *rdev)
 {
 	int rc = 0;
@@ -4320,6 +4323,12 @@ static int smbchg_adjust_vfloat_mv_trim(struct smbchg_chip *chip,
 			return -EINVAL;
 		}
 
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_LAND)
+		if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_LAND)
+			rc = smbchg_sec_masked_write(chip, chip->misc_base + TRIM_14,
+					VF_TRIM_MASK, 1);
+		else
+#endif
 		rc = smbchg_sec_masked_write(chip, chip->misc_base + TRIM_14,
 				VF_TRIM_MASK, new_trim);
 		if (rc < 0) {
@@ -4676,6 +4685,14 @@ static void restore_from_hvdcp_detection(struct smbchg_chip *chip)
 		pr_err("Couldn't enable APSD rc=%d\n", rc);
 
 	/* Reset back to 5V unregulated */
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_LAND) || IS_ENABLED(CONFIG_MACH_XIAOMI_SANTONI)
+	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_LAND ||
+		xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_SANTONI)
+		rc = smbchg_sec_masked_write(chip,
+			chip->usb_chgpth_base + USBIN_CHGR_CFG,
+			ADAPTER_ALLOWANCE_MASK, XIAOMI_LAND_SANTONI_USBIN_ADAPTER_5V_UNREGULATED_9V);
+	else
+#endif
 	rc = smbchg_sec_masked_write(chip,
 		chip->usb_chgpth_base + USBIN_CHGR_CFG,
 		ADAPTER_ALLOWANCE_MASK, USBIN_ADAPTER_5V_UNREGULATED_9V);
@@ -6964,6 +6981,9 @@ static inline int get_bpd(const char *name)
 #define OTG_PIN_CTRL_RID_DIS		0x04
 #define OTG_CMD_CTRL_RID_EN		0x08
 #define AICL_ADC_BIT			BIT(6)
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SANTONI)
+#define XIAOMI_SANTONI_OTG_CURRENT_REG	SMB_MASK(1, 0)
+#endif
 static void batt_ov_wa_check(struct smbchg_chip *chip)
 {
 	int rc;
@@ -7420,6 +7440,18 @@ static int smbchg_hw_init(struct smbchg_chip *chip)
 			return rc;
 		}
 	}
+
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SANTONI)
+	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_SANTONI) {
+		rc = smbchg_sec_masked_write(chip, chip->otg_base + 0xF3,
+				XIAOMI_SANTONI_OTG_CURRENT_REG, 0x2);
+		if (rc < 0) {
+			dev_err(chip->dev, "Couldn't set XIAOMI SANTONI OTG current config rc = %d\n",
+					rc);
+			return rc;
+		}
+	}
+#endif
 
 	if (chip->wa_flags & SMBCHG_BATT_OV_WA)
 		batt_ov_wa_check(chip);
