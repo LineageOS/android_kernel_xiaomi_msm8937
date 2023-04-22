@@ -8804,6 +8804,13 @@ static int __init smbchg_init(void)
 	}
 #endif
 
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_LAND) || IS_ENABLED(CONFIG_MACH_XIAOMI_SANTONI)
+	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_LAND ||
+		xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_SANTONI) {
+		smbchg_parallel_en = 0;
+	}
+#endif
+
 	return platform_driver_register(&smbchg_driver);
 }
 
