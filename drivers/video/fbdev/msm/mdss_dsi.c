@@ -3706,7 +3706,7 @@ static int mdss_dsi_ctrl_probe(struct platform_device *pdev)
 error_shadow_clk_deinit:
 	mdss_dsi_shadow_clk_deinit(&pdev->dev, ctrl_pdata);
 error_pan_node:
-#ifndef CONFIG_BACKLIGHT_QCOM_SPMI_WLED
+#ifndef CONFIG_BACKLIGHT_CLASS_DEVICE
 	mdss_dsi_unregister_bl_settings(ctrl_pdata);
 #endif
 	of_node_put(dsi_pan_node);
