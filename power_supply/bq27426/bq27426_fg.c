@@ -51,6 +51,12 @@
 #include "riva/bq27426_gmfs_scud.h"
 #include "riva/bq27426_gmfs_sunwoda.h"
 #endif
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_ULYSSE)
+#include "ulysse/bq27426_gmfs_coslight.h"
+#include "ulysse/bq27426_gmfs_scud.h"
+#include "ulysse/bq27426_gmfs_sdi.h"
+#include "ulysse/bq27426_gmfs_sunwoda.h"
+#endif
 
 #if 1
 #undef pr_debug
@@ -151,6 +157,12 @@ enum bqfs_image_ids {
 	BQFS_IMAGE_XIAOMI_RIVA_3,
 	BQFS_IMAGE_XIAOMI_RIVA_4,
 #endif
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_ULYSSE)
+	BQFS_IMAGE_XIAOMI_ULYSSE_0,
+	BQFS_IMAGE_XIAOMI_ULYSSE_1,
+	BQFS_IMAGE_XIAOMI_ULYSSE_2,
+	BQFS_IMAGE_XIAOMI_ULYSSE_3,
+#endif
 };
 
 static const struct fg_batt_profile bqfs_image[] = {
@@ -162,6 +174,12 @@ static const struct fg_batt_profile bqfs_image[] = {
 	[BQFS_IMAGE_XIAOMI_RIVA_2] = {bqfs_xiaomi_riva_scud, ARRAY_SIZE(bqfs_xiaomi_riva_scud), 98},
 	[BQFS_IMAGE_XIAOMI_RIVA_3] = {bqfs_xiaomi_riva_sunwoda, ARRAY_SIZE(bqfs_xiaomi_riva_sunwoda), 61},
 	[BQFS_IMAGE_XIAOMI_RIVA_4] = {bqfs_xiaomi_riva_atl, ARRAY_SIZE(bqfs_xiaomi_riva_atl), 98},
+#endif
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_ULYSSE)
+	[BQFS_IMAGE_XIAOMI_ULYSSE_0] = {bqfs_xiaomi_ulysse_scud, ARRAY_SIZE(bqfs_xiaomi_ulysse_scud), 0x10},
+	[BQFS_IMAGE_XIAOMI_ULYSSE_1] = {bqfs_xiaomi_ulysse_coslight, ARRAY_SIZE(bqfs_xiaomi_ulysse_coslight), 0x10},
+	[BQFS_IMAGE_XIAOMI_ULYSSE_2] = {bqfs_xiaomi_ulysse_sunwoda, ARRAY_SIZE(bqfs_xiaomi_ulysse_sunwoda), 0x10},
+	[BQFS_IMAGE_XIAOMI_ULYSSE_3] = {bqfs_xiaomi_ulysse_sdi, ARRAY_SIZE(bqfs_xiaomi_ulysse_sdi), 0x10},
 #endif
 };
 
@@ -1847,7 +1865,23 @@ static void convert_rid2battid(struct bq_fg_chip *bq)
 		bq->batt_id = 1;
 	}
 #endif
-	bq->batt_id = 0;
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_ULYSSE)
+	if (xiaomi_msm8937_mach_get_family() == XIAOMI_MSM8937_MACH_FAMILY_ULYSSE) {
+		if (bq->connected_rid > 400 && bq->connected_rid < 600) {
+			bq->batt_id = BQFS_IMAGE_XIAOMI_ULYSSE_3;
+		} else if (bq->connected_rid > 220 && bq->connected_rid < 385) {
+			bq->batt_id = BQFS_IMAGE_XIAOMI_ULYSSE_2;
+		} else if (bq->connected_rid > 60 && bq->connected_rid < 140) {
+			bq->batt_id = BQFS_IMAGE_XIAOMI_ULYSSE_1;
+		} else if (bq->connected_rid > 10 && bq->connected_rid < 50) {
+			bq->batt_id = BQFS_IMAGE_XIAOMI_ULYSSE_0;
+		} else {
+			bq->batt_id = BQFS_IMAGE_XIAOMI_ULYSSE_1;
+		}
+		return;
+	}
+#endif
+	bq->batt_id = BQFS_IMAGE_DEFAULT_COSLIGHT;
 }
 
 
