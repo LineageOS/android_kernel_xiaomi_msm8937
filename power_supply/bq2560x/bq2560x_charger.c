@@ -580,7 +580,7 @@ static int bq2560x_set_acovp_threshold(struct bq2560x *bq, int volt)
 		val = REG06_OVP_14P3V;
 	else if (volt == VAC_OVP_10500)
 		val = REG06_OVP_10P5V;
-	else if (volt == VAC_OVP_6200)
+	else if (volt == VAC_OVP_6500 || volt == VAC_OVP_6200)
 		val = REG06_OVP_6P2V;
 	else
 		val = REG06_OVP_5P5V;
