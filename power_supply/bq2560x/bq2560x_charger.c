@@ -36,6 +36,7 @@
 #include <linux/bitops.h>
 #include <linux/math64.h>
 #include <linux/alarmtimer.h>
+#include <xiaomi-msm8937/mach.h>
 #include <xiaomi-msm8937/power_supply_legacy.h>
 
 #include "bq2560x_reg.h"
@@ -947,6 +948,10 @@ static int bq2560x_charger_get_property(struct power_supply *psy,
 		break;
 	case POWER_SUPPLY_PROP_CHARGE_FULL_DESIGN:
 		val->intval = 3080;
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_RIVA)
+		if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_RIVA)
+			val->intval = 3000;
+#endif
 		break;
 	
 	case POWER_SUPPLY_PROP_STATUS:
