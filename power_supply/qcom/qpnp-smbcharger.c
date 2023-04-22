@@ -1065,6 +1065,24 @@ static int get_prop_batt_temp(struct smbchg_chip *chip)
 		pr_smb(PR_STATUS, "Couldn't get temperature rc = %d\n", rc);
 		temp = DEFAULT_BATT_TEMP;
 	}
+
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_LAND)
+	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_LAND) {
+		if (temp < -50) {
+			temp = temp - 55;
+		}
+	}
+#endif
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SANTONI)
+	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_SANTONI) {
+		if (temp < -100) {
+			temp = temp - 55;
+		} else if (temp > 450) {
+			temp = temp - 10;
+		}
+	}
+#endif
+
 	return temp;
 }
 
