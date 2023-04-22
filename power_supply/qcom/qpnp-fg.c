@@ -6296,6 +6296,44 @@ fail:
 	return -EINVAL;
 }
 
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SANTONI)
+#define XIAOMI_SANTONI_REDO_BATID_DURING_FIRST_EST	BIT(4)
+static void xiaomi_santoni_fg_hw_restart(struct fg_chip *chip)
+{
+	u8 reg, rc;
+	int batt_id;
+	u8 data[4];
+
+	reg = 0x80;
+	fg_masked_write(chip, 0x4150, reg, reg, 1);
+	fg_masked_write(chip, chip->soc_base + SOC_RESTART, 0xFF, 0, 1);
+	mdelay(5);
+
+	reg = XIAOMI_SANTONI_REDO_BATID_DURING_FIRST_EST|REDO_FIRST_ESTIMATE;
+	fg_masked_write(chip, chip->soc_base + SOC_RESTART, reg, reg, 1);
+	mdelay(5);
+
+	reg = XIAOMI_SANTONI_REDO_BATID_DURING_FIRST_EST | REDO_FIRST_ESTIMATE | RESTART_GO;
+	fg_masked_write(chip, chip->soc_base + SOC_RESTART, reg, reg, 1);
+	mdelay(1000);
+
+	fg_masked_write(chip, chip->soc_base + SOC_RESTART, 0xFF, 0, 1);
+	fg_masked_write(chip, 0x4150, 0x80, 0, 1);
+
+	mdelay(2000);
+
+	rc = fg_mem_read(chip, data, fg_data[FG_DATA_BATT_ID].address,
+			fg_data[FG_DATA_BATT_ID].len, fg_data[FG_DATA_BATT_ID].offset, 0);
+	if (rc) {
+		pr_err("XJB Failed to get sram battery id data\n");
+	} else {
+		fg_data[FG_DATA_BATT_ID].value = data[0] * LSB_8B;
+	}
+	batt_id = get_sram_prop_now(chip, FG_DATA_BATT_ID);
+	pr_err("fg_hw_restart. wingtech after restart battery id = %d\n", batt_id);
+}
+#endif
+
 #define FG_PROFILE_LEN			128
 #define PROFILE_COMPARE_LEN		32
 #define THERMAL_COEFF_ADDR		0x444
@@ -6310,6 +6348,9 @@ static int fg_batt_profile_init(struct fg_chip *chip)
 	const char *data, *batt_type_str;
 	bool tried_again = false, vbat_in_range, profiles_same;
 	u8 reg = 0;
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SANTONI)
+	int xiaomi_santoni_value = 0;
+#endif
 
 wait:
 	fg_stay_awake(&chip->profile_wakeup_source);
@@ -6329,6 +6370,18 @@ wait:
 	/* Check whether the charger is ready */
 	if (!is_charger_available(chip))
 		goto reschedule;
+
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SANTONI)
+	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_SANTONI) {
+		xiaomi_santoni_value = get_sram_prop_now(chip, FG_DATA_BATT_ID);
+		pr_err("wingtech later init FG_DATA_BATT_ID =%d\n", xiaomi_santoni_value);
+		if (!(((xiaomi_santoni_value > 85000) && (xiaomi_santoni_value < 115000)) ||
+			((xiaomi_santoni_value > 57000) && (xiaomi_santoni_value < 78000)) ||
+			((xiaomi_santoni_value > 24000) && (xiaomi_santoni_value < 35000)))) {
+			xiaomi_santoni_fg_hw_restart(chip);
+		}
+	}
+#endif
 
 	/* Disable charging for a FG cycle before calculating vbat_in_range */
 	if (!chip->charging_disabled) {
