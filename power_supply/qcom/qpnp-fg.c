@@ -2259,6 +2259,10 @@ static int get_prop_capacity(struct fg_chip *chip)
 	if (chip->battery_missing)
 		return MISSING_CAPACITY;
 	if (!chip->profile_loaded && !chip->use_otp_profile)
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_LAND) || IS_ENABLED(CONFIG_MACH_XIAOMI_SANTONI)
+	if (xiaomi_msm8937_mach_get() != XIAOMI_MSM8937_MACH_LAND &&
+		xiaomi_msm8937_mach_get() != XIAOMI_MSM8937_MACH_SANTONI)
+#endif
 		return DEFAULT_CAPACITY;
 	if (chip->charge_full)
 		return FULL_CAPACITY;
