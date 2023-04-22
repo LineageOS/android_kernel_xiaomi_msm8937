@@ -37,6 +37,7 @@
 #include <linux/string_helpers.h>
 #include <linux/alarmtimer.h>
 #include <linux/qpnp/qpnp-revid.h>
+#include <xiaomi-msm8937/mach.h>
 
 /* Register offsets */
 
@@ -9187,6 +9188,11 @@ static struct platform_driver fg_driver = {
 
 static int __init fg_init(void)
 {
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_LAND)
+	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_LAND)
+		settings[FG_MEM_VBAT_EST_DIFF].value = 100;
+#endif
+
 	return platform_driver_register(&fg_driver);
 }
 
