@@ -8037,6 +8037,13 @@ static int fg_common_hw_init(struct fg_chip *chip)
 		}
 	}
 
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_LAND)
+	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_LAND)
+		rc = fg_mem_masked_write(chip, settings[FG_MEM_DELTA_SOC].address, 0xFF,
+				settings[FG_MEM_DELTA_SOC].value,
+				settings[FG_MEM_DELTA_SOC].offset);
+	else
+#endif
 	rc = fg_mem_masked_write(chip, settings[FG_MEM_DELTA_SOC].address, 0xFF,
 			soc_to_setpoint(settings[FG_MEM_DELTA_SOC].value),
 			settings[FG_MEM_DELTA_SOC].offset);
