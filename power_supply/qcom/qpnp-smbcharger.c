@@ -43,6 +43,7 @@
 #include <linux/ktime.h>
 #include <linux/extcon.h>
 #include <linux/pmic-voter.h>
+#include <xiaomi-msm8937/mach.h>
 
 /* Mask/Bit helpers */
 #define _SMB_MASK(BITS, POS) \
@@ -5939,6 +5940,7 @@ static enum power_supply_property smbchg_battery_properties[] = {
 	POWER_SUPPLY_PROP_RESTRICTED_CHARGING,
 	POWER_SUPPLY_PROP_ALLOW_HVDCP3,
 	POWER_SUPPLY_PROP_MAX_PULSE_ALLOWED,
+	POWER_SUPPLY_PROP_CHARGE_FULL_DESIGN,
 };
 
 static int smbchg_battery_set_property(struct power_supply *psy,
@@ -6165,6 +6167,16 @@ static int smbchg_battery_get_property(struct power_supply *psy,
 	case POWER_SUPPLY_PROP_MAX_PULSE_ALLOWED:
 		val->intval = chip->max_pulse_allowed;
 		break;
+	case POWER_SUPPLY_PROP_CHARGE_FULL_DESIGN:
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_LAND) || IS_ENABLED(CONFIG_MACH_XIAOMI_SANTONI) || IS_ENABLED(CONFIG_MACH_XIAOMI_PRADA)
+		if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_LAND ||
+			xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_SANTONI ||
+			xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_PRADA) {
+			val->intval = 4100;
+			break;
+		}
+#endif
+		return -ENODATA;
 	default:
 		return -EINVAL;
 	}
