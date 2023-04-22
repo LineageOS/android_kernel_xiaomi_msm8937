@@ -1267,7 +1267,6 @@ static int fg_get_property(struct power_supply *psy, enum power_supply_property 
 	mutex_unlock(&bq->update_lock);
 	return 0;
 }
-static void fg_dump_registers(struct bq_fg_chip *bq);
 
 static int fg_set_property(struct power_supply *psy,
 				       enum power_supply_property prop,
@@ -1284,7 +1283,6 @@ static int fg_set_property(struct power_supply *psy,
 		power_supply_changed(bq->fg_psy);
 		break;
 	case POWER_SUPPLY_PROP_UPDATE_NOW:
-		fg_dump_registers(bq);
 		break;
 	default:
 		return -EINVAL;
@@ -1697,6 +1695,7 @@ static void fg_update_bqfs_workfunc(struct work_struct *work)
 		fg_update_bqfs(bq);
 }
 
+#if 0
 static void fg_dump_registers(struct bq_fg_chip *bq)
 {
 	int i;
@@ -1710,6 +1709,7 @@ static void fg_dump_registers(struct bq_fg_chip *bq)
 			pr_err("Reg[%02X] = 0x%04X\n", fg_dump_regs[i], val);
 	}
 }
+#endif
 
 static irqreturn_t fg_irq_thread(int irq, void *dev_id)
 {
@@ -1734,8 +1734,6 @@ static irqreturn_t fg_irq_thread(int irq, void *dev_id)
 	mutex_lock(&bq->update_lock);
 	fg_read_status(bq);
 	mutex_unlock(&bq->update_lock);
-
-	fg_dump_registers(bq);
 
 	pr_info("itpor=%d, cfg_mode = %d, seal_state=%d, batt_present=%d", 
 			bq->itpor, bq->cfg_update_mode, bq->seal_state, bq->batt_present);
