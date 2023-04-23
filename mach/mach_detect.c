@@ -7,7 +7,7 @@
 #include <xiaomi-msm8937/mach.h>
 
 typedef struct xiaomi_msm8937_mach_info {
-	int mach_family;
+	enum xiaomi_msm8937_mach_family_types mach_family;
 	const char *of_compatible;
 	const char *codename;
 	const char *product_name;
@@ -34,17 +34,17 @@ static const xiaomi_msm8937_mach_info_t xiaomi_msm8937_mach_table[XIAOMI_MSM8937
 #if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_WINGTECH)
 static char saved_wingtech_board_id[10];
 #endif
-static int saved_mach = XIAOMI_MSM8937_MACH_UNKNOWN;
+static enum xiaomi_msm8937_mach_types saved_mach = XIAOMI_MSM8937_MACH_UNKNOWN;
 static struct kobject *xiaomi_msm8937_mach_kobj;
 
-int xiaomi_msm8937_mach_get_family(void) {
+enum xiaomi_msm8937_mach_family_types xiaomi_msm8937_mach_get_family(void) {
 	if (!saved_mach)
 		return XIAOMI_MSM8937_MACH_FAMILY_UNKNOWN;
 	return xiaomi_msm8937_mach_table[saved_mach].mach_family;
 }
 EXPORT_SYMBOL(xiaomi_msm8937_mach_get_family);
 
-int xiaomi_msm8937_mach_get(void) {
+enum xiaomi_msm8937_mach_types xiaomi_msm8937_mach_get(void) {
 	return saved_mach;
 }
 EXPORT_SYMBOL(xiaomi_msm8937_mach_get);
