@@ -1,5 +1,6 @@
 /* From stock msm8917-pmi8937-qrd-sku5_S88503.dtsi */
 &i2c_5 {
+/*
 	cw2015: cw2015@62 {
 		compatible = "cellwise,cw2015";
 		reg = <0x62>;
@@ -33,9 +34,6 @@
 		qcom,using-pmic-therm;
 		qcom,bat-present-decidegc = <(300)>;
 		qcom,disable-apsd;
-/*
- * Below properties are used for enable JEITA
- */
 		qcom,hot-bat-decidegc = <600>;
 		qcom,warm-bat-decidegc = <450>;
 		qcom,cool-bat-decidegc = <100>;
@@ -50,6 +48,39 @@
 
 		qcom,battery-fcc = <3030>;
 		status = "ok";
+	};
+*/
+
+	/* Imported from old dts overlay */
+	smb358_otg_vreg: smb358-charger@57 {
+		compatible = "qcom,smb358-charger";
+		reg = <0x57>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <61 0x0>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&smb_int_default>;
+		qcom,irq-gpio = <&tlmm 61 0x0>;
+		qcom,float-voltage-mv = <4400>;
+		qcom,recharge-mv = <50>;
+		qcom,battery-data = <&qrd_batterydata>;
+		regulator-name = "smb358_otg_vreg";
+		qcom,bms-psy-name = "bms";
+		qcom,chg-inhibit-disabled;	
+		qcom,chg-vadc = <&pm8937_vadc>;
+		qcom,iterm-ma = <150>;
+		/* Optional Properties */
+		qcom,thermal-mitigation = <1500 1000 700 700>;
+		status = "ok";
+	};
+	cw2015: cw2015@62 {
+		compatible = "cellwise,cw2015";
+		reg = <0x62>;
+		vdd-supply = <&pm8937_l17>;
+		vcc_i2c-supply = <&pm8937_l5>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <86 8>;
+		qcom,battery-data = <&qrd_batterydata>;
+		cw2015,irq-gpio=<86>;
 	};
 };
 &qrd_batterydata {
