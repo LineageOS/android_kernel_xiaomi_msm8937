@@ -563,7 +563,7 @@ static struct gpio_leds_priv *gpio_leds_create(struct platform_device *pdev)
 }
 
 static const struct of_device_id of_gpio_leds_match[] = {
-	{ .compatible = "gpio-leds", },
+	{ .compatible = "gpio-leds-ir-mi8937", },
 	{},
 };
 
@@ -625,7 +625,7 @@ static struct platform_driver gpio_led_driver = {
 	.probe		= gpio_led_probe,
 	.shutdown	= gpio_led_shutdown,
 	.driver		= {
-		.name	= "leds-gpio",
+		.name	= "leds-gpio-ir-mi8937",
 		.of_match_table = of_gpio_leds_match,
 	},
 };
