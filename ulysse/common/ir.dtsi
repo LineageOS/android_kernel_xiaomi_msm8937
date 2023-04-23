@@ -1,7 +1,11 @@
 /* From stock msm8937-mtp.dtsi */
 &soc {
 	pwm_ir {
+#ifdef CONFIG_IR_PWM_MI8937
+		compatible = "pwm-ir-mi8937";
+#else
 		compatible = "pwm-ir";
+#endif
 		pwms = <&pm8937_pwm 0 0>;
 		qcom,test-gpios = <&pm8937_gpios 6 0>;
 		reg-id = "vdd";
