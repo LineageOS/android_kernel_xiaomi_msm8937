@@ -56,7 +56,7 @@
 
 #define WAKELOCK_HOLD_TIME 500
 
-#define GF_SPIDEV_NAME     "goodix,fingerprint"
+#define GF_SPIDEV_NAME     "goodix,fingerprint-ugg"
 #define GF_DEV_NAME            "goodix_fp"
 #define	GF_INPUT_NAME	    "uinput-gf"
 
@@ -838,7 +838,7 @@ static struct spi_driver gf_driver = {
 static struct platform_driver gf_driver = {
 #endif
 	.driver = {
-		.name = GF_DEV_NAME,
+		.name = GF_DEV_NAME "-ugg",
 		.owner = THIS_MODULE,
 		.of_match_table = gx_match_table,
 	},

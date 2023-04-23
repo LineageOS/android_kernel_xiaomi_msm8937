@@ -629,14 +629,14 @@ static int fpc1020_remove(struct platform_device *pdev)
 }
 
 static struct of_device_id fpc1020_of_match[] = {
-	{ .compatible = "fpc,fpc1020", },
+	{ .compatible = "fpc,fpc1020-ugg", },
 	{}
 };
 MODULE_DEVICE_TABLE(of, fpc1020_of_match);
 
 static struct platform_driver fpc1020_driver = {
 	.driver = {
-		.name	= "fpc1020",
+		.name	= "fpc1020-ugg",
 		.owner	= THIS_MODULE,
 		.of_match_table = fpc1020_of_match,
 	},
