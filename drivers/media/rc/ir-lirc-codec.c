@@ -19,8 +19,15 @@
 #include <media/lirc_dev.h>
 #include <media/rc-core.h>
 #include "rc-core-priv.h"
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
+#include <xiaomi-msm8937/mach.h>
+#endif
 
-#define LIRCBUF_SIZE 256
+#define LIRCBUF_SIZE_DEFAULT_VALUE 256
+static int lircbuf_size = LIRCBUF_SIZE_DEFAULT_VALUE;
+#define LIRCBUF_SIZE lircbuf_size
+
+static bool is_xiaomi_lirc = false;
 
 /**
  * ir_lirc_decode() - Send raw IR data to lirc_dev to be relayed to the
@@ -115,7 +122,9 @@ static ssize_t ir_lirc_transmit_ir(struct file *file, const char __user *buf,
 	unsigned int duration = 0; /* signal duration in us */
 	int i;
 
-	start = ktime_get();
+	if (!is_xiaomi_lirc) {
+		start = ktime_get();
+	}
 
 	lirc = lirc_get_pdata(file);
 	if (!lirc)
@@ -143,21 +152,25 @@ static ssize_t ir_lirc_transmit_ir(struct file *file, const char __user *buf,
 		goto out;
 	}
 
-	for (i = 0; i < count; i++) {
-		if (txbuf[i] > IR_MAX_DURATION / 1000 - duration || !txbuf[i]) {
-			ret = -EINVAL;
-			goto out;
-		}
+	if (!is_xiaomi_lirc) {
+		for (i = 0; i < count; i++) {
+			if (txbuf[i] > IR_MAX_DURATION / 1000 - duration || !txbuf[i]) {
+				ret = -EINVAL;
+				goto out;
+			}
 
-		duration += txbuf[i];
+			duration += txbuf[i];
+		}
 	}
 
 	ret = dev->tx_ir(dev, txbuf, count);
 	if (ret < 0)
 		goto out;
 
-	for (duration = i = 0; i < ret; i++)
-		duration += txbuf[i];
+	if (!is_xiaomi_lirc) {
+		for (duration = i = 0; i < ret; i++)
+			duration += txbuf[i];
+	}
 
 	ret *= sizeof(unsigned int);
 
@@ -166,10 +179,12 @@ static ssize_t ir_lirc_transmit_ir(struct file *file, const char __user *buf,
 	 * wait for the actual IR signal to be transmitted before
 	 * returning.
 	 */
-	towait = ktime_us_delta(ktime_add_us(start, duration), ktime_get());
-	if (towait > 0) {
-		set_current_state(TASK_INTERRUPTIBLE);
-		schedule_timeout(usecs_to_jiffies(towait));
+	if (!is_xiaomi_lirc) {
+		towait = ktime_us_delta(ktime_add_us(start, duration), ktime_get());
+		if (towait > 0) {
+			set_current_state(TASK_INTERRUPTIBLE);
+			schedule_timeout(usecs_to_jiffies(towait));
+		}
 	}
 
 out:
@@ -317,11 +332,34 @@ static long ir_lirc_ioctl(struct file *filep, unsigned int cmd,
 
 static int ir_lirc_open(void *data)
 {
+	if (is_xiaomi_lirc) {
+		struct lirc_codec *lirc = data;
+		struct rc_dev *dev = lirc->dev;
+		int ret = 0;
+
+		mutex_lock(&dev->lock);
+		if (!dev->open_count++ && dev->open)
+			ret = dev->open(dev);
+		if (ret < 0)
+			dev->open_count--;
+		mutex_unlock(&dev->lock);
+
+		return ret;
+	}
 	return 0;
 }
 
 static void ir_lirc_close(void *data)
 {
+	if (is_xiaomi_lirc) {
+		struct lirc_codec *lirc = data;
+		struct rc_dev *dev = lirc->dev;
+
+		mutex_lock(&dev->lock);
+		if (!--dev->open_count && dev->close)
+			dev->close(dev);
+		mutex_unlock(&dev->lock);
+	}
 	return;
 }
 
@@ -391,6 +429,8 @@ static int ir_lirc_register(struct rc_dev *dev)
 	drv->set_use_inc = &ir_lirc_open;
 	drv->set_use_dec = &ir_lirc_close;
 	drv->code_length = sizeof(struct ir_raw_event) * 8;
+	if (is_xiaomi_lirc)
+		drv->code_length = sizeof(int) * 8;
 	drv->fops = &lirc_fops;
 	drv->dev = &dev->dev;
 	drv->rdev = dev;
@@ -407,6 +447,8 @@ static int ir_lirc_register(struct rc_dev *dev)
 	return 0;
 
 lirc_register_failed:
+	if (is_xiaomi_lirc)
+		lirc_buffer_free(rbuf);
 rbuf_init_failed:
 	kfree(rbuf);
 rbuf_alloc_failed:
@@ -436,6 +478,14 @@ static struct ir_raw_handler lirc_handler = {
 
 static int __init ir_lirc_codec_init(void)
 {
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
+	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_PRADA ||
+		xiaomi_msm8937_mach_get_family() == XIAOMI_MSM8937_MACH_FAMILY_ULYSSE) {
+		is_xiaomi_lirc = true;
+		lircbuf_size = 1024;
+	}
+#endif
+
 	ir_raw_handler_register(&lirc_handler);
 
 	printk(KERN_INFO "IR LIRC bridge handler initialized\n");

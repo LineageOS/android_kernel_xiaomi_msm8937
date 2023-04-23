@@ -24,6 +24,10 @@
 #include <linux/module.h>
 #include "rc-core-priv.h"
 
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
+#include <xiaomi-msm8937/mach.h>
+#endif
+
 /* Sizes are in bytes, 256 bytes allows for 32 entries on x64 */
 #define IR_TAB_MIN_SIZE	256
 #define IR_TAB_MAX_SIZE	8192
@@ -745,7 +749,25 @@ EXPORT_SYMBOL_GPL(rc_open);
 
 static int ir_open(struct input_dev *idev)
 {
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
+	int rc = 0;
+#endif
 	struct rc_dev *rdev = input_get_drvdata(idev);
+
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
+	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_PRADA ||
+		xiaomi_msm8937_mach_get_family() == XIAOMI_MSM8937_MACH_FAMILY_ULYSSE) {
+
+		mutex_lock(&rdev->lock);
+		if (!rdev->open_count++)
+			rc = rdev->open(rdev);
+		if (rc < 0)
+			rdev->open_count--;
+		mutex_unlock(&rdev->lock);
+
+		return rc;
+	}
+#endif
 
 	return rc_open(rdev);
 }
@@ -766,6 +788,18 @@ EXPORT_SYMBOL_GPL(rc_close);
 static void ir_close(struct input_dev *idev)
 {
 	struct rc_dev *rdev = input_get_drvdata(idev);
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
+	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_PRADA ||
+		xiaomi_msm8937_mach_get_family() == XIAOMI_MSM8937_MACH_FAMILY_ULYSSE) {
+		if (rdev) {
+			mutex_lock(&rdev->lock);
+			if (!--rdev->open_count)
+				rdev->close(rdev);
+			mutex_unlock(&rdev->lock);
+		}
+		return;
+	}
+#endif
 	rc_close(rdev);
 }
 

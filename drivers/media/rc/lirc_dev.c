@@ -41,6 +41,10 @@
 #include <media/lirc.h>
 #include <media/lirc_dev.h>
 
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
+#include <xiaomi-msm8937/mach.h>
+#endif
+
 static bool debug;
 
 #define IRCTL_DEV_NAME	"BaseRemoteCtl"
@@ -206,6 +210,12 @@ static int lirc_allocate_buffer(struct irctl *ir)
 
 	bytes_in_key = BITS_TO_LONGS(d->code_length) +
 						(d->code_length % 8 ? 1 : 0);
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
+	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_PRADA ||
+		xiaomi_msm8937_mach_get_family() == XIAOMI_MSM8937_MACH_FAMILY_ULYSSE) {
+		bytes_in_key = (d->code_length + 7)/8;
+	}
+#endif
 	buffer_size = d->buffer_size ? d->buffer_size : BUFLEN / bytes_in_key;
 	chunk_size  = d->chunk_size  ? d->chunk_size  : bytes_in_key;
 
