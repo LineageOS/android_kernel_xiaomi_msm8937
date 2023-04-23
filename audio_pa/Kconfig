@@ -1,0 +1,4 @@
+menu "Audio Power Amplifier"
+	depends on SND_SOC
+
+endmenu
