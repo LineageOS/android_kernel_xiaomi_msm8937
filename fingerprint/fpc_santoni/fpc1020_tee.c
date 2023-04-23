@@ -621,14 +621,14 @@ static const struct dev_pm_ops fpc1020_pm_ops = {
 #endif
 
 static struct of_device_id fpc1020_of_match[] = {
-	{ .compatible = "soc:fpc1020", },
+	{ .compatible = "soc:fpc1020-santoni", },
 	{}
 };
 MODULE_DEVICE_TABLE(of, fpc1020_of_match);
 
 static struct platform_driver fpc1020_driver = {
 	.driver = {
-		.name	= "fpc1020",
+		.name	= "fpc1020-santoni",
 		.owner	= THIS_MODULE,
 		.of_match_table = fpc1020_of_match,
 #ifdef LINUX_CONTROL_SPI_CLK

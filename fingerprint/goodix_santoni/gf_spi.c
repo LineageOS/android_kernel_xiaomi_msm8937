@@ -55,7 +55,7 @@
 #include <linux/platform_device.h>
 #endif
 
-#define GF_SPIDEV_NAME		"goodix,fingerprint"
+#define GF_SPIDEV_NAME		"goodix,fingerprint-santoni"
 
 #define GF_DEV_NAME		"goodix_fp"
 #define GF_INPUT_NAME		"gf3208"
@@ -827,7 +827,7 @@ static struct spi_driver gf_driver = {
 static struct platform_driver gf_driver = {
 #endif
 	.driver = {
-		.name = GF_DEV_NAME,
+		.name = GF_DEV_NAME "-santoni",
 		.owner = THIS_MODULE,
 #if defined(USE_SPI_BUS)
 
