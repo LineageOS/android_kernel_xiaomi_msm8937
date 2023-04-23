@@ -451,7 +451,7 @@ static void __exit aw87319_pa_exit(void) {
 }
 
 
-subsys_initcall(aw87319_pa_init);
+module_init(aw87319_pa_init);
 module_exit(aw87319_pa_exit);
 
 MODULE_AUTHOR("<liweilei@awinic.com.cn>");
