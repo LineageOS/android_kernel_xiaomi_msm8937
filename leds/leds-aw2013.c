@@ -625,7 +625,7 @@ static const struct i2c_device_id aw2013_led_id[] = {
 MODULE_DEVICE_TABLE(i2c, aw2013_led_id);
 
 static struct of_device_id aw2013_match_table[] = {
-	{ .compatible = "awinic,aw2013",},
+	{ .compatible = "awinic,aw2013-mi8937",},
 	{ },
 };
 
@@ -633,7 +633,7 @@ static struct i2c_driver aw2013_led_driver = {
 	.probe = aw2013_led_probe,
 	.remove = aw2013_led_remove,
 	.driver = {
-		.name = "aw2013_led",
+		.name = "aw2013_led-mi8937",
 		.owner = THIS_MODULE,
 		.of_match_table = of_match_ptr(aw2013_match_table),
 	},

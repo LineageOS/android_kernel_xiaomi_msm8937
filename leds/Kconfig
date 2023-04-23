@@ -1,7 +1,7 @@
 menu "LED"
 	depends on NEW_LEDS
 
-config LEDS_AW2013
+config LEDS_AW2013_MI8937
 	tristate "LED support for AW2013"
 	depends on LEDS_CLASS && I2C
 	help
