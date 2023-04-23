@@ -47,7 +47,7 @@ struct pm_qos_request infrared_qos_req;
 struct gpio_ir_tx_packet {
 	struct completion done;
 	struct hrtimer    timer;
-	unsigned int      gpio_nr;
+	struct gpio_desc *gpiod_nr;
 	bool              high_active;
 	u32               pulse;
 	u32               space;
@@ -125,9 +125,9 @@ static int gpio_blink_set(struct led_classdev *led_cdev,
 static void gpio_ir_tx_set(struct gpio_ir_tx_packet *gpkt, bool on)
 {
 	if (gpkt->high_active)
-		gpio_set_value(gpkt->gpio_nr, on);
+		gpiod_set_value(gpkt->gpiod_nr, on);
 	else
-		gpio_set_value(gpkt->gpio_nr, !on);
+		gpiod_set_value(gpkt->gpiod_nr, !on);
 }
 
 #if defined(USE_HRTIMER_SIMULATION)
@@ -376,7 +376,7 @@ static ssize_t transmit_store(struct device *dev,
 	gpkt.pulse = period * DUTY_CLCLE / 100;
 	gpkt.space = period - gpkt.pulse;
 
-	gpkt.gpio_nr	 = desc_to_gpio(led_dat->gpiod);
+	gpkt.gpiod_nr	 = led_dat->gpiod;
 	gpkt.high_active = 1/*gdata->tx_high_active*/;
 	gpkt.buffer 	 = (unsigned int *)&temp_buf[1];
 	gpkt.length 	 = ((int)count/4 - 1);
@@ -386,7 +386,7 @@ static ssize_t transmit_store(struct device *dev,
 	rc = gpio_ir_tx_transmit_with_timer(&gpkt);
 #else
 	if (gpkt.high_active) {
-		gpio_direction_output(gpkt.gpio_nr, 0);
+		gpiod_direction_output(gpkt.gpiod_nr, 0);
 	}
 	rc = gpio_ir_tx_transmit_with_delay(&gpkt);
 #endif
