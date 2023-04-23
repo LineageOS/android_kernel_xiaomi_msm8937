@@ -14,6 +14,7 @@ source "techpack/xiaomi-msm8937/leds/Kconfig"
 source "techpack/xiaomi-msm8937/power_supply/Kconfig"
 source "techpack/xiaomi-msm8937/regulator/Kconfig"
 source "techpack/xiaomi-msm8937/touchscreen/Kconfig"
+source "techpack/xiaomi-msm8937/vibrator/Kconfig"
 
 endif # MACH_XIAOMI_MSM8937
 
