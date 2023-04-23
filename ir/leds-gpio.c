@@ -84,7 +84,7 @@ static void gpio_led_set(struct led_classdev *led_cdev,
 	struct gpio_led_data *led_dat = cdev_to_gpio_led_data(led_cdev);
 	int level;
 
-	printk("infr has been start");
+	pr_debug("infr has been start\n");
 
 	if (value == LED_OFF)
 		level = 0;
@@ -102,7 +102,7 @@ static void gpio_led_set(struct led_classdev *led_cdev,
 			gpiod_set_value(led_dat->gpiod, level);
 	}
 
-	printk("infr has been end");
+	pr_debug("infr has been end\n");
 }
 
 static int gpio_led_set_blocking(struct led_classdev *led_cdev,
@@ -215,7 +215,7 @@ static int gpio_ir_tx_transmit_with_timer(struct gpio_ir_tx_packet *gpkt)
 		for (i = 0; i < JUSTTIMES; i++) {
 			adjust_dealt = hrtime_adjust(gpkt);
 		}
-		printk("infrared time_adjust fail!! adjust_dealt=%lld\n", adjust_dealt);
+		pr_err("infrared time_adjust fail!! adjust_dealt=%lld\n", adjust_dealt);
 		if (adjust_dealt > HRTIME_JUST_DELAY)
 			adjust_dealt = HRTIME_JUST_DELAY;
 	}
@@ -229,7 +229,7 @@ static int gpio_ir_tx_transmit_with_timer(struct gpio_ir_tx_packet *gpkt)
 	hrtimer = hrtimer_is_hres_active(&gpkt->timer);
 
 	if (!hrtimer) {
-		printk("unable to use High-Resolution timer\n");
+		pr_err("unable to use High-Resolution timer\n");
 	}
 
 	hrtimer_start(&gpkt->timer, ns_to_ktime(0), HRTIMER_MODE_REL_PINNED);
@@ -315,7 +315,7 @@ static int gpio_ir_tx_transmit_with_delay(struct gpio_ir_tx_packet *gpkt)
 	while (try_again && (dealt > JUST_DELAY)) {
 		try_again--;
 		dealt = time_adjust(gpkt);
-		printk("jeft time_adjust again!! dealt=%lld\n", dealt);
+		pr_debug("jeft time_adjust again!! dealt=%lld\n", dealt);
 	}
 
 	if (dealt > JUST_DELAY)
@@ -342,7 +342,7 @@ static int gpio_ir_tx_transmit_with_delay(struct gpio_ir_tx_packet *gpkt)
 	return rc;
 
 out:
-	printk("jeft cpu too low infrared send fail dealt =%lld\n", dealt);
+	pr_err("jeft cpu too low infrared send fail dealt =%lld\n", dealt);
 	return rc;
 }
 #endif
