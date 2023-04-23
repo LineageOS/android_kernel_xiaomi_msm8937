@@ -232,6 +232,8 @@ static int msm_cdc_pinctrl_probe(struct platform_device *pdev)
 	if (!gpio_data)
 		return -ENOMEM;
 
+	dev_info(&pdev->dev, "Probe\n");
+
 	gpio_data->pinctrl = devm_pinctrl_get(&pdev->dev);
 	if (IS_ERR_OR_NULL(gpio_data->pinctrl)) {
 		dev_err(&pdev->dev, "%s: Cannot get cdc gpio pinctrl:%ld\n",
