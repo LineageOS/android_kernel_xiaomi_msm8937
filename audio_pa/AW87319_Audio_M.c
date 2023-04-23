@@ -30,7 +30,6 @@
 #include <linux/gameport.h>
 #include <linux/moduleparam.h>
 #include <linux/mutex.h>
-#include <linux/wakelock.h>
 
 
 #define AW87319_I2C_NAME	"AW87319_PA"
