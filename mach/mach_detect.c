@@ -15,36 +15,20 @@ typedef struct xiaomi_msm8937_mach_info {
 
 static const xiaomi_msm8937_mach_info_t xiaomi_msm8937_mach_table[XIAOMI_MSM8937_MACH_MAX] = {
 	// No Family
-#if IS_ENABLED(CONFIG_MACH_XIAOMI_PRADA)
 	[XIAOMI_MSM8937_MACH_PRADA] = {XIAOMI_MSM8937_MACH_FAMILY_UNKNOWN, "xiaomi,prada", "prada", "Redmi 4 (Standard)"},
-#endif
 
 	// Family ULYSSE
-#if IS_ENABLED(CONFIG_MACH_XIAOMI_UGG)
 	[XIAOMI_MSM8937_MACH_UGG] = {XIAOMI_MSM8937_MACH_FAMILY_ULYSSE, "xiaomi,ugg", "ugg", "Redmi Note 5A / Y1 Prime"},
-#endif
-#if IS_ENABLED(CONFIG_MACH_XIAOMI_UGGLITE)
 	[XIAOMI_MSM8937_MACH_UGGLITE] = {XIAOMI_MSM8937_MACH_FAMILY_ULYSSE, "xiaomi,ugglite", "ugglite", "Redmi Note 5A / Y1 Lite"},
-#endif
 
 	// Family WINGTECH (MSM8917)
-#if IS_ENABLED(CONFIG_MACH_XIAOMI_RIVA)
 	[XIAOMI_MSM8937_MACH_RIVA] = {XIAOMI_MSM8937_MACH_FAMILY_WINGTECH, "xiaomi,riva", "riva", "Redmi 5A"},
-#endif
-#if IS_ENABLED(CONFIG_MACH_XIAOMI_ROLEX)
 	[XIAOMI_MSM8937_MACH_ROLEX] = {XIAOMI_MSM8937_MACH_FAMILY_WINGTECH, "xiaomi,rolex", "rolex", "Redmi 4A"},
-#endif
-#if IS_ENABLED(CONFIG_MACH_XIAOMI_TIARE)
 	[XIAOMI_MSM8937_MACH_TIARE] = {XIAOMI_MSM8937_MACH_FAMILY_WINGTECH, "xiaomi,tiare", "tiare", "Redmi Go"},
-#endif
 
 	// Family WINGTECH (MSM8937 / MSM8940)
-#if IS_ENABLED(CONFIG_MACH_XIAOMI_LAND)
 	[XIAOMI_MSM8937_MACH_LAND] = {XIAOMI_MSM8937_MACH_FAMILY_WINGTECH, "xiaomi,land", "land", "Redmi 3S / 3X"},
-#endif
-#if IS_ENABLED(CONFIG_MACH_XIAOMI_SANTONI)
 	[XIAOMI_MSM8937_MACH_SANTONI] = {XIAOMI_MSM8937_MACH_FAMILY_WINGTECH, "xiaomi,santoni", "santoni", "Redmi 4 (India) / 4X"},
-#endif
 };
 
 #if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_WINGTECH)
@@ -113,6 +97,7 @@ static struct kobj_attribute xiaomi_msm8937_mach_product_name_attr = {
 	.show = xiaomi_msm8937_mach_product_name_show,
 };
 
+/*
 static ssize_t xiaomi_msm8937_mach_supported_machines_show(struct kobject *kobj,
 							struct kobj_attribute *attr, char *buf)
 {
@@ -134,6 +119,7 @@ static struct kobj_attribute xiaomi_msm8937_mach_supported_machines_attr = {
 	},
 	.show = xiaomi_msm8937_mach_supported_machines_show,
 };
+*/
 
 #if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_WINGTECH)
 static ssize_t xiaomi_msm8937_mach_wingtech_board_id_show(struct kobject *kobj,
@@ -198,10 +184,12 @@ static int __init xiaomi_msm8937_mach_detect_init(void) {
 	if (rc < 0)
 		pr_err("%s: Failed to create sysfs file product_name, rc=%d\n", __func__, rc);
 
+/*
 	rc = sysfs_create_file(xiaomi_msm8937_mach_kobj,
 			&xiaomi_msm8937_mach_supported_machines_attr.attr);
 	if (rc < 0)
 		pr_err("%s: Failed to create sysfs file supported_machines, rc=%d\n", __func__, rc);
+*/
 
 #if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_WINGTECH)
 	if (saved_wingtech_board_id[0]) {
