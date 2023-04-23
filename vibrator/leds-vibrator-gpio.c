@@ -298,7 +298,7 @@ static int vibrator_gpio_remove(struct platform_device *pdev)
 }
 
 static  struct of_device_id vibrator_gpio_machine_of_match[]  = {
-	{ .compatible = "qcom,vibrator-gpio", },
+	{ .compatible = "qcom,vibrator-gpio-mi8937", },
 	{},
 };
 MODULE_DEVICE_TABLE(of, vibrator_gpio_machine_of_match);
@@ -307,7 +307,7 @@ static struct platform_driver vibrator_gpio_driver = {
 	.probe = vibrator_gpio_probe,
 	.remove = vibrator_gpio_remove,
 	.driver = {
-		.name = "vibrator_gpio",
+		.name = "vibrator_gpio-mi8937",
 		.of_match_table = vibrator_gpio_machine_of_match,
 		.pm	= &vibrator_gpio_pm_ops,
 	},
