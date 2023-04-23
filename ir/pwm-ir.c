@@ -262,6 +262,9 @@ static int __devinit pwm_ir_tx_probe(struct pwm_ir_dev *dev)
 	dev->rdev->s_tx_carrier    = pwm_ir_tx_carrier;
 	dev->rdev->s_tx_duty_cycle = pwm_ir_tx_duty_cycle;
 
+	pwm_enable(dev->pwm);
+	pwm_disable(dev->pwm);
+
 	return rc;
 
 err_pwm_free:
