@@ -44,7 +44,6 @@
 #include <linux/regulator/consumer.h>
 #include <soc/qcom/scm.h>
 #include <linux/platform_device.h>
-#include <linux/hardware_info.h>
 
 #define FPC1020_RESET_LOW_US 1000
 #define FPC1020_RESET_HIGH1_US 100
@@ -85,7 +84,7 @@ struct fpc1020_data {
 	bool clocks_suspended;
 #endif
 };
-char boardid_info_fingerprint[HARDWARE_MAX_ITEM_LONGTH] = {0,};
+static char boardid_info_fingerprint[64] = {0,};
 static irqreturn_t fpc1020_irq_handler(int irq, void *handle);
 static int fpc1020_request_named_gpio(struct fpc1020_data *fpc1020,
 		const char *label, int *gpio);
