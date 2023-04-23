@@ -28,6 +28,7 @@
 #include <linux/pci.h>
 #include <linux/dma-mapping.h>
 #include <linux/gameport.h>
+#include <linux/module.h>
 #include <linux/moduleparam.h>
 #include <linux/mutex.h>
 
