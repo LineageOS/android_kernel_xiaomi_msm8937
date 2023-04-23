@@ -14,7 +14,7 @@
 #ifndef __PWM_IR_H__
 #define __PWM_IR_H__
 
-#define PWM_IR_NAME	"pwm-ir"
+#define PWM_IR_NAME	"pwm-ir-mi8937"
 
 struct pwm_ir_data {
 	const char  *reg_id;

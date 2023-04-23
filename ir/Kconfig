@@ -11,7 +11,7 @@ config LEDS_GPIO_IR_MI8937
 	  defined as platform devices and/or OpenFirmware platform devices.
 	  The code to use these bindings can be selected below.
 
-config IR_PWM
+config IR_PWM_MI8937
 	tristate "PWM IR remote control"
 	depends on RC_CORE
 	---help---
