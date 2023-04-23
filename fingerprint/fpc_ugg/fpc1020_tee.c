@@ -37,7 +37,12 @@
 #include <linux/platform_device.h>
 #include <linux/regulator/consumer.h>
 #include <linux/proc_fs.h>
-
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
+#include <xiaomi-msm8937/mach.h>
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_UGG)
+#include <xiaomi-msm8937/ugg_fpsensor.h>
+#endif
+#endif
 
 #define FPC_TTW_HOLD_TIME 1000
 
@@ -53,7 +58,6 @@
 #define NUM_PARAMS_REG_ENABLE_SET 2
 #define PROC_NAME  "hwinfo"
 static struct proc_dir_entry *proc_entry;
-extern int fpsensor;
 
 static struct kernfs_node *soc_symlink = NULL;
 
@@ -463,25 +467,28 @@ static int fpc1020_probe(struct platform_device *pdev)
 	size_t i;
 	int irqf;
 	struct device_node *np = dev->of_node;
-	struct fpc1020_data *fpc1020 = devm_kzalloc(dev, sizeof(*fpc1020),
-			GFP_KERNEL);
+	struct fpc1020_data *fpc1020;
 
 	struct device *platform_dev;
 	struct kobject *soc_kobj;
 	struct kernfs_node *devices_node, *soc_node;
 
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_UGG)
+	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_UGG) {
+		if (xiaomi_ugg_fpsensor_variant != XIAOMI_UGG_FPSENSOR_FPC) {
+			dev_err(dev, "Xiaomi UGG fingerprint sensor variant is not FPC, Abort probe\n");
+			return -ENODEV;
+		}
+	}
+#endif
+
+	fpc1020 = devm_kzalloc(dev, sizeof(*fpc1020), GFP_KERNEL);
 	if (!fpc1020) {
 		dev_err(dev,
 			"failed to allocate memory for struct fpc1020_data\n");
 		rc = -ENOMEM;
 		goto exit;
 	}
-
-	if(fpsensor != 1) {
-				pr_err("Macle fpc1020_probe failed as fpsensor=%d(1=fp)\n", fpsensor);
-				return -1;
-		 }
-
 
 	fpc1020->dev = dev;
 	platform_set_drvdata(pdev, fpc1020);

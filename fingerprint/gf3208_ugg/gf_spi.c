@@ -42,6 +42,12 @@
 #include <linux/cpufreq.h>
 #include <linux/proc_fs.h>
 #include "gf_spi.h"
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
+#include <xiaomi-msm8937/mach.h>
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_UGG)
+#include <xiaomi-msm8937/ugg_fpsensor.h>
+#endif
+#endif
 
 #if defined(USE_SPI_BUS)
 #include <linux/spi/spi.h>
@@ -74,7 +80,6 @@ static DEFINE_MUTEX(device_list_lock);
 static struct wakeup_source fp_wakelock;
 static struct gf_dev gf;
 
-extern int fpsensor;
 static struct proc_dir_entry *proc_entry;
 struct gf_key_map maps[] = {
 	{ EV_KEY, KEY_HOME },
@@ -850,11 +855,14 @@ static int __init gf_init(void)
 {
 	int status;
 
-	   if(fpsensor != 2) {
-				pr_err("Macle gf_init failed as fpsensor=%d(2=gx)\n", fpsensor);
-				return -1;
-		 }
-
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_UGG)
+	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_UGG) {
+		if (xiaomi_ugg_fpsensor_variant != XIAOMI_UGG_FPSENSOR_GOODIX) {
+			pr_err("%s: Xiaomi UGG fingerprint sensor variant is not GOODIX, Abort init\n", __func__);
+			return -ENODEV;
+		}
+	}
+#endif
 
 	BUILD_BUG_ON(N_SPI_MINORS > 256);
 	status = register_chrdev(SPIDEV_MAJOR, CHRD_DRIVER_NAME, &gf_fops);
