@@ -2,7 +2,11 @@
 &soc {
 	fpc1020 {
 		status = "ok";
+#ifdef CONFIG_FINGERPRINT_FPC1020_UGG
+		compatible = "fpc,fpc1020-ugg";
+#else
 		compatible = "fpc,fpc1020";
+#endif
 		interrupt-parent = <&tlmm>;
 		interrupts = <124 0x0>;
 		fpc,gpio_rst    = <&tlmm 132 0x0>;
@@ -20,7 +24,11 @@
 		pinctrl-2 = <&msm_gpio_124>;
 	};
 	goodix_fp {
+#ifdef CONFIG_FINGERPRINT_GF3208_UGG
+		compatible = "goodix,fingerprint-ugg";
+#else
 		compatible = "goodix,fingerprint";
+#endif
 		interrupt-parent = <&tlmm>;
 		interrupt = <124 0x0>;
 		vcc_spi_supply = <&pm8937_l6>;
