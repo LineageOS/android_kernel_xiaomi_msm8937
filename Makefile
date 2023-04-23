@@ -2,6 +2,7 @@ ifeq ($(CONFIG_MACH_XIAOMI_MSM8937),y)
 obj-$(CONFIG_MACH_XIAOMI_MSM8937) += mach/
 
 obj-y += fingerprint/
+obj-y += ir/
 obj-$(CONFIG_NEW_LEDS) += leds/
 obj-$(CONFIG_POWER_SUPPLY) += power_supply/
 obj-$(CONFIG_REGULATOR) += regulator/
