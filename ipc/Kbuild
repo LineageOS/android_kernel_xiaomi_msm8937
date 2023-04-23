@@ -32,7 +32,7 @@ endif
 KDIR := $(TOP)/kernel/msm-$(TARGET_KERNEL_VERSION)
 
 ifeq ($(KERNEL_BUILD), 1)
-	AUDIO_ROOT := $(KDIR)/techpack/audio
+	AUDIO_ROOT := $(KDIR)/techpack/audio-legacy
 endif
 
 ifeq ($(KERNEL_BUILD), 0)
