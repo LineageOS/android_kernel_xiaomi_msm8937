@@ -11,6 +11,15 @@ config LEDS_GPIO_IR_MI8937
 	  defined as platform devices and/or OpenFirmware platform devices.
 	  The code to use these bindings can be selected below.
 
+config IR_PWM
+	tristate "PWM IR remote control"
+	depends on RC_CORE
+	---help---
+	   Say Y if you want to use PWM based IR.
+
+	   To compile this driver as a module, choose M here: the module will
+	   be called pwm-ir.
+
 config SPI_SPIDEV_IR_MI8937
 	tristate "User mode SPI IR device driver support"
 	depends on SPI
