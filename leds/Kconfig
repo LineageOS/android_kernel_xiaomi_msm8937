@@ -1,0 +1,4 @@
+menu "LED"
+	depends on NEW_LEDS
+
+endmenu
