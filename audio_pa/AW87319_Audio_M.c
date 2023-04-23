@@ -33,7 +33,7 @@
 #include <linux/mutex.h>
 
 
-#define AW87319_I2C_NAME	"AW87319_PA"
+#define AW87319_I2C_NAME	"AW87319_PA-mi8937"
 #define AW87319_I2C_BUS		0
 #define AW87319_I2C_ADDR	0x58
 
@@ -418,7 +418,7 @@ static const struct i2c_device_id aw87319_i2c_id[] = {
 
 
 static const struct of_device_id extpa_of_match[] = {
-	{.compatible = "awinic,aw87319_pa"},
+	{.compatible = "awinic,aw87319_pa-mi8937"},
 	{},
 };
 

@@ -35,7 +35,7 @@
 /*******************************************************************************
  * aw87329 marco
  ******************************************************************************/
-#define AW87329_I2C_NAME    "aw87329_pa"
+#define AW87329_I2C_NAME    "aw87329_pa-mi8937"
 
 #define AW87329_DRIVER_VERSION  "v1.1.1"
 
@@ -826,7 +826,7 @@ static const struct i2c_device_id aw87329_i2c_id[] = {
 
 
 static const struct of_device_id extpa_of_match[] = {
-    {.compatible = "awinic,aw87329_pa"},
+    {.compatible = "awinic,aw87329_pa-mi8937"},
     {},
 };
 
