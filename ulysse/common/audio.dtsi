@@ -32,3 +32,8 @@
 		"PDM_IN_RX2", "PDM_OUT_RX2",
 		"PDM_IN_RX3", "PDM_OUT_RX3";
 };
+
+/* Custom */
+&cdc_quin_mi2s_gpios {
+	status = "disabled";
+};
