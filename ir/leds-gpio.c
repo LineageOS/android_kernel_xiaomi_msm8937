@@ -21,7 +21,6 @@
 #include <linux/platform_device.h>
 #include <linux/property.h>
 #include <linux/slab.h>
-#include <linux/regulator/consumer.h>
 
 #include <linux/delay.h>
 #include <linux/hrtimer.h>
@@ -491,7 +490,6 @@ static int create_gpio_led(const struct gpio_led *template,
 
 struct gpio_leds_priv {
 	int num_leds;
-	struct regulator *vdd_ldo_1, *vdd_ldo_2;
 	struct gpio_led_data leds[];
 };
 
@@ -506,7 +504,7 @@ static struct gpio_leds_priv *gpio_leds_create(struct platform_device *pdev)
 	struct device *dev = &pdev->dev;
 	struct fwnode_handle *child;
 	struct gpio_leds_priv *priv;
-	int count, ret, error;
+	int count, ret;
 	count = device_get_child_node_count(dev);
 	if (!count)
 		return ERR_PTR(-ENODEV);
@@ -560,28 +558,6 @@ static struct gpio_leds_priv *gpio_leds_create(struct platform_device *pdev)
 		}
 		led_dat->cdev.dev->of_node = np;
 		priv->num_leds++;
-	}
-	priv->vdd_ldo_1 = regulator_get(&pdev->dev, "vdd_ldo_1");
-	if (IS_ERR(priv->vdd_ldo_1)) {
-		error = PTR_ERR(priv->vdd_ldo_1);
-		pr_err("%s: regulator get failed vdd_ldo_1 rc=%d\n",
-			__func__, error);
-	}
-	ret = regulator_enable(priv->vdd_ldo_1);
-	if (ret) {
-		pr_err("%s: Regulator vdd_ldo_1 enable failed rc=%d\n",
-			__func__, ret);
-	}
-	priv->vdd_ldo_2 = regulator_get(&pdev->dev, "vdd_ldo_2");
-	if (IS_ERR(priv->vdd_ldo_2)) {
-		error = PTR_ERR(priv->vdd_ldo_2);
-		pr_err("%s: regulator get failed vdd_ldo_2 rc=%d\n",
-			__func__, error);
-	}
-	ret = regulator_enable(priv->vdd_ldo_2);
-	if (ret) {
-		pr_err("%s: Regulator vdd_ldo_2 enable failed rc=%d\n",
-			__func__, ret);
 	}
 	return priv;
 }
@@ -644,49 +620,6 @@ static void gpio_led_shutdown(struct platform_device *pdev)
 	}
 }
 
-static int gpio_led_suspend(struct platform_device *pdev, pm_message_t message)
-{
-	int ret;
-	struct gpio_leds_priv *priv = platform_get_drvdata(pdev);
-
-	if (priv->vdd_ldo_1) {
-		ret = regulator_disable(priv->vdd_ldo_1);
-		if (ret) {
-			pr_err("%s: Regulator vdd_ldo_1 disable failed rc=%d\n",
-				__func__, ret);
-			return ret;
-		}
-	}
-	if (priv->vdd_ldo_2) {
-		ret = regulator_disable(priv->vdd_ldo_2);
-		if (ret) {
-			pr_err("%s: Regulator vdd_ldo_2 disable failed rc=%d\n",
-				__func__, ret);
-			return ret;
-		}
-	}
-	return 0;
-}
-
-static int gpio_led_resume(struct platform_device *pdev)
-{
-	int ret;
-	struct gpio_leds_priv *priv = platform_get_drvdata(pdev);
-
-	ret = regulator_enable(priv->vdd_ldo_1);
-	if (ret) {
-		pr_err("%s: Regulator vdd_ldo_1 enable failed rc=%d\n",
-			__func__, ret);
-		return ret;
-	}
-	ret = regulator_enable(priv->vdd_ldo_2);
-	if (ret) {
-		pr_err("%s: Regulator vdd_ldo_2 enable failed rc=%d\n",
-			__func__, ret);
-		return ret;
-	}
-	return 0;
-}
 
 static struct platform_driver gpio_led_driver = {
 	.probe		= gpio_led_probe,
@@ -695,8 +628,6 @@ static struct platform_driver gpio_led_driver = {
 		.name	= "leds-gpio",
 		.of_match_table = of_gpio_leds_match,
 	},
-	.suspend = gpio_led_suspend,
-	.resume = gpio_led_resume,
 };
 
 module_platform_driver(gpio_led_driver);
