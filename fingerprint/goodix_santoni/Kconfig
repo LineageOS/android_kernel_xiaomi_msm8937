@@ -1,5 +1,4 @@
 config FINGERPRINT_GOODIX_GF3208_SANTONI
 	tristate "Goodix GF3208 fingerprint drvier support (santoni)"
-	depends on FINGERPRINT
 	help
 	  Say Y here to enable goodix fingerprint driver support!
