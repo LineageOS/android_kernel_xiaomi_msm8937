@@ -1648,6 +1648,20 @@ static void *def_msm8952_wcd_mbhc_cal(void)
 			btn_low[3] = 500;
 			btn_high[3] = 500;
 			break;
+		case XIAOMI_MSM8937_MACH_LAND:
+		case XIAOMI_MSM8937_MACH_RIVA:
+		case XIAOMI_MSM8937_MACH_ROLEX:
+		case XIAOMI_MSM8937_MACH_SANTONI:
+		case XIAOMI_MSM8937_MACH_TIARE:
+			btn_low[0] = 25;
+			btn_low[1] = 200;
+			btn_high[1] = 225;
+			btn_low[2] = 325;
+			btn_high[2] = 450;
+			btn_low[3] = 500;
+			btn_high[3] = 510;
+			btn_low[4] = 530;
+			btn_high[4] = 540;
 		default:
 			break;
 	}
