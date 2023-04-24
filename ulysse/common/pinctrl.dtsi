@@ -53,6 +53,7 @@
 		};
 	};
 
+#ifndef MI8937_V2
 	pmx_spk_ext_pa_active {
 		spk_ext_pa_active: spk_ext_pa_active {
 			mux {
@@ -83,6 +84,7 @@
 			};
 		};
 	};
+#endif
 };
 &mdss_dsi_active {
 	mux {

@@ -4,10 +4,9 @@
 	qcom,msm-mbhc-hphl-swh = <1>;
 	qcom,msm-mbhc-gnd-swh = <1>;
 	qcom,msm-micbias2-ext-cap;
+#ifndef MI8937_V2
 	qcom,smg3711-enable-gpio = <&tlmm 25 0>;
 	qcom,smg3711-in-gpio = <&tlmm 16 0>;
-
-#ifndef MI8937_V2
 	qcom,spk_ext_pa = <&tlmm 1 0>;
 #endif
 	/* WARNING: Override
@@ -39,3 +38,8 @@
 &cdc_quin_mi2s_gpios {
 	status = "disabled";
 };
+#ifdef MI8937_V2
+#include "../../common/include/msm-cdc-pinctrl.h"
+MSM_CDC_PINCTRL_PA_GPIO_DOUBLE_PINS(hph, gpio16, gpio25)
+MSM_CDC_PINCTRL_PA_GPIO_SINGLE_PIN(spk, gpio1)
+#endif

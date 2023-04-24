@@ -1,3 +1,9 @@
+/* Custom */
+#ifdef MI8937_V2
+#include "../../../common/include/msm-cdc-pinctrl.h"
+MSM_CDC_PINCTRL_PA_GPIO_SINGLE_PIN(spk, gpio124)
+#endif
+
 /* From stock msm-audio.dtsi */
 &int_codec {
 #ifndef MI8937_V2
