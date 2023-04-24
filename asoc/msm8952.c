@@ -23,6 +23,9 @@
 #include <asoc/msm-cdc-pinctrl.h>
 #include "msm8952.h"
 #include "msm-pcm-voice-v2.h"
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
+#include <xiaomi-msm8937/mach.h>
+#endif
 
 #define DRV_NAME "msm8952-asoc-wcd"
 
@@ -1631,6 +1634,24 @@ static void *def_msm8952_wcd_mbhc_cal(void)
 	btn_high[3] = 450;
 	btn_low[4] = 500;
 	btn_high[4] = 500;
+
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
+	switch (xiaomi_msm8937_mach_get()) {
+		case XIAOMI_MSM8937_MACH_UGG:
+		case XIAOMI_MSM8937_MACH_UGGLITE:
+			btn_low[0] = 100;
+			btn_high[0] = 100;
+			btn_low[1] = 200;
+			btn_high[1] = 200;
+			btn_low[2] = 450;
+			btn_high[2] = 450;
+			btn_low[3] = 500;
+			btn_high[3] = 500;
+			break;
+		default:
+			break;
+	}
+#endif
 
 	return msm8952_wcd_cal;
 }
