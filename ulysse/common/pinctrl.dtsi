@@ -53,34 +53,33 @@
 		};
 	};
 
-	pmx_spk_ext_pa_active{
+	pmx_spk_ext_pa_active {
 		spk_ext_pa_active: spk_ext_pa_active {
 			mux {
-			pins = "gpio1";
-			function = "gpio";
+				pins = "gpio1";
+				function = "gpio";
 			};
 
-		config {
-			pins = "gpio1";
-			drive-strength = <8>;
-			output-high;
-			bias-pull-up;
+			config {
+				pins = "gpio1";
+				drive-strength = <8>;
+				output-high;
+				bias-pull-up;
 			};
-
 		};
 	};
 
-	pmx_spk_ext_pa_suspend{
+	pmx_spk_ext_pa_suspend {
 		spk_ext_pa_suspend: spk_ext_pa_suspend {
 			mux {
-			pins = "gpio1";
-			function = "gpio";
+				pins = "gpio1";
+				function = "gpio";
 			};
 
-		config {
-			pins = "gpio1";
-			drive-strength = <2>;
-			bias-disable;
+			config {
+				pins = "gpio1";
+				drive-strength = <2>;
+				bias-disable;
 			};
 		};
 	};
