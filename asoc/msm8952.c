@@ -381,6 +381,57 @@ done:
 	return ret;
 }
 
+int is_hph_pa_gpio_support(struct platform_device *pdev,
+			struct msm_asoc_mach_data *pdata)
+{
+	const char *hph_pa_gpio_p = "qcom,msm-hph-pa-pinctrl";
+
+	pr_debug("%s:Enter\n", __func__);
+
+	pdata->hph_pa_gpio_p = of_parse_phandle(pdev->dev.of_node,
+							hph_pa_gpio_p, 0);
+
+	if (!pdata->hph_pa_gpio_p) {
+		dev_err(&pdev->dev,
+			"%s: missing %s in dt node\n", __func__, hph_pa_gpio_p);
+	}
+	return 0;
+}
+
+static int enable_hph_pa_gpio(struct snd_soc_component *component, int enable)
+{
+	struct snd_soc_card *card = component->card;
+	struct msm_asoc_mach_data *pdata = snd_soc_card_get_drvdata(card);
+	int ret;
+
+	if (!pdata->hph_pa_gpio_p) {
+		pr_err("%s: Invalid headphone PA pinctrl phandle\n", __func__);
+		return false;
+	}
+
+	pr_info("%s: %s headphone PA gpio set\n", __func__,
+		enable ? "Enable" : "Disable");
+
+	if (enable) {
+		ret =  msm_cdc_pinctrl_select_active_state(
+					pdata->hph_pa_gpio_p);
+		if (ret) {
+			pr_err("%s: headphone PA gpio set cannot be enabled\n",
+					__func__);
+			return ret;
+		}
+	} else {
+		ret = msm_cdc_pinctrl_select_sleep_state(
+				pdata->hph_pa_gpio_p);
+		if (ret) {
+			pr_err("%s: headphone PA gpio set cannot be disabled\n",
+					__func__);
+			return ret;
+		}
+	}
+	return 0;
+}
+
 int is_ext_spk_gpio_support(struct platform_device *pdev,
 			struct msm_asoc_mach_data *pdata)
 {
@@ -1761,6 +1812,7 @@ static int msm_audrx_init(struct snd_soc_pcm_runtime *rtd)
 
 	snd_soc_dapm_sync(dapm);
 
+	msm_anlg_cdc_hph_pa_gpio_cb(enable_hph_pa_gpio, ana_cdc);
 	msm_anlg_cdc_spk_ext_pa_cb(enable_spk_ext_pa, ana_cdc);
 	msm_dig_cdc_hph_comp_cb(config_hph_compander_gpio, dig_cdc);
 
@@ -3545,6 +3597,7 @@ parse_mclk_freq:
 			pdata->ext_pa = (pdata->ext_pa | QUIN_MI2S_ID);
 	}
 	pr_debug("%s: ext_pa = %d\n", __func__, pdata->ext_pa);
+
 	pdata->spk_ext_pa_gpio = of_get_named_gpio(pdev->dev.of_node,
 							spk_ext_pa, 0);
 	if (pdata->spk_ext_pa_gpio < 0) {
@@ -3564,6 +3617,11 @@ parse_mclk_freq:
 	pdata->dmic_gpio_p = of_parse_phandle(pdev->dev.of_node,
 					"qcom,cdc-dmic-gpios", 0);
 
+
+	ret = is_hph_pa_gpio_support(pdev, pdata);
+	if (ret < 0)
+		pr_err("%s:  doesn't support headphone pa gpio set\n",
+				__func__);
 	ret = is_ext_spk_gpio_support(pdev, pdata);
 	if (ret < 0)
 		pr_err("%s:  doesn't support external speaker pa\n",
