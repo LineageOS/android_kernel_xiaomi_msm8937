@@ -58,7 +58,8 @@ static int pwm_ir_tx_config(struct pwm_ir_dev *dev, u32 carrier, u32 duty_cycle)
 	if (rc == 0) {
 		dev->carrier = carrier;
 		dev->duty_cycle = duty_cycle;
-	}
+	} else
+		dev_err(&dev->pdev->dev, "%s: Failed, rc=%d\n", __func__, rc);
 
 	return rc;
 }
@@ -194,8 +195,10 @@ static int pwm_ir_tx_transmit(struct rc_dev *rdev, unsigned *txbuf, unsigned n)
 
 	if (dev->reg) {
 		rc = regulator_enable(dev->reg);
-		if (rc != 0)
+		if (rc != 0) {
+			dev_err(&dev->pdev->dev, "%s: failed to enable regulator rc=%d\n", __func__, rc);
 			goto err_regulator_enable;
+		}
 	}
 
 	pkt.pwm    = dev->pwm;
@@ -206,6 +209,9 @@ static int pwm_ir_tx_transmit(struct rc_dev *rdev, unsigned *txbuf, unsigned n)
 		rc = pwm_ir_tx_transmit_with_timer(&pkt);
 	else
 		rc = pwm_ir_tx_transmit_with_delay(&pkt);
+
+	if (rc != 0)
+		dev_err(&dev->pdev->dev, "%s: transmit error rc=%d\n", __func__, rc);
 
 	if (dev->reg)
 		regulator_disable(dev->reg);
@@ -336,8 +342,10 @@ static int __devinit pwm_ir_probe(struct platform_device *pdev)
 	dev->rdev->priv             = dev;
 
 	rc = pwm_ir_tx_probe(dev);
-	if (rc != 0)
+	if (rc != 0) {
+		dev_err(&pdev->dev, "failed to probe pwm ir tx\n");
 		goto err_pwm_ir_tx_probe;
+	}
 
 	rc = rc_register_device(dev->rdev);
 	if (rc < 0) {
