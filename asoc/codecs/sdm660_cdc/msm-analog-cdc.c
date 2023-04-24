@@ -339,7 +339,8 @@ static bool msm_anlg_cdc_adj_ref_current(struct snd_soc_codec *codec,
 }
 
 void msm_anlg_cdc_hph_pa_gpio_cb(
-		int (*codec_hph_pa_gpio)(struct snd_soc_codec *codec,
+		int (*codec_hph_pa_gpio_get)(struct snd_soc_codec *codec),
+		int (*codec_hph_pa_gpio_set)(struct snd_soc_codec *codec,
 			int enable), struct snd_soc_codec *codec)
 {
 	struct sdm660_cdc_priv *sdm660_cdc;
@@ -352,12 +353,14 @@ void msm_anlg_cdc_hph_pa_gpio_cb(
 	sdm660_cdc = snd_soc_codec_get_drvdata(codec);
 
 	dev_dbg(codec->dev, "%s: Enter\n", __func__);
-	sdm660_cdc->codec_hph_pa_gpio_cb = codec_hph_pa_gpio;
+	sdm660_cdc->codec_hph_pa_gpio_get_cb = codec_hph_pa_gpio_get;
+	sdm660_cdc->codec_hph_pa_gpio_set_cb = codec_hph_pa_gpio_set;
 }
 EXPORT_SYMBOL(msm_anlg_cdc_hph_pa_gpio_cb);
 
 void msm_anlg_cdc_spk_pa_gpio_cb(
-		int (*codec_spk_pa_gpio)(struct snd_soc_codec *codec,
+		int (*codec_spk_pa_gpio_get)(struct snd_soc_codec *codec),
+		int (*codec_spk_pa_gpio_set)(struct snd_soc_codec *codec,
 			int enable), struct snd_soc_codec *codec)
 {
 	struct sdm660_cdc_priv *sdm660_cdc;
@@ -370,7 +373,8 @@ void msm_anlg_cdc_spk_pa_gpio_cb(
 	sdm660_cdc = snd_soc_codec_get_drvdata(codec);
 
 	dev_dbg(codec->dev, "%s: Enter\n", __func__);
-	sdm660_cdc->codec_spk_pa_gpio_cb = codec_spk_pa_gpio;
+	sdm660_cdc->codec_spk_pa_gpio_get_cb = codec_spk_pa_gpio_get;
+	sdm660_cdc->codec_spk_pa_gpio_set_cb = codec_spk_pa_gpio_set;
 }
 EXPORT_SYMBOL(msm_anlg_cdc_spk_pa_gpio_cb);
 
@@ -1908,6 +1912,72 @@ static int msm_anlg_cdc_ext_spk_boost_set(struct snd_kcontrol *kcontrol,
 	return 0;
 }
 
+static int msm_anlg_cdc_hph_pa_gpio_get(struct snd_kcontrol *kcontrol,
+					  struct snd_ctl_elem_value *ucontrol)
+{
+	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
+	struct sdm660_cdc_priv *sdm660_cdc =
+					snd_soc_codec_get_drvdata(codec);
+
+	if (!sdm660_cdc->codec_hph_pa_gpio_get_cb)
+		return -ENODEV;
+
+	ucontrol->value.integer.value[0] = !!sdm660_cdc->codec_hph_pa_gpio_get_cb(codec);
+
+	return 0;
+}
+
+static int msm_anlg_cdc_hph_pa_gpio_set(struct snd_kcontrol *kcontrol,
+					  struct snd_ctl_elem_value *ucontrol)
+{
+	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
+	struct sdm660_cdc_priv *sdm660_cdc =
+					snd_soc_codec_get_drvdata(codec);
+
+	dev_dbg(codec->dev, "%s: ucontrol->value.integer.value[0] = %ld\n",
+		__func__, ucontrol->value.integer.value[0]);
+
+	if (!sdm660_cdc->codec_hph_pa_gpio_set_cb)
+		return -ENODEV;
+
+	sdm660_cdc->codec_hph_pa_gpio_set_cb(codec, !!ucontrol->value.integer.value[0]);
+
+	return 0;
+}
+
+static int msm_anlg_cdc_spk_pa_gpio_get(struct snd_kcontrol *kcontrol,
+					  struct snd_ctl_elem_value *ucontrol)
+{
+	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
+	struct sdm660_cdc_priv *sdm660_cdc =
+					snd_soc_codec_get_drvdata(codec);
+
+	if (!sdm660_cdc->codec_spk_pa_gpio_get_cb)
+		return -ENODEV;
+
+	ucontrol->value.integer.value[0] = !!sdm660_cdc->codec_spk_pa_gpio_get_cb(codec);
+
+	return 0;
+}
+
+static int msm_anlg_cdc_spk_pa_gpio_set(struct snd_kcontrol *kcontrol,
+					  struct snd_ctl_elem_value *ucontrol)
+{
+	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
+	struct sdm660_cdc_priv *sdm660_cdc =
+					snd_soc_codec_get_drvdata(codec);
+
+	dev_dbg(codec->dev, "%s: ucontrol->value.integer.value[0] = %ld\n",
+		__func__, ucontrol->value.integer.value[0]);
+
+	if (!sdm660_cdc->codec_spk_pa_gpio_set_cb)
+		return -ENODEV;
+
+	sdm660_cdc->codec_spk_pa_gpio_set_cb(codec, !!ucontrol->value.integer.value[0]);
+
+	return 0;
+}
+
 static const char * const msm_anlg_cdc_ear_pa_boost_ctrl_text[] = {
 		"DISABLE", "ENABLE"};
 static const struct soc_enum msm_anlg_cdc_ear_pa_boost_ctl_enum[] = {
@@ -1945,6 +2015,18 @@ static const struct soc_enum msm_anlg_cdc_hph_mode_ctl_enum[] = {
 			msm_anlg_cdc_hph_mode_ctrl_text),
 };
 
+static const char * const msm_anlg_cdc_hph_pa_gpio_ctrl_text[] = {
+		"Off", "On"};
+static const struct soc_enum msm_anlg_cdc_hph_pa_gpio_ctl_enum[] = {
+		SOC_ENUM_SINGLE_EXT(2, msm_anlg_cdc_hph_pa_gpio_ctrl_text),
+};
+
+static const char * const msm_anlg_cdc_spk_pa_gpio_ctrl_text[] = {
+		"Off", "On"};
+static const struct soc_enum msm_anlg_cdc_spk_pa_gpio_ctl_enum[] = {
+		SOC_ENUM_SINGLE_EXT(2, msm_anlg_cdc_spk_pa_gpio_ctrl_text),
+};
+
 /*cut of frequency for high pass filter*/
 static const char * const cf_text[] = {
 	"MIN_3DB_4Hz", "MIN_3DB_75Hz", "MIN_3DB_150Hz"
@@ -1970,6 +2052,12 @@ static const struct snd_kcontrol_new msm_anlg_cdc_snd_controls[] = {
 
 	SOC_ENUM_EXT("Ext Spk Boost", msm_anlg_cdc_ext_spk_boost_ctl_enum[0],
 		msm_anlg_cdc_ext_spk_boost_get, msm_anlg_cdc_ext_spk_boost_set),
+
+	SOC_ENUM_EXT("HPH PA GPIO", msm_anlg_cdc_hph_pa_gpio_ctl_enum[0],
+		msm_anlg_cdc_hph_pa_gpio_get, msm_anlg_cdc_hph_pa_gpio_set),
+
+	SOC_ENUM_EXT("SPK PA GPIO", msm_anlg_cdc_spk_pa_gpio_ctl_enum[0],
+		msm_anlg_cdc_spk_pa_gpio_get, msm_anlg_cdc_spk_pa_gpio_set),
 
 	SOC_SINGLE_TLV("ADC1 Volume", MSM89XX_PMIC_ANALOG_TX_1_EN, 3,
 					8, 0, analog_gain),
@@ -2317,12 +2405,8 @@ static int msm_anlg_cdc_codec_enable_spk_pa(struct snd_soc_dapm_widget *w,
 		msm_anlg_cdc_dig_notifier_call(codec,
 					       DIG_CDC_EVENT_RX3_MUTE_OFF);
 		snd_soc_update_bits(codec, w->reg, 0x80, 0x80);
-		if (sdm660_cdc->codec_spk_pa_gpio_cb)
-			sdm660_cdc->codec_spk_pa_gpio_cb(codec, 1);
 		break;
 	case SND_SOC_DAPM_PRE_PMD:
-		if (sdm660_cdc->codec_spk_pa_gpio_cb)
-			sdm660_cdc->codec_spk_pa_gpio_cb(codec, 0);
 		msm_anlg_cdc_dig_notifier_call(codec,
 					       DIG_CDC_EVENT_RX3_MUTE_ON);
 		/*
@@ -2999,13 +3083,9 @@ static int msm_anlg_cdc_hph_pa_event(struct snd_soc_dapm_widget *w,
 			msm_anlg_cdc_dig_notifier_call(codec,
 					       DIG_CDC_EVENT_RX2_MUTE_OFF);
 		}
-		if (sdm660_cdc->codec_hph_pa_gpio_cb)
-			sdm660_cdc->codec_hph_pa_gpio_cb(codec, 1);
 		break;
 
 	case SND_SOC_DAPM_PRE_PMD:
-		if (sdm660_cdc->codec_hph_pa_gpio_cb)
-			sdm660_cdc->codec_hph_pa_gpio_cb(codec, 0);
 		if (w->shift == 5) {
 			msm_anlg_cdc_dig_notifier_call(codec,
 					       DIG_CDC_EVENT_RX1_MUTE_ON);
