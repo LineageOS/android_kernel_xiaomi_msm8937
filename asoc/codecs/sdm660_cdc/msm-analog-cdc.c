@@ -356,6 +356,24 @@ void msm_anlg_cdc_hph_pa_gpio_cb(
 }
 EXPORT_SYMBOL(msm_anlg_cdc_hph_pa_gpio_cb);
 
+void msm_anlg_cdc_spk_pa_gpio_cb(
+		int (*codec_spk_pa_gpio)(struct snd_soc_codec *codec,
+			int enable), struct snd_soc_codec *codec)
+{
+	struct sdm660_cdc_priv *sdm660_cdc;
+
+	if (!codec) {
+		pr_err("%s: NULL codec pointer!\n", __func__);
+		return;
+	}
+
+	sdm660_cdc = snd_soc_codec_get_drvdata(codec);
+
+	dev_dbg(codec->dev, "%s: Enter\n", __func__);
+	sdm660_cdc->codec_spk_pa_gpio_cb = codec_spk_pa_gpio;
+}
+EXPORT_SYMBOL(msm_anlg_cdc_spk_pa_gpio_cb);
+
 void msm_anlg_cdc_spk_ext_pa_cb(
 		int (*codec_spk_ext_pa)(struct snd_soc_codec *codec,
 			int enable), struct snd_soc_codec *codec)
@@ -2299,8 +2317,12 @@ static int msm_anlg_cdc_codec_enable_spk_pa(struct snd_soc_dapm_widget *w,
 		msm_anlg_cdc_dig_notifier_call(codec,
 					       DIG_CDC_EVENT_RX3_MUTE_OFF);
 		snd_soc_update_bits(codec, w->reg, 0x80, 0x80);
+		if (sdm660_cdc->codec_spk_pa_gpio_cb)
+			sdm660_cdc->codec_spk_pa_gpio_cb(codec, 1);
 		break;
 	case SND_SOC_DAPM_PRE_PMD:
+		if (sdm660_cdc->codec_spk_pa_gpio_cb)
+			sdm660_cdc->codec_spk_pa_gpio_cb(codec, 0);
 		msm_anlg_cdc_dig_notifier_call(codec,
 					       DIG_CDC_EVENT_RX3_MUTE_ON);
 		/*
