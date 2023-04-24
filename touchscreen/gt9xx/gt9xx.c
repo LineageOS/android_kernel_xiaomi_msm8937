@@ -1212,37 +1212,6 @@ static ssize_t gtp_workmode_show(struct device *dev,
 }
 static DEVICE_ATTR(workmode, 0444, gtp_workmode_show, NULL);
 
-#define FW_NAME_MAX_LEN	80
-static ssize_t gtp_dofwupdate_store(struct device *dev,
-				    struct device_attribute *attr,
-				    const char *buf, size_t count)
-{
-	struct goodix_ts_data *ts = dev_get_drvdata(dev);
-	char update_file_name[FW_NAME_MAX_LEN];
-	int retval;
-
-	if (count > FW_NAME_MAX_LEN) {
-		dev_info(&ts->client->dev, "FW filename is too long\n");
-		retval = -EINVAL;
-		goto exit;
-	}
-
-	strlcpy(update_file_name, buf, count);
-
-	ts->force_update = true;
-	retval = gup_update_proc(update_file_name);
-	if (retval == FAIL)
-		dev_err(&ts->client->dev, "Fail to update GTP firmware.\n");
-	else
-		dev_info(&ts->client->dev, "Update success\n");
-
-	return count;
-
-exit:
-	return retval;
-}
-static DEVICE_ATTR(dofwupdate, 0664, NULL, gtp_dofwupdate_store);
-
 static ssize_t gtp_productinfo_show(struct device *dev,
 		struct device_attribute *attr, char *buf)
 {
@@ -1315,7 +1284,6 @@ static DEVICE_ATTR(reset, 0220, NULL, gtp_reset_store);
 static struct attribute *gtp_attrs[] = {
 	&dev_attr_workmode.attr,
 	&dev_attr_productinfo.attr,
-	&dev_attr_dofwupdate.attr,
 	&dev_attr_drv_irq.attr,
 	&dev_attr_reset.attr,
 	NULL
@@ -2163,12 +2131,6 @@ static int gtp_probe(struct i2c_client *client, const struct i2c_device_id *id)
 	gtp_work_control_enable(ts, true);
 
 	init_wr_node(client);/*TODO judge return value */
-
-	if (ts->pdata->auto_update) {
-		ret = gup_init_update_proc(ts);
-		if (ret < 0)
-			dev_err(&client->dev, "Failed create update thread\n");
-	}
 
 	return 0;
 

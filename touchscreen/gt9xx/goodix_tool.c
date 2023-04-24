@@ -412,33 +412,6 @@ ssize_t goodix_tool_write(struct file *filp, const char __user *buff,
 		gtp_reset_guitar(gt_client, 20);
 	}
 
-	else if (11 == cmd_head.wr) {/*Enter update mode!*/
-		if (FAIL == gup_enter_update_mode(gt_client))
-			return -EPERM;
-	} else if (13 == cmd_head.wr) {/*Leave update mode!*/
-		gup_leave_update_mode(gt_client);
-	} else if (15 == cmd_head.wr) {/*Update firmware!*/
-		show_len = 0;
-		total_len = 0;
-		if (cmd_head.data_len > DATA_LENGTH) {
-			dev_err(&gt_client->dev,
-				"Tool write failed data too long");
-			return -EPERM;
-		}
-		memset(cmd_head.data, 0, DATA_LENGTH);
-		ret = copy_from_user(cmd_head.data,
-				     &buff[CMD_HEAD_LENGTH],
-				     cmd_head.data_len);
-		if (ret) {
-			dev_dbg(&gt_client->dev, "copy_from_user failed.");
-			return -EPERM;
-		}
-
-		if (FAIL == gup_update_proc((void *)cmd_head.data))
-			return -EPERM;
-	}
-
-
 	return len;
 }
 
@@ -508,19 +481,6 @@ ssize_t goodix_tool_read(struct file *file, char __user *page,
 	} else if (2 == cmd_head.wr) {
 		ret = simple_read_from_buffer(page, size, ppos,
 					      IC_TYPE, sizeof(IC_TYPE));
-		return ret;
-	}
-
-	else if (4 == cmd_head.wr) {
-		u8 progress_buf[4];
-
-		progress_buf[0] = show_len >> 8;
-		progress_buf[1] = show_len & 0xff;
-		progress_buf[2] = total_len >> 8;
-		progress_buf[3] = total_len & 0xff;
-
-		ret = simple_read_from_buffer(page, size, ppos,
-					      progress_buf, 4);
 		return ret;
 	}
 

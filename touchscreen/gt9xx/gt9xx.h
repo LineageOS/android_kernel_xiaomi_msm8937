@@ -358,13 +358,6 @@ extern void gtp_esd_on(struct goodix_ts_data *ts);
 extern void gtp_esd_off(struct goodix_ts_data *ts);
 extern void gtp_work_control_enable(struct goodix_ts_data *ts, bool enable);
 
-extern u16 show_len;
-extern u16 total_len;
-extern u8 gup_init_update_proc(struct goodix_ts_data *);
-extern s32 gup_update_proc(void *dir);
-extern s32 gup_enter_update_mode(struct i2c_client *client);
-extern void gup_leave_update_mode(struct i2c_client *client);
-
 extern s32 init_wr_node(struct i2c_client *);
 extern void uninit_wr_node(void);
 
