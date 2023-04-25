@@ -13,3 +13,9 @@
 &pmic_analog_codec {
 	qcom,cdc-micbias-cfilt-mv = <2400000>;
 };
+
+#ifdef MI8937_V2
+&spk_pa_p {
+	status = "disabled";
+};
+#endif
