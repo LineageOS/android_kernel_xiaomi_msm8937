@@ -65,7 +65,7 @@
 #define REG_WR_ACCESS           1 << 1
 #define aw87329_REG_MAX         0x0F
 
-const unsigned char aw87329_reg_access[aw87329_REG_MAX] = {
+static const unsigned char aw87329_reg_access[aw87329_REG_MAX] = {
     [aw87329_REG_CHIPID  ] = REG_RD_ACCESS|REG_WR_ACCESS,
     [aw87329_REG_SYSCTRL ] = REG_RD_ACCESS|REG_WR_ACCESS,
     [aw87329_REG_MODECTRL] = REG_RD_ACCESS|REG_WR_ACCESS,
@@ -103,15 +103,15 @@ struct aw87329_t{
     struct hrtimer cfg_timer;
     struct work_struct cfg_work;
 };
-struct aw87329_t *aw87329 = NULL;
+static struct aw87329_t *aw87329 = NULL;
 
 struct aw87329_container{
     int len;
     unsigned char data[];
 };
-struct aw87329_container *aw87329_kspk_cnt;
-struct aw87329_container *aw87329_drcv_cnt;
-struct aw87329_container *aw87329_abrcv_cnt;
+static struct aw87329_container *aw87329_kspk_cnt;
+static struct aw87329_container *aw87329_drcv_cnt;
+static struct aw87329_container *aw87329_abrcv_cnt;
 
 static char *aw87329_kspk_name = "aw87329_kspk.bin";
 static char *aw87329_drcv_name = "aw87329_drcv.bin";
@@ -683,7 +683,7 @@ static int aw87329_parse_dt(struct device *dev, struct device_node *np) {
     return 0;
 }
 
-int aw87329_hw_reset(void)
+static int aw87329_hw_reset(void)
 {
     pr_info("%s enter\n", __func__);
 
@@ -703,7 +703,7 @@ int aw87329_hw_reset(void)
 /*****************************************************
  * check chip id
  *****************************************************/
-int aw87329_read_chipid(void)
+static int aw87329_read_chipid(void)
 {
     unsigned int cnt = 0;
     unsigned int reg = 0;
