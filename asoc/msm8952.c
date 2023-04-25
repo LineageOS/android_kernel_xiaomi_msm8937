@@ -1601,7 +1601,9 @@ static void *def_msm8952_wcd_mbhc_cal(void)
 		return NULL;
 
 #define S(X, Y) ((WCD_MBHC_CAL_PLUG_TYPE_PTR(msm8952_wcd_cal)->X) = (Y))
-	S(v_hs_max, 1500);
+/*--- +bug 264424 ,zhanghao,modify,20170522,fix is  can not identfiy headset  --*/
+/*--- +bug 329872 ,yangrun,modify,20171229,fix the problem that delay identfiy headset --*/
+	S(v_hs_max, 1700);
 #undef S
 #define S(X, Y) ((WCD_MBHC_CAL_BTN_DET_PTR(msm8952_wcd_cal)->X) = (Y))
 	S(num_btn, WCD_MBHC_DEF_BUTTONS);
