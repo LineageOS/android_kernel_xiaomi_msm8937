@@ -83,10 +83,10 @@ static const unsigned char aw87329_reg_access[aw87329_REG_MAX] = {
 /*******************************************************************************
  * aw87329 functions
  ******************************************************************************/
-unsigned int aw87329_audio_off(void);
-unsigned int aw87329_audio_kspk(void);
-unsigned int aw87329_audio_drcv(void);
-unsigned int aw87329_audio_abrcv(void);
+unsigned int xiaomi_msm8937_aw87329_audio_off(void);
+unsigned int xiaomi_msm8937_aw87329_audio_kspk(void);
+unsigned int xiaomi_msm8937_aw87329_audio_drcv(void);
+unsigned int xiaomi_msm8937_aw87329_audio_abrcv(void);
 
 
 /*******************************************************************************
@@ -234,7 +234,7 @@ unsigned char aw87329_abrcv_reg_val(unsigned char reg)
     }
 }
 
-unsigned int aw87329_audio_kspk(void)
+unsigned int xiaomi_msm8937_aw87329_audio_kspk(void)
 {
     if(aw87329 == NULL) {
         pr_err("%s: aw87329 is NULL\n", __func__);
@@ -265,7 +265,7 @@ unsigned int aw87329_audio_kspk(void)
     return 0;
 }
 
-unsigned int aw87329_audio_drcv(void)
+unsigned int xiaomi_msm8937_aw87329_audio_drcv(void)
 {
     if(aw87329 == NULL) {
         pr_err("%s: aw87329 is NULL\n", __func__);
@@ -296,7 +296,7 @@ unsigned int aw87329_audio_drcv(void)
     return 0;
 }
 
-unsigned int aw87329_audio_abrcv(void)
+unsigned int xiaomi_msm8937_aw87329_audio_abrcv(void)
 {
     if(aw87329 == NULL) {
         pr_err("%s: aw87329 is NULL\n", __func__);
@@ -327,7 +327,7 @@ unsigned int aw87329_audio_abrcv(void)
     return 0;
 }
 
-unsigned int aw87329_audio_off(void)
+unsigned int xiaomi_msm8937_aw87329_audio_off(void)
 {
     if(aw87329 == NULL) {
         pr_err("%s: aw87329 is NULL\n", __func__);
@@ -637,15 +637,15 @@ static ssize_t aw87329_set_mode(struct device* cd, struct device_attribute *attr
 
     sscanf(buf, "%d", &databuf[0]);
     if(databuf[0] == 0) {
-        aw87329_audio_off();
+        xiaomi_msm8937_aw87329_audio_off();
     } else if(databuf[0] == 1) {
-        aw87329_audio_kspk();
+        xiaomi_msm8937_aw87329_audio_kspk();
     } else if(databuf[0] == 2) {
-        aw87329_audio_drcv();
+        xiaomi_msm8937_aw87329_audio_drcv();
     } else if(databuf[0] == 3) {
-        aw87329_audio_abrcv();
+        xiaomi_msm8937_aw87329_audio_abrcv();
     } else {
-        aw87329_audio_off();
+        xiaomi_msm8937_aw87329_audio_off();
     }
 
     return len;
