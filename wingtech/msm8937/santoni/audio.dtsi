@@ -1,6 +1,10 @@
 &i2c_2  {
 	aw87319@58{ /*AW87319 PA*/
+#ifdef CONFIG_SND_SOC_AW87319_MI8937
+		compatible = "awinic,aw87319_pa-mi8937";
+#else
 		compatible = "awinic,aw87319_pa";
+#endif
 		reg = <0x58>;
 		qcom,ext_pa_spk_aw87319_rst = <&tlmm 124 0>;
 	};

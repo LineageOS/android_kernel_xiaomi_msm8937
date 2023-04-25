@@ -44,7 +44,11 @@
 &i2c_6 {
 	status = "ok";
 	aw87329@58 {
+#ifdef CONFIG_SND_SOC_AW87329_MI8937
+		compatible = "awinic,aw87329_pa-mi8937";
+#else
 		compatible = "awinic,aw87329_pa";
+#endif
 		reg = <0x58>;
 		reset-gpio = <&tlmm 124 0>;
 		status = "ok";
