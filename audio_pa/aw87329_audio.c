@@ -264,6 +264,7 @@ unsigned int xiaomi_msm8937_aw87329_audio_kspk(void)
 
     return 0;
 }
+EXPORT_SYMBOL(xiaomi_msm8937_aw87329_audio_kspk);
 
 unsigned int xiaomi_msm8937_aw87329_audio_drcv(void)
 {
@@ -295,6 +296,7 @@ unsigned int xiaomi_msm8937_aw87329_audio_drcv(void)
 
     return 0;
 }
+EXPORT_SYMBOL(xiaomi_msm8937_aw87329_audio_drcv);
 
 unsigned int xiaomi_msm8937_aw87329_audio_abrcv(void)
 {
@@ -326,6 +328,7 @@ unsigned int xiaomi_msm8937_aw87329_audio_abrcv(void)
 
     return 0;
 }
+EXPORT_SYMBOL(xiaomi_msm8937_aw87329_audio_abrcv);
 
 unsigned int xiaomi_msm8937_aw87329_audio_off(void)
 {
@@ -346,6 +349,7 @@ unsigned int xiaomi_msm8937_aw87329_audio_off(void)
 
     return 0;
 }
+EXPORT_SYMBOL(xiaomi_msm8937_aw87329_audio_off);
 
 
 /*******************************************************************************
