@@ -37,15 +37,15 @@
 #define AW87319_I2C_BUS		0
 #define AW87319_I2C_ADDR	0x58
 
-unsigned char AW87319_Audio_Reciver(void);
-unsigned char AW87319_Audio_Speaker(void);
-unsigned char AW87319_Audio_OFF(void);
+void AW87319_Audio_Reciver(void);
+void AW87319_Audio_Speaker(void);
+void AW87319_Audio_OFF(void);
 
 
-unsigned char aw87319_hw_on(void);
-unsigned char aw87319_hw_off(void);
-unsigned char aw87319_sw_on(void);
-unsigned char aw87319_sw_off(void);
+void aw87319_hw_on(void);
+void aw87319_hw_off(void);
+void aw87319_sw_on(void);
+void aw87319_sw_off(void);
 
 static ssize_t aw87319_get_reg(struct device* cd, struct device_attribute *attr, char* buf);
 static ssize_t aw87319_set_reg(struct device* cd, struct device_attribute *attr, const char* buf, size_t len);
@@ -89,7 +89,7 @@ static void aw87319_pa_pwroff(void)
 
 
 
-unsigned char I2C_write_reg(unsigned char addr, unsigned char reg_data)
+static unsigned char I2C_write_reg(unsigned char addr, unsigned char reg_data)
 {
 	char ret;
 	u8 wdbuf[512] = {0};
@@ -119,7 +119,7 @@ unsigned char I2C_write_reg(unsigned char addr, unsigned char reg_data)
     return ret;
 }
 
-unsigned char I2C_read_reg(unsigned char addr)
+static unsigned char I2C_read_reg(unsigned char addr)
 {
 	unsigned char ret;
 	u8 rdbuf[512] = {0};
@@ -158,7 +158,7 @@ unsigned char I2C_read_reg(unsigned char addr)
 
 
 
-unsigned char AW87319_Audio_Reciver(void)
+void AW87319_Audio_Reciver(void)
 {
 	aw87319_hw_on();
 
@@ -166,11 +166,9 @@ unsigned char AW87319_Audio_Reciver(void)
 
 	I2C_write_reg(0x01, 0x02);
 	I2C_write_reg(0x01, 0x06);
-
-	return 0;
 }
 
-unsigned char AW87319_Audio_Speaker(void)
+void AW87319_Audio_Speaker(void)
 {
 	aw87319_hw_on();
 
@@ -189,55 +187,43 @@ unsigned char AW87319_Audio_Speaker(void)
 
 	I2C_write_reg(0x01, 0x03);
 	I2C_write_reg(0x01, 0x07);
-
-	return 0;
 }
 
 
-unsigned char AW87319_Audio_OFF(void)
+void AW87319_Audio_OFF(void)
 {
 	I2C_write_reg(0x01, 0x00);
 	aw87319_hw_off();
-
-	return 0;
 }
 
 
 
 
-unsigned char aw87319_sw_on(void)
+void aw87319_sw_on(void)
 {
 	unsigned char reg;
 	reg = I2C_read_reg(0x01);
 	reg |= 0x04;
 	I2C_write_reg(0x01, reg);
-
-	return 0;
 }
 
-unsigned char aw87319_sw_off(void)
+void aw87319_sw_off(void)
 {
 	unsigned char reg;
 	reg = I2C_read_reg(0x01);
 	reg &= 0xFB;
 	I2C_write_reg(0x01, reg);
-
-	return 0;
 }
 
-unsigned char aw87319_hw_on(void)
+void aw87319_hw_on(void)
 {
 	aw87319_pa_pwron();
 	I2C_write_reg(0x64, 0x2C);
-
-	return 0;
 }
 
-unsigned char aw87319_hw_off(void)
+void aw87319_hw_off(void)
 {
 	aw87319_pa_pwroff();
-
-	return 0;
 }
 
 
