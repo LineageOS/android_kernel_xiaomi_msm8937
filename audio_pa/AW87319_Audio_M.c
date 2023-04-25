@@ -164,6 +164,7 @@ void xiaomi_msm8937_AW87319_Audio_Reciver(void)
 	I2C_write_reg(0x01, 0x02);
 	I2C_write_reg(0x01, 0x06);
 }
+EXPORT_SYMBOL(xiaomi_msm8937_AW87319_Audio_Reciver);
 
 void xiaomi_msm8937_AW87319_Audio_Speaker(void)
 {
@@ -185,6 +186,7 @@ void xiaomi_msm8937_AW87319_Audio_Speaker(void)
 	I2C_write_reg(0x01, 0x03);
 	I2C_write_reg(0x01, 0x07);
 }
+EXPORT_SYMBOL(xiaomi_msm8937_AW87319_Audio_Speaker);
 
 
 void xiaomi_msm8937_AW87319_Audio_OFF(void)
@@ -192,6 +194,7 @@ void xiaomi_msm8937_AW87319_Audio_OFF(void)
 	I2C_write_reg(0x01, 0x00);
 	aw87319_hw_off();
 }
+EXPORT_SYMBOL(xiaomi_msm8937_AW87319_Audio_OFF);
 
 
 
