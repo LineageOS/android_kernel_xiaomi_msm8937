@@ -2044,6 +2044,70 @@ static int msm_anlg_cdc_spk_pa_gpio_set(struct snd_kcontrol *kcontrol,
 	return 0;
 }
 
+#if IS_ENABLED(CONFIG_SND_SOC_AW87319_MI8937)
+extern void xiaomi_msm8937_AW87319_Audio_Speaker(void);
+extern void xiaomi_msm8937_AW87319_Audio_OFF(void);
+static int msm_anlg_cdc_mi8937_aw87319_pa_value = 0;
+
+static int msm_anlg_cdc_mi8937_aw87319_pa_get(struct snd_kcontrol *kcontrol,
+					  struct snd_ctl_elem_value *ucontrol)
+{
+	ucontrol->value.integer.value[0] = msm_anlg_cdc_mi8937_aw87319_pa_value;
+	return 0;
+}
+
+static int msm_anlg_cdc_mi8937_aw87319_pa_set(struct snd_kcontrol *kcontrol,
+					  struct snd_ctl_elem_value *ucontrol)
+{
+	struct snd_soc_component *component =
+				snd_soc_kcontrol_component(kcontrol);
+
+	dev_dbg(component->dev, "%s: ucontrol->value.integer.value[0] = %ld\n",
+		__func__, ucontrol->value.integer.value[0]);
+
+	if (ucontrol->value.integer.value[0])
+		xiaomi_msm8937_AW87319_Audio_Speaker();
+	else
+		xiaomi_msm8937_AW87319_Audio_OFF();
+
+	msm_anlg_cdc_mi8937_aw87319_pa_value = ucontrol->value.integer.value[0];
+
+	return 0;
+}
+#endif
+
+#if IS_ENABLED(CONFIG_SND_SOC_AW87329_MI8937)
+extern unsigned int xiaomi_msm8937_aw87329_audio_kspk(void);
+extern unsigned int xiaomi_msm8937_aw87329_audio_off(void);
+static int msm_anlg_cdc_mi8937_aw87329_pa_value = 0;
+
+static int msm_anlg_cdc_mi8937_aw87329_pa_get(struct snd_kcontrol *kcontrol,
+					  struct snd_ctl_elem_value *ucontrol)
+{
+	ucontrol->value.integer.value[0] = msm_anlg_cdc_mi8937_aw87329_pa_value;
+	return 0;
+}
+
+static int msm_anlg_cdc_mi8937_aw87329_pa_set(struct snd_kcontrol *kcontrol,
+					  struct snd_ctl_elem_value *ucontrol)
+{
+	struct snd_soc_component *component =
+				snd_soc_kcontrol_component(kcontrol);
+
+	dev_dbg(component->dev, "%s: ucontrol->value.integer.value[0] = %ld\n",
+		__func__, ucontrol->value.integer.value[0]);
+
+	if (ucontrol->value.integer.value[0])
+		xiaomi_msm8937_aw87329_audio_kspk();
+	else
+		xiaomi_msm8937_aw87329_audio_off();
+
+	msm_anlg_cdc_mi8937_aw87329_pa_value = ucontrol->value.integer.value[0];
+
+	return 0;
+}
+#endif
+
 static const char * const msm_anlg_cdc_ear_pa_boost_ctrl_text[] = {
 		"DISABLE", "ENABLE"};
 static const struct soc_enum msm_anlg_cdc_ear_pa_boost_ctl_enum[] = {
@@ -2093,6 +2157,22 @@ static const struct soc_enum msm_anlg_cdc_spk_pa_gpio_ctl_enum[] = {
 		SOC_ENUM_SINGLE_EXT(2, msm_anlg_cdc_spk_pa_gpio_ctrl_text),
 };
 
+#if IS_ENABLED(CONFIG_SND_SOC_AW87319_MI8937)
+static const char * const msm_anlg_cdc_mi8937_aw87319_pa_ctrl_text[] = {
+		"Off", "On"};
+static const struct soc_enum msm_anlg_cdc_mi8937_aw87319_pa_ctl_enum[] = {
+		SOC_ENUM_SINGLE_EXT(2, msm_anlg_cdc_mi8937_aw87319_pa_ctrl_text),
+};
+#endif
+
+#if IS_ENABLED(CONFIG_SND_SOC_AW87329_MI8937)
+static const char * const msm_anlg_cdc_mi8937_aw87329_pa_ctrl_text[] = {
+		"Off", "On"};
+static const struct soc_enum msm_anlg_cdc_mi8937_aw87329_pa_ctl_enum[] = {
+		SOC_ENUM_SINGLE_EXT(2, msm_anlg_cdc_mi8937_aw87329_pa_ctrl_text),
+};
+#endif
+
 /*cut of frequency for high pass filter*/
 static const char * const cf_text[] = {
 	"MIN_3DB_4Hz", "MIN_3DB_75Hz", "MIN_3DB_150Hz"
@@ -2124,6 +2204,16 @@ static const struct snd_kcontrol_new msm_anlg_cdc_snd_controls[] = {
 
 	SOC_ENUM_EXT("SPK PA GPIO", msm_anlg_cdc_spk_pa_gpio_ctl_enum[0],
 		msm_anlg_cdc_spk_pa_gpio_get, msm_anlg_cdc_spk_pa_gpio_set),
+
+#if IS_ENABLED(CONFIG_SND_SOC_AW87319_MI8937)
+	SOC_ENUM_EXT("MI8937 AW87319 PA", msm_anlg_cdc_mi8937_aw87319_pa_ctl_enum[0],
+		msm_anlg_cdc_mi8937_aw87319_pa_get, msm_anlg_cdc_mi8937_aw87319_pa_set),
+#endif
+
+#if IS_ENABLED(CONFIG_SND_SOC_AW87329_MI8937)
+	SOC_ENUM_EXT("MI8937 AW87329 PA", msm_anlg_cdc_mi8937_aw87329_pa_ctl_enum[0],
+		msm_anlg_cdc_mi8937_aw87329_pa_get, msm_anlg_cdc_mi8937_aw87329_pa_set),
+#endif
 
 	SOC_SINGLE_TLV("ADC1 Volume", MSM89XX_PMIC_ANALOG_TX_1_EN, 3,
 					8, 0, analog_gain),
