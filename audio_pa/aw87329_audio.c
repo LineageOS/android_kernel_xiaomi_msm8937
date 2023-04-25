@@ -83,10 +83,10 @@ const unsigned char aw87329_reg_access[aw87329_REG_MAX] = {
 /*******************************************************************************
  * aw87329 functions
  ******************************************************************************/
-unsigned char aw87329_audio_off(void);
-unsigned char aw87329_audio_kspk(void);
-unsigned char aw87329_audio_drcv(void);
-unsigned char aw87329_audio_abrcv(void);
+unsigned int aw87329_audio_off(void);
+unsigned int aw87329_audio_kspk(void);
+unsigned int aw87329_audio_drcv(void);
+unsigned int aw87329_audio_abrcv(void);
 
 
 /*******************************************************************************
@@ -234,7 +234,7 @@ unsigned char aw87329_abrcv_reg_val(unsigned char reg)
     }
 }
 
-unsigned char aw87329_audio_kspk(void)
+unsigned int aw87329_audio_kspk(void)
 {
     if(aw87329 == NULL) {
         pr_err("%s: aw87329 is NULL\n", __func__);
@@ -265,7 +265,7 @@ unsigned char aw87329_audio_kspk(void)
     return 0;
 }
 
-unsigned char aw87329_audio_drcv(void)
+unsigned int aw87329_audio_drcv(void)
 {
     if(aw87329 == NULL) {
         pr_err("%s: aw87329 is NULL\n", __func__);
@@ -296,7 +296,7 @@ unsigned char aw87329_audio_drcv(void)
     return 0;
 }
 
-unsigned char aw87329_audio_abrcv(void)
+unsigned int aw87329_audio_abrcv(void)
 {
     if(aw87329 == NULL) {
         pr_err("%s: aw87329 is NULL\n", __func__);
@@ -327,7 +327,7 @@ unsigned char aw87329_audio_abrcv(void)
     return 0;
 }
 
-unsigned char aw87329_audio_off(void)
+unsigned int aw87329_audio_off(void)
 {
     if(aw87329 == NULL) {
         pr_err("%s: aw87329 is NULL\n", __func__);
