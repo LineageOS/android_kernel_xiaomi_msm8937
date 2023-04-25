@@ -60,7 +60,7 @@ static DEVICE_ATTR(hwen, 0660, aw87319_get_hwen,  aw87319_set_hwen);
 
 static struct i2c_client *aw87319_pa_client;
 static bool aw87319_exist = false;
-static int aw87319_rst;
+static int aw87319_rst = -1;
 
 
 
@@ -355,6 +355,7 @@ static int aw87319_i2c_probe(struct i2c_client *client, const struct i2c_device_
 	aw87319_rst = of_get_named_gpio(client->dev.of_node, "qcom,ext_pa_spk_aw87319_rst", 0);
 	if(aw87319_rst < 0)
 	{
+		pr_err("%s: get spk_pa_gpio  fail!\n", __func__);
 		err = -ENODEV;
 		goto exit_gpio_get_failed;
 	}
