@@ -37,9 +37,9 @@
 #define AW87319_I2C_BUS		0
 #define AW87319_I2C_ADDR	0x58
 
-void AW87319_Audio_Reciver(void);
-void AW87319_Audio_Speaker(void);
-void AW87319_Audio_OFF(void);
+void xiaomi_msm8937_AW87319_Audio_Reciver(void);
+void xiaomi_msm8937_AW87319_Audio_Speaker(void);
+void xiaomi_msm8937_AW87319_Audio_OFF(void);
 
 
 static void aw87319_hw_on(void);
@@ -155,7 +155,7 @@ static unsigned char I2C_read_reg(unsigned char addr)
 
 
 
-void AW87319_Audio_Reciver(void)
+void xiaomi_msm8937_AW87319_Audio_Reciver(void)
 {
 	aw87319_hw_on();
 
@@ -165,7 +165,7 @@ void AW87319_Audio_Reciver(void)
 	I2C_write_reg(0x01, 0x06);
 }
 
-void AW87319_Audio_Speaker(void)
+void xiaomi_msm8937_AW87319_Audio_Speaker(void)
 {
 	aw87319_hw_on();
 
@@ -187,7 +187,7 @@ void AW87319_Audio_Speaker(void)
 }
 
 
-void AW87319_Audio_OFF(void)
+void xiaomi_msm8937_AW87319_Audio_OFF(void)
 {
 	I2C_write_reg(0x01, 0x00);
 	aw87319_hw_off();
