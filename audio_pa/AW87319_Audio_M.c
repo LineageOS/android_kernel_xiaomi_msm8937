@@ -59,6 +59,7 @@ static DEVICE_ATTR(swen, 0660, aw87319_get_swen,  aw87319_set_swen);
 static DEVICE_ATTR(hwen, 0660, aw87319_get_hwen,  aw87319_set_hwen);
 
 static struct i2c_client *aw87319_pa_client;
+static bool aw87319_exist = false;
 static int aw87319_rst;
 
 
@@ -157,6 +158,11 @@ static unsigned char I2C_read_reg(unsigned char addr)
 
 void xiaomi_msm8937_AW87319_Audio_Reciver(void)
 {
+	if (!aw87319_exist) {
+		aw87319_pa_pwron();
+		return;
+	}
+
 	aw87319_hw_on();
 
 	I2C_write_reg(0x05, 0x03);
@@ -168,6 +174,11 @@ EXPORT_SYMBOL(xiaomi_msm8937_AW87319_Audio_Reciver);
 
 void xiaomi_msm8937_AW87319_Audio_Speaker(void)
 {
+	if (!aw87319_exist) {
+		aw87319_pa_pwron();
+		return;
+	}
+
 	aw87319_hw_on();
 
 	I2C_write_reg(0x02, 0x28);
@@ -191,6 +202,11 @@ EXPORT_SYMBOL(xiaomi_msm8937_AW87319_Audio_Speaker);
 
 void xiaomi_msm8937_AW87319_Audio_OFF(void)
 {
+	if (!aw87319_exist) {
+		aw87319_pa_pwroff();
+		return;
+	}
+
 	I2C_write_reg(0x01, 0x00);
 	aw87319_hw_off();
 }
@@ -365,11 +381,14 @@ static int aw87319_i2c_probe(struct i2c_client *client, const struct i2c_device_
 		cnt --;
 		msleep(10);
 	}
-	if(!cnt)
-	{
-		err = -ENODEV;
-		aw87319_hw_off();
+
+	if (cnt)
+		aw87319_exist = true;
+	else {
 		pr_err("%s:can not find AW87319, board  is S88537A12\n!", __func__);
+		aw87319_exist = false;
+		aw87319_pa_pwroff();
+		err = -ENODEV;
 		goto exit_create_singlethread;
 	}
 
