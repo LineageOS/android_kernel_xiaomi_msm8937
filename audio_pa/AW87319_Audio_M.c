@@ -42,10 +42,10 @@ void AW87319_Audio_Speaker(void);
 void AW87319_Audio_OFF(void);
 
 
-void aw87319_hw_on(void);
-void aw87319_hw_off(void);
-void aw87319_sw_on(void);
-void aw87319_sw_off(void);
+static void aw87319_hw_on(void);
+static void aw87319_hw_off(void);
+static void aw87319_sw_on(void);
+static void aw87319_sw_off(void);
 
 static ssize_t aw87319_get_reg(struct device* cd, struct device_attribute *attr, char* buf);
 static ssize_t aw87319_set_reg(struct device* cd, struct device_attribute *attr, const char* buf, size_t len);
@@ -58,11 +58,8 @@ static DEVICE_ATTR(reg, 0660, aw87319_get_reg,  aw87319_set_reg);
 static DEVICE_ATTR(swen, 0660, aw87319_get_swen,  aw87319_set_swen);
 static DEVICE_ATTR(hwen, 0660, aw87319_get_hwen,  aw87319_set_hwen);
 
-struct i2c_client *aw87319_pa_client;
-int aw87319_rst;
-struct pinctrl *aw87319ctrl = NULL;
-struct pinctrl_state *aw87319_rst_high = NULL;
-struct pinctrl_state *aw87319_rst_low = NULL;
+static struct i2c_client *aw87319_pa_client;
+static int aw87319_rst;
 
 
 
@@ -199,7 +196,7 @@ void AW87319_Audio_OFF(void)
 
 
 
-void aw87319_sw_on(void)
+static void aw87319_sw_on(void)
 {
 	unsigned char reg;
 	reg = I2C_read_reg(0x01);
@@ -207,7 +204,7 @@ void aw87319_sw_on(void)
 	I2C_write_reg(0x01, reg);
 }
 
-void aw87319_sw_off(void)
+static void aw87319_sw_off(void)
 {
 	unsigned char reg;
 	reg = I2C_read_reg(0x01);
@@ -215,13 +212,13 @@ void aw87319_sw_off(void)
 	I2C_write_reg(0x01, reg);
 }
 
-void aw87319_hw_on(void)
+static void aw87319_hw_on(void)
 {
 	aw87319_pa_pwron();
 	I2C_write_reg(0x64, 0x2C);
 }
 
-void aw87319_hw_off(void)
+static void aw87319_hw_off(void)
 {
 	aw87319_pa_pwroff();
 }
