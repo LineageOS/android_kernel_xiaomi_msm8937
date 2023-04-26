@@ -99,6 +99,7 @@ static int aw2013_power_on(struct aw2013_led *led, bool on)
 				"Regulator vcc enable failed rc=%d\n", rc);
 			goto fail_enable_reg;
 		}
+		msleep(100);
 		led->poweron = true;
 	} else {
 		rc = regulator_disable(led->vdd);
