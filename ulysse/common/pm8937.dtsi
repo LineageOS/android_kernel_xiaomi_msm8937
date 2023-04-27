@@ -47,7 +47,11 @@
 	pwm_ir {
 		pwm_ir_default: pwm_ir_default {
 			pins = "gpio6";
+#ifdef CONFIG_IR_PWM_MI8937
+			function = "func1";
+#else
 			function = "dtest2";
+#endif
 			qcom,drive-strength = <2>;
 #ifdef CONFIG_IR_PWM_MI8937
 			output-high;
@@ -62,7 +66,7 @@
 #ifdef CONFIG_IR_PWM_MI8937
 		pwm_ir_sleep: pwm_ir_sleep {
 			pins = "gpio6";
-			function = "dtest2";
+			function = "func1";
 			qcom,drive-strength = <2>;
 			output-low;
 			bias-pull-down;
