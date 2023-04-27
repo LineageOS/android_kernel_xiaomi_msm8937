@@ -49,10 +49,26 @@
 			pins = "gpio6";
 			function = "dtest2";
 			qcom,drive-strength = <2>;
+#ifdef CONFIG_IR_PWM_MI8937
+			output-high;
+			bias-disable;
+#else
+			output-low;
+			bias-pull-down;
+#endif
+			status = "okay";
+		};
+
+#ifdef CONFIG_IR_PWM_MI8937
+		pwm_ir_sleep: pwm_ir_sleep {
+			pins = "gpio6";
+			function = "dtest2";
+			qcom,drive-strength = <2>;
 			output-low;
 			bias-pull-down;
 			status = "okay";
 		};
+#endif
 	};
 };
 
