@@ -1,3 +1,5 @@
+ifeq (,$(filter y,$(CONFIG_ARCH_MSM8937) $(CONFIG_ARCH_MSM8953)))
+
 # auto-detect subdirs
 ifeq ($(CONFIG_ARCH_SDM845),y)
   audioconf := -include $(srctree)/techpack/audio/config/sdm845autoconf.h
@@ -75,3 +77,8 @@ obj-y += asoc/
 obj-y += dsp/
 obj-y += ipc/
 obj-y += soc/
+
+else
+ccflags-y := -Wno-unused-function
+obj-y := stub.o
+endif
