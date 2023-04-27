@@ -8,7 +8,5 @@
 #endif
 		pwms = <&pm8937_pwm 0 0>;
 		qcom,test-gpios = <&pm8937_gpios 6 0>;
-		reg-id = "vdd";
-		vdd-supply = <&pm8937_l10>;
 	};
 };
