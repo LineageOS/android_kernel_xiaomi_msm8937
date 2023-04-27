@@ -15,6 +15,7 @@
 #include <linux/hrtimer.h>
 #include <linux/module.h>
 #include <linux/of.h>
+#include <linux/pinctrl/consumer.h>
 #include <linux/platform_device.h>
 #include <linux/pwm.h>
 #include <linux/regulator/consumer.h>
@@ -30,6 +31,10 @@ struct pwm_ir_dev {
 	struct pwm_device      *pwm;
 	u32                     carrier;
 	u32                     duty_cycle;
+
+	struct pinctrl *pinctrl;
+	struct pinctrl_state *pinctrl_active;
+	struct pinctrl_state *pinctrl_sleep;
 };
 
 struct pwm_ir_packet {
@@ -201,6 +206,10 @@ static int pwm_ir_tx_transmit(struct rc_dev *rdev, unsigned *txbuf, unsigned n)
 		}
 	}
 
+	if (dev->pinctrl_active) {
+		pinctrl_select_state(dev->pinctrl, dev->pinctrl_active);
+	}
+
 	pkt.pwm    = dev->pwm;
 	pkt.buffer = txbuf;
 	pkt.length = n;
@@ -212,6 +221,10 @@ static int pwm_ir_tx_transmit(struct rc_dev *rdev, unsigned *txbuf, unsigned n)
 
 	if (rc != 0)
 		dev_err(&dev->pdev->dev, "%s: transmit error rc=%d\n", __func__, rc);
+
+	if (dev->pinctrl_sleep) {
+		pinctrl_select_state(dev->pinctrl, dev->pinctrl_sleep);
+	}
 
 	if (dev->reg)
 		regulator_disable(dev->reg);
@@ -236,6 +249,25 @@ static int __devinit pwm_ir_tx_probe(struct pwm_ir_dev *dev)
 		}
 	}
 
+	dev->pinctrl = devm_pinctrl_get(&dev->pdev->dev);
+	if (IS_ERR_OR_NULL(dev->pinctrl)) {
+		dev_err(&dev->pdev->dev, "%s: Cannot get ir gpio pinctrl:%ld\n",
+			__func__, PTR_ERR(dev->pinctrl));
+	} else {
+		dev->pinctrl_active = pinctrl_lookup_state(
+						dev->pinctrl, "ir_active");
+		if (IS_ERR_OR_NULL(dev->pinctrl_active)) {
+			dev_err(&dev->pdev->dev, "%s: Cannot get ir_active pinctrl state:%ld\n",
+				__func__, PTR_ERR(dev->pinctrl_active));
+		}
+
+		dev->pinctrl_sleep = pinctrl_lookup_state(
+						dev->pinctrl, "ir_sleep");
+		if (IS_ERR_OR_NULL(dev->pinctrl_sleep)) {
+			dev_err(&dev->pdev->dev, "%s: Cannot get ir_sleep pinctrl state:%ld\n",
+				__func__, PTR_ERR(dev->pinctrl_sleep));
+		}
+	}
 
 	dev->pwm = of_pwm_get(pdev->dev.of_node, NULL);
 	if (IS_ERR(dev->pwm)) {
@@ -244,7 +276,7 @@ static int __devinit pwm_ir_tx_probe(struct pwm_ir_dev *dev)
 		rc = PTR_ERR(dev->pwm);
 		dev_err(&dev->pdev->dev, "Cannot get PWM device rc:(%d)\n", rc);
 		dev->pwm = NULL;
-		goto err_regulator_put;
+		goto err_pinctrl_regulator_put;
 	}
 
 	if (data->low_active) {
@@ -271,11 +303,17 @@ static int __devinit pwm_ir_tx_probe(struct pwm_ir_dev *dev)
 	pwm_enable(dev->pwm);
 	pwm_disable(dev->pwm);
 
+	if (dev->pinctrl_sleep) {
+		pinctrl_select_state(dev->pinctrl, dev->pinctrl_sleep);
+	}
+
 	return rc;
 
 err_pwm_free:
 	pwm_free(dev->pwm);
-err_regulator_put:
+err_pinctrl_regulator_put:
+	if (dev->pinctrl)
+		devm_pinctrl_put(dev->pinctrl);
 	if (dev->reg)
 		regulator_put(dev->reg);
 	return rc;
@@ -283,6 +321,8 @@ err_regulator_put:
 
 static void pwm_ir_tx_remove(struct pwm_ir_dev *dev)
 {
+	if (dev->pinctrl)
+		devm_pinctrl_put(dev->pinctrl);
 	if (dev->reg)
 		regulator_put(dev->reg);
 	pwm_free(dev->pwm);
