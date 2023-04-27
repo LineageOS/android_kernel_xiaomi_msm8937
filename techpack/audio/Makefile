@@ -1,3 +1,5 @@
+ifeq (,$(filter y,$(CONFIG_ARCH_MSM8937) $(CONFIG_ARCH_MSM8953)))
+
 # auto-detect subdirs
 ifeq ($(CONFIG_ARCH_SDXPOORWILLS), y)
 include $(srctree)/techpack/audio/config/sdxpoorwillsauto.conf
@@ -71,3 +73,8 @@ obj-y += soc/
 obj-y += dsp/
 obj-y += ipc/
 obj-y += asoc/
+
+else
+ccflags-y := -Wno-unused-function
+obj-y := stub.o
+endif
