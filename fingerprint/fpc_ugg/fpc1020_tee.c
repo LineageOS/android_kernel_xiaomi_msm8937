@@ -37,12 +37,6 @@
 #include <linux/platform_device.h>
 #include <linux/regulator/consumer.h>
 #include <linux/proc_fs.h>
-#if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
-#include <xiaomi-msm8937/mach.h>
-#if IS_ENABLED(CONFIG_MACH_XIAOMI_UGG)
-#include <xiaomi-msm8937/ugg_fpsensor.h>
-#endif
-#endif
 
 #define FPC_TTW_HOLD_TIME 1000
 
@@ -473,15 +467,6 @@ static int fpc1020_probe(struct platform_device *pdev)
 	struct kobject *soc_kobj;
 	struct kernfs_node *devices_node, *soc_node;
 
-#if IS_ENABLED(CONFIG_MACH_XIAOMI_UGG)
-	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_UGG) {
-		if (xiaomi_ugg_fpsensor_variant != XIAOMI_UGG_FPSENSOR_FPC) {
-			dev_err(dev, "Xiaomi UGG fingerprint sensor variant is not FPC, Abort probe\n");
-			return -ENODEV;
-		}
-	}
-#endif
-
 	fpc1020 = devm_kzalloc(dev, sizeof(*fpc1020), GFP_KERNEL);
 	if (!fpc1020) {
 		dev_err(dev,
@@ -651,7 +636,7 @@ static struct platform_driver fpc1020_driver = {
 	.remove	= fpc1020_remove,
 };
 
-static int __init fpc1020_init(void)
+int xiaomi_msm8937_fingerprint_fpc_ugg_init(void)
 {
 	int rc = platform_driver_register(&fpc1020_driver);
 
@@ -669,7 +654,6 @@ static void __exit fpc1020_exit(void)
 	platform_driver_unregister(&fpc1020_driver);
 }
 
-module_init(fpc1020_init);
 module_exit(fpc1020_exit);
 
 MODULE_LICENSE("GPL v2");

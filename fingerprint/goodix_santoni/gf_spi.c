@@ -840,7 +840,9 @@ static struct platform_driver gf_driver = {
 	.resume = gf_resume,
 };
 
-static int __init gf_init(void)
+static bool gf_init_finished = false;
+
+int xiaomi_msm8937_fingerprint_goodix_santoni_init(void)
 {
 	int status;
 	FUNC_ENTRY();
@@ -883,17 +885,19 @@ static int __init gf_init(void)
 	pr_info(" status = 0x%x\n", status);
 	FUNC_EXIT();
 
+	gf_init_finished = true;
 	pr_warn("--------gf_init end---OK.--------\n");
 	return 0;
 }
-
-module_init(gf_init);
 
 static void __exit gf_exit(void)
 {
 #ifdef CONFIG_FB
 	struct gf_dev *gf_dev = &gf;
 #endif
+
+	if (!gf_init_finished)
+		return;
 
 	FUNC_ENTRY();
 

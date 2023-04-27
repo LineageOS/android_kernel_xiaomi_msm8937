@@ -42,12 +42,6 @@
 #include <linux/cpufreq.h>
 #include <linux/proc_fs.h>
 #include "gf_spi.h"
-#if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
-#include <xiaomi-msm8937/mach.h>
-#if IS_ENABLED(CONFIG_MACH_XIAOMI_UGG)
-#include <xiaomi-msm8937/ugg_fpsensor.h>
-#endif
-#endif
 
 #if defined(USE_SPI_BUS)
 #include <linux/spi/spi.h>
@@ -851,18 +845,11 @@ static struct platform_driver gf_driver = {
 	.remove = gf_remove,
 };
 
-static int __init gf_init(void)
+static bool gf_init_finished = false;
+
+int xiaomi_msm8937_fingerprint_gf3208_ugg_init(void)
 {
 	int status;
-
-#if IS_ENABLED(CONFIG_MACH_XIAOMI_UGG)
-	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_UGG) {
-		if (xiaomi_ugg_fpsensor_variant != XIAOMI_UGG_FPSENSOR_GOODIX) {
-			pr_err("%s: Xiaomi UGG fingerprint sensor variant is not GOODIX, Abort init\n", __func__);
-			return -ENODEV;
-		}
-	}
-#endif
 
 	BUILD_BUG_ON(N_SPI_MINORS > 256);
 	status = register_chrdev(SPIDEV_MAJOR, CHRD_DRIVER_NAME, &gf_fops);
@@ -891,13 +878,17 @@ static int __init gf_init(void)
 #ifdef GF_NETLINK_ENABLE
 	xiaomi_ugg_netlink_init();
 #endif
+
+	gf_init_finished = true;
 	pr_info("status = 0x%x\n", status);
 	return 0;
 }
-module_init(gf_init);
 
 static void __exit gf_exit(void)
 {
+	if (!gf_init_finished)
+		return;
+
 #ifdef GF_NETLINK_ENABLE
 	xiaomi_ugg_netlink_exit();
 #endif
