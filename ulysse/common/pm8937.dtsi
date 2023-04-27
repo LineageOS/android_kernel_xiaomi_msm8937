@@ -43,15 +43,16 @@
 	interrupt-names = "pm8937_gpio1", "pm8937_gpio2", "pm8937_gpio5",
 			  "pm8937_gpio6", "pmi8937_gpio7", "pm8937_gpio8";
 	qcom,gpios-disallowed = <3 4>;
-	pinctrl-names = "default";
-	pinctrl-0 = <&pwm_ir_default>;
-	pwm_ir_default: pm8937_gpio6 {
-		pins = "gpio6";
-		function = "dtest2";
-		qcom,drive-strength = <2>;
-		output-low;
-		bias-disable;
-		status = "okay";
+
+	pwm_ir {
+		pwm_ir_default: pwm_ir_default {
+			pins = "gpio6";
+			function = "dtest2";
+			qcom,drive-strength = <2>;
+			output-low;
+			bias-pull-down;
+			status = "okay";
+		};
 	};
 };
 
