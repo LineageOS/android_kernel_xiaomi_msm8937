@@ -16,6 +16,7 @@
 #include <media/v4l2-device.h>
 #include <media/v4l2-fh.h>
 #include <media/v4l2-ctrls.h>
+#include <media/videobuf2-v4l2.h>
 #include <linux/msm-bus.h>
 #include <media/msm_fd-legacy-m.h>
 #include <linux/dma-buf.h>
