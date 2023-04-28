@@ -1,5 +1,7 @@
 menu "Tech packages"
 
+source "techpack/camera-legacy/Kconfig"
+source "techpack/camera-legacy-m/Kconfig"
 source "techpack/xiaomi-msm8937/Kconfig"
 
 endmenu
