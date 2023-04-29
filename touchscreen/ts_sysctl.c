@@ -102,14 +102,14 @@ static struct ctl_table xiaomi_msm8937_touchscreen_files[] = {
 		.procname	= "enable_dt2w",
 		.data		= &xiaomi_msm8937_touchscreen_enable_dt2w_val,
 		.maxlen		= sizeof(int),
-		.mode		= 0664,
+		.mode		= 0666,
 		.proc_handler	= xiaomi_msm8937_touchscreen_toggle_enable_dt2w,
 	},
 	{
 		.procname	= "disable_keys",
 		.data		= &xiaomi_msm8937_touchscreen_disable_keys_val,
 		.maxlen		= sizeof(int),
-		.mode		= 0664,
+		.mode		= 0666,
 		.proc_handler	= xiaomi_msm8937_touchscreen_toggle_disable_keys,
 	},
 	{ }
