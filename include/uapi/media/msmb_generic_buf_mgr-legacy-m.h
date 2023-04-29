@@ -1,0 +1,1 @@
+../../../techpack/camera-legacy-m/include/uapi/media/msmb_generic_buf_mgr-legacy-m.h

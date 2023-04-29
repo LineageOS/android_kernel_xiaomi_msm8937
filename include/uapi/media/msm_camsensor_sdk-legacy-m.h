@@ -1,0 +1,1 @@
+../../../techpack/camera-legacy-m/include/uapi/media/msm_camsensor_sdk-legacy-m.h
