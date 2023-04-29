@@ -19,6 +19,7 @@
 #include <linux/sched.h>
 #if IS_ENABLED(CONFIG_AVTIMER_LEGACY)
 #include <media/msmb_isp.h>
+void __weak msm_isp_set_avtimer_fptr(struct avtimer_fptr_t avtimer_func) {}
 #if IS_ENABLED(CONFIG_MSMB_CAMERA_LEGACY)
 extern void legacy_msm_isp_set_avtimer_fptr(struct avtimer_fptr_t avtimer_func);
 #endif
