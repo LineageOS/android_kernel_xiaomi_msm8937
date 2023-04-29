@@ -1,0 +1,1 @@
+../../techpack/camera-legacy-m/include/media/msmb_generic_buf_mgr-legacy-m.h
