@@ -69,7 +69,7 @@ static struct ctl_table xiaomi_sdm439_touchscreen_files[] = {
 		.procname	= "enable_dt2w",
 		.data		= &xiaomi_sdm439_touchscreen_enable_dt2w_val,
 		.maxlen		= sizeof(int),
-		.mode		= 0664,
+		.mode		= 0666,
 		.proc_handler	= xiaomi_sdm439_touchscreen_toggle_enable_dt2w,
 	},
 	{ }
