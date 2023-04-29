@@ -1682,7 +1682,7 @@ static int fts_input_report_key(struct fts_ts_data *data, int index)
 
 #if IS_ENABLED(CONFIG_TOUCHSCREEN_SYSCTL_MI8937)
 	if (data->disable_keys) {
-		return 0;
+		return -EINVAL;
 	}
 #endif
 
