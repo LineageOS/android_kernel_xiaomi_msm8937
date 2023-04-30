@@ -1050,7 +1050,7 @@ void legacy_msm_isp_notify(struct vfe_device *vfe_dev, uint32_t event_type,
 		ISP_DBG("%s: vfe %d frame_src %d frame id: %u\n", __func__,
 			vfe_dev->pdev->id, frame_src,
 			vfe_dev->axi_data.src_info[frame_src].frame_id);
-		trace_msm_cam_isp_bufcount("legacy_msm_isp_notify:",
+		trace_legacy_msm_cam_isp_bufcount("legacy_msm_isp_notify:",
 		vfe_dev->pdev->id,
 		vfe_dev->axi_data.src_info[frame_src].frame_id, frame_src);
 
@@ -2162,7 +2162,7 @@ static int msm_isp_process_done_buf(struct vfe_device *vfe_dev,
 		}
 	}
 
-	trace_msm_cam_isp_bufcount("msm_isp_process_done_buf:",
+	trace_legacy_msm_cam_isp_bufcount("msm_isp_process_done_buf:",
 		vfe_dev->pdev->id, frame_id,
 		SRC_TO_INTF(stream_info->stream_src));
 
@@ -3420,7 +3420,7 @@ static int msm_isp_request_frame(struct vfe_device *vfe_dev,
 	}
 
 	frame_src = SRC_TO_INTF(stream_info->stream_src);
-	trace_msm_cam_isp_bufcount("msm_isp_request_frame:",
+	trace_legacy_msm_cam_isp_bufcount("msm_isp_request_frame:",
 		vfe_dev->pdev->id, frame_id, frame_src);
 
 	/*

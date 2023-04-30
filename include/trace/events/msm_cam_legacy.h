@@ -23,7 +23,7 @@
 struct vfe_device;
 #define STRING_LEN 80
 
-TRACE_EVENT(msm_cam_isp_overflow,
+TRACE_EVENT(legacy_msm_cam_isp_overflow,
 
 	TP_PROTO(struct vfe_device *vfe_dev,
 		unsigned int irq_status0,
@@ -217,7 +217,7 @@ TRACE_EVENT(msm_cam_isp_overflow,
 	)
 );
 
-TRACE_EVENT(msm_cam_tasklet_debug_dump,
+TRACE_EVENT(legacy_msm_cam_tasklet_debug_dump,
 	TP_PROTO(struct dual_vfe_state tasklet_state),
 	TP_ARGS(tasklet_state),
 	TP_STRUCT__entry(
@@ -255,7 +255,7 @@ TRACE_EVENT(msm_cam_tasklet_debug_dump,
 	)
 );
 
-TRACE_EVENT(msm_cam_ping_pong_debug_dump,
+TRACE_EVENT(legacy_msm_cam_ping_pong_debug_dump,
 	TP_PROTO(struct dual_vfe_state ping_pong_state),
 	TP_ARGS(ping_pong_state),
 	TP_STRUCT__entry(
@@ -308,7 +308,7 @@ TRACE_EVENT(msm_cam_ping_pong_debug_dump,
 	)
 );
 
-TRACE_EVENT(msm_cam_string,
+TRACE_EVENT(legacy_msm_cam_string,
 	TP_PROTO(const char *str),
 	TP_ARGS(str),
 	TP_STRUCT__entry(
@@ -320,7 +320,7 @@ TRACE_EVENT(msm_cam_string,
 	TP_printk("msm_cam: %s", __entry->str)
 );
 
-TRACE_EVENT(msm_cam_isp_bufcount,
+TRACE_EVENT(legacy_msm_cam_isp_bufcount,
 	TP_PROTO(const char *str,
 	unsigned int vfe_id,
 	unsigned int frame_id,
