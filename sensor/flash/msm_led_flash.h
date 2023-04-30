@@ -71,27 +71,27 @@ struct msm_led_flash_ctrl_t {
 	struct msm_pinctrl_info pinctrl_info;
 };
 
-int msm_flash_i2c_probe(struct i2c_client *client,
+int legacy_msm_flash_i2c_probe(struct i2c_client *client,
 	const struct i2c_device_id *id);
 
-int msm_flash_probe(struct platform_device *pdev, const void *data);
+int legacy_msm_flash_probe(struct platform_device *pdev, const void *data);
 
-int32_t msm_led_flash_create_v4lsubdev(struct platform_device *pdev,
+int32_t legacy_msm_led_flash_create_v4lsubdev(struct platform_device *pdev,
 	void *data);
-int32_t msm_led_i2c_flash_create_v4lsubdev(void *data);
+int32_t legacy_msm_led_i2c_flash_create_v4lsubdev(void *data);
 
-int32_t msm_led_i2c_trigger_get_subdev_id(struct msm_led_flash_ctrl_t *fctrl,
+int32_t legacy_msm_led_i2c_trigger_get_subdev_id(struct msm_led_flash_ctrl_t *fctrl,
 	void *arg);
 
-int32_t msm_led_i2c_trigger_config(struct msm_led_flash_ctrl_t *fctrl,
+int32_t legacy_msm_led_i2c_trigger_config(struct msm_led_flash_ctrl_t *fctrl,
 	void *data);
 
-int32_t msm_led_torch_create_classdev(struct platform_device *pdev,
+int32_t legacy_msm_led_torch_create_classdev(struct platform_device *pdev,
 	void *data);
 
-int msm_flash_led_init(struct msm_led_flash_ctrl_t *fctrl);
-int msm_flash_led_release(struct msm_led_flash_ctrl_t *fctrl);
-int msm_flash_led_off(struct msm_led_flash_ctrl_t *fctrl);
-int msm_flash_led_low(struct msm_led_flash_ctrl_t *fctrl);
-int msm_flash_led_high(struct msm_led_flash_ctrl_t *fctrl);
+int legacy_msm_flash_led_init(struct msm_led_flash_ctrl_t *fctrl);
+int legacy_msm_flash_led_release(struct msm_led_flash_ctrl_t *fctrl);
+int legacy_msm_flash_led_off(struct msm_led_flash_ctrl_t *fctrl);
+int legacy_msm_flash_led_low(struct msm_led_flash_ctrl_t *fctrl);
+int legacy_msm_flash_led_high(struct msm_led_flash_ctrl_t *fctrl);
 #endif

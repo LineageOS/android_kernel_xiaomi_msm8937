@@ -281,13 +281,13 @@ struct cpp_device {
 	struct msm_cpp_vbif_data *vbif_data;
 };
 
-int msm_cpp_set_micro_clk(struct cpp_device *cpp_dev);
-int msm_update_freq_tbl(struct cpp_device *cpp_dev);
-int msm_cpp_get_clock_index(struct cpp_device *cpp_dev, const char *clk_name);
-long msm_cpp_set_core_clk(struct cpp_device *cpp_dev, long rate, int idx);
-void msm_cpp_fetch_dt_params(struct cpp_device *cpp_dev);
-int msm_cpp_read_payload_params_from_dt(struct cpp_device *cpp_dev);
-void msm_cpp_vbif_register_error_handler(void *dev,
+int legacy_msm_cpp_set_micro_clk(struct cpp_device *cpp_dev);
+int legacy_msm_update_freq_tbl(struct cpp_device *cpp_dev);
+int legacy_msm_cpp_get_clock_index(struct cpp_device *cpp_dev, const char *clk_name);
+long legacy_msm_cpp_set_core_clk(struct cpp_device *cpp_dev, long rate, int idx);
+void legacy_msm_cpp_fetch_dt_params(struct cpp_device *cpp_dev);
+int legacy_msm_cpp_read_payload_params_from_dt(struct cpp_device *cpp_dev);
+void legacy_msm_cpp_vbif_register_error_handler(void *dev,
 	enum cpp_vbif_client client,
 	int (*client_vbif_error_handler)(void *, uint32_t));
 

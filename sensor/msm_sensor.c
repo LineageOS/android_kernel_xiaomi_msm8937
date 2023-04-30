@@ -79,7 +79,7 @@ static void msm_sensor_misc_regulator(
 	}
 }
 
-int32_t msm_sensor_free_sensor_data(struct msm_sensor_ctrl_t *s_ctrl)
+int32_t legacy_msm_sensor_free_sensor_data(struct msm_sensor_ctrl_t *s_ctrl)
 {
 	if (!s_ctrl->pdev && !s_ctrl->sensor_i2c_client->client)
 		return 0;
@@ -96,13 +96,13 @@ int32_t msm_sensor_free_sensor_data(struct msm_sensor_ctrl_t *s_ctrl)
 	kfree(s_ctrl->sensordata->csi_lane_params);
 	kfree(s_ctrl->sensordata->sensor_info);
 	if (s_ctrl->sensor_device_type == MSM_CAMERA_I2C_DEVICE) {
-		msm_camera_i2c_dev_put_clk_info(
+		legacy_msm_camera_i2c_dev_put_clk_info(
 			&s_ctrl->sensor_i2c_client->client->dev,
 			&s_ctrl->sensordata->power_info.clk_info,
 			&s_ctrl->sensordata->power_info.clk_ptr,
 			s_ctrl->sensordata->power_info.clk_info_size);
 	} else {
-		msm_camera_put_clk_info(s_ctrl->pdev,
+		legacy_msm_camera_put_clk_info(s_ctrl->pdev,
 			&s_ctrl->sensordata->power_info.clk_info,
 			&s_ctrl->sensordata->power_info.clk_ptr,
 			s_ctrl->sensordata->power_info.clk_info_size);
@@ -112,7 +112,7 @@ int32_t msm_sensor_free_sensor_data(struct msm_sensor_ctrl_t *s_ctrl)
 	return 0;
 }
 
-int msm_sensor_power_down(struct msm_sensor_ctrl_t *s_ctrl)
+int legacy_msm_sensor_power_down(struct msm_sensor_ctrl_t *s_ctrl)
 {
 	struct msm_camera_power_ctrl_t *power_info;
 	enum msm_camera_device_type_t sensor_device_type;
@@ -139,13 +139,13 @@ int msm_sensor_power_down(struct msm_sensor_ctrl_t *s_ctrl)
 
 	/* Power down secure session if it exist*/
 	if (s_ctrl->is_secure)
-		msm_camera_tz_i2c_power_down(sensor_i2c_client);
+		legacy_msm_camera_tz_i2c_power_down(sensor_i2c_client);
 
-	return msm_camera_power_down(power_info, sensor_device_type,
+	return legacy_msm_camera_power_down(power_info, sensor_device_type,
 		sensor_i2c_client);
 }
 
-int msm_sensor_power_up(struct msm_sensor_ctrl_t *s_ctrl)
+int legacy_msm_sensor_power_up(struct msm_sensor_ctrl_t *s_ctrl)
 {
 	int rc;
 	struct msm_camera_power_ctrl_t *power_info;
@@ -184,7 +184,7 @@ int msm_sensor_power_up(struct msm_sensor_ctrl_t *s_ctrl)
 
 	for (retry = 0; retry < 3; retry++) {
 		if (s_ctrl->is_secure) {
-			rc = msm_camera_tz_i2c_power_up(sensor_i2c_client);
+			rc = legacy_msm_camera_tz_i2c_power_up(sensor_i2c_client);
 			if (rc < 0) {
 #ifdef CONFIG_MSM_SEC_CCI_DEBUG
 				CDBG("Secure Sensor %d use cci\n", s_ctrl->id);
@@ -200,13 +200,13 @@ int msm_sensor_power_up(struct msm_sensor_ctrl_t *s_ctrl)
 					&msm_sensor_secure_func_tbl;
 			}
 		}
-		rc = msm_camera_power_up(power_info, s_ctrl->sensor_device_type,
+		rc = legacy_msm_camera_power_up(power_info, s_ctrl->sensor_device_type,
 			sensor_i2c_client);
 		if (rc < 0)
 			return rc;
-		rc = msm_sensor_check_id(s_ctrl);
+		rc = legacy_msm_sensor_check_id(s_ctrl);
 		if (rc < 0) {
-			msm_camera_power_down(power_info,
+			legacy_msm_camera_power_down(power_info,
 				s_ctrl->sensor_device_type, sensor_i2c_client);
 			msleep(20);
 			continue;
@@ -237,7 +237,7 @@ static uint16_t msm_sensor_id_by_mask(struct msm_sensor_ctrl_t *s_ctrl,
 	return sensor_id;
 }
 
-int msm_sensor_match_id(struct msm_sensor_ctrl_t *s_ctrl)
+int legacy_msm_sensor_match_id(struct msm_sensor_ctrl_t *s_ctrl)
 {
 	int rc = 0;
 	uint16_t chipid = 0;
@@ -373,7 +373,7 @@ static long msm_sensor_subdev_do_ioctl(
 	}
 }
 
-long msm_sensor_subdev_fops_ioctl(struct file *file,
+long legacy_msm_sensor_subdev_fops_ioctl(struct file *file,
 	unsigned int cmd, unsigned long arg)
 {
 	return video_usercopy(file, cmd, arg, msm_sensor_subdev_do_ioctl);
@@ -908,7 +908,7 @@ DONE:
 }
 #endif
 
-int msm_sensor_config(struct msm_sensor_ctrl_t *s_ctrl, void __user *argp)
+int legacy_msm_sensor_config(struct msm_sensor_ctrl_t *s_ctrl, void __user *argp)
 {
 	struct sensorb_cfg_data *cdata = (struct sensorb_cfg_data *)argp;
 	int32_t rc = 0;
@@ -1389,14 +1389,14 @@ DONE:
 	return rc;
 }
 
-int msm_sensor_check_id(struct msm_sensor_ctrl_t *s_ctrl)
+int legacy_msm_sensor_check_id(struct msm_sensor_ctrl_t *s_ctrl)
 {
 	int rc;
 
 	if (s_ctrl->func_tbl->sensor_match_id)
 		rc = s_ctrl->func_tbl->sensor_match_id(s_ctrl);
 	else
-		rc = msm_sensor_match_id(s_ctrl);
+		rc = legacy_msm_sensor_match_id(s_ctrl);
 	if (rc < 0)
 		pr_err("%s:%d match id failed rc %d\n", __func__, __LINE__, rc);
 	return rc;
@@ -1425,61 +1425,61 @@ static struct v4l2_subdev_ops msm_sensor_subdev_ops = {
 };
 
 static struct msm_sensor_fn_t msm_sensor_func_tbl = {
-	.sensor_config = msm_sensor_config,
+	.sensor_config = legacy_msm_sensor_config,
 #ifdef CONFIG_COMPAT
 	.sensor_config32 = msm_sensor_config32,
 #endif
-	.sensor_power_up = msm_sensor_power_up,
-	.sensor_power_down = msm_sensor_power_down,
-	.sensor_match_id = msm_sensor_match_id,
+	.sensor_power_up = legacy_msm_sensor_power_up,
+	.sensor_power_down = legacy_msm_sensor_power_down,
+	.sensor_match_id = legacy_msm_sensor_match_id,
 };
 
 static struct msm_camera_i2c_fn_t msm_sensor_cci_func_tbl = {
-	.i2c_read = msm_camera_cci_i2c_read,
-	.i2c_read_seq = msm_camera_cci_i2c_read_seq,
-	.i2c_write = msm_camera_cci_i2c_write,
-	.i2c_write_table = msm_camera_cci_i2c_write_table,
-	.i2c_write_seq_table = msm_camera_cci_i2c_write_seq_table,
+	.i2c_read = legacy_msm_camera_cci_i2c_read,
+	.i2c_read_seq = legacy_msm_camera_cci_i2c_read_seq,
+	.i2c_write = legacy_msm_camera_cci_i2c_write,
+	.i2c_write_table = legacy_msm_camera_cci_i2c_write_table,
+	.i2c_write_seq_table = legacy_msm_camera_cci_i2c_write_seq_table,
 	.i2c_write_table_w_microdelay =
-		msm_camera_cci_i2c_write_table_w_microdelay,
-	.i2c_util = msm_sensor_cci_i2c_util,
-	.i2c_write_conf_tbl = msm_camera_cci_i2c_write_conf_tbl,
-	.i2c_write_table_async = msm_camera_cci_i2c_write_table_async,
-	.i2c_write_table_sync = msm_camera_cci_i2c_write_table_sync,
-	.i2c_write_table_sync_block = msm_camera_cci_i2c_write_table_sync_block,
+		legacy_msm_camera_cci_i2c_write_table_w_microdelay,
+	.i2c_util = legacy_msm_sensor_cci_i2c_util,
+	.i2c_write_conf_tbl = legacy_msm_camera_cci_i2c_write_conf_tbl,
+	.i2c_write_table_async = legacy_msm_camera_cci_i2c_write_table_async,
+	.i2c_write_table_sync = legacy_msm_camera_cci_i2c_write_table_sync,
+	.i2c_write_table_sync_block = legacy_msm_camera_cci_i2c_write_table_sync_block,
 
 };
 
 static struct msm_camera_i2c_fn_t msm_sensor_qup_func_tbl = {
-	.i2c_read = msm_camera_qup_i2c_read,
-	.i2c_read_seq = msm_camera_qup_i2c_read_seq,
-	.i2c_write = msm_camera_qup_i2c_write,
-	.i2c_write_table = msm_camera_qup_i2c_write_table,
-	.i2c_write_seq_table = msm_camera_qup_i2c_write_seq_table,
+	.i2c_read = legacy_msm_camera_qup_i2c_read,
+	.i2c_read_seq = legacy_msm_camera_qup_i2c_read_seq,
+	.i2c_write = legacy_msm_camera_qup_i2c_write,
+	.i2c_write_table = legacy_msm_camera_qup_i2c_write_table,
+	.i2c_write_seq_table = legacy_msm_camera_qup_i2c_write_seq_table,
 	.i2c_write_table_w_microdelay =
-		msm_camera_qup_i2c_write_table_w_microdelay,
-	.i2c_write_conf_tbl = msm_camera_qup_i2c_write_conf_tbl,
-	.i2c_write_table_async = msm_camera_qup_i2c_write_table,
-	.i2c_write_table_sync = msm_camera_qup_i2c_write_table,
-	.i2c_write_table_sync_block = msm_camera_qup_i2c_write_table,
+		legacy_msm_camera_qup_i2c_write_table_w_microdelay,
+	.i2c_write_conf_tbl = legacy_msm_camera_qup_i2c_write_conf_tbl,
+	.i2c_write_table_async = legacy_msm_camera_qup_i2c_write_table,
+	.i2c_write_table_sync = legacy_msm_camera_qup_i2c_write_table,
+	.i2c_write_table_sync_block = legacy_msm_camera_qup_i2c_write_table,
 };
 
 static struct msm_camera_i2c_fn_t msm_sensor_secure_func_tbl = {
-	.i2c_read = msm_camera_tz_i2c_read,
-	.i2c_read_seq = msm_camera_tz_i2c_read_seq,
-	.i2c_write = msm_camera_tz_i2c_write,
-	.i2c_write_table = msm_camera_tz_i2c_write_table,
-	.i2c_write_seq_table = msm_camera_tz_i2c_write_seq_table,
+	.i2c_read = legacy_msm_camera_tz_i2c_read,
+	.i2c_read_seq = legacy_msm_camera_tz_i2c_read_seq,
+	.i2c_write = legacy_msm_camera_tz_i2c_write,
+	.i2c_write_table = legacy_msm_camera_tz_i2c_write_table,
+	.i2c_write_seq_table = legacy_msm_camera_tz_i2c_write_seq_table,
 	.i2c_write_table_w_microdelay =
-		msm_camera_tz_i2c_write_table_w_microdelay,
-	.i2c_util = msm_sensor_tz_i2c_util,
-	.i2c_write_conf_tbl = msm_camera_tz_i2c_write_conf_tbl,
-	.i2c_write_table_async = msm_camera_tz_i2c_write_table_async,
-	.i2c_write_table_sync = msm_camera_tz_i2c_write_table_sync,
-	.i2c_write_table_sync_block = msm_camera_tz_i2c_write_table_sync_block,
+		legacy_msm_camera_tz_i2c_write_table_w_microdelay,
+	.i2c_util = legacy_msm_sensor_tz_i2c_util,
+	.i2c_write_conf_tbl = legacy_msm_camera_tz_i2c_write_conf_tbl,
+	.i2c_write_table_async = legacy_msm_camera_tz_i2c_write_table_async,
+	.i2c_write_table_sync = legacy_msm_camera_tz_i2c_write_table_sync,
+	.i2c_write_table_sync_block = legacy_msm_camera_tz_i2c_write_table_sync_block,
 };
 
-int32_t msm_sensor_init_default_params(struct msm_sensor_ctrl_t *s_ctrl)
+int32_t legacy_msm_sensor_init_default_params(struct msm_sensor_ctrl_t *s_ctrl)
 {
 	struct msm_camera_cci_client *cci_client = NULL;
 	unsigned long mount_pos = 0;
@@ -1510,10 +1510,10 @@ int32_t msm_sensor_init_default_params(struct msm_sensor_ctrl_t *s_ctrl)
 		cci_client = s_ctrl->sensor_i2c_client->cci_client;
 
 		/* Get CCI subdev */
-		cci_client->cci_subdev = msm_cci_get_subdev();
+		cci_client->cci_subdev = legacy_msm_cci_get_subdev();
 
 		if (s_ctrl->is_secure)
-			msm_camera_tz_i2c_register_sensor((void *)s_ctrl);
+			legacy_msm_camera_tz_i2c_register_sensor((void *)s_ctrl);
 
 		/* Update CCI / I2C function table */
 		if (!s_ctrl->sensor_i2c_client->i2c_func_tbl)

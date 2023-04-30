@@ -41,7 +41,7 @@ struct msm_sd_close_ioctl {
 #define MSM_SD_UNNOTIFY_FREEZE \
 	_IOWR('V', BASE_VIDIOC_PRIVATE + 31, struct msm_sd_close_ioctl)
 /*
- * This is used to install Sequence in msm_sd_register.
+ * This is used to install Sequence in legacy_msm_sd_register.
  * During msm_close, proper close sequence will be triggered.
  * For example:
  *
@@ -89,11 +89,11 @@ struct msm_sd_req_vb2_q {
 #define MSM_CAM_GET_IOCTL_ARG_PTR(ptr, \
 	ioctl_ptr, len) memcpy(ptr, ioctl_ptr, len)
 
-int msm_sd_register(struct msm_sd_subdev *msm_subdev);
-int msm_sd_unregister(struct msm_sd_subdev *sd);
+int legacy_msm_sd_register(struct msm_sd_subdev *msm_subdev);
+int legacy_msm_sd_unregister(struct msm_sd_subdev *sd);
 struct v4l2_subdev *msm_sd_get_subdev(struct v4l2_subdev *sd,
 	const char *get_name);
 void msm_sd_put_subdev(struct v4l2_subdev *sd, struct v4l2_subdev *put);
-void msm_cam_copy_v4l2_subdev_fops(struct v4l2_file_operations *d1);
+void legacy_msm_cam_copy_v4l2_subdev_fops(struct v4l2_file_operations *d1);
 
 #endif /*_MSM_SD_H */

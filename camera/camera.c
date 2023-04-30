@@ -100,7 +100,7 @@ static int camera_v4l2_querycap(struct file *filep, void *fh,
 	camera_pack_event(filep, MSM_CAMERA_GET_PARM,
 		MSM_CAMERA_PRIV_QUERY_CAP, -1, &event);
 
-	rc = msm_post_event(&event, MSM_POST_EVT_TIMEOUT);
+	rc = legacy_msm_post_event(&event, MSM_POST_EVT_TIMEOUT);
 	if (rc < 0)
 		return rc;
 
@@ -127,7 +127,7 @@ static int camera_v4l2_s_crop(struct file *filep, void *fh,
 		camera_pack_event(filep, MSM_CAMERA_SET_PARM,
 			MSM_CAMERA_PRIV_S_CROP, -1, &event);
 
-		rc = msm_post_event(&event, MSM_POST_EVT_TIMEOUT);
+		rc = legacy_msm_post_event(&event, MSM_POST_EVT_TIMEOUT);
 		if (rc < 0)
 			return rc;
 
@@ -150,7 +150,7 @@ static int camera_v4l2_g_crop(struct file *filep, void *fh,
 		camera_pack_event(filep, MSM_CAMERA_GET_PARM,
 			MSM_CAMERA_PRIV_G_CROP, -1, &event);
 
-		rc = msm_post_event(&event, MSM_POST_EVT_TIMEOUT);
+		rc = legacy_msm_post_event(&event, MSM_POST_EVT_TIMEOUT);
 		if (rc < 0)
 			return rc;
 
@@ -174,7 +174,7 @@ static int camera_v4l2_queryctrl(struct file *filep, void *fh,
 		camera_pack_event(filep, MSM_CAMERA_GET_PARM,
 			ctrl->id, -1, &event);
 
-		rc = msm_post_event(&event, MSM_POST_EVT_TIMEOUT);
+		rc = legacy_msm_post_event(&event, MSM_POST_EVT_TIMEOUT);
 		if (rc < 0)
 			return rc;
 
@@ -199,7 +199,7 @@ static int camera_v4l2_g_ctrl(struct file *filep, void *fh,
 			camera_pack_event(filep, MSM_CAMERA_GET_PARM,
 					ctrl->id, -1, &event);
 
-			rc = msm_post_event(&event, MSM_POST_EVT_TIMEOUT);
+			rc = legacy_msm_post_event(&event, MSM_POST_EVT_TIMEOUT);
 			if (rc < 0)
 				return rc;
 
@@ -220,7 +220,7 @@ static int camera_v4l2_s_ctrl(struct file *filep, void *fh,
 		camera_pack_event(filep, MSM_CAMERA_SET_PARM, ctrl->id,
 		ctrl->value, &event);
 
-		rc = msm_post_event(&event, MSM_POST_EVT_TIMEOUT);
+		rc = legacy_msm_post_event(&event, MSM_POST_EVT_TIMEOUT);
 		if (rc < 0)
 			return rc;
 		event_data = (struct msm_v4l2_event_data *)event.u.data;
@@ -239,7 +239,7 @@ static int camera_v4l2_reqbufs(struct file *filep, void *fh,
 	struct camera_v4l2_private *sp = fh_to_private(fh);
 	struct msm_video_device *pvdev = video_drvdata(filep);
 	unsigned int session_id = pvdev->vdev->num;
-	session = msm_session_find(session_id);
+	session = legacy_msm_session_find(session_id);
 	if (WARN_ON(!session))
 		return -EIO;
 	mutex_lock(&sp->lock);
@@ -262,7 +262,7 @@ static int camera_v4l2_qbuf(struct file *filep, void *fh,
 	struct camera_v4l2_private *sp = fh_to_private(fh);
 		struct msm_video_device *pvdev = video_drvdata(filep);
 	unsigned int session_id = pvdev->vdev->num;
-	session = msm_session_find(session_id);
+	session = legacy_msm_session_find(session_id);
 	if (WARN_ON(!session))
 		return -EIO;
 	mutex_lock(&sp->lock);
@@ -279,7 +279,7 @@ static int camera_v4l2_dqbuf(struct file *filep, void *fh,
 	struct camera_v4l2_private *sp = fh_to_private(fh);
 		struct msm_video_device *pvdev = video_drvdata(filep);
 	unsigned int session_id = pvdev->vdev->num;
-	session = msm_session_find(session_id);
+	session = legacy_msm_session_find(session_id);
 	if (WARN_ON(!session))
 		return -EIO;
 	mutex_lock(&sp->lock);
@@ -305,7 +305,7 @@ static int camera_v4l2_streamon(struct file *filep, void *fh,
 	camera_pack_event(filep, MSM_CAMERA_SET_PARM,
 		MSM_CAMERA_PRIV_STREAM_ON, -1, &event);
 
-	rc = msm_post_event(&event, MSM_POST_EVT_TIMEOUT);
+	rc = legacy_msm_post_event(&event, MSM_POST_EVT_TIMEOUT);
 	if (rc < 0)
 		return rc;
 
@@ -324,7 +324,7 @@ static int camera_v4l2_streamoff(struct file *filep, void *fh,
 		camera_pack_event(filep, MSM_CAMERA_SET_PARM,
 			MSM_CAMERA_PRIV_STREAM_OFF, -1, &event);
 
-		rc = msm_post_event(&event, MSM_POST_EVT_TIMEOUT);
+		rc = legacy_msm_post_event(&event, MSM_POST_EVT_TIMEOUT);
 		if (rc < 0)
 			return rc;
 		rc = camera_check_event_status(&event);
@@ -349,7 +349,7 @@ static int camera_v4l2_g_fmt_vid_cap_mplane(struct file *filep, void *fh,
 		camera_pack_event(filep, MSM_CAMERA_GET_PARM,
 			MSM_CAMERA_PRIV_G_FMT, -1, &event);
 
-		rc = msm_post_event(&event, MSM_POST_EVT_TIMEOUT);
+		rc = legacy_msm_post_event(&event, MSM_POST_EVT_TIMEOUT);
 		if (rc < 0)
 			return rc;
 
@@ -398,7 +398,7 @@ static int camera_v4l2_s_fmt_vid_cap_mplane(struct file *filep, void *fh,
 			camera_pack_event(filep, MSM_CAMERA_SET_PARM,
 				MSM_CAMERA_PRIV_S_FMT, -1, &event);
 
-			rc = msm_post_event(&event, MSM_POST_EVT_TIMEOUT);
+			rc = legacy_msm_post_event(&event, MSM_POST_EVT_TIMEOUT);
 			if (rc < 0)
 				goto done;
 			rc = camera_check_event_status(&event);
@@ -437,13 +437,13 @@ static int camera_v4l2_s_parm(struct file *filep, void *fh,
 	camera_pack_event(filep, MSM_CAMERA_SET_PARM,
 		MSM_CAMERA_PRIV_NEW_STREAM, -1, &event);
 
-	rc = msm_create_stream(event_data->session_id,
+	rc = legacy_msm_create_stream(event_data->session_id,
 		event_data->stream_id, &sp->vb2_q);
 	if (rc < 0)
 		return rc;
 
 	if (msm_is_daemon_present() != false) {
-		rc = msm_post_event(&event, MSM_POST_EVT_TIMEOUT);
+		rc = legacy_msm_post_event(&event, MSM_POST_EVT_TIMEOUT);
 		if (rc < 0)
 			goto error;
 
@@ -458,7 +458,7 @@ static int camera_v4l2_s_parm(struct file *filep, void *fh,
 	return rc;
 
 error:
-	msm_delete_stream(event_data->session_id,
+	legacy_msm_delete_stream(event_data->session_id,
 		event_data->stream_id);
 	return rc;
 }
@@ -513,7 +513,7 @@ static long camera_v4l2_vidioc_private_ioctl(struct file *filep, void *fh,
 			sizeof(struct msm_camera_return_buf))) {
 			return -EFAULT;
 		}
-		rc = msm_vb2_return_buf_by_idx(pvdev->vdev->num, sp->stream_id,
+		rc = legacy_msm_vb2_return_buf_by_idx(pvdev->vdev->num, sp->stream_id,
 			ptr.index);
 		}
 		break;
@@ -614,8 +614,8 @@ static int camera_v4l2_vb2_q_init(struct file *filep)
 	}
 	mutex_init(q->lock);
 
-	q->mem_ops = msm_vb2_get_q_mem_ops();
-	q->ops = msm_vb2_get_q_ops();
+	q->mem_ops = legacy_msm_vb2_get_q_mem_ops();
+	q->ops = legacy_msm_vb2_get_q_ops();
 
 	/* default queue type */
 	q->type = V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE;
@@ -667,17 +667,17 @@ static int camera_v4l2_open(struct file *filep)
 		pm_stay_awake(&pvdev->vdev->dev);
 
 		/* Disable power collapse latency */
-		msm_pm_qos_update_request(CAMERA_DISABLE_PC_LATENCY);
+		legacy_msm_pm_qos_update_request(CAMERA_DISABLE_PC_LATENCY);
 
 		/* create a new session when first opened */
-		rc = msm_create_session(pvdev->vdev->num, pvdev->vdev);
+		rc = legacy_msm_create_session(pvdev->vdev->num, pvdev->vdev);
 		if (rc < 0) {
 			pr_err("%s : session creation failed Line %d rc %d\n",
 					__func__, __LINE__, rc);
 			goto session_fail;
 		}
 
-		rc = msm_create_command_ack_q(pvdev->vdev->num,
+		rc = legacy_msm_create_command_ack_q(pvdev->vdev->num,
 			find_first_zero_bit((const unsigned long *)&opn_idx,
 				MSM_CAMERA_STREAM_CNT_BITS));
 		if (rc < 0) {
@@ -690,7 +690,7 @@ static int camera_v4l2_open(struct file *filep)
 		if (msm_is_daemon_present() != false) {
 			camera_pack_event(filep, MSM_CAMERA_NEW_SESSION,
 				0, -1, &event);
-			rc = msm_post_event(&event, MSM_POST_EVT_TIMEOUT);
+			rc = legacy_msm_post_event(&event, MSM_POST_EVT_TIMEOUT);
 			if (rc < 0) {
 				pr_err("%s : NEW_SESSION event failed,rc %d\n",
 					__func__, rc);
@@ -702,9 +702,9 @@ static int camera_v4l2_open(struct file *filep)
 				goto post_fail;
 		}
 		/* Enable power collapse latency */
-		msm_pm_qos_update_request(CAMERA_ENABLE_PC_LATENCY);
+		legacy_msm_pm_qos_update_request(CAMERA_ENABLE_PC_LATENCY);
 	} else {
-		rc = msm_create_command_ack_q(pvdev->vdev->num,
+		rc = legacy_msm_create_command_ack_q(pvdev->vdev->num,
 			find_first_zero_bit((const unsigned long *)&opn_idx,
 				MSM_CAMERA_STREAM_CNT_BITS));
 		if (rc < 0) {
@@ -721,11 +721,11 @@ static int camera_v4l2_open(struct file *filep)
 	return rc;
 
 post_fail:
-	msm_delete_command_ack_q(pvdev->vdev->num, 0);
+	legacy_msm_delete_command_ack_q(pvdev->vdev->num, 0);
 command_ack_q_fail:
-	msm_destroy_session(pvdev->vdev->num);
+	legacy_msm_destroy_session(pvdev->vdev->num);
 session_fail:
-	msm_pm_qos_update_request(CAMERA_ENABLE_PC_LATENCY);
+	legacy_msm_pm_qos_update_request(CAMERA_ENABLE_PC_LATENCY);
 	pm_relax(&pvdev->vdev->dev);
 stream_fail:
 	camera_v4l2_vb2_q_release(filep);
@@ -759,7 +759,7 @@ static int camera_v4l2_close(struct file *filep)
 	unsigned int opn_idx, mask;
 	struct msm_session *session;
 	BUG_ON(!pvdev);
-	session = msm_session_find(pvdev->vdev->num);
+	session = legacy_msm_session_find(pvdev->vdev->num);
 	if (WARN_ON(!session))
 		return -EIO;
 
@@ -774,7 +774,7 @@ static int camera_v4l2_close(struct file *filep)
 		pr_debug("%s: close stream_id=%d\n", __func__, sp->stream_id);
 		camera_pack_event(filep, MSM_CAMERA_SET_PARM,
 			MSM_CAMERA_PRIV_DEL_STREAM, -1, &event);
-		msm_post_event(&event, MSM_POST_EVT_TIMEOUT);
+		legacy_msm_post_event(&event, MSM_POST_EVT_TIMEOUT);
 	}
 
 	if (sp->stream_created == true)
@@ -784,23 +784,23 @@ static int camera_v4l2_close(struct file *filep)
 		if (msm_is_daemon_present() != false) {
 			camera_pack_event(filep, MSM_CAMERA_DEL_SESSION,
 				0, -1, &event);
-			msm_post_event(&event, MSM_POST_EVT_TIMEOUT);
+			legacy_msm_post_event(&event, MSM_POST_EVT_TIMEOUT);
 		}
-		msm_delete_command_ack_q(pvdev->vdev->num, 0);
-		msm_delete_stream(pvdev->vdev->num, sp->stream_id);
+		legacy_msm_delete_command_ack_q(pvdev->vdev->num, 0);
+		legacy_msm_delete_stream(pvdev->vdev->num, sp->stream_id);
 		mutex_unlock(&session->close_lock);
 		/* This should take care of both normal close
 		 * and application crashes */
 		camera_v4l2_vb2_q_release(filep);
-		msm_destroy_session(pvdev->vdev->num);
+		legacy_msm_destroy_session(pvdev->vdev->num);
 
 		pm_relax(&pvdev->vdev->dev);
 	} else {
-		msm_delete_command_ack_q(pvdev->vdev->num,
+		legacy_msm_delete_command_ack_q(pvdev->vdev->num,
 			sp->stream_id);
 
 		camera_v4l2_vb2_q_release(filep);
-		msm_delete_stream(pvdev->vdev->num, sp->stream_id);
+		legacy_msm_delete_stream(pvdev->vdev->num, sp->stream_id);
 		mutex_unlock(&session->close_lock);
 	}
 
@@ -818,7 +818,7 @@ static long camera_handle_internal_compat_ioctl(struct file *file,
 	struct msm_camera_private_ioctl_arg k_ioctl;
 	void __user *tmp_compat_ioctl_ptr = NULL;
 
-	rc = msm_copy_camera_private_ioctl_args(arg,
+	rc = legacy_msm_copy_camera_private_ioctl_args(arg,
 		&k_ioctl, &tmp_compat_ioctl_ptr);
 	if (rc < 0) {
 		pr_err("Subdev cmd %d failed\n", cmd);
@@ -847,7 +847,7 @@ static long camera_handle_internal_compat_ioctl(struct file *file,
 	return rc;
 }
 
-long camera_v4l2_compat_ioctl(struct file *file, unsigned int cmd,
+long legacy_camera_v4l2_compat_ioctl(struct file *file, unsigned int cmd,
 	unsigned long arg)
 {
 	long ret = 0;
@@ -876,11 +876,11 @@ static struct v4l2_file_operations camera_v4l2_fops = {
 	.release = camera_v4l2_close,
 	.unlocked_ioctl   = video_ioctl2,
 #ifdef CONFIG_COMPAT
-	.compat_ioctl32 = camera_v4l2_compat_ioctl,
+	.compat_ioctl32 = legacy_camera_v4l2_compat_ioctl,
 #endif
 };
 
-int camera_init_v4l2(struct device *dev, unsigned int *session)
+int legacy_camera_init_v4l2(struct device *dev, unsigned int *session)
 {
 	struct msm_video_device *pvdev;
 	struct v4l2_device *v4l2_dev;

@@ -60,7 +60,7 @@ static struct v4l2_subdev_ops msm_flash_subdev_ops = {
 
 static const struct v4l2_subdev_internal_ops msm_flash_internal_ops;
 
-int32_t msm_led_flash_create_v4lsubdev(struct platform_device *pdev, void *data)
+int32_t legacy_msm_led_flash_create_v4lsubdev(struct platform_device *pdev, void *data)
 {
 	struct msm_led_flash_ctrl_t *fctrl =
 		(struct msm_led_flash_ctrl_t *)data;
@@ -83,7 +83,7 @@ int32_t msm_led_flash_create_v4lsubdev(struct platform_device *pdev, void *data)
 	media_entity_pads_init(&fctrl->msm_sd.sd.entity, 0, NULL);
 	fctrl->msm_sd.sd.entity.group_id = MSM_CAMERA_SUBDEV_FLASH;
 	fctrl->msm_sd.close_seq = MSM_SD_CLOSE_2ND_CATEGORY | 0x1;
-	msm_sd_register(&fctrl->msm_sd);
+	legacy_msm_sd_register(&fctrl->msm_sd);
 
 	msm_led_flash_v4l2_subdev_fops = v4l2_subdev_fops;
 #ifdef CONFIG_COMPAT
@@ -95,7 +95,7 @@ int32_t msm_led_flash_create_v4lsubdev(struct platform_device *pdev, void *data)
 	return 0;
 }
 
-int32_t msm_led_i2c_flash_create_v4lsubdev(void *data)
+int32_t legacy_msm_led_i2c_flash_create_v4lsubdev(void *data)
 {
 	struct msm_led_flash_ctrl_t *fctrl =
 		(struct msm_led_flash_ctrl_t *)data;
@@ -116,7 +116,7 @@ int32_t msm_led_i2c_flash_create_v4lsubdev(void *data)
 		"msm_flash");
 	media_entity_pads_init(&fctrl->msm_sd.sd.entity, 0, NULL);
 	fctrl->msm_sd.sd.entity.group_id = MSM_CAMERA_SUBDEV_LED_FLASH;
-	msm_sd_register(&fctrl->msm_sd);
+	legacy_msm_sd_register(&fctrl->msm_sd);
 
 	msm_led_flash_v4l2_subdev_fops = v4l2_subdev_fops;
 	fctrl->msm_sd.sd.devnode->fops = &msm_led_flash_v4l2_subdev_fops;

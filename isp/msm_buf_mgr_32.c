@@ -37,7 +37,7 @@
 #undef CDBG
 #define CDBG(fmt, args...) pr_debug(fmt, ##args)
 
-struct msm_isp_bufq *msm_isp_get_bufq(
+struct msm_isp_bufq *legacy_msm_isp_get_bufq(
 	struct msm_isp_buf_mgr *buf_mgr,
 	uint32_t bufq_handle)
 {
@@ -63,7 +63,7 @@ static struct msm_isp_buffer *msm_isp_get_buf_ptr(
 	struct msm_isp_bufq *bufq = NULL;
 	struct msm_isp_buffer *buf_info = NULL;
 
-	bufq = msm_isp_get_bufq(buf_mgr, bufq_handle);
+	bufq = legacy_msm_isp_get_bufq(buf_mgr, bufq_handle);
 	if (!bufq) {
 		pr_err("%s: Invalid bufq\n", __func__);
 		return buf_info;
@@ -108,7 +108,7 @@ static int msm_isp_free_buf_handle(struct msm_isp_buf_mgr *buf_mgr,
 	uint32_t bufq_handle)
 {
 	struct msm_isp_bufq *bufq =
-		msm_isp_get_bufq(buf_mgr, bufq_handle);
+		legacy_msm_isp_get_bufq(buf_mgr, bufq_handle);
 	if (!bufq)
 		return -EINVAL;
 	memset(bufq, 0, sizeof(struct msm_isp_bufq));
@@ -235,7 +235,7 @@ static int msm_isp_buf_prepare(struct msm_isp_buf_mgr *buf_mgr,
 		return rc;
 	}
 
-	bufq = msm_isp_get_bufq(buf_mgr, buf_info->bufq_handle);
+	bufq = legacy_msm_isp_get_bufq(buf_mgr, buf_info->bufq_handle);
 	if (!bufq) {
 		pr_err("%s: Invalid bufq\n", __func__);
 		return rc;
@@ -281,7 +281,7 @@ static int msm_isp_buf_unprepare(struct msm_isp_buf_mgr *buf_mgr,
 	struct msm_isp_bufq *bufq = NULL;
 	struct msm_isp_buffer *buf_info = NULL;
 
-	bufq = msm_isp_get_bufq(buf_mgr, buf_handle);
+	bufq = legacy_msm_isp_get_bufq(buf_mgr, buf_handle);
 	if (!bufq) {
 		pr_err("%s: Invalid bufq\n", __func__);
 		return rc;
@@ -319,7 +319,7 @@ static int msm_isp_get_buf_by_index(struct msm_isp_buf_mgr *buf_mgr,
 	struct msm_isp_buffer *temp_buf_info;
 	uint32_t i = 0;
 
-	bufq = msm_isp_get_bufq(buf_mgr, bufq_handle);
+	bufq = legacy_msm_isp_get_bufq(buf_mgr, bufq_handle);
 	if (!bufq) {
 		pr_err("%s: Invalid bufq\n", __func__);
 		return rc;
@@ -363,7 +363,7 @@ static int msm_isp_get_buf(struct msm_isp_buf_mgr *buf_mgr, uint32_t id,
 	struct msm_isp_buffer_mapped_info *mped_info_tmp1;
 	struct msm_isp_buffer_mapped_info *mped_info_tmp2;
 
-	bufq = msm_isp_get_bufq(buf_mgr, bufq_handle);
+	bufq = legacy_msm_isp_get_bufq(buf_mgr, bufq_handle);
 	if (!bufq) {
 		pr_err("%s: Invalid bufq\n", __func__);
 		return rc;
@@ -516,7 +516,7 @@ static int msm_isp_put_buf(struct msm_isp_buf_mgr *buf_mgr,
 	struct msm_isp_bufq *bufq = NULL;
 	struct msm_isp_buffer *buf_info = NULL;
 
-	bufq = msm_isp_get_bufq(buf_mgr, bufq_handle);
+	bufq = legacy_msm_isp_get_bufq(buf_mgr, bufq_handle);
 	if (!bufq) {
 		pr_err("%s: Invalid bufq\n", __func__);
 		return rc;
@@ -572,7 +572,7 @@ static int msm_isp_put_buf_unsafe(struct msm_isp_buf_mgr *buf_mgr,
 	struct msm_isp_bufq *bufq = NULL;
 	struct msm_isp_buffer *buf_info = NULL;
 
-	bufq = msm_isp_get_bufq(buf_mgr, bufq_handle);
+	bufq = legacy_msm_isp_get_bufq(buf_mgr, bufq_handle);
 	if (!bufq) {
 		pr_err("%s: Invalid bufq\n", __func__);
 		return rc;
@@ -622,7 +622,7 @@ static int msm_isp_buf_done(struct msm_isp_buf_mgr *buf_mgr,
 	struct msm_isp_buffer *buf_info = NULL;
 	enum msm_isp_buffer_state state;
 
-	bufq = msm_isp_get_bufq(buf_mgr, bufq_handle);
+	bufq = legacy_msm_isp_get_bufq(buf_mgr, bufq_handle);
 	if (!bufq) {
 		pr_err("Invalid bufq\n");
 		return rc;
@@ -679,7 +679,7 @@ static int msm_isp_flush_buf(struct msm_isp_buf_mgr *buf_mgr,
 	struct msm_isp_bufq *bufq = NULL;
 	struct msm_isp_buffer *buf_info = NULL;
 
-	bufq = msm_isp_get_bufq(buf_mgr, bufq_handle);
+	bufq = legacy_msm_isp_get_bufq(buf_mgr, bufq_handle);
 	if (!bufq) {
 		pr_err("Invalid bufq\n");
 		return rc;
@@ -731,7 +731,7 @@ static int msm_isp_buf_divert(struct msm_isp_buf_mgr *buf_mgr,
 	struct msm_isp_bufq *bufq = NULL;
 	struct msm_isp_buffer *buf_info = NULL;
 
-	bufq = msm_isp_get_bufq(buf_mgr, bufq_handle);
+	bufq = legacy_msm_isp_get_bufq(buf_mgr, bufq_handle);
 	if (!bufq) {
 		pr_err("Invalid bufq\n");
 		return rc;
@@ -787,7 +787,7 @@ static int msm_isp_buf_enqueue(struct msm_isp_buf_mgr *buf_mgr,
 			rc = msm_isp_put_buf(buf_mgr,
 				info->handle, info->buf_idx);
 		} else {
-			bufq = msm_isp_get_bufq(buf_mgr, info->handle);
+			bufq = legacy_msm_isp_get_bufq(buf_mgr, info->handle);
 			if (!bufq) {
 				pr_err("%s: Invalid bufq\n", __func__);
 				return rc;
@@ -801,7 +801,7 @@ static int msm_isp_buf_enqueue(struct msm_isp_buf_mgr *buf_mgr,
 					buf_info->tv, buf_info->frame_id, 0);
 		}
 	} else {
-		bufq = msm_isp_get_bufq(buf_mgr, info->handle);
+		bufq = legacy_msm_isp_get_bufq(buf_mgr, info->handle);
 		if (!bufq) {
 			pr_err("%s: Invalid bufq\n", __func__);
 			return rc;
@@ -839,7 +839,7 @@ static int msm_isp_get_buf_src(struct msm_isp_buf_mgr *buf_mgr,
 {
 	struct msm_isp_bufq *bufq = NULL;
 
-	bufq = msm_isp_get_bufq(buf_mgr, bufq_handle);
+	bufq = legacy_msm_isp_get_bufq(buf_mgr, bufq_handle);
 	if (!bufq) {
 		pr_err("%s: Invalid bufq\n", __func__);
 		return -EINVAL;
@@ -869,7 +869,7 @@ static int msm_isp_request_bufq(struct msm_isp_buf_mgr *buf_mgr,
 		return rc;
 	}
 
-	bufq = msm_isp_get_bufq(buf_mgr, buf_request->handle);
+	bufq = legacy_msm_isp_get_bufq(buf_mgr, buf_request->handle);
 	if (!bufq) {
 		pr_err("Invalid buffer queue\n");
 		return rc;
@@ -907,7 +907,7 @@ static int msm_isp_release_bufq(struct msm_isp_buf_mgr *buf_mgr,
 	struct msm_isp_bufq *bufq = NULL;
 	int rc = -1;
 
-	bufq = msm_isp_get_bufq(buf_mgr, bufq_handle);
+	bufq = legacy_msm_isp_get_bufq(buf_mgr, bufq_handle);
 	if (!bufq) {
 		pr_err("Invalid bufq release\n");
 		return rc;
@@ -1032,7 +1032,7 @@ static int msm_isp_detach_ctx(struct msm_isp_buf_mgr *buf_mgr)
 	return 0;
 }
 
-int msm_isp_smmu_attach(struct msm_isp_buf_mgr *buf_mgr,
+int legacy_msm_isp_smmu_attach(struct msm_isp_buf_mgr *buf_mgr,
 	void *arg)
 {
 	struct msm_vfe_smmu_attach_cmd *cmd = arg;
@@ -1103,7 +1103,7 @@ static int msm_isp_deinit_isp_buf_mgr(
 	return 0;
 }
 
-int msm_isp_proc_buf_cmd(struct msm_isp_buf_mgr *buf_mgr,
+int legacy_msm_isp_proc_buf_cmd(struct msm_isp_buf_mgr *buf_mgr,
 	unsigned int cmd, void *arg)
 {
 	switch (cmd) {
@@ -1193,10 +1193,10 @@ static struct msm_isp_buf_ops isp_buf_ops = {
 	.buf_mgr_init = msm_isp_init_isp_buf_mgr,
 	.buf_mgr_deinit = msm_isp_deinit_isp_buf_mgr,
 	.buf_mgr_debug = msm_isp_buf_mgr_debug,
-	.get_bufq = msm_isp_get_bufq,
+	.get_bufq = legacy_msm_isp_get_bufq,
 };
 
-int msm_isp_create_isp_buf_mgr(
+int legacy_msm_isp_create_isp_buf_mgr(
 	struct msm_isp_buf_mgr *buf_mgr,
 	struct msm_sd_req_vb2_q *vb2_ops,
 	struct msm_iova_layout *iova_layout)

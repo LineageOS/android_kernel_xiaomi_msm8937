@@ -36,7 +36,7 @@ enum cam_ahb_clk_client {
 	CAM_AHB_CLIENT_MAX
 };
 
-int cam_config_ahb_clk(struct device *dev, unsigned long freq,
+int legacy_cam_config_ahb_clk(struct device *dev, unsigned long freq,
 	enum cam_ahb_clk_client id, enum cam_ahb_clk_vote vote);
-int cam_ahb_clk_init(struct platform_device *pdev);
+int legacy_cam_ahb_clk_init(struct platform_device *pdev);
 #endif

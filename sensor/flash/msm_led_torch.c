@@ -47,7 +47,7 @@ static struct led_classdev msm_torch_led[MAX_LED_TRIGGERS] = {
 	},
 };
 
-int32_t msm_led_torch_create_classdev(struct platform_device *pdev,
+int32_t legacy_msm_led_torch_create_classdev(struct platform_device *pdev,
 				void *data)
 {
 	int32_t i, rc = 0;

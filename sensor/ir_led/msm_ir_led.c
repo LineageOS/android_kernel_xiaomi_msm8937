@@ -391,7 +391,7 @@ static int32_t msm_ir_led_platform_probe(struct platform_device *pdev)
 	ir_led_ctrl->msm_sd.sd.entity.group_id = MSM_CAMERA_SUBDEV_IR_LED;
 	ir_led_ctrl->msm_sd.close_seq = MSM_SD_CLOSE_2ND_CATEGORY | 0x1;
 
-	rc = msm_sd_register(&ir_led_ctrl->msm_sd);
+	rc = legacy_msm_sd_register(&ir_led_ctrl->msm_sd);
 	if (rc < 0) {
 		pr_err("sub dev register failed for ir_led device\n");
 		return rc;

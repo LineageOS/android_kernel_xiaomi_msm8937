@@ -29,7 +29,7 @@
 #define CDBG(fmt, args...) pr_debug(fmt, ##args)
 
 static void *g_fctrl;
-int32_t msm_led_i2c_trigger_get_subdev_id(struct msm_led_flash_ctrl_t *fctrl,
+int32_t legacy_msm_led_i2c_trigger_get_subdev_id(struct msm_led_flash_ctrl_t *fctrl,
 	void *arg)
 {
 	uint32_t *subdev_id = (uint32_t *)arg;
@@ -44,7 +44,7 @@ int32_t msm_led_i2c_trigger_get_subdev_id(struct msm_led_flash_ctrl_t *fctrl,
 	return 0;
 }
 
-int32_t msm_led_i2c_trigger_config(struct msm_led_flash_ctrl_t *fctrl,
+int32_t legacy_msm_led_i2c_trigger_config(struct msm_led_flash_ctrl_t *fctrl,
 	void *data)
 {
 	int rc = 0;
@@ -162,7 +162,7 @@ static int msm_flash_pinctrl_init(struct msm_led_flash_ctrl_t *ctrl)
 }
 
 
-int msm_flash_led_init(struct msm_led_flash_ctrl_t *fctrl)
+int legacy_msm_flash_led_init(struct msm_led_flash_ctrl_t *fctrl)
 {
 	int rc = 0;
 	struct msm_camera_sensor_board_info *flashdata = NULL;
@@ -185,7 +185,7 @@ int msm_flash_led_init(struct msm_led_flash_ctrl_t *fctrl)
 			return rc;
 		}
 	}
-	rc = msm_camera_request_gpio_table(
+	rc = legacy_msm_camera_request_gpio_table(
 		power_info->gpio_conf->cam_gpio_req_tbl,
 		power_info->gpio_conf->cam_gpio_req_tbl_size, 1);
 	if (rc < 0) {
@@ -235,7 +235,7 @@ int msm_flash_led_init(struct msm_led_flash_ctrl_t *fctrl)
 	return rc;
 }
 
-int msm_flash_led_release(struct msm_led_flash_ctrl_t *fctrl)
+int legacy_msm_flash_led_release(struct msm_led_flash_ctrl_t *fctrl)
 {
 	int rc = 0, ret = 0;
 	struct msm_camera_sensor_board_info *flashdata = NULL;
@@ -277,7 +277,7 @@ int msm_flash_led_release(struct msm_led_flash_ctrl_t *fctrl)
 				__func__, __LINE__);
 		}
 	}
-	rc = msm_camera_request_gpio_table(
+	rc = legacy_msm_camera_request_gpio_table(
 		power_info->gpio_conf->cam_gpio_req_tbl,
 		power_info->gpio_conf->cam_gpio_req_tbl_size, 0);
 	if (rc < 0) {
@@ -297,7 +297,7 @@ int msm_flash_led_release(struct msm_led_flash_ctrl_t *fctrl)
 	return 0;
 }
 
-int msm_flash_led_off(struct msm_led_flash_ctrl_t *fctrl)
+int legacy_msm_flash_led_off(struct msm_led_flash_ctrl_t *fctrl)
 {
 	int rc = 0;
 	struct msm_camera_sensor_board_info *flashdata = NULL;
@@ -325,7 +325,7 @@ int msm_flash_led_off(struct msm_led_flash_ctrl_t *fctrl)
 	return rc;
 }
 
-int msm_flash_led_low(struct msm_led_flash_ctrl_t *fctrl)
+int legacy_msm_flash_led_low(struct msm_led_flash_ctrl_t *fctrl)
 {
 	int rc = 0;
 	struct msm_camera_sensor_board_info *flashdata = NULL;
@@ -357,7 +357,7 @@ int msm_flash_led_low(struct msm_led_flash_ctrl_t *fctrl)
 	return rc;
 }
 
-int msm_flash_led_high(struct msm_led_flash_ctrl_t *fctrl)
+int legacy_msm_flash_led_high(struct msm_led_flash_ctrl_t *fctrl)
 {
 	int rc = 0;
 	struct msm_camera_sensor_board_info *flashdata = NULL;
@@ -515,21 +515,21 @@ static int32_t msm_led_get_dt_data(struct device_node *of_node,
 					gpio_array[i]);
 			}
 
-			rc = msm_camera_get_dt_gpio_req_tbl(of_node, gconf,
+			rc = legacy_msm_camera_get_dt_gpio_req_tbl(of_node, gconf,
 				gpio_array, gpio_array_size);
 			if (rc < 0) {
 				pr_err("%s failed %d\n", __func__, __LINE__);
 				goto ERROR4;
 			}
 
-			rc = msm_camera_get_dt_gpio_set_tbl(of_node, gconf,
+			rc = legacy_msm_camera_get_dt_gpio_set_tbl(of_node, gconf,
 				gpio_array, gpio_array_size);
 			if (rc < 0) {
 				pr_err("%s failed %d\n", __func__, __LINE__);
 				goto ERROR5;
 			}
 
-			rc = msm_camera_init_gpio_pin_tbl(of_node, gconf,
+			rc = legacy_msm_camera_init_gpio_pin_tbl(of_node, gconf,
 				gpio_array, gpio_array_size);
 			if (rc < 0) {
 				pr_err("%s failed %d\n", __func__, __LINE__);
@@ -627,25 +627,25 @@ ERROR1:
 }
 
 static struct msm_camera_i2c_fn_t msm_sensor_qup_func_tbl = {
-	.i2c_read = msm_camera_qup_i2c_read,
-	.i2c_read_seq = msm_camera_qup_i2c_read_seq,
-	.i2c_write = msm_camera_qup_i2c_write,
-	.i2c_write_table = msm_camera_qup_i2c_write_table,
-	.i2c_write_seq_table = msm_camera_qup_i2c_write_seq_table,
+	.i2c_read = legacy_msm_camera_qup_i2c_read,
+	.i2c_read_seq = legacy_msm_camera_qup_i2c_read_seq,
+	.i2c_write = legacy_msm_camera_qup_i2c_write,
+	.i2c_write_table = legacy_msm_camera_qup_i2c_write_table,
+	.i2c_write_seq_table = legacy_msm_camera_qup_i2c_write_seq_table,
 	.i2c_write_table_w_microdelay =
-		msm_camera_qup_i2c_write_table_w_microdelay,
+		legacy_msm_camera_qup_i2c_write_table_w_microdelay,
 };
 
 static struct msm_camera_i2c_fn_t msm_sensor_cci_func_tbl = {
-	.i2c_read = msm_camera_cci_i2c_read,
-	.i2c_read_seq = msm_camera_cci_i2c_read_seq,
-	.i2c_write = msm_camera_cci_i2c_write,
-	.i2c_write_table = msm_camera_cci_i2c_write_table,
-	.i2c_write_seq_table = msm_camera_cci_i2c_write_seq_table,
+	.i2c_read = legacy_msm_camera_cci_i2c_read,
+	.i2c_read_seq = legacy_msm_camera_cci_i2c_read_seq,
+	.i2c_write = legacy_msm_camera_cci_i2c_write,
+	.i2c_write_table = legacy_msm_camera_cci_i2c_write_table,
+	.i2c_write_seq_table = legacy_msm_camera_cci_i2c_write_seq_table,
 	.i2c_write_table_w_microdelay =
-		msm_camera_cci_i2c_write_table_w_microdelay,
-	.i2c_util = msm_sensor_cci_i2c_util,
-	.i2c_write_conf_tbl = msm_camera_cci_i2c_write_conf_tbl,
+		legacy_msm_camera_cci_i2c_write_table_w_microdelay,
+	.i2c_util = legacy_msm_sensor_cci_i2c_util,
+	.i2c_write_conf_tbl = legacy_msm_camera_cci_i2c_write_conf_tbl,
 };
 
 #ifdef CONFIG_DEBUG_FS
@@ -666,13 +666,13 @@ static int set_led_status(void *data, u64 val)
 	}
 	if (val == 0) {
 		pr_debug("set_led_status: val is disable");
-		rc = msm_flash_led_off(fctrl);
+		rc = legacy_msm_flash_led_off(fctrl);
 		if (rc < 0) {
 			pr_err("%s led_off failed line %d\n",
 			__func__, __LINE__);
 			return rc;
 		}
-		rc = msm_flash_led_release(fctrl);
+		rc = legacy_msm_flash_led_release(fctrl);
 		if (rc < 0) {
 			pr_err("%s led_release failed line %d\n",
 			__func__, __LINE__);
@@ -680,13 +680,13 @@ static int set_led_status(void *data, u64 val)
 		}
 	} else {
 		pr_debug("set_led_status: val is enable");
-		rc = msm_flash_led_init(fctrl);
+		rc = legacy_msm_flash_led_init(fctrl);
 		if (rc < 0) {
 			pr_err("%s led_init failed line %d\n",
 			__func__, __LINE__);
 			return rc;
 		}
-		rc = msm_flash_led_low(fctrl);
+		rc = legacy_msm_flash_led_low(fctrl);
 		if (rc < 0) {
 			pr_err("%s led_low failed line %d\n",
 			__func__, __LINE__);
@@ -745,7 +745,7 @@ static int32_t msm_i2c_torch_create_classdev(struct device *dev ,
 	return 0;
 };
 
-int msm_flash_i2c_probe(struct i2c_client *client,
+int legacy_msm_flash_i2c_probe(struct i2c_client *client,
 		const struct i2c_device_id *id)
 {
 	int rc = 0;
@@ -794,7 +794,7 @@ int msm_flash_i2c_probe(struct i2c_client *client,
 		fctrl->flash_i2c_client->i2c_func_tbl =
 			&msm_sensor_qup_func_tbl;
 
-	rc = msm_led_i2c_flash_create_v4lsubdev(fctrl);
+	rc = legacy_msm_led_i2c_flash_create_v4lsubdev(fctrl);
 #ifdef CONFIG_DEBUG_FS
 	dentry = debugfs_create_file("ledflash", S_IRUGO, NULL, (void *)fctrl,
 		&ledflashdbg_fops);
@@ -816,7 +816,7 @@ probe_failure:
 	return rc;
 }
 
-int msm_flash_probe(struct platform_device *pdev,
+int legacy_msm_flash_probe(struct platform_device *pdev,
 	const void *data)
 {
 	int rc = 0;
@@ -859,7 +859,7 @@ int msm_flash_probe(struct platform_device *pdev,
 		return rc;
 
 	cci_client = fctrl->flash_i2c_client->cci_client;
-	cci_client->cci_subdev = msm_cci_get_subdev();
+	cci_client->cci_subdev = legacy_msm_cci_get_subdev();
 	cci_client->cci_i2c_master = fctrl->cci_i2c_master;
 	if (fctrl->flashdata->slave_info->sensor_slave_addr)
 		cci_client->sid =
@@ -871,7 +871,7 @@ int msm_flash_probe(struct platform_device *pdev,
 		fctrl->flash_i2c_client->i2c_func_tbl =
 			&msm_sensor_cci_func_tbl;
 
-	rc = msm_led_flash_create_v4lsubdev(pdev, fctrl);
+	rc = legacy_msm_led_flash_create_v4lsubdev(pdev, fctrl);
 
 	CDBG("%s: probe success\n", __func__);
 	return 0;

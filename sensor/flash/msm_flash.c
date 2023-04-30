@@ -53,28 +53,28 @@ static struct msm_flash_table *flash_table[] = {
 };
 
 static struct msm_camera_i2c_fn_t msm_flash_qup_func_tbl = {
-	.i2c_read = msm_camera_qup_i2c_read,
-	.i2c_read_seq = msm_camera_qup_i2c_read_seq,
-	.i2c_write = msm_camera_qup_i2c_write,
-	.i2c_write_table = msm_camera_qup_i2c_write_table,
-	.i2c_write_seq_table = msm_camera_qup_i2c_write_seq_table,
+	.i2c_read = legacy_msm_camera_qup_i2c_read,
+	.i2c_read_seq = legacy_msm_camera_qup_i2c_read_seq,
+	.i2c_write = legacy_msm_camera_qup_i2c_write,
+	.i2c_write_table = legacy_msm_camera_qup_i2c_write_table,
+	.i2c_write_seq_table = legacy_msm_camera_qup_i2c_write_seq_table,
 	.i2c_write_table_w_microdelay =
-		msm_camera_qup_i2c_write_table_w_microdelay,
+		legacy_msm_camera_qup_i2c_write_table_w_microdelay,
 };
 
 static struct msm_camera_i2c_fn_t msm_sensor_cci_func_tbl = {
-	.i2c_read = msm_camera_cci_i2c_read,
-	.i2c_read_seq = msm_camera_cci_i2c_read_seq,
-	.i2c_write = msm_camera_cci_i2c_write,
-	.i2c_write_table = msm_camera_cci_i2c_write_table,
-	.i2c_write_seq_table = msm_camera_cci_i2c_write_seq_table,
+	.i2c_read = legacy_msm_camera_cci_i2c_read,
+	.i2c_read_seq = legacy_msm_camera_cci_i2c_read_seq,
+	.i2c_write = legacy_msm_camera_cci_i2c_write,
+	.i2c_write_table = legacy_msm_camera_cci_i2c_write_table,
+	.i2c_write_seq_table = legacy_msm_camera_cci_i2c_write_seq_table,
 	.i2c_write_table_w_microdelay =
-		msm_camera_cci_i2c_write_table_w_microdelay,
-	.i2c_util = msm_sensor_cci_i2c_util,
-	.i2c_poll =  msm_camera_cci_i2c_poll,
+		legacy_msm_camera_cci_i2c_write_table_w_microdelay,
+	.i2c_util = legacy_msm_sensor_cci_i2c_util,
+	.i2c_poll =  legacy_msm_camera_cci_i2c_poll,
 };
 
-void msm_torch_brightness_set(struct led_classdev *led_cdev,
+void legacy_msm_torch_brightness_set(struct led_classdev *led_cdev,
 				enum led_brightness value)
 {
 	if (!torch_trigger) {
@@ -88,17 +88,17 @@ void msm_torch_brightness_set(struct led_classdev *led_cdev,
 static struct led_classdev msm_torch_led[MAX_LED_TRIGGERS] = {
 	{
 		.name		= "torch-light0",
-		.brightness_set	= msm_torch_brightness_set,
+		.brightness_set	= legacy_msm_torch_brightness_set,
 		.brightness	= LED_OFF,
 	},
 	{
 		.name		= "torch-light1",
-		.brightness_set	= msm_torch_brightness_set,
+		.brightness_set	= legacy_msm_torch_brightness_set,
 		.brightness	= LED_OFF,
 	},
 	{
 		.name		= "torch-light2",
-		.brightness_set	= msm_torch_brightness_set,
+		.brightness_set	= legacy_msm_torch_brightness_set,
 		.brightness	= LED_OFF,
 	},
 };
@@ -119,9 +119,9 @@ static int32_t msm_torch_create_classdev(struct platform_device *pdev,
 	for (i = 0; i < fctrl->torch_num_sources; i++) {
 		if (fctrl->torch_trigger[i]) {
 			torch_trigger = fctrl->torch_trigger[i];
-			CDBG("%s:%d msm_torch_brightness_set for torch %d",
+			CDBG("%s:%d legacy_msm_torch_brightness_set for torch %d",
 				__func__, __LINE__, i);
-			msm_torch_brightness_set(&msm_torch_led[i],
+			legacy_msm_torch_brightness_set(&msm_torch_led[i],
 				LED_OFF);
 
 			rc = led_classdev_register(&pdev->dev,
@@ -304,11 +304,11 @@ static int32_t msm_flash_i2c_init(
 		goto msm_flash_i2c_init_fail;
 	}
 
-	rc = msm_camera_power_up(&flash_ctrl->power_info,
+	rc = legacy_msm_camera_power_up(&flash_ctrl->power_info,
 		flash_ctrl->flash_device_type,
 		&flash_ctrl->flash_i2c_client);
 	if (rc < 0) {
-		pr_err("%s msm_camera_power_up failed %d\n",
+		pr_err("%s legacy_msm_camera_power_up failed %d\n",
 			__func__, __LINE__);
 		goto msm_flash_i2c_init_fail;
 	}
@@ -390,11 +390,11 @@ static int32_t msm_flash_i2c_release(
 		return -EINVAL;
 	}
 
-	rc = msm_camera_power_down(&flash_ctrl->power_info,
+	rc = legacy_msm_camera_power_down(&flash_ctrl->power_info,
 		flash_ctrl->flash_device_type,
 		&flash_ctrl->flash_i2c_client);
 	if (rc < 0) {
-		pr_err("%s msm_camera_power_down failed %d\n",
+		pr_err("%s legacy_msm_camera_power_down failed %d\n",
 			__func__, __LINE__);
 		return -EINVAL;
 	}
@@ -1030,7 +1030,7 @@ static int32_t msm_flash_get_dt_data(struct device_node *of_node,
 	}
 
 	/* Read the gpio information from device tree */
-	rc = msm_sensor_driver_get_gpio_data(
+	rc = legacy_msm_sensor_driver_get_gpio_data(
 		&(fctrl->power_info.gpio_conf), of_node);
 	if (-ENODEV == rc) {
 		pr_notice("No valid flash GPIOs data\n");
@@ -1142,7 +1142,7 @@ static int msm_camera_flash_i2c_probe(struct i2c_client *client,
 	CDBG("Enter\n");
 
 	if (client == NULL) {
-		pr_err("msm_flash_i2c_probe: client is null\n");
+		pr_err("legacy_msm_flash_i2c_probe: client is null\n");
 		return -EINVAL;
 	}
 
@@ -1185,7 +1185,7 @@ static int msm_camera_flash_i2c_probe(struct i2c_client *client,
 	media_entity_pads_init(&flash_ctrl->msm_sd.sd.entity, 0, NULL);
 	flash_ctrl->msm_sd.sd.entity.group_id = MSM_CAMERA_SUBDEV_FLASH;
 	flash_ctrl->msm_sd.close_seq = MSM_SD_CLOSE_2ND_CATEGORY | 0x1;
-	msm_sd_register(&flash_ctrl->msm_sd);
+	legacy_msm_sd_register(&flash_ctrl->msm_sd);
 
 	CDBG("%s:%d flash sd name = %s", __func__, __LINE__,
 		flash_ctrl->msm_sd.sd.entity.name);
@@ -1244,7 +1244,7 @@ static int32_t msm_flash_platform_probe(struct platform_device *pdev)
 	}
 
 	cci_client = flash_ctrl->flash_i2c_client.cci_client;
-	cci_client->cci_subdev = msm_cci_get_subdev();
+	cci_client->cci_subdev = legacy_msm_cci_get_subdev();
 	cci_client->cci_i2c_master = flash_ctrl->cci_i2c_master;
 
 	/* Initialize sub device */
@@ -1259,11 +1259,11 @@ static int32_t msm_flash_platform_probe(struct platform_device *pdev)
 	media_entity_pads_init(&flash_ctrl->msm_sd.sd.entity, 0, NULL);
 	flash_ctrl->msm_sd.sd.entity.group_id = MSM_CAMERA_SUBDEV_FLASH;
 	flash_ctrl->msm_sd.close_seq = MSM_SD_CLOSE_2ND_CATEGORY | 0x1;
-	msm_sd_register(&flash_ctrl->msm_sd);
+	legacy_msm_sd_register(&flash_ctrl->msm_sd);
 
 	CDBG("%s:%d flash sd name = %s", __func__, __LINE__,
 		flash_ctrl->msm_sd.sd.entity.name);
-	msm_cam_copy_v4l2_subdev_fops(&msm_flash_v4l2_subdev_fops);
+	legacy_msm_cam_copy_v4l2_subdev_fops(&msm_flash_v4l2_subdev_fops);
 #ifdef CONFIG_COMPAT
 	msm_flash_v4l2_subdev_fops.compat_ioctl32 =
 		msm_flash_subdev_fops_ioctl;

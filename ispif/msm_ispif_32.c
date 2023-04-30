@@ -60,7 +60,7 @@ static void msm_ispif_io_dump_reg(struct ispif_device *ispif)
 		return;
 	}
 
-	msm_camera_io_dump(ispif->base, 0x250, 0);
+	legacy_msm_camera_io_dump(ispif->base, 0x250, 0);
 }
 
 
@@ -123,11 +123,11 @@ static int msm_ispif_reset_hw(struct ispif_device *ispif)
 
 	ispif->clk_idx = 0;
 
-	rc = msm_cam_clk_enable(&ispif->pdev->dev,
+	rc = legacy_msm_cam_clk_enable(&ispif->pdev->dev,
 		ispif_8974_reset_clk_info, reset_clk,
 		ARRAY_SIZE(ispif_8974_reset_clk_info), 1);
 	if (rc < 0) {
-		rc = msm_cam_clk_enable(&ispif->pdev->dev,
+		rc = legacy_msm_cam_clk_enable(&ispif->pdev->dev,
 			ispif_8626_reset_clk_info, reset_clk1,
 			ARRAY_SIZE(ispif_8626_reset_clk_info), 1);
 		if (rc < 0) {
@@ -147,10 +147,10 @@ static int msm_ispif_reset_hw(struct ispif_device *ispif)
 		init_completion(&ispif->reset_complete[VFE1]);
 
 	/* initiate reset of ISPIF */
-	msm_camera_io_w(ISPIF_RST_CMD_MASK,
+	legacy_msm_camera_io_w(ISPIF_RST_CMD_MASK,
 				ispif->base + ISPIF_RST_CMD_ADDR);
 	if (ispif->hw_num_isps > 1)
-		msm_camera_io_w(ISPIF_RST_CMD_1_MASK,
+		legacy_msm_camera_io_w(ISPIF_RST_CMD_1_MASK,
 					ispif->base + ISPIF_RST_CMD_1_ADDR);
 
 	timeout = wait_for_completion_timeout(
@@ -159,11 +159,11 @@ static int msm_ispif_reset_hw(struct ispif_device *ispif)
 
 	if (timeout <= 0) {
 		pr_err("%s: VFE0 reset wait timeout\n", __func__);
-		rc = msm_cam_clk_enable(&ispif->pdev->dev,
+		rc = legacy_msm_cam_clk_enable(&ispif->pdev->dev,
 			ispif_8974_reset_clk_info, reset_clk,
 			ARRAY_SIZE(ispif_8974_reset_clk_info), 0);
 		if (rc < 0) {
-			rc = msm_cam_clk_enable(&ispif->pdev->dev,
+			rc = legacy_msm_cam_clk_enable(&ispif->pdev->dev,
 				ispif_8626_reset_clk_info, reset_clk1,
 				ARRAY_SIZE(ispif_8626_reset_clk_info), 0);
 			if (rc < 0)
@@ -180,7 +180,7 @@ static int msm_ispif_reset_hw(struct ispif_device *ispif)
 		CDBG("%s: VFE1 done\n", __func__);
 		if (timeout <= 0) {
 			pr_err("%s: VFE1 reset wait timeout\n", __func__);
-			msm_cam_clk_enable(&ispif->pdev->dev,
+			legacy_msm_cam_clk_enable(&ispif->pdev->dev,
 				ispif_8974_reset_clk_info, reset_clk,
 				ARRAY_SIZE(ispif_8974_reset_clk_info), 0);
 			return -ETIMEDOUT;
@@ -188,7 +188,7 @@ static int msm_ispif_reset_hw(struct ispif_device *ispif)
 	}
 
 	if (ispif->clk_idx == 1) {
-		rc = msm_cam_clk_enable(&ispif->pdev->dev,
+		rc = legacy_msm_cam_clk_enable(&ispif->pdev->dev,
 			ispif_8974_reset_clk_info, reset_clk,
 			ARRAY_SIZE(ispif_8974_reset_clk_info), 0);
 		if (rc < 0) {
@@ -198,7 +198,7 @@ static int msm_ispif_reset_hw(struct ispif_device *ispif)
 	}
 
 	if (ispif->clk_idx == 2) {
-		rc = msm_cam_clk_enable(&ispif->pdev->dev,
+		rc = legacy_msm_cam_clk_enable(&ispif->pdev->dev,
 			ispif_8626_reset_clk_info, reset_clk1,
 			ARRAY_SIZE(ispif_8626_reset_clk_info), 0);
 		if (rc < 0) {
@@ -280,7 +280,7 @@ static int msm_ispif_clk_ahb_enable(struct ispif_device *ispif, int enable)
 			return -EFAULT;
 	}
 
-	rc = msm_cam_clk_enable(&ispif->pdev->dev,
+	rc = legacy_msm_cam_clk_enable(&ispif->pdev->dev,
 		ispif_8974_ahb_clk_info, ispif->ahb_clk,
 		ispif->num_ahb_clk, enable);
 	if (rc < 0) {
@@ -301,43 +301,43 @@ static int msm_ispif_reset(struct ispif_device *ispif)
 	memset(ispif->sof_count, 0, sizeof(ispif->sof_count));
 	for (i = 0; i < ispif->vfe_info.num_vfe; i++) {
 
-		msm_camera_io_w(1 << PIX0_LINE_BUF_EN_BIT,
+		legacy_msm_camera_io_w(1 << PIX0_LINE_BUF_EN_BIT,
 			ispif->base + ISPIF_VFE_m_CTRL_0(i));
-		msm_camera_io_w(0, ispif->base + ISPIF_VFE_m_IRQ_MASK_0(i));
-		msm_camera_io_w(0, ispif->base + ISPIF_VFE_m_IRQ_MASK_1(i));
-		msm_camera_io_w(0, ispif->base + ISPIF_VFE_m_IRQ_MASK_2(i));
-		msm_camera_io_w(0xFFFFFFFF, ispif->base +
+		legacy_msm_camera_io_w(0, ispif->base + ISPIF_VFE_m_IRQ_MASK_0(i));
+		legacy_msm_camera_io_w(0, ispif->base + ISPIF_VFE_m_IRQ_MASK_1(i));
+		legacy_msm_camera_io_w(0, ispif->base + ISPIF_VFE_m_IRQ_MASK_2(i));
+		legacy_msm_camera_io_w(0xFFFFFFFF, ispif->base +
 			ISPIF_VFE_m_IRQ_CLEAR_0(i));
-		msm_camera_io_w(0xFFFFFFFF, ispif->base +
+		legacy_msm_camera_io_w(0xFFFFFFFF, ispif->base +
 			ISPIF_VFE_m_IRQ_CLEAR_1(i));
-		msm_camera_io_w(0xFFFFFFFF, ispif->base +
+		legacy_msm_camera_io_w(0xFFFFFFFF, ispif->base +
 			ISPIF_VFE_m_IRQ_CLEAR_2(i));
 
-		msm_camera_io_w(0, ispif->base + ISPIF_VFE_m_INPUT_SEL(i));
+		legacy_msm_camera_io_w(0, ispif->base + ISPIF_VFE_m_INPUT_SEL(i));
 
-		msm_camera_io_w(ISPIF_STOP_INTF_IMMEDIATELY,
+		legacy_msm_camera_io_w(ISPIF_STOP_INTF_IMMEDIATELY,
 			ispif->base + ISPIF_VFE_m_INTF_CMD_0(i));
-		msm_camera_io_w(ISPIF_STOP_INTF_IMMEDIATELY,
+		legacy_msm_camera_io_w(ISPIF_STOP_INTF_IMMEDIATELY,
 			ispif->base + ISPIF_VFE_m_INTF_CMD_1(i));
 		pr_debug("%s: base %pK", __func__, ispif->base);
-		msm_camera_io_w(0, ispif->base +
+		legacy_msm_camera_io_w(0, ispif->base +
 			ISPIF_VFE_m_PIX_INTF_n_CID_MASK(i, 0));
-		msm_camera_io_w(0, ispif->base +
+		legacy_msm_camera_io_w(0, ispif->base +
 			ISPIF_VFE_m_PIX_INTF_n_CID_MASK(i, 1));
-		msm_camera_io_w(0, ispif->base +
+		legacy_msm_camera_io_w(0, ispif->base +
 			ISPIF_VFE_m_RDI_INTF_n_CID_MASK(i, 0));
-		msm_camera_io_w(0, ispif->base +
+		legacy_msm_camera_io_w(0, ispif->base +
 			ISPIF_VFE_m_RDI_INTF_n_CID_MASK(i, 1));
-		msm_camera_io_w(0, ispif->base +
+		legacy_msm_camera_io_w(0, ispif->base +
 			ISPIF_VFE_m_RDI_INTF_n_CID_MASK(i, 2));
 
-		msm_camera_io_w(0, ispif->base +
+		legacy_msm_camera_io_w(0, ispif->base +
 			ISPIF_VFE_m_PIX_INTF_n_CROP(i, 0));
-		msm_camera_io_w(0, ispif->base +
+		legacy_msm_camera_io_w(0, ispif->base +
 			ISPIF_VFE_m_PIX_INTF_n_CROP(i, 1));
 	}
 
-	msm_camera_io_w_mb(ISPIF_IRQ_GLOBAL_CLEAR_CMD, ispif->base +
+	legacy_msm_camera_io_w_mb(ISPIF_IRQ_GLOBAL_CLEAR_CMD, ispif->base +
 		ISPIF_IRQ_GLOBAL_CLEAR_CMD_ADDR);
 
 	return rc;
@@ -366,7 +366,7 @@ static void msm_ispif_sel_csid_core(struct ispif_device *ispif,
 		return;
 	}
 
-	data = msm_camera_io_r(ispif->base + ISPIF_VFE_m_INPUT_SEL(vfe_intf));
+	data = legacy_msm_camera_io_r(ispif->base + ISPIF_VFE_m_INPUT_SEL(vfe_intf));
 	switch (intftype) {
 	case PIX0:
 		data &= ~(BIT(1) | BIT(0));
@@ -390,7 +390,7 @@ static void msm_ispif_sel_csid_core(struct ispif_device *ispif,
 		break;
 	}
 
-	msm_camera_io_w_mb(data, ispif->base +
+	legacy_msm_camera_io_w_mb(data, ispif->base +
 		ISPIF_VFE_m_INPUT_SEL(vfe_intf));
 }
 
@@ -407,18 +407,18 @@ static void msm_ispif_enable_crop(struct ispif_device *ispif,
 		return;
 	}
 
-	data = msm_camera_io_r(ispif->base + ISPIF_VFE_m_CTRL_0(vfe_intf));
+	data = legacy_msm_camera_io_r(ispif->base + ISPIF_VFE_m_CTRL_0(vfe_intf));
 	data |= (1 << (intftype + 7));
 	if (intftype == PIX0)
 		data |= 1 << PIX0_LINE_BUF_EN_BIT;
-	msm_camera_io_w(data,
+	legacy_msm_camera_io_w(data,
 		ispif->base + ISPIF_VFE_m_CTRL_0(vfe_intf));
 
 	if (intftype == PIX0)
-		msm_camera_io_w_mb(start_pixel | (end_pixel << 16),
+		legacy_msm_camera_io_w_mb(start_pixel | (end_pixel << 16),
 			ispif->base + ISPIF_VFE_m_PIX_INTF_n_CROP(vfe_intf, 0));
 	else if (intftype == PIX1)
-		msm_camera_io_w_mb(start_pixel | (end_pixel << 16),
+		legacy_msm_camera_io_w_mb(start_pixel | (end_pixel << 16),
 			ispif->base + ISPIF_VFE_m_PIX_INTF_n_CROP(vfe_intf, 1));
 	else {
 		pr_err("%s: invalid intftype=%d\n", __func__, intftype);
@@ -461,12 +461,12 @@ static void msm_ispif_enable_intf_cids(struct ispif_device *ispif,
 		return;
 	}
 
-	data = msm_camera_io_r(ispif->base + intf_addr);
+	data = legacy_msm_camera_io_r(ispif->base + intf_addr);
 	if (enable)
 		data |= (uint32_t)cid_mask;
 	else
 		data &= ~((uint32_t)cid_mask);
-	msm_camera_io_w_mb(data, ispif->base + intf_addr);
+	legacy_msm_camera_io_w_mb(data, ispif->base + intf_addr);
 }
 
 static int msm_ispif_validate_intf_status(struct ispif_device *ispif,
@@ -484,23 +484,23 @@ static int msm_ispif_validate_intf_status(struct ispif_device *ispif,
 
 	switch (intftype) {
 	case PIX0:
-		data = msm_camera_io_r(ispif->base +
+		data = legacy_msm_camera_io_r(ispif->base +
 			ISPIF_VFE_m_PIX_INTF_n_STATUS(vfe_intf, 0));
 		break;
 	case RDI0:
-		data = msm_camera_io_r(ispif->base +
+		data = legacy_msm_camera_io_r(ispif->base +
 			ISPIF_VFE_m_RDI_INTF_n_STATUS(vfe_intf, 0));
 		break;
 	case PIX1:
-		data = msm_camera_io_r(ispif->base +
+		data = legacy_msm_camera_io_r(ispif->base +
 			ISPIF_VFE_m_PIX_INTF_n_STATUS(vfe_intf, 1));
 		break;
 	case RDI1:
-		data = msm_camera_io_r(ispif->base +
+		data = legacy_msm_camera_io_r(ispif->base +
 			ISPIF_VFE_m_RDI_INTF_n_STATUS(vfe_intf, 1));
 		break;
 	case RDI2:
-		data = msm_camera_io_r(ispif->base +
+		data = legacy_msm_camera_io_r(ispif->base +
 			ISPIF_VFE_m_RDI_INTF_n_STATUS(vfe_intf, 2));
 		break;
 	}
@@ -516,43 +516,43 @@ static void msm_ispif_select_clk_mux(struct ispif_device *ispif,
 
 	switch (intftype) {
 	case PIX0:
-		data = msm_camera_io_r(ispif->clk_mux_base);
+		data = legacy_msm_camera_io_r(ispif->clk_mux_base);
 		data &= ~(0xf << (vfe_intf * 8));
 		data |= (csid << (vfe_intf * 8));
-		msm_camera_io_w(data, ispif->clk_mux_base);
+		legacy_msm_camera_io_w(data, ispif->clk_mux_base);
 		break;
 
 	case RDI0:
-		data = msm_camera_io_r(ispif->clk_mux_base +
+		data = legacy_msm_camera_io_r(ispif->clk_mux_base +
 			ISPIF_RDI_CLK_MUX_SEL_ADDR);
 		data &= ~(0xf << (vfe_intf * 12));
 		data |= (csid << (vfe_intf * 12));
-		msm_camera_io_w(data, ispif->clk_mux_base +
+		legacy_msm_camera_io_w(data, ispif->clk_mux_base +
 			ISPIF_RDI_CLK_MUX_SEL_ADDR);
 		break;
 
 	case PIX1:
-		data = msm_camera_io_r(ispif->clk_mux_base);
+		data = legacy_msm_camera_io_r(ispif->clk_mux_base);
 		data &= ~(0xf0 << (vfe_intf * 8));
 		data |= (csid << (4 + (vfe_intf * 8)));
-		msm_camera_io_w(data, ispif->clk_mux_base);
+		legacy_msm_camera_io_w(data, ispif->clk_mux_base);
 		break;
 
 	case RDI1:
-		data = msm_camera_io_r(ispif->clk_mux_base +
+		data = legacy_msm_camera_io_r(ispif->clk_mux_base +
 			ISPIF_RDI_CLK_MUX_SEL_ADDR);
 		data &= ~(0xf << (4 + (vfe_intf * 12)));
 		data |= (csid << (4 + (vfe_intf * 12)));
-		msm_camera_io_w(data, ispif->clk_mux_base +
+		legacy_msm_camera_io_w(data, ispif->clk_mux_base +
 			ISPIF_RDI_CLK_MUX_SEL_ADDR);
 		break;
 
 	case RDI2:
-		data = msm_camera_io_r(ispif->clk_mux_base +
+		data = legacy_msm_camera_io_r(ispif->clk_mux_base +
 			ISPIF_RDI_CLK_MUX_SEL_ADDR);
 		data &= ~(0xf << (8 + (vfe_intf * 12)));
 		data |= (csid << (8 + (vfe_intf * 12)));
-		msm_camera_io_w(data, ispif->clk_mux_base +
+		legacy_msm_camera_io_w(data, ispif->clk_mux_base +
 			ISPIF_RDI_CLK_MUX_SEL_ADDR);
 		break;
 	}
@@ -611,11 +611,11 @@ static int msm_ispif_config(struct ispif_device *ispif,
 			pr_err("%s: invalid interface type\n", __func__);
 			return -EINVAL;
 		}
-		msm_camera_io_w(0x0, ispif->base +
+		legacy_msm_camera_io_w(0x0, ispif->base +
 			ISPIF_VFE_m_IRQ_MASK_0(vfe_intf));
-		msm_camera_io_w(0x0, ispif->base +
+		legacy_msm_camera_io_w(0x0, ispif->base +
 			ISPIF_VFE_m_IRQ_MASK_1(vfe_intf));
-		msm_camera_io_w_mb(0x0, ispif->base +
+		legacy_msm_camera_io_w_mb(0x0, ispif->base +
 			ISPIF_VFE_m_IRQ_MASK_2(vfe_intf));
 	}
 
@@ -660,26 +660,26 @@ static int msm_ispif_config(struct ispif_device *ispif,
 	}
 
 	for (vfe_intf = 0; vfe_intf < 2; vfe_intf++) {
-		msm_camera_io_w(ISPIF_IRQ_STATUS_MASK, ispif->base +
+		legacy_msm_camera_io_w(ISPIF_IRQ_STATUS_MASK, ispif->base +
 			ISPIF_VFE_m_IRQ_MASK_0(vfe_intf));
 
-		msm_camera_io_w(ISPIF_IRQ_STATUS_MASK, ispif->base +
+		legacy_msm_camera_io_w(ISPIF_IRQ_STATUS_MASK, ispif->base +
 			ISPIF_VFE_m_IRQ_CLEAR_0(vfe_intf));
 
-		msm_camera_io_w(ISPIF_IRQ_STATUS_1_MASK, ispif->base +
+		legacy_msm_camera_io_w(ISPIF_IRQ_STATUS_1_MASK, ispif->base +
 			ISPIF_VFE_m_IRQ_MASK_1(vfe_intf));
 
-		msm_camera_io_w(ISPIF_IRQ_STATUS_1_MASK, ispif->base +
+		legacy_msm_camera_io_w(ISPIF_IRQ_STATUS_1_MASK, ispif->base +
 			ISPIF_VFE_m_IRQ_CLEAR_1(vfe_intf));
 
-		msm_camera_io_w(ISPIF_IRQ_STATUS_2_MASK, ispif->base +
+		legacy_msm_camera_io_w(ISPIF_IRQ_STATUS_2_MASK, ispif->base +
 			ISPIF_VFE_m_IRQ_MASK_2(vfe_intf));
 
-		msm_camera_io_w(ISPIF_IRQ_STATUS_2_MASK, ispif->base +
+		legacy_msm_camera_io_w(ISPIF_IRQ_STATUS_2_MASK, ispif->base +
 			ISPIF_VFE_m_IRQ_CLEAR_2(vfe_intf));
 	}
 
-	msm_camera_io_w_mb(ISPIF_IRQ_GLOBAL_CLEAR_CMD, ispif->base +
+	legacy_msm_camera_io_w_mb(ISPIF_IRQ_GLOBAL_CLEAR_CMD, ispif->base +
 		ISPIF_IRQ_GLOBAL_CLEAR_CMD_ADDR);
 
 	return rc;
@@ -734,13 +734,13 @@ static void msm_ispif_intf_cmd(struct ispif_device *ispif, uint32_t cmd_bits,
 		}
 		/* cmd for PIX0, PIX1, RDI0, RDI1 */
 		if (ispif->applied_intf_cmd[vfe_intf].intf_cmd != 0xFFFFFFFF)
-			msm_camera_io_w_mb(
+			legacy_msm_camera_io_w_mb(
 				ispif->applied_intf_cmd[vfe_intf].intf_cmd,
 				ispif->base + ISPIF_VFE_m_INTF_CMD_0(vfe_intf));
 
 		/* cmd for RDI2 */
 		if (ispif->applied_intf_cmd[vfe_intf].intf_cmd1 != 0xFFFFFFFF)
-			msm_camera_io_w_mb(
+			legacy_msm_camera_io_w_mb(
 				ispif->applied_intf_cmd[vfe_intf].intf_cmd1,
 				ispif->base + ISPIF_VFE_m_INTF_CMD_1(vfe_intf));
 	}
@@ -842,11 +842,11 @@ static int msm_ispif_restart_frame_boundary(struct ispif_device *ispif,
 		vfe_mask |= (1 << vfe_intf);
 	}
 
-	rc = msm_cam_clk_enable(&ispif->pdev->dev,
+	rc = legacy_msm_cam_clk_enable(&ispif->pdev->dev,
 		ispif_8974_reset_clk_info, reset_clk,
 		ARRAY_SIZE(ispif_8974_reset_clk_info), 1);
 	if (rc < 0) {
-		rc = msm_cam_clk_enable(&ispif->pdev->dev,
+		rc = legacy_msm_cam_clk_enable(&ispif->pdev->dev,
 			ispif_8626_reset_clk_info, reset_clk1,
 			ARRAY_SIZE(ispif_8626_reset_clk_info), 1);
 		if (rc < 0) {
@@ -865,13 +865,13 @@ static int msm_ispif_restart_frame_boundary(struct ispif_device *ispif,
 		init_completion(&ispif->reset_complete[VFE0]);
 		pr_err("%s Init completion VFE0\n", __func__);
 			/* initiate reset of ISPIF */
-		msm_camera_io_w(0x00001FF9,
+		legacy_msm_camera_io_w(0x00001FF9,
 				ispif->base + ISPIF_RST_CMD_ADDR);
 	}
 	if (ispif->hw_num_isps > 1 && (vfe_mask & (1 << VFE1))) {
 		init_completion(&ispif->reset_complete[VFE1]);
 		pr_err("%s Init completion VFE1\n", __func__);
-				msm_camera_io_w(0x00001FF9,
+				legacy_msm_camera_io_w(0x00001FF9,
 					ispif->base + ISPIF_RST_CMD_1_ADDR);
 	}
 
@@ -899,7 +899,7 @@ static int msm_ispif_restart_frame_boundary(struct ispif_device *ispif,
 	pr_info("%s: ISPIF reset hw done", __func__);
 
 	if (ispif->clk_idx == 1) {
-		rc = msm_cam_clk_enable(&ispif->pdev->dev,
+		rc = legacy_msm_cam_clk_enable(&ispif->pdev->dev,
 			ispif_8974_reset_clk_info, reset_clk,
 			ARRAY_SIZE(ispif_8974_reset_clk_info), 0);
 		if (rc < 0) {
@@ -910,7 +910,7 @@ static int msm_ispif_restart_frame_boundary(struct ispif_device *ispif,
 	}
 
 	if (ispif->clk_idx == 2) {
-		rc = msm_cam_clk_enable(&ispif->pdev->dev,
+		rc = legacy_msm_cam_clk_enable(&ispif->pdev->dev,
 			ispif_8626_reset_clk_info, reset_clk1,
 			ARRAY_SIZE(ispif_8626_reset_clk_info), 0);
 		if (rc < 0) {
@@ -967,11 +967,11 @@ static int msm_ispif_restart_frame_boundary(struct ispif_device *ispif,
 end:
 	return rc;
 disable_clk:
-	rc = msm_cam_clk_enable(&ispif->pdev->dev,
+	rc = legacy_msm_cam_clk_enable(&ispif->pdev->dev,
 		ispif_8974_reset_clk_info, reset_clk,
 		ARRAY_SIZE(ispif_8974_reset_clk_info), 0);
 	if (rc < 0) {
-		rc = msm_cam_clk_enable(&ispif->pdev->dev,
+		rc = legacy_msm_cam_clk_enable(&ispif->pdev->dev,
 			ispif_8626_reset_clk_info, reset_clk1,
 			ARRAY_SIZE(ispif_8626_reset_clk_info), 0);
 		if (rc < 0)
@@ -1101,38 +1101,38 @@ static inline void msm_ispif_read_irq_status(struct ispif_irq_status *out,
 	BUG_ON(!ispif);
 	BUG_ON(!out);
 
-	out[VFE0].ispifIrqStatus0 = msm_camera_io_r(ispif->base +
+	out[VFE0].ispifIrqStatus0 = legacy_msm_camera_io_r(ispif->base +
 		ISPIF_VFE_m_IRQ_STATUS_0(VFE0));
-	msm_camera_io_w(out[VFE0].ispifIrqStatus0,
+	legacy_msm_camera_io_w(out[VFE0].ispifIrqStatus0,
 		ispif->base + ISPIF_VFE_m_IRQ_CLEAR_0(VFE0));
 
-	out[VFE0].ispifIrqStatus1 = msm_camera_io_r(ispif->base +
+	out[VFE0].ispifIrqStatus1 = legacy_msm_camera_io_r(ispif->base +
 		ISPIF_VFE_m_IRQ_STATUS_1(VFE0));
-	msm_camera_io_w(out[VFE0].ispifIrqStatus1,
+	legacy_msm_camera_io_w(out[VFE0].ispifIrqStatus1,
 		ispif->base + ISPIF_VFE_m_IRQ_CLEAR_1(VFE0));
 
-	out[VFE0].ispifIrqStatus2 = msm_camera_io_r(ispif->base +
+	out[VFE0].ispifIrqStatus2 = legacy_msm_camera_io_r(ispif->base +
 		ISPIF_VFE_m_IRQ_STATUS_2(VFE0));
-	msm_camera_io_w_mb(out[VFE0].ispifIrqStatus2,
+	legacy_msm_camera_io_w_mb(out[VFE0].ispifIrqStatus2,
 		ispif->base + ISPIF_VFE_m_IRQ_CLEAR_2(VFE0));
 
 	if (ispif->vfe_info.num_vfe > 1) {
-		out[VFE1].ispifIrqStatus0 = msm_camera_io_r(ispif->base +
+		out[VFE1].ispifIrqStatus0 = legacy_msm_camera_io_r(ispif->base +
 			ISPIF_VFE_m_IRQ_STATUS_0(VFE1));
-		msm_camera_io_w(out[VFE1].ispifIrqStatus0,
+		legacy_msm_camera_io_w(out[VFE1].ispifIrqStatus0,
 			ispif->base + ISPIF_VFE_m_IRQ_CLEAR_0(VFE1));
 
-		out[VFE1].ispifIrqStatus1 = msm_camera_io_r(ispif->base +
+		out[VFE1].ispifIrqStatus1 = legacy_msm_camera_io_r(ispif->base +
 			ISPIF_VFE_m_IRQ_STATUS_1(VFE1));
-		msm_camera_io_w(out[VFE1].ispifIrqStatus1,
+		legacy_msm_camera_io_w(out[VFE1].ispifIrqStatus1,
 				ispif->base + ISPIF_VFE_m_IRQ_CLEAR_1(VFE1));
 
-		out[VFE1].ispifIrqStatus2 = msm_camera_io_r(ispif->base +
+		out[VFE1].ispifIrqStatus2 = legacy_msm_camera_io_r(ispif->base +
 			ISPIF_VFE_m_IRQ_STATUS_2(VFE1));
-		msm_camera_io_w_mb(out[VFE1].ispifIrqStatus2,
+		legacy_msm_camera_io_w_mb(out[VFE1].ispifIrqStatus2,
 			ispif->base + ISPIF_VFE_m_IRQ_CLEAR_2(VFE1));
 	}
-	msm_camera_io_w_mb(ISPIF_IRQ_GLOBAL_CLEAR_CMD, ispif->base +
+	legacy_msm_camera_io_w_mb(ISPIF_IRQ_GLOBAL_CLEAR_CMD, ispif->base +
 	ISPIF_IRQ_GLOBAL_CLEAR_CMD_ADDR);
 
 	if (out[VFE0].ispifIrqStatus0 & ISPIF_IRQ_STATUS_MASK) {
@@ -1521,9 +1521,9 @@ static int ispif_probe(struct platform_device *pdev)
 	ispif->msm_sd.sd.entity.group_id = MSM_CAMERA_SUBDEV_ISPIF;
 	ispif->msm_sd.sd.entity.name = pdev->name;
 	ispif->msm_sd.close_seq = MSM_SD_CLOSE_1ST_CATEGORY | 0x1;
-	rc = msm_sd_register(&ispif->msm_sd);
+	rc = legacy_msm_sd_register(&ispif->msm_sd);
 	if (rc) {
-		pr_err("%s: msm_sd_register error = %d\n", __func__, rc);
+		pr_err("%s: legacy_msm_sd_register error = %d\n", __func__, rc);
 		goto error;
 	}
 	msm_ispif_v4l2_subdev_fops.owner = v4l2_subdev_fops.owner;

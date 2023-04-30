@@ -646,7 +646,7 @@ static int32_t msm_camera_tz_i2c_ta_done(void)
 	return rc;
 }
 
-int32_t msm_camera_tz_i2c_power_up(
+int32_t legacy_msm_camera_tz_i2c_power_up(
 	struct msm_camera_i2c_client *client)
 {
 	int32_t rc = -EFAULT;
@@ -737,7 +737,7 @@ int32_t msm_camera_tz_i2c_power_up(
 	return rc;
 }
 
-int32_t msm_camera_tz_i2c_power_down(
+int32_t legacy_msm_camera_tz_i2c_power_down(
 	struct msm_camera_i2c_client *client)
 {
 	int32_t rc = -EFAULT;
@@ -778,7 +778,7 @@ int32_t msm_camera_tz_i2c_power_down(
 	return rc;
 }
 
-int32_t msm_camera_tz_i2c_register_sensor(
+int32_t legacy_msm_camera_tz_i2c_register_sensor(
 	void *s_ctrl_p)
 {
 	struct msm_sensor_ctrl_t *s_ctrl = (struct msm_sensor_ctrl_t *)s_ctrl_p;
@@ -800,7 +800,7 @@ int32_t msm_camera_tz_i2c_register_sensor(
 	return 0;
 }
 
-int32_t msm_camera_tz_i2c_read(struct msm_camera_i2c_client *client,
+int32_t legacy_msm_camera_tz_i2c_read(struct msm_camera_i2c_client *client,
 	uint32_t addr, uint16_t *data,
 	enum msm_camera_i2c_data_type data_type)
 {
@@ -820,10 +820,10 @@ int32_t msm_camera_tz_i2c_read(struct msm_camera_i2c_client *client,
 		msm_camera_tz_i2c_ta_done();
 	}
 	return TZ_I2C_FN_RETURN(rc,
-		msm_camera_cci_i2c_read, client, addr, data, data_type);
+		legacy_msm_camera_cci_i2c_read, client, addr, data, data_type);
 }
 
-int32_t msm_camera_tz_i2c_read_seq(struct msm_camera_i2c_client *client,
+int32_t legacy_msm_camera_tz_i2c_read_seq(struct msm_camera_i2c_client *client,
 	uint32_t addr, uint8_t *data, uint32_t num_byte)
 {
 	int32_t rc = -EFAULT;
@@ -843,10 +843,10 @@ int32_t msm_camera_tz_i2c_read_seq(struct msm_camera_i2c_client *client,
 		msm_camera_tz_i2c_ta_done();
 	}
 	return TZ_I2C_FN_RETURN(rc,
-		msm_camera_cci_i2c_read_seq, client, addr, data, num_byte);
+		legacy_msm_camera_cci_i2c_read_seq, client, addr, data, num_byte);
 }
 
-int32_t msm_camera_tz_i2c_write(struct msm_camera_i2c_client *client,
+int32_t legacy_msm_camera_tz_i2c_write(struct msm_camera_i2c_client *client,
 	uint32_t addr, uint16_t data,
 	enum msm_camera_i2c_data_type data_type)
 {
@@ -866,10 +866,10 @@ int32_t msm_camera_tz_i2c_write(struct msm_camera_i2c_client *client,
 		msm_camera_tz_i2c_ta_done();
 	}
 	return TZ_I2C_FN_RETURN(rc,
-		msm_camera_cci_i2c_write, client, addr, data, data_type);
+		legacy_msm_camera_cci_i2c_write, client, addr, data, data_type);
 }
 
-int32_t msm_camera_tz_i2c_write_seq(struct msm_camera_i2c_client *client,
+int32_t legacy_msm_camera_tz_i2c_write_seq(struct msm_camera_i2c_client *client,
 	uint32_t addr, uint8_t *data, uint32_t num_byte)
 {
 	int32_t rc = -EFAULT;
@@ -889,10 +889,10 @@ int32_t msm_camera_tz_i2c_write_seq(struct msm_camera_i2c_client *client,
 		msm_camera_tz_i2c_ta_done();
 	}
 	return TZ_I2C_FN_RETURN(rc,
-		msm_camera_cci_i2c_write_seq, client, addr, data, num_byte);
+		legacy_msm_camera_cci_i2c_write_seq, client, addr, data, num_byte);
 }
 
-int32_t msm_camera_tz_i2c_write_table_async(
+int32_t legacy_msm_camera_tz_i2c_write_table_async(
 	struct msm_camera_i2c_client *client,
 	struct msm_camera_i2c_reg_setting *write_setting)
 {
@@ -911,10 +911,10 @@ int32_t msm_camera_tz_i2c_write_table_async(
 		msm_camera_tz_i2c_ta_done();
 	}
 	return TZ_I2C_FN_RETURN(rc,
-		msm_camera_cci_i2c_write_table_async, client, write_setting);
+		legacy_msm_camera_cci_i2c_write_table_async, client, write_setting);
 }
 
-int32_t msm_camera_tz_i2c_write_table_sync(
+int32_t legacy_msm_camera_tz_i2c_write_table_sync(
 	struct msm_camera_i2c_client *client,
 	struct msm_camera_i2c_reg_setting *write_setting)
 {
@@ -933,10 +933,10 @@ int32_t msm_camera_tz_i2c_write_table_sync(
 		msm_camera_tz_i2c_ta_done();
 	}
 	return TZ_I2C_FN_RETURN(rc,
-		msm_camera_cci_i2c_write_table_sync, client, write_setting);
+		legacy_msm_camera_cci_i2c_write_table_sync, client, write_setting);
 }
 
-int32_t msm_camera_tz_i2c_write_table_sync_block(
+int32_t legacy_msm_camera_tz_i2c_write_table_sync_block(
 	struct msm_camera_i2c_client *client,
 	struct msm_camera_i2c_reg_setting *write_setting)
 {
@@ -955,11 +955,11 @@ int32_t msm_camera_tz_i2c_write_table_sync_block(
 		msm_camera_tz_i2c_ta_done();
 	}
 	return TZ_I2C_FN_RETURN(rc,
-		msm_camera_cci_i2c_write_table_sync_block, client,
+		legacy_msm_camera_cci_i2c_write_table_sync_block, client,
 			write_setting);
 }
 
-int32_t msm_camera_tz_i2c_write_table(
+int32_t legacy_msm_camera_tz_i2c_write_table(
 	struct msm_camera_i2c_client *client,
 	struct msm_camera_i2c_reg_setting *write_setting)
 {
@@ -978,10 +978,10 @@ int32_t msm_camera_tz_i2c_write_table(
 		msm_camera_tz_i2c_ta_done();
 	}
 	return TZ_I2C_FN_RETURN(rc,
-		msm_camera_cci_i2c_write_table, client, write_setting);
+		legacy_msm_camera_cci_i2c_write_table, client, write_setting);
 }
 
-int32_t msm_camera_tz_i2c_write_seq_table(
+int32_t legacy_msm_camera_tz_i2c_write_seq_table(
 	struct msm_camera_i2c_client *client,
 	struct msm_camera_i2c_seq_reg_setting *write_setting)
 {
@@ -1000,10 +1000,10 @@ int32_t msm_camera_tz_i2c_write_seq_table(
 		msm_camera_tz_i2c_ta_done();
 	}
 	return TZ_I2C_FN_RETURN(rc,
-		msm_camera_cci_i2c_write_seq_table, client, write_setting);
+		legacy_msm_camera_cci_i2c_write_seq_table, client, write_setting);
 }
 
-int32_t msm_camera_tz_i2c_write_table_w_microdelay(
+int32_t legacy_msm_camera_tz_i2c_write_table_w_microdelay(
 	struct msm_camera_i2c_client *client,
 	struct msm_camera_i2c_reg_setting *write_setting)
 {
@@ -1022,11 +1022,11 @@ int32_t msm_camera_tz_i2c_write_table_w_microdelay(
 		msm_camera_tz_i2c_ta_done();
 	}
 	return TZ_I2C_FN_RETURN(rc,
-		msm_camera_cci_i2c_write_table_w_microdelay, client,
+		legacy_msm_camera_cci_i2c_write_table_w_microdelay, client,
 			write_setting);
 }
 
-int32_t msm_camera_tz_i2c_poll(struct msm_camera_i2c_client *client,
+int32_t legacy_msm_camera_tz_i2c_poll(struct msm_camera_i2c_client *client,
 	uint32_t addr, uint16_t data,
 	enum msm_camera_i2c_data_type data_type)
 {
@@ -1045,10 +1045,10 @@ int32_t msm_camera_tz_i2c_poll(struct msm_camera_i2c_client *client,
 		msm_camera_tz_i2c_ta_done();
 	}
 	return TZ_I2C_FN_RETURN(rc,
-		msm_camera_cci_i2c_poll, client, addr, data, data_type);
+		legacy_msm_camera_cci_i2c_poll, client, addr, data, data_type);
 }
 
-int32_t msm_camera_tz_i2c_write_conf_tbl(
+int32_t legacy_msm_camera_tz_i2c_write_conf_tbl(
 	struct msm_camera_i2c_client *client,
 	struct msm_camera_i2c_reg_conf *reg_conf_tbl, uint16_t size,
 	enum msm_camera_i2c_data_type data_type)
@@ -1068,11 +1068,11 @@ int32_t msm_camera_tz_i2c_write_conf_tbl(
 		msm_camera_tz_i2c_ta_done();
 	}
 	return TZ_I2C_FN_RETURN(rc,
-		msm_camera_cci_i2c_write_conf_tbl, client, reg_conf_tbl, size,
+		legacy_msm_camera_cci_i2c_write_conf_tbl, client, reg_conf_tbl, size,
 			data_type);
 }
 
-int32_t msm_sensor_tz_i2c_util(struct msm_camera_i2c_client *client,
+int32_t legacy_msm_sensor_tz_i2c_util(struct msm_camera_i2c_client *client,
 	uint16_t cci_cmd)
 {
 	int32_t rc = -EFAULT;
@@ -1089,5 +1089,5 @@ int32_t msm_sensor_tz_i2c_util(struct msm_camera_i2c_client *client,
 		msm_camera_tz_i2c_ta_done();
 	}
 	return TZ_I2C_FN_RETURN(rc,
-		msm_sensor_cci_i2c_util, client, cci_cmd);
+		legacy_msm_sensor_cci_i2c_util, client, cci_cmd);
 }

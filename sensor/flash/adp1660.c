@@ -82,7 +82,7 @@ static int msm_flash_adp1660_i2c_probe(struct i2c_client *client,
 		id = adp1660_i2c_id;
 	}
 
-	return msm_flash_i2c_probe(client, id);
+	return legacy_msm_flash_i2c_probe(client, id);
 }
 
 static struct i2c_driver adp1660_i2c_driver = {
@@ -104,7 +104,7 @@ static int msm_flash_adp1660_platform_probe(struct platform_device *pdev)
 
 	if (!match)
 		return -EFAULT;
-	return msm_flash_probe(pdev, match->data);
+	return legacy_msm_flash_probe(pdev, match->data);
 }
 
 static struct platform_driver adp1660_platform_driver = {
@@ -195,13 +195,13 @@ static struct msm_led_flash_reg_t adp1660_regs = {
 };
 
 static struct msm_flash_fn_t adp1660_func_tbl = {
-	.flash_get_subdev_id = msm_led_i2c_trigger_get_subdev_id,
-	.flash_led_config = msm_led_i2c_trigger_config,
-	.flash_led_init = msm_flash_led_init,
-	.flash_led_release = msm_flash_led_release,
-	.flash_led_off = msm_flash_led_off,
-	.flash_led_low = msm_flash_led_low,
-	.flash_led_high = msm_flash_led_high,
+	.flash_get_subdev_id = legacy_msm_led_i2c_trigger_get_subdev_id,
+	.flash_led_config = legacy_msm_led_i2c_trigger_config,
+	.flash_led_init = legacy_msm_flash_led_init,
+	.flash_led_release = legacy_msm_flash_led_release,
+	.flash_led_off = legacy_msm_flash_led_off,
+	.flash_led_low = legacy_msm_flash_led_low,
+	.flash_led_high = legacy_msm_flash_led_high,
 };
 
 static struct msm_led_flash_ctrl_t fctrl = {

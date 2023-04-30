@@ -67,7 +67,7 @@ buf_error:
 	return rc;
 }
 
-void msm_isp_process_stats_irq(struct vfe_device *vfe_dev,
+void legacy_msm_isp_process_stats_irq(struct vfe_device *vfe_dev,
 	uint32_t irq_status0, uint32_t irq_status1,
 	struct msm_isp_timestamp *ts)
 {
@@ -149,7 +149,7 @@ void msm_isp_process_stats_irq(struct vfe_device *vfe_dev,
 					ISP_DBG("%s: stats frameid: 0x%x %d\n",
 						__func__, buf_event.frame_id,
 						stream_info->stats_type);
-					msm_isp_send_event(vfe_dev,
+					legacy_msm_isp_send_event(vfe_dev,
 						ISP_EVENT_STATS_NOTIFY +
 						stream_info->stats_type,
 						&buf_event);
@@ -165,14 +165,14 @@ void msm_isp_process_stats_irq(struct vfe_device *vfe_dev,
 				__func__, buf_event.frame_id,
 				comp_stats_type_mask);
 			stats_event->stats_mask = comp_stats_type_mask;
-			msm_isp_send_event(vfe_dev,
+			legacy_msm_isp_send_event(vfe_dev,
 				ISP_EVENT_COMP_STATS_NOTIFY, &buf_event);
 			comp_stats_type_mask = 0;
 		}
 	}
 }
 
-int msm_isp_stats_create_stream(struct vfe_device *vfe_dev,
+int legacy_msm_isp_stats_create_stream(struct vfe_device *vfe_dev,
 	struct msm_vfe_stats_stream_request_cmd *stream_req_cmd)
 {
 	int rc = -1;
@@ -231,7 +231,7 @@ int msm_isp_stats_create_stream(struct vfe_device *vfe_dev,
 	return 0;
 }
 
-int msm_isp_request_stats_stream(struct vfe_device *vfe_dev, void *arg)
+int legacy_msm_isp_request_stats_stream(struct vfe_device *vfe_dev, void *arg)
 {
 	int rc = -1;
 	struct msm_vfe_stats_stream_request_cmd *stream_req_cmd = arg;
@@ -240,7 +240,7 @@ int msm_isp_request_stats_stream(struct vfe_device *vfe_dev, void *arg)
 	uint32_t framedrop_period;
 	uint32_t stats_idx;
 
-	rc = msm_isp_stats_create_stream(vfe_dev, stream_req_cmd);
+	rc = legacy_msm_isp_stats_create_stream(vfe_dev, stream_req_cmd);
 	if (rc < 0) {
 		pr_err("%s: create stream failed\n", __func__);
 		return rc;
@@ -255,7 +255,7 @@ int msm_isp_request_stats_stream(struct vfe_device *vfe_dev, void *arg)
 
 	stream_info = &stats_data->stream_info[stats_idx];
 
-	framedrop_period = msm_isp_get_framedrop_period(
+	framedrop_period = legacy_msm_isp_get_framedrop_period(
 	   stream_req_cmd->framedrop_pattern);
 
 	if (stream_req_cmd->framedrop_pattern == SKIP_ALL)
@@ -275,7 +275,7 @@ int msm_isp_request_stats_stream(struct vfe_device *vfe_dev, void *arg)
 	return rc;
 }
 
-int msm_isp_release_stats_stream(struct vfe_device *vfe_dev, void *arg)
+int legacy_msm_isp_release_stats_stream(struct vfe_device *vfe_dev, void *arg)
 {
 	int rc = -1;
 	struct msm_vfe_stats_stream_cfg_cmd stream_cfg_cmd;
@@ -298,7 +298,7 @@ int msm_isp_release_stats_stream(struct vfe_device *vfe_dev, void *arg)
 		stream_cfg_cmd.num_streams = 1;
 		stream_cfg_cmd.stream_handle[0] =
 			stream_release_cmd->stream_handle;
-		rc = msm_isp_cfg_stats_stream(vfe_dev, &stream_cfg_cmd);
+		rc = legacy_msm_isp_cfg_stats_stream(vfe_dev, &stream_cfg_cmd);
 	}
 
 	if (!stream_info->composite_flag)
@@ -356,7 +356,7 @@ static void msm_isp_deinit_stats_ping_pong_reg(
 	}
 }
 
-void msm_isp_update_stats_framedrop_reg(struct vfe_device *vfe_dev)
+void legacy_msm_isp_update_stats_framedrop_reg(struct vfe_device *vfe_dev)
 {
 	int i;
 	struct msm_vfe_stats_shared_data *stats_data = &vfe_dev->stats_data;
@@ -377,7 +377,7 @@ void msm_isp_update_stats_framedrop_reg(struct vfe_device *vfe_dev)
 	}
 }
 
-void msm_isp_stats_stream_update(struct vfe_device *vfe_dev)
+void legacy_msm_isp_stats_stream_update(struct vfe_device *vfe_dev)
 {
 	int i;
 	uint32_t stats_mask = 0, comp_stats_mask = 0;
@@ -624,7 +624,7 @@ static int msm_isp_stop_stats_stream(struct vfe_device *vfe_dev,
 	return rc;
 }
 
-int msm_isp_cfg_stats_stream(struct vfe_device *vfe_dev, void *arg)
+int legacy_msm_isp_cfg_stats_stream(struct vfe_device *vfe_dev, void *arg)
 {
 	int rc = 0;
 	struct msm_vfe_stats_stream_cfg_cmd *stream_cfg_cmd = arg;
@@ -651,7 +651,7 @@ int msm_isp_cfg_stats_stream(struct vfe_device *vfe_dev, void *arg)
 	return rc;
 }
 
-int msm_isp_update_stats_stream(struct vfe_device *vfe_dev, void *arg)
+int legacy_msm_isp_update_stats_stream(struct vfe_device *vfe_dev, void *arg)
 {
 	int rc = 0, i;
 	struct msm_vfe_stats_stream *stream_info;
@@ -686,7 +686,7 @@ int msm_isp_update_stats_stream(struct vfe_device *vfe_dev, void *arg)
 		switch (update_cmd->update_type) {
 		case UPDATE_STREAM_STATS_FRAMEDROP_PATTERN: {
 			uint32_t framedrop_period =
-				msm_isp_get_framedrop_period(
+				legacy_msm_isp_get_framedrop_period(
 				   update_info->skip_pattern);
 			if (update_info->skip_pattern == SKIP_ALL)
 				stream_info->framedrop_pattern = 0x0;

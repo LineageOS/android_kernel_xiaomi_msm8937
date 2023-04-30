@@ -21,7 +21,7 @@
 
 #define HANDLE_TO_IDX(handle) (handle & 0xFF)
 
-int msm_isp_axi_create_stream(
+int legacy_msm_isp_axi_create_stream(
 	struct msm_vfe_axi_shared_data *axi_data,
 	struct msm_vfe32_axi_stream_request_cmd *stream_cfg_cmd)
 {
@@ -55,7 +55,7 @@ int msm_isp_axi_create_stream(
 	return 0;
 }
 
-void msm_isp_axi_destroy_stream(
+void legacy_msm_isp_axi_destroy_stream(
 	struct msm_vfe_axi_shared_data *axi_data, int stream_idx)
 {
 	if (axi_data->stream_info[stream_idx].state != AVAILABLE) {
@@ -66,7 +66,7 @@ void msm_isp_axi_destroy_stream(
 	}
 }
 
-int msm_isp_validate_axi_request(struct msm_vfe_axi_shared_data *axi_data,
+int legacy_msm_isp_validate_axi_request(struct msm_vfe_axi_shared_data *axi_data,
 	struct msm_vfe32_axi_stream_request_cmd *stream_cfg_cmd)
 {
 	int rc = -1, i;
@@ -142,7 +142,7 @@ int msm_isp_validate_axi_request(struct msm_vfe_axi_shared_data *axi_data,
 		break;
 	/*TD: Add more image format*/
 	default:
-		msm_isp_print_fourcc_error(__func__,
+		legacy_msm_isp_print_fourcc_error(__func__,
 				stream_cfg_cmd->output_format);
 		return rc;
 	}
@@ -271,14 +271,14 @@ static uint32_t msm_isp_axi_get_plane_size(
 		break;
 	/*TD: Add more image format*/
 	default:
-		msm_isp_print_fourcc_error(__func__,
+		legacy_msm_isp_print_fourcc_error(__func__,
 				stream_info->output_format);
 		break;
 	}
 	return size;
 }
 
-void msm_isp_axi_reserve_wm(struct msm_vfe_axi_shared_data *axi_data,
+void legacy_msm_isp_axi_reserve_wm(struct msm_vfe_axi_shared_data *axi_data,
 	struct msm_vfe_axi_stream *stream_info)
 {
 	int i, j;
@@ -299,7 +299,7 @@ void msm_isp_axi_reserve_wm(struct msm_vfe_axi_shared_data *axi_data,
 	}
 }
 
-void msm_isp_axi_free_wm(struct msm_vfe_axi_shared_data *axi_data,
+void legacy_msm_isp_axi_free_wm(struct msm_vfe_axi_shared_data *axi_data,
 	struct msm_vfe_axi_stream *stream_info)
 {
 	int i;
@@ -314,7 +314,7 @@ void msm_isp_axi_free_wm(struct msm_vfe_axi_shared_data *axi_data,
 		axi_data->num_rdi_stream++;
 }
 
-void msm_isp_axi_reserve_comp_mask(
+void legacy_msm_isp_axi_reserve_comp_mask(
 	struct msm_vfe_axi_shared_data *axi_data,
 	struct msm_vfe_axi_stream *stream_info)
 {
@@ -337,7 +337,7 @@ void msm_isp_axi_reserve_comp_mask(
 	stream_info->comp_mask_index = i;
 }
 
-void msm_isp_axi_free_comp_mask(struct msm_vfe_axi_shared_data *axi_data,
+void legacy_msm_isp_axi_free_comp_mask(struct msm_vfe_axi_shared_data *axi_data,
 	struct msm_vfe_axi_stream *stream_info)
 {
 	axi_data->composite_info[stream_info->comp_mask_index].
@@ -390,7 +390,7 @@ int msm_isp_axi_get_bufq_handles(
 	return rc;
 }
 
-int msm_isp_axi_check_stream_state(
+int legacy_msm_isp_axi_check_stream_state(
 	struct vfe_device *vfe_dev,
 	struct msm_vfe_axi_stream_cfg_cmd *stream_cfg_cmd)
 {
@@ -440,7 +440,7 @@ int msm_isp_axi_check_stream_state(
 	return rc;
 }
 
-void msm_isp_update_framedrop_reg(struct vfe_device *vfe_dev,
+void legacy_msm_isp_update_framedrop_reg(struct vfe_device *vfe_dev,
 	uint8_t input_src)
 {
 	int i;
@@ -484,7 +484,7 @@ void msm_isp_update_framedrop_reg(struct vfe_device *vfe_dev,
 	}
 }
 
-void msm_isp_reset_framedrop(struct vfe_device *vfe_dev,
+void legacy_msm_isp_reset_framedrop(struct vfe_device *vfe_dev,
 			struct msm_vfe_axi_stream *stream_info)
 {
 	stream_info->runtime_init_frame_drop = stream_info->init_frame_drop;
@@ -496,7 +496,7 @@ void msm_isp_reset_framedrop(struct vfe_device *vfe_dev,
 	vfe_dev->hw_info->vfe_ops.axi_ops.cfg_framedrop(vfe_dev, stream_info);
 }
 
-void msm_isp_notify(struct vfe_device *vfe_dev, uint32_t event_type,
+void legacy_msm_isp_notify(struct vfe_device *vfe_dev, uint32_t event_type,
 	enum msm_vfe_input_src frame_src, struct msm_isp_timestamp *ts)
 {
 	struct msm_isp32_event_data event_data;
@@ -527,10 +527,10 @@ void msm_isp_notify(struct vfe_device *vfe_dev, uint32_t event_type,
 	event_data.frame_id = vfe_dev->axi_data.src_info[frame_src].frame_id;
 	event_data.timestamp = ts->event_time;
 	event_data.mono_timestamp = ts->buf_time;
-	msm_isp_send_event(vfe_dev, event_type | frame_src, &event_data);
+	legacy_msm_isp_send_event(vfe_dev, event_type | frame_src, &event_data);
 }
 
-void msm_isp_calculate_framedrop(
+void legacy_msm_isp_calculate_framedrop(
 	struct msm_vfe_axi_shared_data *axi_data,
 	struct msm_vfe32_axi_stream_request_cmd *stream_cfg_cmd)
 {
@@ -549,7 +549,7 @@ void msm_isp_calculate_framedrop(
 		return;
 	}
 
-	framedrop_period = msm_isp_get_framedrop_period(
+	framedrop_period = legacy_msm_isp_get_framedrop_period(
 	   stream_cfg_cmd->frame_skip_pattern);
 	stream_info->frame_skip_pattern =
 		stream_cfg_cmd->frame_skip_pattern;
@@ -584,7 +584,7 @@ void msm_isp_calculate_framedrop(
 	}
 }
 
-void msm_isp_calculate_bandwidth(
+void legacy_msm_isp_calculate_bandwidth(
 	struct msm_vfe_axi_shared_data *axi_data,
 	struct msm_vfe_axi_stream *stream_info)
 {
@@ -600,7 +600,7 @@ void msm_isp_calculate_bandwidth(
 	} else {
 		int rdi = SRC_TO_INTF(stream_info->stream_src);
 
-		bpp = msm_isp_get_bit_per_pixel(stream_info->output_format);
+		bpp = legacy_msm_isp_get_bit_per_pixel(stream_info->output_format);
 		if (rdi < VFE_SRC_MAX)
 			stream_info->bandwidth =
 				(axi_data->src_info[rdi].pixel_clock / 8) * bpp;
@@ -610,13 +610,13 @@ void msm_isp_calculate_bandwidth(
 }
 
 #ifdef CONFIG_MSM_AVTIMER
-void msm_isp_start_avtimer(void)
+void legacy_msm_isp_start_avtimer(void)
 {
 	avcs_core_open();
 	avcs_core_disable_power_collapse(1);
 }
 
-static inline void msm_isp_get_avtimer_ts(
+static inline void legacy_msm_isp_get_avtimer_ts(
 		struct msm_isp_timestamp *time_stamp)
 {
 	int rc = 0;
@@ -639,12 +639,12 @@ static inline void msm_isp_get_avtimer_ts(
 	}
 }
 #else
-void msm_isp_start_avtimer(void)
+void legacy_msm_isp_start_avtimer(void)
 {
 	pr_err("AV Timer is not supported\n");
 }
 
-static inline void msm_isp_get_avtimer_ts(
+static inline void legacy_msm_isp_get_avtimer_ts(
 		struct msm_isp_timestamp *time_stamp)
 {
 	pr_err_ratelimited("%s: Error: AVTimer driver not available\n",
@@ -654,27 +654,27 @@ static inline void msm_isp_get_avtimer_ts(
 }
 #endif
 
-int msm_isp_request_axi_stream(struct vfe_device *vfe_dev, void *arg)
+int legacy_msm_isp_request_axi_stream(struct vfe_device *vfe_dev, void *arg)
 {
 	int rc = 0, i;
 	uint32_t io_format = 0;
 	struct msm_vfe32_axi_stream_request_cmd *stream_cfg_cmd = arg;
 	struct msm_vfe_axi_stream *stream_info;
 
-	rc = msm_isp_axi_create_stream(
+	rc = legacy_msm_isp_axi_create_stream(
 		&vfe_dev->axi_data, stream_cfg_cmd);
 	if (rc) {
 		pr_err("%s: create stream failed\n", __func__);
 		return rc;
 	}
 
-	rc = msm_isp_validate_axi_request(
+	rc = legacy_msm_isp_validate_axi_request(
 		&vfe_dev->axi_data, stream_cfg_cmd);
 	if (rc) {
 		pr_err("%s: Request validation failed\n", __func__);
 		if (HANDLE_TO_IDX(stream_cfg_cmd->axi_stream_handle) <
 			MAX_NUM_STREAM)
-			msm_isp_axi_destroy_stream(&vfe_dev->axi_data,
+			legacy_msm_isp_axi_destroy_stream(&vfe_dev->axi_data,
 			      HANDLE_TO_IDX(stream_cfg_cmd->axi_stream_handle));
 		return rc;
 	}
@@ -688,7 +688,7 @@ int msm_isp_request_axi_stream(struct vfe_device *vfe_dev, void *arg)
 
 	stream_info->memory_input = stream_cfg_cmd->memory_input;
 
-	msm_isp_axi_reserve_wm(&vfe_dev->axi_data, stream_info);
+	legacy_msm_isp_axi_reserve_wm(&vfe_dev->axi_data, stream_info);
 
 	if (stream_info->stream_src < RDI_INTF_0) {
 		io_format = vfe_dev->axi_data.src_info[VFE_PIX_0].input_format;
@@ -705,22 +705,22 @@ int msm_isp_request_axi_stream(struct vfe_device *vfe_dev, void *arg)
 			vfe_dev, stream_info->stream_src, io_format);
 		if (rc) {
 			pr_err("%s: cfg io format failed\n", __func__);
-			msm_isp_axi_free_wm(&vfe_dev->axi_data,
+			legacy_msm_isp_axi_free_wm(&vfe_dev->axi_data,
 				stream_info);
-			msm_isp_axi_destroy_stream(&vfe_dev->axi_data,
+			legacy_msm_isp_axi_destroy_stream(&vfe_dev->axi_data,
 				HANDLE_TO_IDX(
 				stream_cfg_cmd->axi_stream_handle));
 			return rc;
 		}
 	}
 
-	msm_isp_calculate_framedrop(&vfe_dev->axi_data, stream_cfg_cmd);
+	legacy_msm_isp_calculate_framedrop(&vfe_dev->axi_data, stream_cfg_cmd);
 	if (stream_cfg_cmd->vt_enable && !vfe_dev->vt_enable) {
 		vfe_dev->vt_enable = stream_cfg_cmd->vt_enable;
-		msm_isp_start_avtimer();
+		legacy_msm_isp_start_avtimer();
 	}
 	if (stream_info->num_planes > 1) {
-		msm_isp_axi_reserve_comp_mask(
+		legacy_msm_isp_axi_reserve_comp_mask(
 			&vfe_dev->axi_data, stream_info);
 		vfe_dev->hw_info->vfe_ops.axi_ops.
 		cfg_comp_mask(vfe_dev, stream_info);
@@ -739,7 +739,7 @@ int msm_isp_request_axi_stream(struct vfe_device *vfe_dev, void *arg)
 	return rc;
 }
 
-int msm_isp_release_axi_stream(struct vfe_device *vfe_dev, void *arg)
+int legacy_msm_isp_release_axi_stream(struct vfe_device *vfe_dev, void *arg)
 {
 	int rc = 0, i;
 	struct msm_vfe_axi_stream_release_cmd *stream_release_cmd = arg;
@@ -762,7 +762,7 @@ int msm_isp_release_axi_stream(struct vfe_device *vfe_dev, void *arg)
 		stream_cfg.cmd = STOP_STREAM;
 		stream_cfg.num_streams = 1;
 		stream_cfg.stream_handle[0] = stream_release_cmd->stream_handle;
-		msm_isp_cfg_axi_stream(vfe_dev, (void *) &stream_cfg);
+		legacy_msm_isp_cfg_axi_stream(vfe_dev, (void *) &stream_cfg);
 	}
 
 	for (i = 0; i < stream_info->num_planes; i++) {
@@ -776,16 +776,16 @@ int msm_isp_release_axi_stream(struct vfe_device *vfe_dev, void *arg)
 	if (stream_info->num_planes > 1) {
 		vfe_dev->hw_info->vfe_ops.axi_ops.
 			clear_comp_mask(vfe_dev, stream_info);
-		msm_isp_axi_free_comp_mask(&vfe_dev->axi_data, stream_info);
+		legacy_msm_isp_axi_free_comp_mask(&vfe_dev->axi_data, stream_info);
 	} else {
 		vfe_dev->hw_info->vfe_ops.axi_ops.
 		clear_wm_irq_mask(vfe_dev, stream_info);
 	}
 
 	vfe_dev->hw_info->vfe_ops.axi_ops.clear_framedrop(vfe_dev, stream_info);
-	msm_isp_axi_free_wm(axi_data, stream_info);
+	legacy_msm_isp_axi_free_wm(axi_data, stream_info);
 
-	msm_isp_axi_destroy_stream(&vfe_dev->axi_data,
+	legacy_msm_isp_axi_destroy_stream(&vfe_dev->axi_data,
 		HANDLE_TO_IDX(stream_release_cmd->stream_handle));
 
 	return rc;
@@ -825,7 +825,7 @@ static void msm_isp_axi_stream_enable_cfg(
 		axi_data->num_active_stream--;
 }
 
-void msm_isp_axi_stream_update(struct vfe_device *vfe_dev, uint8_t input_src)
+void legacy_msm_isp_axi_stream_update(struct vfe_device *vfe_dev, uint8_t input_src)
 {
 	int i;
 	struct msm_vfe_axi_shared_data *axi_data = &vfe_dev->axi_data;
@@ -891,7 +891,7 @@ static void msm_isp_reload_ping_pong_offset(struct vfe_device *vfe_dev,
 	}
 }
 
-void msm_isp_axi_cfg_update(struct vfe_device *vfe_dev)
+void legacy_msm_isp_axi_cfg_update(struct vfe_device *vfe_dev)
 {
 	int i, j;
 	uint32_t update_state;
@@ -1060,7 +1060,7 @@ static void msm_isp_process_done_buf(struct vfe_device *vfe_dev,
 
 	if (buf && ts) {
 		if (vfe_dev->vt_enable) {
-			msm_isp_get_avtimer_ts(ts);
+			legacy_msm_isp_get_avtimer_ts(ts);
 			time_stamp = &ts->vt_time;
 		} else
 			time_stamp = &ts->buf_time;
@@ -1090,7 +1090,7 @@ static void msm_isp_process_done_buf(struct vfe_device *vfe_dev,
 				buf_event.u.buf_done.buf_idx = buf->buf_idx;
 				buf_event.u.buf_done.output_format =
 					stream_info->runtime_output_format;
-				msm_isp_send_event(vfe_dev,
+				legacy_msm_isp_send_event(vfe_dev,
 					ISP_EVENT_BUF_DIVERT + stream_idx,
 					&buf_event);
 			}
@@ -1105,7 +1105,7 @@ static void msm_isp_process_done_buf(struct vfe_device *vfe_dev,
 				stream_info->stream_id;
 			buf_event.u.buf_done.output_format =
 				stream_info->runtime_output_format;
-			msm_isp_send_event(vfe_dev,
+			legacy_msm_isp_send_event(vfe_dev,
 				ISP_EVENT_BUF_DONE, &buf_event);
 			vfe_dev->buf_mgr->ops->buf_done(vfe_dev->buf_mgr,
 				buf->bufq_handle, buf->buf_idx,
@@ -1269,7 +1269,7 @@ static uint8_t msm_isp_get_curr_stream_cnt(
 /*Factor in Q2 format*/
 #define ISP_DEFAULT_FORMAT_FACTOR 6
 #define ISP_BUS_UTILIZATION_FACTOR 1536 /* 1.5 in Q10 format */
-static int msm_isp_update_stream_bandwidth(struct vfe_device *vfe_dev)
+static int legacy_msm_isp_update_stream_bandwidth(struct vfe_device *vfe_dev)
 {
 	int i, rc = 0;
 	struct msm_vfe_axi_stream *stream_info;
@@ -1301,11 +1301,11 @@ static int msm_isp_update_stream_bandwidth(struct vfe_device *vfe_dev)
 	ISP_DBG("%s: bus_util_factor = %u\n", __func__, bus_util_factor);
 
 	if (total_streams == 1)
-		rc = msm_isp_update_bandwidth(ISP_VFE0 + vfe_dev->pdev->id,
+		rc = legacy_msm_isp_update_bandwidth(ISP_VFE0 + vfe_dev->pdev->id,
 		total_bandwidth ,
 		(total_bandwidth * bus_util_factor / ISP_Q10));
 	else
-		rc = msm_isp_update_bandwidth(ISP_VFE0 + vfe_dev->pdev->id,
+		rc = legacy_msm_isp_update_bandwidth(ISP_VFE0 + vfe_dev->pdev->id,
 		(total_bandwidth + MSM_ISP_MIN_AB),  (total_bandwidth *
 		bus_util_factor / ISP_Q10 + MSM_ISP_MIN_IB));
 	if (rc < 0)
@@ -1396,7 +1396,7 @@ static void msm_isp_get_stream_wm_mask(
 		*wm_reload_mask |= (1 << stream_info->wm[i]);
 }
 
-int msm_isp_axi_halt(struct vfe_device *vfe_dev,
+int legacy_msm_isp_axi_halt(struct vfe_device *vfe_dev,
 	struct msm_vfe_axi_halt_cmd *halt_cmd)
 {
 	int rc = 0;
@@ -1422,7 +1422,7 @@ int msm_isp_axi_halt(struct vfe_device *vfe_dev,
 	return rc;
 }
 
-int msm_isp_axi_reset(struct vfe_device *vfe_dev,
+int legacy_msm_isp_axi_reset(struct vfe_device *vfe_dev,
 	struct msm_vfe_axi_reset_cmd *reset_cmd)
 {
 	int rc = 0, i, j;
@@ -1471,7 +1471,7 @@ int msm_isp_axi_reset(struct vfe_device *vfe_dev,
 		}
 		axi_data->src_info[SRC_TO_INTF(stream_info->stream_src)].
 			frame_id = reset_cmd->frame_id;
-		msm_isp_reset_burst_count_and_frame_drop(vfe_dev, stream_info);
+		legacy_msm_isp_reset_burst_count_and_frame_drop(vfe_dev, stream_info);
 	}
 
 	if (rc < 0)
@@ -1480,7 +1480,7 @@ int msm_isp_axi_reset(struct vfe_device *vfe_dev,
 	return rc;
 }
 
-int msm_isp_axi_restart(struct vfe_device *vfe_dev,
+int legacy_msm_isp_axi_restart(struct vfe_device *vfe_dev,
 	struct msm_vfe_axi_restart_cmd *restart_cmd)
 {
 	int rc = 0, i, j;
@@ -1566,8 +1566,8 @@ static int msm_isp_start_axi_stream(struct vfe_device *vfe_dev,
 			return -EINVAL;
 		}
 
-		msm_isp_calculate_bandwidth(axi_data, stream_info);
-		msm_isp_reset_framedrop(vfe_dev, stream_info);
+		legacy_msm_isp_calculate_bandwidth(axi_data, stream_info);
+		legacy_msm_isp_reset_framedrop(vfe_dev, stream_info);
 		init_frm_drop = stream_info->init_frame_drop;
 		msm_isp_get_stream_wm_mask(stream_info, &wm_reload_mask);
 		rc = msm_isp_init_stream_ping_pong_reg(vfe_dev, stream_info);
@@ -1597,7 +1597,7 @@ static int msm_isp_start_axi_stream(struct vfe_device *vfe_dev,
 						init_frm_drop;
 		}
 	}
-	msm_isp_update_stream_bandwidth(vfe_dev);
+	legacy_msm_isp_update_stream_bandwidth(vfe_dev);
 	vfe_dev->hw_info->vfe_ops.axi_ops.reload_wm(vfe_dev, wm_reload_mask);
 	vfe_dev->hw_info->vfe_ops.core_ops.reg_update(vfe_dev, 0xF);
 	msm_isp_update_camif_output_count(vfe_dev, stream_cfg_cmd);
@@ -1719,7 +1719,7 @@ static int msm_isp_stop_axi_stream(struct vfe_device *vfe_dev,
 		vfe_dev->hw_info->vfe_ops.core_ops.init_hw_reg(vfe_dev);
 		vfe_dev->ignore_error = 0;
 	}
-	msm_isp_update_stream_bandwidth(vfe_dev);
+	legacy_msm_isp_update_stream_bandwidth(vfe_dev);
 
 	for (i = 0; i < stream_cfg_cmd->num_streams; i++) {
 		stream_info = &axi_data->stream_info[
@@ -1731,14 +1731,14 @@ static int msm_isp_stop_axi_stream(struct vfe_device *vfe_dev,
 }
 
 
-int msm_isp_cfg_axi_stream(struct vfe_device *vfe_dev, void *arg)
+int legacy_msm_isp_cfg_axi_stream(struct vfe_device *vfe_dev, void *arg)
 {
 	int rc = 0;
 	struct msm_vfe_axi_stream_cfg_cmd *stream_cfg_cmd = arg;
 	struct msm_vfe_axi_shared_data *axi_data = &vfe_dev->axi_data;
 	enum msm_isp_camif_update_state camif_update;
 
-	rc = msm_isp_axi_check_stream_state(vfe_dev, stream_cfg_cmd);
+	rc = legacy_msm_isp_axi_check_stream_state(vfe_dev, stream_cfg_cmd);
 	if (rc < 0) {
 		pr_err("%s: Invalid stream state\n", __func__);
 		return rc;
@@ -1788,8 +1788,8 @@ static int msm_isp_request_frame(struct vfe_device *vfe_dev,
 	stream_cfg_cmd.frame_skip_pattern = NO_SKIP;
 	stream_cfg_cmd.init_frame_drop = 0;
 	stream_cfg_cmd.burst_count = stream_info->request_frm_num;
-	msm_isp_calculate_framedrop(&vfe_dev->axi_data, &stream_cfg_cmd);
-	msm_isp_reset_framedrop(vfe_dev, stream_info);
+	legacy_msm_isp_calculate_framedrop(&vfe_dev->axi_data, &stream_cfg_cmd);
+	legacy_msm_isp_reset_framedrop(vfe_dev, stream_info);
 
 	if (stream_info->request_frm_num != request_frm_num) {
 		pingpong_status =
@@ -1845,7 +1845,7 @@ static int msm_isp_request_frame(struct vfe_device *vfe_dev,
 	return rc;
 }
 
-int msm_isp_update_axi_stream(struct vfe_device *vfe_dev, void *arg)
+int legacy_msm_isp_update_axi_stream(struct vfe_device *vfe_dev, void *arg)
 {
 	int rc = 0, i, j;
 	struct msm_vfe_axi_stream *stream_info;
@@ -1896,7 +1896,7 @@ int msm_isp_update_axi_stream(struct vfe_device *vfe_dev, void *arg)
 			break;
 		case UPDATE_STREAM_FRAMEDROP_PATTERN: {
 			uint32_t framedrop_period =
-				msm_isp_get_framedrop_period(
+				legacy_msm_isp_get_framedrop_period(
 				   update_info->skip_pattern);
 			if (update_info->skip_pattern == SKIP_ALL)
 				stream_info->framedrop_pattern = 0x0;
@@ -1950,7 +1950,7 @@ int msm_isp_update_axi_stream(struct vfe_device *vfe_dev, void *arg)
 	return rc;
 }
 
-void msm_isp_process_axi_irq(struct vfe_device *vfe_dev,
+void legacy_msm_isp_process_axi_irq(struct vfe_device *vfe_dev,
 	uint32_t irq_status0, uint32_t irq_status1,
 	struct msm_isp_timestamp *ts)
 {

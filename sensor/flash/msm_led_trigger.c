@@ -291,9 +291,9 @@ static int32_t msm_led_trigger_probe(struct platform_device *pdev)
 		}
 	}
 
-	rc = msm_led_flash_create_v4lsubdev(pdev, &fctrl);
+	rc = legacy_msm_led_flash_create_v4lsubdev(pdev, &fctrl);
 	if (!rc)
-		msm_led_torch_create_classdev(pdev, &fctrl);
+		legacy_msm_led_torch_create_classdev(pdev, &fctrl);
 
 	return rc;
 }

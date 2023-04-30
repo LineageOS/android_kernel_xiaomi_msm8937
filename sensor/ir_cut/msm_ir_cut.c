@@ -100,7 +100,7 @@ static int32_t msm_ir_cut_off(struct msm_ir_cut_ctrl_t *ir_cut_ctrl,
 	CDBG("Enter cut off\n");
 
 	if (ir_cut_ctrl->gconf) {
-		rc = msm_camera_request_gpio_table(
+		rc = legacy_msm_camera_request_gpio_table(
 			ir_cut_ctrl->gconf->cam_gpio_req_tbl,
 			ir_cut_ctrl->gconf->cam_gpio_req_tbl_size, 1);
 
@@ -146,7 +146,7 @@ static int32_t msm_ir_cut_off(struct msm_ir_cut_ctrl_t *ir_cut_ctrl,
 		1);
 
 	if (ir_cut_ctrl->gconf) {
-		rc = msm_camera_request_gpio_table(
+		rc = legacy_msm_camera_request_gpio_table(
 			ir_cut_ctrl->gconf->cam_gpio_req_tbl,
 			ir_cut_ctrl->gconf->cam_gpio_req_tbl_size, 0);
 
@@ -174,7 +174,7 @@ static int32_t msm_ir_cut_on(
 	CDBG("Enter ir cut on\n");
 
 	if (ir_cut_ctrl->gconf) {
-		rc = msm_camera_request_gpio_table(
+		rc = legacy_msm_camera_request_gpio_table(
 			ir_cut_ctrl->gconf->cam_gpio_req_tbl,
 			ir_cut_ctrl->gconf->cam_gpio_req_tbl_size, 1);
 
@@ -220,7 +220,7 @@ static int32_t msm_ir_cut_on(
 		1);
 
 	if (ir_cut_ctrl->gconf) {
-		rc = msm_camera_request_gpio_table(
+		rc = legacy_msm_camera_request_gpio_table(
 			ir_cut_ctrl->gconf->cam_gpio_req_tbl,
 			ir_cut_ctrl->gconf->cam_gpio_req_tbl_size, 0);
 
@@ -431,7 +431,7 @@ static int32_t msm_ir_cut_get_gpio_dt_data(struct device_node *of_node,
 				gpio_array[i]);
 		}
 
-		rc = msm_camera_get_dt_gpio_req_tbl(of_node, gconf,
+		rc = legacy_msm_camera_get_dt_gpio_req_tbl(of_node, gconf,
 			gpio_array, gpio_array_size);
 		if (rc < 0) {
 			pr_err("%s failed %d\n", __func__, __LINE__);
@@ -547,7 +547,7 @@ static int32_t msm_ir_cut_platform_probe(struct platform_device *pdev)
 		return -EINVAL;
 	}
 
-	rc = msm_sensor_driver_get_gpio_data(&(ir_cut_ctrl->gconf),
+	rc = legacy_msm_sensor_driver_get_gpio_data(&(ir_cut_ctrl->gconf),
 		(&pdev->dev)->of_node);
 
 	if ((rc < 0) || (ir_cut_ctrl->gconf == NULL)) {
@@ -574,7 +574,7 @@ static int32_t msm_ir_cut_platform_probe(struct platform_device *pdev)
 
 	ir_cut_ctrl->cam_pinctrl_status = 1;
 
-	rc = msm_camera_pinctrl_init(
+	rc = legacy_msm_camera_pinctrl_init(
 		&(ir_cut_ctrl->pinctrl_info), &(pdev->dev));
 
 	if (rc < 0) {
@@ -600,7 +600,7 @@ static int32_t msm_ir_cut_platform_probe(struct platform_device *pdev)
 	media_entity_pads_init(&ir_cut_ctrl->msm_sd.sd.entity, 0, NULL);
 	ir_cut_ctrl->msm_sd.sd.entity.group_id = MSM_CAMERA_SUBDEV_IR_CUT;
 	ir_cut_ctrl->msm_sd.close_seq = MSM_SD_CLOSE_2ND_CATEGORY | 0x1;
-	msm_sd_register(&ir_cut_ctrl->msm_sd);
+	legacy_msm_sd_register(&ir_cut_ctrl->msm_sd);
 
 	CDBG("%s:%d ir_cut sd name = %s", __func__, __LINE__,
 		ir_cut_ctrl->msm_sd.sd.entity.name);

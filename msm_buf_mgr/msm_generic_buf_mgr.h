@@ -55,11 +55,11 @@ struct msm_buf_mngr_user_buf_cont_info {
 
 /* kernel space functions*/
 struct msm_cam_buf_mgr_req_ops {
-	int (*msm_cam_buf_mgr_ops)(unsigned int cmd, void *argp);
+	int (*legacy_msm_cam_buf_mgr_ops)(unsigned int cmd, void *argp);
 };
 
 /* API to register callback from client. This assumes cb_struct is allocated by
  * client.
  */
-int msm_cam_buf_mgr_register_ops(struct msm_cam_buf_mgr_req_ops *cb_struct);
+int legacy_msm_cam_buf_mgr_register_ops(struct msm_cam_buf_mgr_req_ops *cb_struct);
 #endif

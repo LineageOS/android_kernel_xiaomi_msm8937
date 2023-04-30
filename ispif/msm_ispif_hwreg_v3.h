@@ -136,7 +136,7 @@ static inline void msm_ispif_cfg_pack_mode(struct ispif_device *ispif,
 		__func__, intftype, pack_addr[0],
 		pack_cfg_mask[0], pack_addr[1],
 		pack_cfg_mask[1]);
-	msm_camera_io_w_mb(pack_cfg_mask[0], ispif->base + pack_addr[0]);
-	msm_camera_io_w_mb(pack_cfg_mask[1], ispif->base + pack_addr[1]);
+	legacy_msm_camera_io_w_mb(pack_cfg_mask[0], ispif->base + pack_addr[0]);
+	legacy_msm_camera_io_w_mb(pack_cfg_mask[1], ispif->base + pack_addr[1]);
 }
 #endif /* __MSM_ISPIF_HWREG_V3_H__ */
