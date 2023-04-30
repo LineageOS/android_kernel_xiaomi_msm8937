@@ -1,6 +1,6 @@
-ccflags-y += -Idrivers/media/platform/msm/camera_v2
-ccflags-y += -Idrivers/media/platform/msm/camera_v2/sensor/io
-ccflags-y += -Idrivers/media/platform/msm/camera_v2/common/
+ccflags-y += -Itechpack/camera-legacy
+ccflags-y += -Itechpack/camera-legacy/sensor/io
+ccflags-y += -Itechpack/camera-legacy/common/
 ifeq ($(CONFIG_MSM_ISP_V1),y)
 obj-$(CONFIG_MSMB_CAMERA) += msm_isp_32.o msm_buf_mgr_32.o msm_isp_util_32.o msm_isp_axi_util_32.o msm_isp_stats_util_32.o
 obj-$(CONFIG_MSMB_CAMERA) += msm_isp32.o

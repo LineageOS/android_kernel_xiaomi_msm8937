@@ -1,7 +1,7 @@
-ccflags-y += -Idrivers/media/platform/msm/camera_v2/sensor/cci
-ccflags-y += -Idrivers/media/platform/msm/camera_v2
-ccflags-y += -Idrivers/media/platform/msm/camera_v2/common
-ccflags-y += -Idrivers/media/platform/msm/camera_v2/sensor/io
+ccflags-y += -Itechpack/camera-legacy/sensor/cci
+ccflags-y += -Itechpack/camera-legacy
+ccflags-y += -Itechpack/camera-legacy/common
+ccflags-y += -Itechpack/camera-legacy/sensor/io
 obj-$(CONFIG_MSMB_CAMERA) += msm_flash.o
 obj-$(CONFIG_MSMB_CAMERA) += msm_led_flash.o
 obj-$(CONFIG_MSMB_CAMERA) += msm_led_trigger.o
