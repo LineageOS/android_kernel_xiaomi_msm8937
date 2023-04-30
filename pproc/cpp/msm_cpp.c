@@ -27,9 +27,9 @@
 #include <linux/workqueue.h>
 #include <media/v4l2-event.h>
 #include <media/v4l2-ioctl.h>
-#include <media/msmb_camera.h>
-#include <media/msmb_generic_buf_mgr.h>
-#include <media/msmb_pproc.h>
+#include <media/msmb_camera-legacy.h>
+#include <media/msmb_generic_buf_mgr-legacy.h>
+#include <media/msmb_pproc-legacy.h>
 #include "msm_cpp.h"
 #include "msm_isp_util.h"
 #include "msm_camera_io_util.h"

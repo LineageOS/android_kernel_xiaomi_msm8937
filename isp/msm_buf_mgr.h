@@ -13,7 +13,7 @@
 #ifndef _MSM_ISP_BUF_H_
 #define _MSM_ISP_BUF_H_
 
-#include <media/msmb_isp.h>
+#include <media/msmb_isp-legacy.h>
 #include "msm_sd.h"
 
 /* Buffer type could be userspace / HAL.

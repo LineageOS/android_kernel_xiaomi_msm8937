@@ -17,7 +17,7 @@
 #include <linux/io.h>
 #include <linux/platform_device.h>
 #include <media/v4l2-subdev.h>
-#include <media/msm_cam_sensor.h>
+#include <media/msm_cam_sensor-legacy.h>
 #include "msm_sd.h"
 #include "msm_camera_io_util.h"
 #include "msm_camera_dt_util.h"

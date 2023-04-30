@@ -22,7 +22,7 @@
 #include <linux/slab.h>
 #include <linux/device.h>
 #include <linux/uaccess.h>
-#include <media/msm_jpeg.h>
+#include <media/msm_jpeg-legacy.h>
 #include <media/v4l2-device.h>
 #include <media/v4l2-subdev.h>
 

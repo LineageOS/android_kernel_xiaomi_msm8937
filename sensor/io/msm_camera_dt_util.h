@@ -13,7 +13,7 @@
 #ifndef MSM_CAMERA_DT_UTIL_H__
 #define MSM_CAMERA_DT_UTIL_H__
 
-#include <soc/qcom/camera2.h>
+#include <soc/qcom/camera2-legacy.h>
 #include <linux/gpio.h>
 #include <linux/of_gpio.h>
 #include <linux/of.h>

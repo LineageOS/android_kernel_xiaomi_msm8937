@@ -21,7 +21,7 @@
 #include <linux/regulator/consumer.h>
 #include <linux/interrupt.h>
 #include <linux/slab.h>
-#include <soc/qcom/camera2.h>
+#include <soc/qcom/camera2-legacy.h>
 
 enum cam_bus_client {
 	CAM_BUS_CLIENT_VFE,

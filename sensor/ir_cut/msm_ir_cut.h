@@ -14,7 +14,7 @@
 #ifndef MSM_IR_CUT_H
 #define MSM_IR_CUT_H
 
-#include <soc/qcom/camera2.h>
+#include <soc/qcom/camera2-legacy.h>
 #include "msm_camera_dt_util.h"
 #include "msm_camera_io_util.h"
 #include "msm_sd.h"

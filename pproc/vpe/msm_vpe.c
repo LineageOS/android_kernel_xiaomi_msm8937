@@ -25,8 +25,8 @@
 #include <media/v4l2-ioctl.h>
 #include <media/v4l2-subdev.h>
 #include <media/media-entity.h>
-#include <media/msmb_generic_buf_mgr.h>
-#include <media/msmb_pproc.h>
+#include <media/msmb_generic_buf_mgr-legacy.h>
+#include <media/msmb_pproc-legacy.h>
 #include <asm/dma-iommu.h>
 #include <linux/dma-direction.h>
 #include <linux/dma-attrs.h>

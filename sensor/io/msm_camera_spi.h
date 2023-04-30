@@ -14,7 +14,7 @@
 #define __MSM_CAMERA_SPI_H
 
 #include <linux/spi/spi.h>
-#include <media/msm_cam_sensor.h>
+#include <media/msm_cam_sensor-legacy.h>
 #include "msm_camera_i2c.h"
 
 #define MAX_SPI_SIZE 110

@@ -12,7 +12,7 @@
 #ifndef __MSMB_ISP__
 #define __MSMB_ISP__
 
-#include <uapi/media/msmb_isp.h>
+#include <uapi/media/msmb_isp-legacy.h>
 
 #ifdef CONFIG_COMPAT
 struct msm_isp_event_data32 {

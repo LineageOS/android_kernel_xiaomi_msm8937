@@ -30,7 +30,7 @@
 #include "msm_vb2.h"
 #include "msm_sd.h"
 #include "cam_hw_ops.h"
-#include <media/msmb_generic_buf_mgr.h>
+#include <media/msmb_generic_buf_mgr-legacy.h>
 
 static struct v4l2_device *msm_v4l2_dev;
 static struct list_head    ordered_sd_list;

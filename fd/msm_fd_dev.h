@@ -17,7 +17,7 @@
 #include <media/v4l2-fh.h>
 #include <media/v4l2-ctrls.h>
 #include <linux/msm-bus.h>
-#include <media/msm_fd.h>
+#include <media/msm_fd-legacy.h>
 #include <linux/dma-buf.h>
 #include <linux/msm_ion.h>
 #include "cam_soc_api.h"

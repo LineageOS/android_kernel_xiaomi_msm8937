@@ -1,7 +1,7 @@
 #ifndef __MSMB_PPROC_H
 #define __MSMB_PPROC_H
 
-#include <uapi/media/msmb_pproc.h>
+#include <uapi/media/msmb_pproc-legacy.h>
 
 #include <linux/compat.h>
 

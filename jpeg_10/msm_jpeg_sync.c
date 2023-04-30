@@ -18,7 +18,7 @@
 #include <linux/slab.h>
 #include <linux/compat.h>
 #include <linux/ratelimit.h>
-#include <media/msm_jpeg.h>
+#include <media/msm_jpeg-legacy.h>
 #include <linux/msm-bus.h>
 #include "msm_jpeg_sync.h"
 #include "msm_jpeg_core.h"
