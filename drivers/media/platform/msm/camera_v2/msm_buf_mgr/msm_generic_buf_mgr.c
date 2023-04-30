@@ -884,9 +884,14 @@ static long msm_buf_subdev_fops_ioctl(struct file *file,
 	return video_usercopy(file, cmd, arg, msm_bmgr_subdev_do_ioctl);
 }
 
+extern bool msmb_camera_enable;
+
 static int32_t __init msm_buf_mngr_init(void)
 {
 	int32_t rc = 0;
+
+	if (!msmb_camera_enable)
+		return -ENODEV;
 
 	msm_buf_mngr_dev = kzalloc(sizeof(*msm_buf_mngr_dev),
 		GFP_KERNEL);

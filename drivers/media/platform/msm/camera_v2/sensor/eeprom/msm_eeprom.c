@@ -1966,9 +1966,14 @@ static struct spi_driver msm_eeprom_spi_driver = {
 	.remove = msm_eeprom_spi_remove,
 };
 
+extern bool msmb_camera_enable;
+
 static int __init msm_eeprom_init_module(void)
 {
 	int rc = 0;
+
+	if (!msmb_camera_enable)
+		return -ENODEV;
 
 	CDBG("%s E\n", __func__);
 	rc = platform_driver_register(&msm_eeprom_platform_driver);

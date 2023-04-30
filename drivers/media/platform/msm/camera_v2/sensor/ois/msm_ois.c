@@ -1078,9 +1078,14 @@ static struct platform_driver msm_ois_platform_driver = {
 	},
 };
 
+extern bool msmb_camera_enable;
+
 static int __init msm_ois_init_module(void)
 {
 	int32_t rc = 0;
+
+	if (!msmb_camera_enable)
+		return -ENODEV;
 
 	CDBG("Enter\n");
 	rc = platform_driver_register(&msm_ois_platform_driver);

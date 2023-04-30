@@ -2323,8 +2323,12 @@ static struct platform_driver cam_smmu_driver = {
 	},
 };
 
+extern bool msmb_camera_enable;
+
 static int __init cam_smmu_init_module(void)
 {
+	if (!msmb_camera_enable)
+		return -ENODEV;
 	return platform_driver_register(&cam_smmu_driver);
 }
 

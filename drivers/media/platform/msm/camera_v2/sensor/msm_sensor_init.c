@@ -167,9 +167,15 @@ static long msm_sensor_init_subdev_fops_ioctl(
 }
 #endif
 
+extern bool msmb_camera_enable;
+
 static int __init msm_sensor_init_module(void)
 {
 	int ret = 0;
+
+	if (!msmb_camera_enable)
+		return -ENODEV;
+
 	/* Allocate memory for msm_sensor_init control structure */
 	s_init = kzalloc(sizeof(struct msm_sensor_init_t), GFP_KERNEL);
 	if (!s_init)

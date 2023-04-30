@@ -1557,9 +1557,14 @@ static struct i2c_driver msm_sensor_driver_i2c = {
 	},
 };
 
+extern bool msmb_camera_enable;
+
 static int __init msm_sensor_driver_init(void)
 {
 	int32_t rc = 0;
+
+	if (!msmb_camera_enable)
+		return -ENODEV;
 
 	CDBG("%s Enter\n", __func__);
 	rc = platform_driver_register(&msm_sensor_platform_driver);

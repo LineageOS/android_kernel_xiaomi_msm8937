@@ -599,9 +599,14 @@ static struct platform_driver msm_laser_led_platform_driver = {
 	},
 };
 
+extern bool msmb_camera_enable;
+
 static int __init msm_laser_led_init_module(void)
 {
 	int32_t rc;
+
+	if (!msmb_camera_enable)
+		return -ENODEV;
 
 	CDBG("Enter\n");
 	rc = platform_driver_register(&msm_laser_led_platform_driver);

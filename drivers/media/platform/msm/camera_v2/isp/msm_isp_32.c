@@ -527,8 +527,12 @@ static struct platform_driver vfe_driver = {
 	.id_table = msm_vfe_dev_id,
 };
 
+extern bool msmb_camera_enable;
+
 static int __init msm_vfe_init_module(void)
 {
+	if (!msmb_camera_enable)
+		return -ENODEV;
 	return platform_driver_register(&vfe_driver);
 }
 
