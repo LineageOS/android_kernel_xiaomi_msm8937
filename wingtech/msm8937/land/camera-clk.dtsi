@@ -1,12 +1,12 @@
 &soc {
 	qcom,csiphy@1b34000 {
-		clocks = <&clock_gcc clk_gcc_camss_top_ahb_clk>,
-			<&clock_gcc clk_gcc_camss_ispif_ahb_clk>,
-			<&clock_gcc clk_csi0phytimer_clk_src>,
-			<&clock_gcc clk_gcc_camss_csi0phytimer_clk>,
-			<&clock_gcc clk_camss_top_ahb_clk_src>,
-			<&clock_gcc clk_gcc_camss_csi0phy_clk>,
-			<&clock_gcc clk_gcc_camss_ahb_clk>;
+		clocks = <&gcc GCC_CAMSS_TOP_AHB_CLK>,
+			<&gcc GCC_CAMSS_ISPIF_AHB_CLK>,
+			<&gcc CSI0PHYTIMER_CLK_SRC>,
+			<&gcc GCC_CAMSS_CSI0PHYTIMER_CLK>,
+			<&gcc CAMSS_TOP_AHB_CLK_SRC>,
+			<&gcc GCC_CAMSS_CSI0PHY_CLK>,
+			<&gcc GCC_CAMSS_AHB_CLK>;
 		clock-names = "camss_top_ahb_clk", "ispif_ahb_clk",
 			"csiphy_timer_src_clk", "csiphy_timer_clk",
 			"camss_ahb_src", "csi_phy_clk",
@@ -15,13 +15,13 @@
 	};
 
 	qcom,csiphy@1b35000 {
-		clocks = <&clock_gcc clk_gcc_camss_top_ahb_clk>,
-			<&clock_gcc clk_gcc_camss_ispif_ahb_clk>,
-			<&clock_gcc clk_csi1phytimer_clk_src>,
-			<&clock_gcc clk_gcc_camss_csi1phytimer_clk>,
-			<&clock_gcc clk_camss_top_ahb_clk_src>,
-			<&clock_gcc clk_gcc_camss_csi1phy_clk>,
-			<&clock_gcc clk_gcc_camss_ahb_clk>;
+		clocks = <&gcc GCC_CAMSS_TOP_AHB_CLK>,
+			<&gcc GCC_CAMSS_ISPIF_AHB_CLK>,
+			<&gcc CSI1PHYTIMER_CLK_SRC>,
+			<&gcc GCC_CAMSS_CSI1PHYTIMER_CLK>,
+			<&gcc CAMSS_TOP_AHB_CLK_SRC>,
+			<&gcc GCC_CAMSS_CSI1PHY_CLK>,
+			<&gcc GCC_CAMSS_AHB_CLK>;
 		clock-names = "camss_top_ahb_clk", "ispif_ahb_clk",
 			"csiphy_timer_src_clk", "csiphy_timer_clk",
 			"camss_ahb_src", "csi_phy_clk",
@@ -30,14 +30,14 @@
 	};
 
 	qcom,csid@1b30000  {
-		clocks = <&clock_gcc clk_gcc_camss_top_ahb_clk>,
-			<&clock_gcc clk_gcc_camss_ispif_ahb_clk>,
-			<&clock_gcc clk_gcc_camss_csi0_ahb_clk>,
-			<&clock_gcc clk_csi0_clk_src>,
-			<&clock_gcc clk_gcc_camss_csi0_clk>,
-			<&clock_gcc clk_gcc_camss_csi0pix_clk>,
-			<&clock_gcc clk_gcc_camss_csi0rdi_clk>,
-			<&clock_gcc clk_gcc_camss_ahb_clk>;
+		clocks = <&gcc GCC_CAMSS_TOP_AHB_CLK>,
+			<&gcc GCC_CAMSS_ISPIF_AHB_CLK>,
+			<&gcc GCC_CAMSS_CSI0_AHB_CLK>,
+			<&gcc CSI0_CLK_SRC>,
+			<&gcc GCC_CAMSS_CSI0_CLK>,
+			<&gcc GCC_CAMSS_CSI0PIX_CLK>,
+			<&gcc GCC_CAMSS_CSI0RDI_CLK>,
+			<&gcc GCC_CAMSS_AHB_CLK>;
 		clock-names = "camss_top_ahb_clk",
 			"ispif_ahb_clk", "csi_ahb_clk", "csi_src_clk",
 			"csi_clk",  "csi_pix_clk",
@@ -46,14 +46,14 @@
 	};
 
 	qcom,csid@1b30400 {
-		clocks = <&clock_gcc clk_gcc_camss_top_ahb_clk>,
-			<&clock_gcc clk_gcc_camss_ispif_ahb_clk>,
-			<&clock_gcc clk_gcc_camss_csi1_ahb_clk>,
-			<&clock_gcc clk_csi1_clk_src>,
-			<&clock_gcc clk_gcc_camss_csi1_clk>,
-			<&clock_gcc clk_gcc_camss_csi1pix_clk>,
-			<&clock_gcc clk_gcc_camss_csi1rdi_clk>,
-			<&clock_gcc clk_gcc_camss_ahb_clk>;
+		clocks = <&gcc GCC_CAMSS_TOP_AHB_CLK>,
+			<&gcc GCC_CAMSS_ISPIF_AHB_CLK>,
+			<&gcc GCC_CAMSS_CSI1_AHB_CLK>,
+			<&gcc CSI1_CLK_SRC>,
+			<&gcc GCC_CAMSS_CSI1_CLK>,
+			<&gcc GCC_CAMSS_CSI1PIX_CLK>,
+			<&gcc GCC_CAMSS_CSI1RDI_CLK>,
+			<&gcc GCC_CAMSS_AHB_CLK>;
 		clock-names = "camss_top_ahb_clk",
 			"ispif_ahb_clk", "csi_ahb_clk", "csi_src_clk",
 			"csi_clk", "csi_pix_clk",
@@ -62,14 +62,14 @@
 	};
 
 	qcom,csid@1b30800 {
-		clocks = <&clock_gcc clk_gcc_camss_top_ahb_clk>,
-			<&clock_gcc clk_gcc_camss_ispif_ahb_clk>,
-			<&clock_gcc clk_gcc_camss_csi2_ahb_clk>,
-			<&clock_gcc clk_csi2_clk_src>,
-			<&clock_gcc clk_gcc_camss_csi2_clk>,
-			<&clock_gcc clk_gcc_camss_csi2pix_clk>,
-			<&clock_gcc clk_gcc_camss_csi2rdi_clk>,
-			<&clock_gcc clk_gcc_camss_ahb_clk>;
+		clocks = <&gcc GCC_CAMSS_TOP_AHB_CLK>,
+			<&gcc GCC_CAMSS_ISPIF_AHB_CLK>,
+			<&gcc GCC_CAMSS_CSI2_AHB_CLK>,
+			<&gcc CSI2_CLK_SRC>,
+			<&gcc GCC_CAMSS_CSI2_CLK>,
+			<&gcc GCC_CAMSS_CSI2PIX_CLK>,
+			<&gcc GCC_CAMSS_CSI2RDI_CLK>,
+			<&gcc GCC_CAMSS_AHB_CLK>;
 		clock-names = "camss_top_ahb_clk",
 			"ispif_ahb_clk", "csi_ahb_clk", "csi_src_clk",
 			"csi_clk", "csi_pix_clk",

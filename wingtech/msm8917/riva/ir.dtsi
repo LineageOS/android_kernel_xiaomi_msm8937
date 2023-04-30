@@ -20,8 +20,8 @@
 		pinctrl-names = "spi_default", "spi_sleep";
 		pinctrl-0 = <&spi7_default &spi7_cs0_active>;
 		pinctrl-1 = <&spi7_sleep &spi7_cs0_sleep>;
-		clocks = <&clock_gcc clk_gcc_blsp2_ahb_clk>,
-			<&clock_gcc clk_gcc_blsp2_qup3_spi_apps_clk>;
+		clocks = <&gcc GCC_BLSP2_AHB_CLK>,
+			<&gcc GCC_BLSP2_QUP3_SPI_APPS_CLK>;
 		clock-names = "iface_clk", "core_clk";
 		qcom,use-bam;
 		qcom,use-pinctrl;

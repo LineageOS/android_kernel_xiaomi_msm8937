@@ -175,8 +175,8 @@
 		qcom,cam-power-seq-delay = <1 1 5 5 5 1 10 10>;
 
 		status = "ok";
-		clocks = <&clock_gcc clk_mclk1_clk_src>,
-			<&clock_gcc clk_gcc_camss_mclk1_clk>;
+		clocks = <&gcc MCLK1_CLK_SRC>,
+			<&gcc GCC_CAMSS_MCLK1_CLK>;
 		clock-names = "cam_src_clk", "cam_clk";
 		qcom,clock-rates = <19200000 0>;
 	};
@@ -356,8 +356,8 @@
 		qcom,cam-power-seq-delay = <1 1 5 5 5 1 10 10>;
 
 		status = "ok";
-		clocks = <&clock_gcc clk_mclk1_clk_src>,
-			<&clock_gcc clk_gcc_camss_mclk1_clk>;
+		clocks = <&gcc MCLK1_CLK_SRC>,
+			<&gcc GCC_CAMSS_MCLK1_CLK>;
 		clock-names = "cam_src_clk", "cam_clk";
 		qcom,clock-rates = <19200000 0>;
 	};
@@ -405,8 +405,8 @@
 		qcom,cam-power-seq-cfg-val = <1 1 1 1 24000000 1 1>;
 		qcom,cam-power-seq-delay = <0 0 0 0 5 5 5>;
 		status = "ok";
-		clocks = <&clock_gcc clk_mclk0_clk_src>,
-				<&clock_gcc clk_gcc_camss_mclk0_clk>;
+		clocks = <&gcc MCLK0_CLK_SRC>,
+				<&gcc GCC_CAMSS_MCLK0_CLK>;
 		clock-names = "cam_src_clk", "cam_clk";
 		qcom,clock-rates = <19200000 0>;
 	};
@@ -448,8 +448,8 @@
 		qcom,sensor-position = <1>;
 		qcom,sensor-mode = <0>;
 		qcom,cci-master = <1>;
-		clocks = <&clock_gcc clk_mclk1_clk_src>,
-				<&clock_gcc clk_gcc_camss_mclk1_clk>;
+		clocks = <&gcc MCLK1_CLK_SRC>,
+				<&gcc GCC_CAMSS_MCLK1_CLK>;
 		clock-names = "cam_src_clk", "cam_clk";
 		qcom,clock-rates = <24000000 0>;
 	};
