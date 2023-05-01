@@ -17,6 +17,13 @@
 #include "camera.h"
 #include "msm_cci.h"
 #include "msm_camera_dt_util.h"
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
+#include <xiaomi-msm8937/mach.h>
+#endif
+
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_ULYSSE)
+extern int legacy_xiaomi_ulysse_match_sensor_eeprom(struct msm_camera_sensor_slave_info *slave_info);
+#endif
 
 /* Logging macro */
 #undef CDBG
@@ -788,6 +795,14 @@ int32_t legacy_msm_sensor_driver_probe(void *setting,
 		rc = -EINVAL;
 		goto free_slave_info;
 	}
+
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_ULYSSE)
+	if (xiaomi_msm8937_mach_get_family() == XIAOMI_MSM8937_MACH_FAMILY_ULYSSE) {
+		rc = legacy_xiaomi_ulysse_match_sensor_eeprom(slave_info);
+		if (rc != 0)
+			goto free_slave_info;
+	}
+#endif
 
 	/* Print slave info */
 	CDBG("camera id %d Slave addr 0x%X addr_type %d\n",
