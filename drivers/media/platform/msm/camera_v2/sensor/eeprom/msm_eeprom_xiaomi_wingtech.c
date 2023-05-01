@@ -18,7 +18,7 @@
 #include "msm_eeprom.h"
 #include "../msm_sensor.h"
 
-extern int ov13850_eeprom_sensor_writereg(struct msm_eeprom_ctrl_t *s_ctrl,
+extern int xiaomi_wingtech_ov13850_eeprom_sensor_writereg(struct msm_eeprom_ctrl_t *s_ctrl,
 					  uint32_t reg_addr, uint32_t reg_value,
 					  uint32_t delay);
 
@@ -28,7 +28,7 @@ extern int ov13850_eeprom_sensor_writereg(struct msm_eeprom_ctrl_t *s_ctrl,
 #if IS_ENABLED(CONFIG_MACH_XIAOMI_TIARE)
 #define HI556_USE_OTP 1
 #ifdef HI556_USE_OTP
-extern int hi556_insensor_read_otp_info(struct msm_eeprom_ctrl_t *e_ctrl);
+extern int xiaomi_tiare_hi556_insensor_read_otp_info(struct msm_eeprom_ctrl_t *e_ctrl);
 #endif
 #endif
 
@@ -388,7 +388,7 @@ int xiaomi_wingtech_eeprom_match_id(
 		}
 		if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_RIVA ||
 			xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_ROLEX)
-			ov13850_eeprom_sensor_writereg(e_ctrl, 0x0100, 0x00, 1);
+			xiaomi_wingtech_ov13850_eeprom_sensor_writereg(e_ctrl, 0x0100, 0x00, 1);
 	} else if (!strcmp(eb_info->eeprom_name, "s5k3l2")) {
 		CDBG("match id for s5k3l2\n");
 		if (e_ctrl->cal_data.mapdata[0] == 0x55) {
@@ -658,9 +658,9 @@ int xiaomi_wingtech_eeprom_match_id(
 	} else if (!strcmp(eb_info->eeprom_name, "hi556_sunny")) {
 		CDBG("match id for hi556_sunny\n");
 #ifdef HI556_USE_OTP
-		rc = hi556_insensor_read_otp_info(e_ctrl);
+		rc = xiaomi_tiare_hi556_insensor_read_otp_info(e_ctrl);
 		if (rc < 0) {
-			pr_err("%s hi556_insensor_read_otp_info failed!\n",
+			pr_err("%s xiaomi_tiare_hi556_insensor_read_otp_info failed!\n",
 				   __func__);
 			goto power_down;
 		}

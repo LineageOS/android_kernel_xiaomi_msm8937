@@ -322,7 +322,7 @@ static void gc8034_gcore_enable_otp(struct msm_sensor_ctrl_t *s_ctrl, bool otp_s
 	}
 }
 
-void gc8034_gcore_identify_otp(struct msm_sensor_ctrl_t *s_ctrl)
+void xiaomi_tiare_gc8034_gcore_identify_otp(struct msm_sensor_ctrl_t *s_ctrl)
 {
 	gc8034_Sensor_WriteReg(s_ctrl, 0xfe, 0x00);
 	gc8034_Sensor_WriteReg(s_ctrl, 0xfe, 0x00);

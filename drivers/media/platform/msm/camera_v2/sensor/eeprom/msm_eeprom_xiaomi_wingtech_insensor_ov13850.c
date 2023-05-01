@@ -16,7 +16,7 @@ static uint16_t ov13850_eeprom_sensor_readreg(
 	return reg_value ;
 }
 
-int ov13850_eeprom_sensor_writereg(
+int xiaomi_wingtech_ov13850_eeprom_sensor_writereg(
 	struct msm_eeprom_ctrl_t *s_ctrl, uint32_t reg_addr, uint32_t reg_value, uint32_t delay)
 {
 	int rc = 0;
@@ -26,7 +26,7 @@ int ov13850_eeprom_sensor_writereg(
 	return rc;
 }
 
-int eeprom_init_ov13850_reg_otp(struct msm_eeprom_ctrl_t *e_ctrl)
+int xiaomi_wingtech_eeprom_init_ov13850_reg_otp(struct msm_eeprom_ctrl_t *e_ctrl)
 {
 	int rc = 0, temp = 0;
 	if (!e_ctrl) {
@@ -38,19 +38,19 @@ int eeprom_init_ov13850_reg_otp(struct msm_eeprom_ctrl_t *e_ctrl)
 	e_ctrl->i2c_client.cci_client->sid = 0x20 >> 1;
 
 
-	rc = ov13850_eeprom_sensor_writereg(e_ctrl, 0x0100, 0x01, 1);
+	rc = xiaomi_wingtech_ov13850_eeprom_sensor_writereg(e_ctrl, 0x0100, 0x01, 1);
 
 
 	temp = ov13850_eeprom_sensor_readreg(e_ctrl, 0x5002);
-	rc += ov13850_eeprom_sensor_writereg(e_ctrl, 0x5002, (temp&(~0x02)), 0);
+	rc += xiaomi_wingtech_ov13850_eeprom_sensor_writereg(e_ctrl, 0x5002, (temp&(~0x02)), 0);
 	printk("%s %d E temp=0x%x\n", __func__, __LINE__, temp);
 
 
-	rc += ov13850_eeprom_sensor_writereg(e_ctrl, 0x3d88, 0x72, 0);
-	rc += ov13850_eeprom_sensor_writereg(e_ctrl, 0x3d89, 0x20, 0);
-	rc += ov13850_eeprom_sensor_writereg(e_ctrl, 0x3d8a, 0x73, 0);
-	rc += ov13850_eeprom_sensor_writereg(e_ctrl, 0x3d8b, 0xb9, 0);
-	rc += ov13850_eeprom_sensor_writereg(e_ctrl, 0x3d81, 0x01, 10);
+	rc += xiaomi_wingtech_ov13850_eeprom_sensor_writereg(e_ctrl, 0x3d88, 0x72, 0);
+	rc += xiaomi_wingtech_ov13850_eeprom_sensor_writereg(e_ctrl, 0x3d89, 0x20, 0);
+	rc += xiaomi_wingtech_ov13850_eeprom_sensor_writereg(e_ctrl, 0x3d8a, 0x73, 0);
+	rc += xiaomi_wingtech_ov13850_eeprom_sensor_writereg(e_ctrl, 0x3d8b, 0xb9, 0);
+	rc += xiaomi_wingtech_ov13850_eeprom_sensor_writereg(e_ctrl, 0x3d81, 0x01, 10);
 
 	if (rc < 0) {
 		pr_err("i2c write faild\n");
