@@ -1,0 +1,1 @@
+../../../techpack/camera-legacy/include/uapi/media/msm_camera-legacy.h
