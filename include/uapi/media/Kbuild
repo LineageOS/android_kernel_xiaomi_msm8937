@@ -3,3 +3,18 @@
 header-y += radio-iris.h
 header-y += radio-iris-commands.h
 header-y += synx.h
+
+ifneq ($(wildcard ../../../techpack/camera-legacy/include/uapi/media/Kbuild),)
+header-y += msmb_camera-legacy.h
+header-y += msmb_generic_buf_mgr-legacy.h
+header-y += msmb_ispif-legacy.h
+header-y += msmb_isp-legacy.h
+header-y += msmb_pproc-legacy.h
+header-y += msm_camera-legacy.h
+header-y += msm_cam_sensor-legacy.h
+header-y += msm_camsensor_sdk-legacy.h
+header-y += msm_fd-legacy.h
+header-y += msm_isp-legacy.h
+header-y += msm_jpeg_dma-legacy.h
+header-y += msm_jpeg-legacy.h
+endif
