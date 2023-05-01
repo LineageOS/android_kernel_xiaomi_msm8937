@@ -24,7 +24,7 @@ struct sensor_otp_reg_t {
 	uint32_t data;
 };
 
-struct sensor_otp_reg_t hi556_init_otp[] = {
+static struct sensor_otp_reg_t hi556_init_otp[] = {
 	{0x0e00, 0x0102},
 	{0x0e02, 0x0102},
 	{0x0e0c, 0x0100},
@@ -44,7 +44,7 @@ struct sensor_otp_reg_t hi556_init_otp[] = {
 #define OTP_ALL_SIZE 5388
 #define FUSION_ID_SIZE 10
 
-int hi556_insensor_read_otp_info(struct msm_eeprom_ctrl_t *e_ctrl)
+int xiaomi_tiare_hi556_insensor_read_otp_info(struct msm_eeprom_ctrl_t *e_ctrl)
 {
 	int rc = 0;
 	uint16_t data = 0;

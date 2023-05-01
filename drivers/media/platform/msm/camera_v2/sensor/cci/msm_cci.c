@@ -24,6 +24,9 @@
 #include "msm_camera_io_util.h"
 #include "msm_camera_dt_util.h"
 #include "cam_hw_ops.h"
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
+#include <xiaomi-msm8937/mach.h>
+#endif
 
 #define V4L2_IDENT_CCI 50005
 #define CCI_I2C_QUEUE_0_SIZE 64
@@ -1432,6 +1435,20 @@ static int32_t msm_cci_init(struct v4l2_subdev *sd,
 	for (i = 0; i < NUM_QUEUES; i++)
 		reinit_completion(&cci_dev->cci_master_info[
 				master].report_q[i]);
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_RIVA) || IS_ENABLED(CONFIG_MACH_XIAOMI_ROLEX) || IS_ENABLED(CONFIG_MACH_XIAOMI_TIARE)
+	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_RIVA ||
+		xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_ROLEX ||
+		xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_TIARE) {
+		reinit_completion(&cci_dev->cci_master_info[MASTER_0].reset_complete);
+		for (i = 0; i < NUM_QUEUES; i++)
+			reinit_completion(&cci_dev->cci_master_info[MASTER_0].
+				report_q[i]);
+		reinit_completion(&cci_dev->cci_master_info[MASTER_1].reset_complete);
+		for (i = 0; i < NUM_QUEUES; i++)
+			reinit_completion(&cci_dev->cci_master_info[MASTER_1].
+				report_q[i]);
+	}
+#endif
 	rc = msm_camera_enable_irq(cci_dev->irq, true);
 	if (rc < 0)
 		pr_err("%s: irq enable failed\n", __func__);

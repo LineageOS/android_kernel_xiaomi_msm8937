@@ -26,6 +26,10 @@
 #if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_ULYSSE)
 extern int xiaomi_ulysse_match_sensor_eeprom(struct msm_camera_sensor_slave_info *slave_info);
 #endif
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_WINGTECH)
+extern int xiaomi_wingtech_sensor_match_id(struct msm_camera_sensor_slave_info *slave_info);
+extern void xiaomi_wingtech_sensor_read_fusion_id(struct msm_camera_sensor_slave_info *slave_info, struct msm_sensor_ctrl_t *s_ctrl);
+#endif
 
 /* Logging macro */
 #undef CDBG
@@ -981,6 +985,14 @@ int32_t msm_sensor_driver_probe(void *setting,
 		goto free_slave_info;
 	}
 
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_WINGTECH)
+	if (xiaomi_msm8937_mach_get_family() == XIAOMI_MSM8937_MACH_FAMILY_WINGTECH) {
+		rc = xiaomi_wingtech_sensor_match_id(slave_info);
+		if (rc != 0)
+			goto free_slave_info;
+	}
+#endif
+
 	/* Extract s_ctrl from camera id */
 	s_ctrl = g_sctrl[slave_info->camera_id];
 	if (!s_ctrl) {
@@ -1152,6 +1164,11 @@ CSID_TG:
 		pr_err("%s power up failed\n", slave_info->sensor_name);
 		goto free_camera_info;
 	}
+
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_WINGTECH)
+	if (xiaomi_msm8937_mach_get_family() == XIAOMI_MSM8937_MACH_FAMILY_WINGTECH)
+		xiaomi_wingtech_sensor_read_fusion_id(slave_info, s_ctrl);
+#endif
 
 	pr_err("%s probe succeeded\n", slave_info->sensor_name);
 

@@ -17,6 +17,9 @@
 #include "msm_sd.h"
 #include "msm_actuator.h"
 #include "msm_cci.h"
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
+#include <xiaomi-msm8937/mach.h>
+#endif
 
 DEFINE_MSM_MUTEX(msm_actuator_mutex);
 
@@ -868,6 +871,17 @@ static int32_t msm_actuator_park_lens(struct msm_actuator_ctrl_t *a_ctrl)
 				(next_lens_pos - a_ctrl->park_lens.max_step) :
 				0;
 		}
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_TIARE)
+		if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_TIARE) {
+			if (next_lens_pos > 400) {
+				next_lens_pos = 400;
+			} else if (next_lens_pos > 25) {
+				next_lens_pos = next_lens_pos - 25;
+			} else {
+				next_lens_pos = 0;
+			}
+		}
+#endif
 		a_ctrl->func_tbl->actuator_parse_i2c_params(a_ctrl,
 			next_lens_pos, a_ctrl->park_lens.hw_params,
 			a_ctrl->park_lens.damping_delay);
@@ -886,6 +900,11 @@ static int32_t msm_actuator_park_lens(struct msm_actuator_ctrl_t *a_ctrl)
 		}
 		a_ctrl->i2c_tbl_index = 0;
 		/* Use typical damping time delay to avoid tick sound */
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_TIARE)
+		if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_TIARE)
+			usleep_range(13000, 14000);
+		else
+#endif
 		usleep_range(10000, 12000);
 	}
 

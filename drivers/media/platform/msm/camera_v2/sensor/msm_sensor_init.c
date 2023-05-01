@@ -18,6 +18,9 @@
 #include "msm_sensor_driver.h"
 #include "msm_sensor.h"
 #include "msm_sd.h"
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
+#include <xiaomi-msm8937/mach.h>
+#endif
 
 /* Logging macro */
 #undef CDBG
@@ -49,6 +52,14 @@ static int msm_sensor_wait_for_probe_done(struct msm_sensor_init_t *s_init)
 		CDBG("msm_cam_get_module_init_status -2\n");
 		return 0;
 	}
+
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_TIARE)
+	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_TIARE) {
+		wait_event(s_init->state_wait, (s_init->module_init_status == 1));
+		return 0;
+	}
+#endif
+
 	rc = wait_event_timeout(s_init->state_wait,
 		(s_init->module_init_status == 1), msecs_to_jiffies(tm));
 	if (rc == 0)

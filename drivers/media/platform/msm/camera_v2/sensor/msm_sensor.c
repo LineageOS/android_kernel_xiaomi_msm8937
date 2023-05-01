@@ -18,6 +18,16 @@
 #include "msm_camera_i2c_mux.h"
 #include <linux/regulator/rpm-smd-regulator.h>
 #include <linux/regulator/consumer.h>
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
+#include <xiaomi-msm8937/mach.h>
+#endif
+
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_TIARE)
+#define XIAOMI_TIARE_GC8034_USE_OTP
+#ifdef XIAOMI_TIARE_GC8034_USE_OTP
+extern void xiaomi_tiare_gc8034_gcore_identify_otp(struct msm_sensor_ctrl_t *s_ctrl);
+#endif
+#endif
 
 #undef CDBG
 #define CDBG(fmt, args...) pr_debug(fmt, ##args)
@@ -286,6 +296,15 @@ int msm_sensor_match_id(struct msm_sensor_ctrl_t *s_ctrl)
 		pr_err("%s: %s: read id failed\n", __func__, sensor_name);
 		return rc;
 	}
+
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_TIARE) && defined(XIAOMI_TIARE_GC8034_USE_OTP)
+	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_TIARE) {
+		if (strcmp(sensor_name, "gc8034_sunny") == 0) {
+			pr_info("%s: Enter gc8034_otp\n", __func__);
+			xiaomi_tiare_gc8034_gcore_identify_otp(s_ctrl);
+		}
+	}
+#endif
 
 	pr_debug("%s: read id: 0x%x expected id 0x%x:\n",
 			__func__, chipid, slave_info->sensor_id);
