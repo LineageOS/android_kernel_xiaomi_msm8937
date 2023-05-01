@@ -24,6 +24,12 @@
 #if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_ULYSSE)
 extern void legacy_xiaomi_ulysse_set_s_vendor_eeprom(struct platform_device *pdev, struct msm_eeprom_ctrl_t *e_ctrl, struct msm_eeprom_board_info *eb_info);
 #endif
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_WINGTECH)
+extern int legacy_xiaomi_wingtech_eeprom_match_id(struct msm_eeprom_ctrl_t *e_ctrl, struct msm_eeprom_board_info *eb_info);
+#endif
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_RIVA) || IS_ENABLED(CONFIG_MACH_XIAOMI_ROLEX)
+extern int legacy_xiaomi_wingtech_eeprom_init_ov13850_reg_otp(struct msm_eeprom_ctrl_t *e_ctrl);
+#endif
 
 #undef CDBG
 #define CDBG(fmt, args...) pr_debug(fmt, ##args)
@@ -1721,6 +1727,16 @@ static int msm_eeprom_platform_probe(struct platform_device *pdev)
 			pr_err("failed rc %d\n", rc);
 			goto memdata_free;
 		}
+
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_RIVA) || IS_ENABLED(CONFIG_MACH_XIAOMI_ROLEX)
+		if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_RIVA ||
+			xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_ROLEX) {
+			if (!strcmp(eb_info->eeprom_name, "ov13850")) {
+				legacy_xiaomi_wingtech_eeprom_init_ov13850_reg_otp(e_ctrl);
+			}
+		}
+#endif
+
 		rc = read_eeprom_memory(e_ctrl, &e_ctrl->cal_data);
 		if (rc < 0) {
 			pr_err("%s read_eeprom_memory failed\n", __func__);
@@ -1733,6 +1749,14 @@ static int msm_eeprom_platform_probe(struct platform_device *pdev)
 #if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_ULYSSE)
 		if (xiaomi_msm8937_mach_get_family() == XIAOMI_MSM8937_MACH_FAMILY_ULYSSE) {
 			legacy_xiaomi_ulysse_set_s_vendor_eeprom(pdev, e_ctrl, eb_info);
+		}
+#endif
+
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_WINGTECH)
+		if (xiaomi_msm8937_mach_get_family() == XIAOMI_MSM8937_MACH_FAMILY_WINGTECH) {
+			rc = legacy_xiaomi_wingtech_eeprom_match_id(e_ctrl, eb_info);
+			if (rc != 0)
+				goto power_down;
 		}
 #endif
 
