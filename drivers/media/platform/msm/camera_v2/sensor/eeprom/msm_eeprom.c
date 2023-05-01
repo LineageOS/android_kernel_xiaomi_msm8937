@@ -18,6 +18,13 @@
 #include "msm_sd.h"
 #include "msm_cci.h"
 #include "msm_eeprom.h"
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
+#include <xiaomi-msm8937/mach.h>
+#endif
+
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_ULYSSE)
+extern void xiaomi_ulysse_set_s_vendor_eeprom(struct platform_device *pdev, struct msm_eeprom_ctrl_t *e_ctrl, struct msm_eeprom_board_info *eb_info);
+#endif
 
 #undef CDBG
 #define CDBG(fmt, args...) pr_debug(fmt, ##args)
@@ -1839,6 +1846,12 @@ static int msm_eeprom_platform_probe(struct platform_device *pdev)
 		for (j = 0; j < e_ctrl->cal_data.num_data; j++)
 			CDBG("memory_data[%d] = 0x%X\n", j,
 				e_ctrl->cal_data.mapdata[j]);
+
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_ULYSSE)
+		if (xiaomi_msm8937_mach_get_family() == XIAOMI_MSM8937_MACH_FAMILY_ULYSSE) {
+			xiaomi_ulysse_set_s_vendor_eeprom(pdev, e_ctrl, eb_info);
+		}
+#endif
 
 		e_ctrl->is_supported |= msm_eeprom_match_crc(&e_ctrl->cal_data);
 

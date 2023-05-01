@@ -4,3 +4,4 @@ ccflags-y += -Idrivers/media/platform/msm/camera_v2/common
 ccflags-y += -Idrivers/media/platform/msm/camera_v2/sensor/io
 ccflags-y += -Idrivers/media/platform/msm/camera_v2/sensor/cci
 obj-$(CONFIG_MSM_EEPROM) += msm_eeprom.o
+obj-$(CONFIG_MACH_FAMILY_XIAOMI_ULYSSE) += msm_eeprom_xiaomi_ulysse.o

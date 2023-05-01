@@ -18,6 +18,9 @@
 #include "msm_isp_axi_util.h"
 #include "msm_isp48.h"
 #include "trace/events/msm_cam.h"
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
+#include <xiaomi-msm8937/mach.h>
+#endif
 
 #define HANDLE_TO_IDX(handle) (handle & 0xFF)
 #define ISP_SOF_DEBUG_COUNT 0
@@ -560,6 +563,15 @@ static void msm_isp_cfg_framedrop_reg(
 
 	if (framedrop_period != MSM_VFE_STREAM_STOP_PERIOD)
 		framedrop_pattern = 0x1;
+
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_ULYSSE)
+	if (xiaomi_msm8937_mach_get_family() == XIAOMI_MSM8937_MACH_FAMILY_ULYSSE) {
+		if (MSM_VFE_STREAM_STOP_PERIOD != framedrop_period) {
+			if (framedrop_period > 1)
+				framedrop_pattern = framedrop_pattern << (framedrop_period - 1);
+		}
+	}
+#endif
 
 	if (WARN_ON(framedrop_period == 0))
 		pr_err("%s framedrop_period is 0\n", __func__);
