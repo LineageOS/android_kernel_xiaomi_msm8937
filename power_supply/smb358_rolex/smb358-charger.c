@@ -30,6 +30,7 @@
 #include <linux/of_gpio.h>
 #include <linux/mutex.h>
 #include <linux/qpnp/qpnp-adc.h>
+#include <linux/iio/consumer.h>
 
 #include <linux/alarmtimer.h>
 #include <linux/kernel.h>
@@ -232,6 +233,11 @@ struct smb358_regulator {
 	struct regulator_dev	*rdev;
 };
 
+struct smb358_iio {
+	struct iio_channel	*batt_id_therm;
+	struct iio_channel	*batt_therm;
+};
+
 struct smb358_charger {
 	struct i2c_client	*client;
 	struct device		*dev;
@@ -300,7 +306,7 @@ struct smb358_charger {
 	struct alarm			batt_temp_alarm;
 
 	/* adc_tm paramters */
-	struct qpnp_vadc_chip	*vadc_dev;
+	struct smb358_iio	iio;
 	struct qpnp_adc_tm_chip	*adc_tm_dev;
 	struct qpnp_adc_tm_btm_param	adc_param;
 	int			cold_bat_decidegc;
@@ -1301,29 +1307,31 @@ static int smb358_get_prop_batt_health(struct smb358_charger *chip)
 static int smb358_get_prop_batt_temp(struct smb358_charger *chip)
 {
 	int rc = 0;
-	struct qpnp_vadc_result results;
+	int batt_therm_result = 0;
 
 	if (!smb358_get_prop_batt_present(chip))
 		return DEFAULT_TEMP;
 
-	rc = qpnp_vadc_read(chip->vadc_dev, P_MUX2_1_1, &results);
-	if (rc) {
-		pr_debug("Unable to read batt temperature rc=%d\n", rc);
-		return DEFAULT_TEMP;
+	if (chip->iio.batt_therm) {
+		rc = iio_read_channel_processed(chip->iio.batt_therm,
+			&batt_therm_result);
+		if (rc < 0) {
+			pr_err("Unable to read batt_therm, rc = %d\n", rc);
+			return DEFAULT_TEMP;
+		}
 	}
-	pr_err("get_bat_temp %d, %lld\n",
-		results.adc_code, results.physical);
+	pr_err("get_bat_temp %d", batt_therm_result);
 
 	#ifdef CONFIG_DISABLE_TEMP_PROTECT
-		pr_err("WINGTECH disable temp protect version; real temp:%lld\n", results.physical*10);
+		pr_err("WINGTECH disable temp protect version; real temp:%lld\n", batt_therm_result*10);
 		return 250;
 	#endif
-	if (results.physical*10 > 46 && results.physical*10 < 51)
-		return results.physical * 10 + 4;
-	else if (results.physical*10 > 51 && results.physical*10 < 56)
-		return results.physical*10 + 6;
+	if (batt_therm_result*10 > 46 && batt_therm_result*10 < 51)
+		return batt_therm_result * 10 + 4;
+	else if (batt_therm_result*10 > 51 && batt_therm_result*10 < 56)
+		return batt_therm_result*10 + 6;
 	else
-		return results.physical*10;
+		return batt_therm_result*10;
 
 
 }
@@ -1335,14 +1343,18 @@ int battid_resister = 0;
  int smb358_get_prop_battid_resister(struct smb358_charger *chip)
 {
 	int rc = 0;
-	struct qpnp_vadc_result results;
+	int batt_id_result = 0;
 
-	rc = qpnp_vadc_read(chip->vadc_dev, P_MUX4_1_1, &results);
-	if (rc) {
-		pr_debug("Unable to read batt resister rc=%d\n", rc);
-		return DEFAULT_RESISTER;
+	if (chip->iio.batt_id_therm) {
+		rc = iio_read_channel_processed(chip->iio.batt_id_therm,
+			&batt_id_result);
+		if (rc < 0) {
+			pr_err("Unable to read batt_шв, rc = %d\n", rc);
+			return DEFAULT_RESISTER;
+		}
 	}
-	battid_resister = (results.physical)*68/(1800000 - results.physical);
+
+	battid_resister = (batt_id_result)*68/(1800000 - batt_id_result);
 	pr_debug("battid_resister = %d\n", battid_resister);
 
 	return battid_resister;
@@ -1369,6 +1381,28 @@ smb358_get_prop_battery_voltage_now(struct smb358_charger *chip)
 	}
 	pr_debug("Couldn't get bms_psy, return default capacity\n");
 	return SMB358_DEFAULT_BATT_VOLTAGE;
+}
+
+static int smb358_get_iio_channel(struct smb358_charger *chip,
+		const char *propname, struct iio_channel **chan)
+{
+	int rc = 0;
+
+	rc = of_property_match_string(chip->dev->of_node,
+					"io-channel-names", propname);
+	if (rc < 0)
+		return 0;
+
+	*chan = iio_channel_get(chip->dev, propname);
+	if (IS_ERR(*chan)) {
+		rc = PTR_ERR(*chan);
+		if (rc != -EPROBE_DEFER)
+			pr_err("%s channel unavailable, %d\n",
+							propname, rc);
+		*chan = NULL;
+	}
+
+	return rc;
 }
 
 static int __smb358_path_suspend(struct smb358_charger *chip, bool suspend)
@@ -2887,6 +2921,16 @@ static int smb_parse_dt(struct smb358_charger *chip)
 	else
 		chip->bat_present_decidegc = -batt_present_degree_negative;
 
+	/* Extract ADC channels */
+	rc = smb358_get_iio_channel(chip, "batt_therm", &chip->iio.batt_therm);
+	if (rc < 0)
+		return rc;
+
+	rc = smb358_get_iio_channel(chip,
+				"batt_id_therm", &chip->iio.batt_id_therm);
+	if (rc < 0)
+		return rc;
+
 	if (of_get_property(node, "qcom,vcc-i2c-supply", NULL)) {
 		chip->vcc_i2c = devm_regulator_get(chip->dev, "vcc-i2c");
 		if (IS_ERR(chip->vcc_i2c)) {
@@ -2896,7 +2940,6 @@ static int smb_parse_dt(struct smb358_charger *chip)
 			return PTR_ERR(chip->vcc_i2c);
 		}
 	}
-
 
 	rc = of_property_read_u32(node, "qcom,battery-fcc",
 						&chip->fcc_mah);
@@ -3167,15 +3210,6 @@ static int smb358_charger_probe(struct i2c_client *client,
 	chip->dev = &client->dev;
 	chip->usb_psy = usb_psy;
 	chip->fake_battery_soc = -EINVAL;
-
-	/* early for VADC get, defer probe if needed */
-	chip->vadc_dev = qpnp_get_vadc(chip->dev, "chg");
-	if (IS_ERR(chip->vadc_dev)) {
-		rc = PTR_ERR(chip->vadc_dev);
-		if (rc != -EPROBE_DEFER)
-			pr_err("vadc property missing\n");
-		return rc;
-	}
 
 	rc = smb_parse_dt(chip);
 	if (rc) {
