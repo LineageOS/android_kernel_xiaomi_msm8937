@@ -696,7 +696,7 @@ static int msm_eeprom_config(struct msm_eeprom_ctrl_t *e_ctrl,
 		if (e_ctrl->userspace_probe == 0) {
 			pr_err("%s:%d Eeprom already probed at kernel boot",
 				__func__, __LINE__);
-			rc = -EINVAL;
+			rc = 0;
 			break;
 		}
 		if (e_ctrl->cal_data.num_data == 0) {
@@ -1665,7 +1665,7 @@ static int msm_eeprom_config32(struct msm_eeprom_ctrl_t *e_ctrl,
 		if (e_ctrl->userspace_probe == 0) {
 			pr_err("%s:%d Eeprom already probed at kernel boot",
 				__func__, __LINE__);
-			rc = -EINVAL;
+			rc = 0;
 			break;
 		}
 		if (e_ctrl->cal_data.num_data == 0) {
