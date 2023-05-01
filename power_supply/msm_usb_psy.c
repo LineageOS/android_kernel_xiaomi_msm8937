@@ -1,4 +1,4 @@
-#include <linux/extcon.h>
+#include <linux/extcon-provider.h>
 #include <linux/init.h>
 #include <linux/module.h>
 #include <linux/of.h>
@@ -95,7 +95,7 @@ static int msm_usb_psy_set_dp_dm(struct msm_usb_psy_data *data, int value)
 
 static int msm_usb_psy_set_cable_state(struct msm_usb_psy_data *data, bool state)
 {
-	return extcon_set_cable_state_(data->extcon, EXTCON_USB, state);
+	return extcon_set_state_sync(data->extcon, EXTCON_USB, state);
 }
 
 static int msm_usb_psy_handle_set_present(struct msm_usb_psy_data *data, bool new_present)
