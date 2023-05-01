@@ -19,7 +19,7 @@
 #include <linux/platform_device.h>
 #include <linux/pwm.h>
 #include <linux/regulator/consumer.h>
-#include <linux/sched.h>
+#include <linux/sched/signal.h>
 #include <linux/slab.h>
 #include <xiaomi-msm8937/mach.h>
 #include "pwm-ir.h"
@@ -367,19 +367,18 @@ static int __devinit pwm_ir_probe(struct platform_device *pdev)
 	dev->pdev = pdev;
 	platform_set_drvdata(pdev, dev);
 
-	dev->rdev = rc_allocate_device();
+	dev->rdev = rc_allocate_device(RC_DRIVER_IR_RAW);
 	if (!dev->rdev) {
 		dev_err(&pdev->dev, "failed to alloc rdev\n");
 		goto err_rc_allocate_device;
 	}
 
 	dev->rdev->dev.parent       = &pdev->dev;
-	dev->rdev->input_name       = PWM_IR_NAME;
+	dev->rdev->device_name       = PWM_IR_NAME;
 	dev->rdev->input_phys       = PWM_IR_NAME;
 	dev->rdev->input_id.bustype = BUS_HOST;
 	dev->rdev->driver_name      = PWM_IR_NAME;
-	dev->rdev->map_name         = RC_MAP_LIRC;
-	dev->rdev->driver_type      = RC_DRIVER_IR_RAW;
+	dev->rdev->map_name         = RC_MAP_EMPTY;
 	dev->rdev->priv             = dev;
 
 	rc = pwm_ir_tx_probe(dev);
