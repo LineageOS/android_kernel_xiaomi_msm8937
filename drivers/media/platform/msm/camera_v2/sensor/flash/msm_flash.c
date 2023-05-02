@@ -579,6 +579,11 @@ static int32_t msm_flash_prepare(
 	CDBG("%s:%d: State : %d\n",
 		__func__, __LINE__, flash_ctrl->flash_state);
 
+	if (flash_ctrl->flash_driver_type != FLASH_DRIVER_PMIC) {
+		CDBG("%s:%d: flash_driver_type is NOT PMIC, Exit\n", __func__, __LINE__);
+		return 0;
+	}
+
 	if (flash_ctrl->switch_trigger == NULL) {
 		if (flash_ctrl->platform_flash_init)
 			return ret;
