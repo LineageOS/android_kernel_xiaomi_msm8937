@@ -1,3 +1,6 @@
+#if IS_ENABLED(CONFIG_PARSE_ANDROIDBOOT_MODE)
+#include <linux/androidboot_mode.h>
+#endif
 #include <linux/export.h>
 #include <linux/init.h>
 #include <linux/module.h>
@@ -42,6 +45,11 @@ extern int xiaomi_msm8937_fingerprint_goodix_santoni_init(void);
 
 static int __init xiaomi_msm8937_fingerprint_init(void)
 {
+#if IS_ENABLED(CONFIG_PARSE_ANDROIDBOOT_MODE)
+	if (androidboot_mode_get() == ANDROIDBOOT_MODE_CHARGER)
+		return -ENODEV;
+#endif
+
 #if IS_ENABLED(CONFIG_MACH_XIAOMI_UGG)
 	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_UGG) {
 		switch (xiaomi_ugg_fpsensor_variant) {
