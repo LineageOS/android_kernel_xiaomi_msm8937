@@ -3688,6 +3688,30 @@ static struct platform_driver msm8952_asoc_machine_driver = {
 
 static int __init msm8952_machine_init(void)
 {
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
+	switch (xiaomi_msm8937_mach_get()) {
+		case XIAOMI_MSM8937_MACH_UGG:
+		case XIAOMI_MSM8937_MACH_UGGLITE:
+			mbhc_cfg.key_code[1] = KEY_VOLUMEUP;
+			mbhc_cfg.key_code[2] = KEY_VOLUMEDOWN;
+			mbhc_cfg.key_code[3] = 0;
+			break;
+		case XIAOMI_MSM8937_MACH_LAND:
+		case XIAOMI_MSM8937_MACH_RIVA:
+		case XIAOMI_MSM8937_MACH_ROLEX:
+		case XIAOMI_MSM8937_MACH_SANTONI:
+		case XIAOMI_MSM8937_MACH_TIARE:
+			mbhc_cfg.key_code[1] = KEY_VOLUMEUP;
+			mbhc_cfg.key_code[2] = KEY_VOLUMEDOWN;
+			mbhc_cfg.key_code[3] = KEY_VOLUMEDOWN;
+			break;
+		case XIAOMI_MSM8937_MACH_PRADA:
+			break;
+		default:
+			break;
+	}
+#endif
+
 	return platform_driver_register(&msm8952_asoc_machine_driver);
 }
 module_init(msm8952_machine_init);
