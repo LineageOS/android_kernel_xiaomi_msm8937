@@ -1088,6 +1088,8 @@ int wcd_mbhc_get_button_mask(struct wcd_mbhc *mbhc)
 
 	btn = mbhc->mbhc_cb->map_btn_code_to_num(mbhc->component);
 
+	pr_info("%s: button %d\n", __func__, btn);
+
 	switch (btn) {
 	case 0:
 		mask = SND_JACK_BTN_0;
