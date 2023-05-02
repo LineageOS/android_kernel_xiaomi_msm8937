@@ -1,3 +1,6 @@
+#if IS_ENABLED(CONFIG_PARSE_ANDROIDBOOT_MODE)
+#include <linux/androidboot_mode.h>
+#endif
 #include <linux/module.h>
 #include <linux/printk.h>
 #if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
@@ -15,6 +18,11 @@ bool camera_legacy_enable = false;
 
 static int __init camera_legacy_init(void)
 {
+#if IS_ENABLED(CONFIG_PARSE_ANDROIDBOOT_MODE)
+	if (androidboot_mode_get() != ANDROIDBOOT_MODE_NORMAL)
+		return -ENODEV;
+#endif
+
 	camera_legacy_enable = true;
 
 #if IS_ENABLED(CONFIG_MSMB_CAMERA_LEGACY_M)
