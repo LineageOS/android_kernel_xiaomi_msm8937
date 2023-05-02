@@ -1,3 +1,4 @@
+ifneq ($(CONFIG_TECHPACK_AUDIO_DISABLE),y)
 # auto-detect subdirs
 ifeq ($(CONFIG_ARCH_SDXPOORWILLS),y)
   audioconf := -include $(srctree)/techpack/audio-legacy/config/sdxpoorwillsautoconf.h
@@ -87,3 +88,6 @@ obj-y += soc/
 obj-y += dsp/
 obj-y += ipc/
 obj-y += asoc/
+else # CONFIG_TECHPACK_AUDIO_DISABLE
+obj-y += stub.o
+endif # CONFIG_TECHPACK_AUDIO_DISABLE
