@@ -1,5 +1,12 @@
 menu "Tech packages"
 
+config TECHPACK_AUDIO_DISABLE
+	bool "Disable compilation for audio module"
+	default n
+	help
+	  Say Y here to disable compilation for audio module.
+	  Sometimes useful for reducing kernel binary size.
+
 source "techpack/camera-legacy/Kconfig"
 source "techpack/camera-legacy-m/Kconfig"
 source "techpack/xiaomi-msm8937/Kconfig"
