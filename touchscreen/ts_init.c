@@ -1,3 +1,6 @@
+#if IS_ENABLED(CONFIG_PARSE_ANDROIDBOOT_MODE)
+#include <linux/androidboot_mode.h>
+#endif
 #include <linux/module.h>
 #include <linux/printk.h>
 #include <linux/string.h>
@@ -35,6 +38,11 @@ extern int xiaomi_msm8937_touchscreen_ist30xx_init(void);
 
 static int __init xiaomi_msm8937_touchscreen_init(void)
 {
+#if IS_ENABLED(CONFIG_PARSE_ANDROIDBOOT_MODE)
+	if (androidboot_mode_get() == ANDROIDBOOT_MODE_CHARGER)
+		return -ENODEV;
+#endif
+
 #if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_ULYSSE)
 	if (xiaomi_msm8937_mach_get_family() == XIAOMI_MSM8937_MACH_FAMILY_ULYSSE) {
 		pr_info("%s: Mach family is ULYSSE, Initialize touchscreen driver depending on panel name.\n", __func__);

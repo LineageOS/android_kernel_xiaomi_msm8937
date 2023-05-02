@@ -1,3 +1,6 @@
+#if IS_ENABLED(CONFIG_PARSE_ANDROIDBOOT_MODE)
+#include <linux/androidboot_mode.h>
+#endif
 #include <linux/device.h>
 #include <linux/module.h>
 #include <linux/sysctl.h>
@@ -141,6 +144,11 @@ static struct ctl_table_header *xiaomi_msm8937_touchscreen_sysctl_header;
 
 static int __init xiaomi_msm8937_touchscreen_sysctl_init(void)
 {
+#if IS_ENABLED(CONFIG_PARSE_ANDROIDBOOT_MODE)
+	if (androidboot_mode_get() == ANDROIDBOOT_MODE_CHARGER)
+		return -ENODEV;
+#endif
+
 	xiaomi_msm8937_touchscreen_sysctl_header = register_sysctl_table(xiaomi_msm8937_touchscreen_root_dir);
 	if (!xiaomi_msm8937_touchscreen_sysctl_header)
 		return -ENOMEM;
