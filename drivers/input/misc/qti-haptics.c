@@ -3,6 +3,9 @@
  * Copyright (c) 2018-2021, The Linux Foundation. All rights reserved.
  */
 
+#if IS_ENABLED(CONFIG_PARSE_ANDROIDBOOT_MODE)
+#include <linux/androidboot_mode.h>
+#endif
 #include <linux/debugfs.h>
 #include <linux/device.h>
 #include <linux/err.h>
@@ -22,6 +25,9 @@
 #include <linux/slab.h>
 #include <linux/types.h>
 #include <linux/uaccess.h>
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
+#include <xiaomi-msm8937/mach.h>
+#endif
 
 enum actutor_type {
 	ACT_LRA,
@@ -1929,6 +1935,11 @@ static int qti_haptics_probe(struct platform_device *pdev)
 	struct input_dev *input_dev;
 	struct ff_device *ff;
 	int rc = 0, effect_count_max;
+
+#if IS_ENABLED(CONFIG_PARSE_ANDROIDBOOT_MODE) && IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
+	if (xiaomi_msm8937_mach_get() && androidboot_mode_get() != ANDROIDBOOT_MODE_NORMAL)
+		return -ENODEV;
+#endif
 
 	chip = devm_kzalloc(&pdev->dev, sizeof(*chip), GFP_KERNEL);
 	if (!chip)
