@@ -1,5 +1,12 @@
 menu "Tech packages"
 
+config TECHPACK_AUDIO_DISABLE
+	bool "Disable compilation for audio module"
+	default n
+	help
+	  Say Y here to disable compilation for audio module.
+	  Sometimes useful for reducing kernel binary size.
+
 source "techpack/data/Kconfig"
 
 source "techpack/camera-legacy/Kconfig"
