@@ -131,7 +131,7 @@ static int msm_usb_psy_get_property(struct power_supply *psy,
 	switch (psp) {
 		/* Set by charger driver */
 		case POWER_SUPPLY_PROP_ONLINE:
-			val->intval = data->online;
+			val->intval = (data->online && data->present);
 			break;
 		case POWER_SUPPLY_PROP_PRESENT:
 			val->intval = data->present;
@@ -286,7 +286,7 @@ static int msm_usb_psy_probe(struct platform_device *pdev)
 	}
 
 	/* Set initial power supply values */
-	data->online = false;
+	data->online = true;
 	data->present = false;
 	data->usb_supply_type = POWER_SUPPLY_TYPE_UNKNOWN;
 	data->current_max = 0;
