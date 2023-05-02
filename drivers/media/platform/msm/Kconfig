@@ -40,6 +40,12 @@ menuconfig MSMB_CAMERA
        adds support for the camera driver stack including sensor, isp
        and postprocessing drivers.
 
+config MSMB_CAMERA_ENABLE
+    bool "Enable compilation"
+    default y
+    ---help---
+      Enable compilation of QTI MSM camera and video capture 2.0 support
+
 config MSMB_CAMERA_DEBUG
      bool "QTI MSM camera 2.0 debugging with printk"
      depends on MSMB_CAMERA
