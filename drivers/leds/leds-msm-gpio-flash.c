@@ -10,6 +10,9 @@
  * GNU General Public License for more details.
  */
 
+#if IS_ENABLED(CONFIG_PARSE_ANDROIDBOOT_MODE)
+#include <linux/androidboot_mode.h>
+#endif
 #include <linux/clk.h>
 #include <linux/clkdev.h>
 #include <linux/kernel.h>
@@ -443,6 +446,11 @@ static int led_gpio_flash_probe(struct platform_device *pdev)
 
 	platform_set_drvdata(pdev, flash_led);
 	flash_led->cdev.max_brightness = LED_FULL;
+#if IS_ENABLED(CONFIG_PARSE_ANDROIDBOOT_MODE)
+	if (androidboot_mode_get() == ANDROIDBOOT_MODE_RECOVERY)
+		flash_led->cdev.max_brightness = 1;
+#endif
+
 	flash_led->cdev.brightness_set = led_gpio_brightness_set;
 	flash_led->cdev.brightness_get = led_gpio_brightness_get;
 
