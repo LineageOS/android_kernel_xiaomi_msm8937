@@ -1,3 +1,4 @@
+ifneq ($(CONFIG_TECHPACK_AUDIO_DISABLE),y)
 # auto-detect subdirs
 ifeq ($(CONFIG_ARCH_SDM845),y)
   audioconf := -include $(srctree)/techpack/audio-legacy/config/sdm845autoconf.h
@@ -76,3 +77,6 @@ obj-y += asoc/
 obj-y += dsp/
 obj-y += ipc/
 obj-y += soc/
+else # CONFIG_TECHPACK_AUDIO_DISABLE
+obj-y += stub.o
+endif # CONFIG_TECHPACK_AUDIO_DISABLE
