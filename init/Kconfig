@@ -66,6 +66,12 @@ config BROKEN_ON_SMP
 	depends on BROKEN || !SMP
 	default y
 
+config PARSE_ANDROIDBOOT_MODE
+	bool "Parse androidboot.mode= parameter"
+	default y
+	help
+	  Select this to parse androidboot.mode= parameter
+
 config INIT_ENV_ARG_LIMIT
 	int
 	default 32 if !UML
