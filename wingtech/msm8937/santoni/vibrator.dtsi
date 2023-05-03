@@ -1,5 +1,5 @@
+#if !defined(CONFIG_INPUT_QTI_HAPTICS) || defined(CONFIG_PARSE_ANDROIDBOOT_MODE)
 &pmi_haptic {
-#ifndef CONFIG_INPUT_QTI_HAPTICS
 	/delete-property/ qcom,en-brake;
-#endif
 };
+#endif

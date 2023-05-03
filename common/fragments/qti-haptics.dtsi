@@ -1,27 +1,13 @@
 #ifdef CONFIG_INPUT_QTI_HAPTICS
-&pmi_haptic {
-	/* Delete qpnp haptics */
-	/delete-property/ compatible;
-	/delete-property/ reg;
-	/delete-property/ interrupts;
-	/delete-property/ interrupt-names;
-	/delete-property/ qcom,pmic-revid;
-	/delete-property/ vcc_pon-supply;
-	/delete-property/ qcom,play-mode;
-	/delete-property/ qcom,wave-play-rate-us;
-	/delete-property/ qcom,actuator-type;
-	/delete-property/ qcom,wave-shape;
-	/delete-property/ qcom,vmax-mv;
-	/delete-property/ qcom,ilim-ma;
-	/delete-property/ qcom,sc-deb-cycles;
-	/delete-property/ qcom,int-pwm-freq-khz;
-	/delete-property/ qcom,en-brake;
-	/delete-property/ qcom,brake-pattern;
-	/delete-property/ qcom,wave-samples;
-	/delete-property/ qcom,wave-rep-cnt;
-	/delete-property/ qcom,wave-samp-rep-cnt;
-
-	/* Setup qti haptics */
+&spmi_bus {
+	qcom,pmi8950@3 {
+#ifndef CONFIG_PARSE_ANDROIDBOOT_MODE
+		/delete-node/ qcom,haptics@c000;
+#endif
+		pmi_qcom_haptics: qcom,qcom_haptics@c000 {};
+	};
+};
+&pmi_qcom_haptics {
 	status = "okay";
 	compatible = "qcom,haptics";
 	reg = <0xc000 0x100>;
