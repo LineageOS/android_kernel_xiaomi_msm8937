@@ -41,15 +41,25 @@
 
 		ti,bq2560x,jeita-hot-degc = <550>;
 		ti,bq2560x,jeita-warm-degc = <450>;
+#ifdef CONFIG_CHARGER_BQ2560X_MI8937
 		ti,bq2560x,jeita-cool-degc = <150>;
 		ti,bq2560x,jeita-cool-xiaomi-degc = <50>;
+#else
+		ti,bq2560x,jeita-cool-normal-degc = <150>;
+		ti,bq2560x,jeita-cold-cool-degc = <50>;
+#endif
 		ti,bq2560x,jeita-cold-degc = <0>;
 
 		ti,bq2560x,jeita-hot-hysteresis = <20>;
 		ti,bq2560x,jeita-cold-hysteresis = <10>;
 
+#ifdef CONFIG_CHARGER_BQ2560X_MI8937
 		ti,bq2560x,jeita-cool-xiaomi-ma = <300>;
 		ti,bq2560x,jeita-cool-ma = <600>;
+#else
+		ti,bq2560x,jeita-cold-cool-ma = <300>;
+		ti,bq2560x,jeita-cool-normal-ma = <600>;
+#endif
 		ti,bq2560x,jeita-cool-mv = <4400>;
 		ti,bq2560x,jeita-warm-ma = <1000>;
 		ti,bq2560x,jeita-warm-mv = <4100>;

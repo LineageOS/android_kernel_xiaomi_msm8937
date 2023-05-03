@@ -33,13 +33,23 @@
 		ti,bq2560x,vac-ovp-threshold = <6200>;
 		ti,bq2560x,jeita-hot-degc = <540>;
 		ti,bq2560x,jeita-warm-degc = <450>;
+#ifdef CONFIG_CHARGER_BQ2560X_MI8937
 		ti,bq2560x,jeita-cool-degc = <150>;
 		ti,bq2560x,jeita-cool-xiaomi-degc = <50>;
+#else
+		ti,bq2560x,jeita-cool-normal-degc = <150>;
+		ti,bq2560x,jeita-cold-cool-degc = <50>;
+#endif
 		ti,bq2560x,jeita-cold-degc = <0>;
 		ti,bq2560x,jeita-hot-hysteresis = <10>;
 		ti,bq2560x,jeita-cold-hysteresis = <0>;
+#ifdef CONFIG_CHARGER_BQ2560X_MI8937
 		ti,bq2560x,jeita-cool-ma = <900>;
 		ti,bq2560x,jeita-cool-xiaomi-ma = <300>;
+#else
+		ti,bq2560x,jeita-cool-normal-ma = <900>;
+		ti,bq2560x,jeita-cold-cool-ma = <300>;
+#endif
 		ti,bq2560x,jeita-cool-mv = <4400>;
 		ti,bq2560x,jeita-warm-ma = <900>;
 		ti,bq2560x,jeita-warm-mv = <4112>;
@@ -60,7 +70,11 @@
 		ti,battery-type-b = "feimaotui_3080mah";
 		ti,battery-type-a = "guangyu_3080mah";
 		ti,batt-profile-select;
+#ifdef CONFIG_FUEL_GAUGE_BQ27426_MI8937
 		qcom,batt_id-vadc = <&pm8937_vadc>;
+#else
+		qcom,battid-vadc = <&pm8937_vadc>;
+#endif
 		ti,profile-a-rid-kohm = <22>;
 		ti,profile-b-rid-kohm = <110>;
 		ti,batt-id-vref-uv = <1800000>;
