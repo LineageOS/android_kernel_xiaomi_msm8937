@@ -3143,7 +3143,7 @@ static int fts_ts_suspend(struct device *dev)
 				input_mt_report_slot_state(ts_data->input_dev, MT_TOOL_FINGER, 0);
 			}
 			input_mt_report_pointer_emulation(ts_data->input_dev, false);
-			__clear_bit(BTN_TOUCH, ts_data->input_dev->keybit);
+			//__clear_bit(BTN_TOUCH, ts_data->input_dev->keybit);
 			input_sync(ts_data->input_dev);
 			ev_btn_status = true;
 		}
@@ -3217,7 +3217,7 @@ static int fts_ts_resume(struct device *dev)
 #endif
 #if (defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE))
 		if (ev_btn_status) {
-			__set_bit(BTN_TOUCH, ts_data->input_dev->keybit);
+			//__set_bit(BTN_TOUCH, ts_data->input_dev->keybit);
 			input_sync(ts_data->input_dev);
 			ev_btn_status = false;
 		}
