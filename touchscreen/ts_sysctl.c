@@ -7,6 +7,7 @@
 #if IS_ENABLED(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE)
 #include <linux/input/doubletap2wake.h>
 #endif
+#include <xiaomi-msm8937/mach.h>
 #include <xiaomi-msm8937/touchscreen.h>
 
 struct xiaomi_msm8937_touchscreen_operations_t *xiaomi_msm8937_touchscreen_operations;
@@ -161,6 +162,13 @@ static int __init xiaomi_msm8937_touchscreen_sysctl_init(void)
 #if IS_ENABLED(CONFIG_PARSE_ANDROIDBOOT_MODE)
 	if (androidboot_mode_get() == ANDROIDBOOT_MODE_CHARGER)
 		return -ENODEV;
+#endif
+
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_LAND) || IS_ENABLED(CONFIG_MACH_XIAOMI_SANTONI)
+	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_LAND ||
+		xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_SANTONI) {
+		use_software_dt2w = true;
+	}
 #endif
 
 	xiaomi_msm8937_touchscreen_sysctl_header = register_sysctl_table(xiaomi_msm8937_touchscreen_root_dir);
