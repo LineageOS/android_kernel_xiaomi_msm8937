@@ -392,4 +392,7 @@ int fts_ts_handle_trusted_touch_tvm(struct fts_ts_data *ts_data, int value);
 void fts_ts_trusted_touch_tvm_i2c_failure_report(struct fts_ts_data *fts_data);
 #endif
 #endif
+#if (defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE))
+extern bool gesture_incall;
+#endif
 #endif /* __LINUX_FOCALTECH_CORE_H__ */

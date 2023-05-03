@@ -70,6 +70,15 @@
 #include <linux/pinctrl/qcom-pinctrl.h>
 #endif
 
+#if (defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) && !defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE))
+#include <linux/input/doubletap2wake.h>
+#elif (defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) && !defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE))
+#include <linux/input/sweep2wake.h>
+#elif (defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) && defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE))
+#include <linux/input/doubletap2wake.h>
+#include <linux/input/sweep2wake.h>
+#endif
+
 /*****************************************************************************
 * Private constant and macro definitions using #define
 *****************************************************************************/
@@ -3080,10 +3089,32 @@ static int fts_ts_remove_entry(struct fts_ts_data *ts_data)
 	return 0;
 }
 
+#if (defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE))
+static bool ev_btn_status = false;
+static bool fts_ts_irq_active = false;
+static void fts_ts_irq_handler(int irq, bool active)
+{
+	if (active) {
+		if (!fts_ts_irq_active) {
+			enable_irq_wake(irq);
+			fts_ts_irq_active = true;
+		}
+	} else {
+		if (fts_ts_irq_active) {
+			disable_irq_wake(irq);
+			fts_ts_irq_active = false;
+		}
+	}
+}
+#endif
+
 static int fts_ts_suspend(struct device *dev)
 {
 	int ret = 0;
 	struct fts_ts_data *ts_data = fts_data;
+#if (defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE))
+	int i = 0;
+#endif
 
 	FTS_FUNC_ENTER();
 	if (ts_data->suspended) {
@@ -3095,6 +3126,31 @@ static int fts_ts_suspend(struct device *dev)
 		FTS_INFO("fw upgrade in process, can't suspend");
 		return 0;
 	}
+
+#if (defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) && !defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE))
+	if (dt2w_switch > 0 && !gesture_incall) {
+#elif (defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) && !defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE))
+	if (s2w_switch == 1 && !gesture_incall) {
+#elif (defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) && defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE))
+	if ((dt2w_switch > 0 || s2w_switch == 1) &&
+		!gesture_incall) {
+#endif
+#if (defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE))
+		if (!ev_btn_status) {
+			/* release all touches */
+			for (i = 0; i < ts_data->pdata->max_touch_number; i++) {
+				input_mt_slot(ts_data->input_dev, i);
+				input_mt_report_slot_state(ts_data->input_dev, MT_TOOL_FINGER, 0);
+			}
+			input_mt_report_pointer_emulation(ts_data->input_dev, false);
+			__clear_bit(BTN_TOUCH, ts_data->input_dev->keybit);
+			input_sync(ts_data->input_dev);
+			ev_btn_status = true;
+		}
+		fts_ts_irq_handler(ts_data->client->irq, true);
+		return 0;
+	}
+#endif
 
 #ifdef CONFIG_FTS_TRUSTED_TOUCH
 	if (atomic_read(&fts_data->trusted_touch_transition)
@@ -3151,6 +3207,23 @@ static int fts_ts_resume(struct device *dev)
 		FTS_DEBUG("Already in awake state");
 		return 0;
 	}
+
+#if (defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) && !defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE))
+	if (dt2w_switch > 0) {
+#elif (defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE) && !defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE))
+	if (s2w_switch == 1) {
+#elif (defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) && defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE))
+	if (dt2w_switch > 0 || s2w_switch == 1) {
+#endif
+#if (defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE))
+		if (ev_btn_status) {
+			__set_bit(BTN_TOUCH, ts_data->input_dev->keybit);
+			input_sync(ts_data->input_dev);
+			ev_btn_status = false;
+		}
+		fts_ts_irq_handler(ts_data->client->irq, false);
+	}
+#endif
 
 #ifdef CONFIG_FTS_TRUSTED_TOUCH
 
