@@ -4,10 +4,14 @@
 #include <linux/device.h>
 #include <linux/module.h>
 #include <linux/sysctl.h>
+#if IS_ENABLED(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE)
+#include <linux/input/doubletap2wake.h>
+#endif
 #include <xiaomi-msm8937/touchscreen.h>
 
 struct xiaomi_msm8937_touchscreen_operations_t *xiaomi_msm8937_touchscreen_operations;
 
+static bool use_software_dt2w = false;
 static int xiaomi_msm8937_touchscreen_enable_dt2w_val = -1;
 static int xiaomi_msm8937_touchscreen_disable_keys_val = -1;
 
@@ -47,9 +51,19 @@ static int xiaomi_msm8937_touchscreen_toggle_enable_dt2w(struct ctl_table *table
 	if (rc == 0 && write && *valp != old_val) {
 		switch (*valp) {
 			case 0:
+#if IS_ENABLED(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE)
+				if (use_software_dt2w)
+					dt2w_switch = 0;
+				else
+#endif
 				rc = xiaomi_msm8937_touchscreen_operations->enable_dt2w(xiaomi_msm8937_touchscreen_operations->dev, false);
 				break;
 			case 1:
+#if IS_ENABLED(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE)
+				if (use_software_dt2w)
+					dt2w_switch = 1;
+				else
+#endif
 				rc = xiaomi_msm8937_touchscreen_operations->enable_dt2w(xiaomi_msm8937_touchscreen_operations->dev, true);
 				break;
 			default:
