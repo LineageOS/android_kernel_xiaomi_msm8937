@@ -311,6 +311,9 @@ static int msm_usb_psy_probe(struct platform_device *pdev)
 		goto err_undo_extcon_register;
 	}
 
+	if (data->pdata->dpdm_always_on)
+		msm_usb_psy_set_dp_dm(data, POWER_SUPPLY_DP_DM_DPF_DMF);
+
 	dev_info(data->dev, "probed successfully!\n");
 	return 0;
 
