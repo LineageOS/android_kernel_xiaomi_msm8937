@@ -446,7 +446,7 @@ int fts_esdcheck_init(struct fts_ts_data *ts_data)
 
 	memset((u8 *)&fts_esdcheck_data, 0, sizeof(struct fts_esdcheck_st));
 
-	fts_esdcheck_data.mode = ENABLE;
+	fts_esdcheck_data.mode = ts_data->pdata->esdcheck;
 	fts_esdcheck_data.intr = 0;
 	fts_esdcheck_data.intr_cnt = 0;
 	fts_create_esd_sysfs(ts_data->dev);
