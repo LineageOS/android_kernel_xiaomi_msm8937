@@ -1571,14 +1571,14 @@ static int fts_get_ic_information(struct fts_ts_data *ts_data)
 		ret = fts_read_reg(FTS_REG_CHIP_ID, &chip_id[0]);
 		ret = fts_read_reg(FTS_REG_CHIP_ID2, &chip_id[1]);
 		if ((ret < 0) || (0x0 == chip_id[0]) || (0x0 == chip_id[1])) {
-			FTS_DEBUG("i2c read invalid, read:0x%02x%02x",
+			FTS_ERROR("i2c read invalid, read:0x%02x%02x",
 				chip_id[0], chip_id[1]);
 		} else {
 			ret = fts_get_chip_types(ts_data, chip_id[0], chip_id[1], VALID);
 			if (!ret)
 				break;
 			else
-				FTS_DEBUG("TP not ready, read:0x%02x%02x",
+				FTS_ERROR("TP not ready, read:0x%02x%02x",
 						chip_id[0], chip_id[1]);
 		}
 
