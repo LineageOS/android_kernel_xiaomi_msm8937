@@ -7,6 +7,7 @@
 		compatible = "focaltech,fts_ts-mi8937";
 		focaltech,ic-type = <0x54350402>; // _FT5435
 		focaltech,key-y-coords = <1350 1350 1350>;
+		focaltech,esd-check;
 #else
 		compatible = "focaltech,ft5435";
 #endif
