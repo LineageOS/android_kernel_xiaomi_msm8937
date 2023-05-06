@@ -1569,8 +1569,10 @@ static int fts_get_ic_information(struct fts_ts_data *ts_data)
 
 	do {
 		ret = fts_read_reg(FTS_REG_CHIP_ID, &chip_id[0]);
-		ret = fts_read_reg(FTS_REG_CHIP_ID2, &chip_id[1]);
-		if ((ret < 0) || (0x0 == chip_id[0]) || (0x0 == chip_id[1])) {
+		ret |= fts_read_reg(FTS_REG_CHIP_ID2, &chip_id[1]);
+		if (ret < 0) {
+			FTS_ERROR("i2c read error, ret=%d", ret);
+		} else if ((0x0 == chip_id[0]) || (0x0 == chip_id[1])) {
 			FTS_ERROR("i2c read invalid, read:0x%02x%02x",
 				chip_id[0], chip_id[1]);
 		} else {
