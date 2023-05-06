@@ -1481,6 +1481,25 @@ void fts_hid2std(void)
 
 }
 
+static void fts_fill_empty_chip_types(
+	struct fts_ts_data *ts_data,
+	u8 id_h, u8 id_l)
+{
+	struct ft_chip_t ctype;
+
+	ctype.type = 0;
+	ctype.chip_idh = id_h;
+	ctype.chip_idl = id_l;
+	ctype.rom_idh = 0;
+	ctype.rom_idl = 0;
+	ctype.pb_idh = 0;
+	ctype.pb_idl = 0;
+	ctype.bl_idh = 0;
+	ctype.bl_idl = 0;
+
+	ts_data->ic_info.ids = ctype;
+}
+
 static int fts_get_chip_types(
 	struct fts_ts_data *ts_data,
 	u8 id_h, u8 id_l, bool fw_valid)
@@ -1572,6 +1591,10 @@ static int fts_get_ic_information(struct fts_ts_data *ts_data)
 		ret |= fts_read_reg(FTS_REG_CHIP_ID2, &chip_id[1]);
 		if (ret < 0) {
 			FTS_ERROR("i2c read error, ret=%d", ret);
+		} else if (ts_data->pdata->ignore_id_check) {
+			FTS_INFO("Ignore ID check");
+			fts_fill_empty_chip_types(ts_data, chip_id[0], chip_id[1]);
+			break;
 		} else if ((0x0 == chip_id[0]) || (0x0 == chip_id[1])) {
 			FTS_ERROR("i2c read invalid, read:0x%02x%02x",
 				chip_id[0], chip_id[1]);
@@ -2633,6 +2656,7 @@ static int fts_parse_dt(struct device *dev, struct fts_ts_platform_data *pdata)
 		pdata->type = temp_val;
 
 	pdata->esdcheck = of_property_read_bool(np, "focaltech,esd-check");
+	pdata->ignore_id_check = of_property_read_bool(np, "focaltech,ignore-id-check");
 
 	FTS_FUNC_EXIT();
 	return 0;
