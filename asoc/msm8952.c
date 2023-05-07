@@ -48,14 +48,6 @@ enum btsco_rates {
 	RATE_16KHZ_ID,
 };
 
-/* dummy definition of deprecated FE DAI's*/
-enum {
-	MSM_FRONTEND_DAI_CS_VOICE = 39,
-	MSM_FRONTEND_DAI_VOICE2,
-	MSM_FRONTEND_DAI_VOLTE,
-	MSM_FRONTEND_DAI_VOWLAN,
-};
-
 static int msm8952_auxpcm_rate = 8000;
 static int msm_btsco_rate = BTSCO_RATE_8KHZ;
 static int msm_btsco_ch = 1;

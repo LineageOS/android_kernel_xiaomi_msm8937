@@ -21,14 +21,6 @@
 
 #define DEV_NAME_STR_LEN            32
 
-/* dummy definition of below deprecated FE DAI's*/
-enum {
-	MSM_FRONTEND_DAI_CS_VOICE = 39,
-	MSM_FRONTEND_DAI_VOICE2,
-	MSM_FRONTEND_DAI_VOLTE,
-	MSM_FRONTEND_DAI_VOWLAN,
-};
-
 enum TASHA_LITE_DEVICE {
 	MSM8952_TASHA_LITE = 0,
 	MSM8953_TASHA_LITE,
