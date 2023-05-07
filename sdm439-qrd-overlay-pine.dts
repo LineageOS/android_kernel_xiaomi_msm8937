@@ -12,9 +12,6 @@
  * GNU General Public License for more details.
  */
 
-/dts-v1/;
-/plugin/;
-
 #include "qcom/sdm439-qrd.dtsi"
 
 #include "dtbo/common/common.dtsi"
