@@ -1,0 +1,55 @@
+/* From stock msm8937-pinctrl.dtsi */
+&i2c_5_sleep {
+	config {
+		bias-disable;
+	};
+};
+&tlmm {
+	fm_pin {
+		fm_on: gpio_on {
+			mux {
+				pins = "gpio87";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio87";
+				drive-strength = <2>;
+				bias-disable;
+			};
+		};
+
+		fm_off: gpio_off {
+			mux {
+				pins = "gpio87";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio87";
+				drive-strength = <2>;
+				bias-disable;
+			};
+		};
+	};
+};
+&cam_sensor_mclk0_default {
+	config {
+		drive-strength = <4>;
+	};
+};
+&cam_sensor_mclk0_sleep {
+	config {
+		drive-strength = <4>;
+	};
+};
+&cam_sensor_mclk2_default {
+	config {
+		drive-strength = <4>;
+	};
+};
+&cam_sensor_mclk2_sleep {
+	config {
+		drive-strength = <4>;
+	};
+};

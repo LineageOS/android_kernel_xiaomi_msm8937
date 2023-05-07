@@ -1,10 +1,8 @@
 dtbo-$(CONFIG_ARCH_SDM439) += sdm439-qrd-overlay-pine.dtbo
-sdm439-qrd-overlay-pine.dtbo-base := sdm439-pine.dtb \
-	msm8937-interposer-sdm439-pine.dtb
+sdm439-qrd-overlay-pine.dtbo-base := sdm439-pine.dtb
 
 #dtbo-$(CONFIG_ARCH_SDM439) += sdm439-qrd-olive-overlay.dtbo
-#sdm439-qrd-olive-overlay.dtbo-base := sdm439-olive.dtb \
-#	msm8937-interposer-sdm439-olive.dtb
+#sdm439-qrd-olive-overlay.dtbo-base := sdm439-olive.dtb
 
 always		:= $(dtb-y)
 subdir-y	:= $(dts-dirs)
