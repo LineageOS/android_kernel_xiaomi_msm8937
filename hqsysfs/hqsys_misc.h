@@ -37,7 +37,7 @@
 #include <linux/atomic.h>
 #include <linux/ctype.h>
 
-#include <linux/hqsysfs.h>
+#include <xiaomi-sdm439/hqsysfs.h>
 
 #define qcom_emmc "/sys/class/mmc_host/mmc0/mmc0:0001/block/mmcblk0/size"
 #define qcom_emmc_len  16

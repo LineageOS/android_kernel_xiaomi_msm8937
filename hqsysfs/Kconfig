@@ -1,4 +1,4 @@
-config HQ_SYSFS_SUPPORT
+config HQ_SYSFS_SUPPORT_MI439
   bool "Enable Huaqin Sysfs Driver"
   default n
   help

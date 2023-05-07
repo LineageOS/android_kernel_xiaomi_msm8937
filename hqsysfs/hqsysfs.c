@@ -12,7 +12,7 @@
  * GNU General Public License for more details.
  */
 
-#include <linux/hqsysfs.h>
+#include <xiaomi-sdm439/hqsysfs.h>
 #include <linux/qpnp/qpnp-revid.h>
 #include "hqsys_misc.h"
 #include "hqsys_pcba.h"
