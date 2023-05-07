@@ -25,5 +25,3 @@
 	qcom,pmic-id = <0x010016 0x25 0x0 0x0>;
 	qcom.pmic-name = "PMI632";
 };
-
-/include/ "sdm439-qrd-overlay-pine.dts"
