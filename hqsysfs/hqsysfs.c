@@ -17,6 +17,29 @@
 #include "hqsys_misc.h"
 #include "hqsys_pcba.h"
 
+struct hw_info{
+	enum xiaomi_sdm439_hardware_id hw_id;
+	struct attribute attr;
+	unsigned int hw_exist;
+//	const char *hw_type_name;
+	char *hw_device_name;
+};
+
+#define __INFO(_id, _hw_type_name) {				\
+		.hw_id = _id,				\
+		.attr = {.name = __stringify(_hw_type_name),				\
+		.mode = VERIFY_OCTAL_PERMISSIONS(S_IWUSR|S_IRUGO) },		\
+		.hw_exist	= 0,						\
+		.hw_device_name	= NULL,						\
+	}
+
+#define HW_INFO(_id, _hw_type_name) \
+	struct hw_info hw_info_##_hw_type_name = __INFO(_id, _hw_type_name)
+
+#define HUAQIN_CLASS_NAME       "huaqin"
+#define HUAIN_INTERFACE_NAME	"interface"
+#define HUAQIN_HWID_NAME        "hw_info"
+
 #define HQ_SYS_FS_VER "2016-03-11 V0.2"
 #define RETURNERR -1
 #define SNPRINTF_MAXLEN 1024

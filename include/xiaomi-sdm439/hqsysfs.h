@@ -35,11 +35,6 @@
 #endif
 #include <linux/atomic.h>
 
-
-
-
-#define MAX_HW_DEVICE_NAME (64)
-
 enum xiaomi_sdm439_hardware_id{
 	HWID_NONE = 0x00,
 	HWID_DDR = 0x10,
@@ -93,40 +88,8 @@ enum xiaomi_sdm439_hardware_id{
 	HWID_END
 };
 
-
-struct hw_info{
-	enum xiaomi_sdm439_hardware_id hw_id;
-	struct attribute attr;
-	unsigned int hw_exist;
-//	const char *hw_type_name;
-	char *hw_device_name;
-};
-
-
-#define __INFO(_id, _hw_type_name) {				\
-		.hw_id = _id,				\
-		.attr = {.name = __stringify(_hw_type_name),				\
-		.mode = VERIFY_OCTAL_PERMISSIONS(S_IWUSR|S_IRUGO) },		\
-		.hw_exist	= 0,						\
-		.hw_device_name	= NULL,						\
-	}
-
-
-#define HW_INFO(_id, _hw_type_name) \
-	struct hw_info hw_info_##_hw_type_name = __INFO(_id, _hw_type_name)
-
-
-
-#define HUAQIN_CLASS_NAME       "huaqin"
-#define HUAIN_INTERFACE_NAME	"interface"
-#define HUAQIN_HWID_NAME        "hw_info"
-#define HUAQIN_VERSION_FILE		"hw_info_ver"
-
-
-
 int xiaomi_sdm439_hq_regiser_hw_info(enum xiaomi_sdm439_hardware_id id, char *device_name);
 int xiaomi_sdm439_hq_deregister_hw_info(enum xiaomi_sdm439_hardware_id id, char *device_name);
 int xiaomi_sdm439_register_kboj_under_hqsysfs(struct kobject *kobj, struct kobj_type *ktype, const char *fmt, ...);
-
 
 #endif
