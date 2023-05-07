@@ -43,28 +43,28 @@ struct hw_info{
 #define HQ_SYS_FS_VER "2016-03-11 V0.2"
 #define RETURNERR -1
 #define SNPRINTF_MAXLEN 1024
-static HW_INFO(HWID_VER, ver);
-static HW_INFO(HWID_SUMMARY, hw_summary);
-static HW_INFO(HWID_DDR, ram);
-static HW_INFO(HWID_EMMC, emmc);
-static HW_INFO(HWID_LCM, lcm);
-//static HW_INFO(HWID_BIAS_IC, lcm_bias_ic);
-static HW_INFO(HWID_CTP, ctp);
-static HW_INFO(HWID_MAIN_CAM, main_cam);
-static HW_INFO(HWID_MAIN_CAM_2, main_cam_2);
-static HW_INFO(HWID_MAIN_LENS, main_cam_len);
-static HW_INFO(HWID_FLASHLIGHT, flashlight);
-static HW_INFO(HWID_SUB_CAM, sub_cam);
-static HW_INFO(HWID_GSENSOR, gsensor);
-static HW_INFO(HWID_ALSPS, alsps);
-static HW_INFO(HWID_MSENSOR, msensor);
-static HW_INFO(HWID_GYRO, gyro);
-static HW_INFO(HWID_IRDA, irda);
-static HW_INFO(HWID_FUEL_GAUGE_IC, fuel_gauge_ic);
-static HW_INFO(HWID_NFC, nfc);
-static HW_INFO(HWID_FP, fingerprint);
-//static HW_INFO(HWID_TEE, tee);
-static HW_INFO(HWID_PCBA, pcba_config);
+static HW_INFO(XIAOMI_SDM439_HWID_VER, ver);
+static HW_INFO(XIAOMI_SDM439_HWID_SUMMARY, hw_summary);
+static HW_INFO(XIAOMI_SDM439_HWID_DDR, ram);
+static HW_INFO(XIAOMI_SDM439_HWID_EMMC, emmc);
+static HW_INFO(XIAOMI_SDM439_HWID_LCM, lcm);
+//static HW_INFO(XIAOMI_SDM439_HWID_BIAS_IC, lcm_bias_ic);
+static HW_INFO(XIAOMI_SDM439_HWID_CTP, ctp);
+static HW_INFO(XIAOMI_SDM439_HWID_MAIN_CAM, main_cam);
+static HW_INFO(XIAOMI_SDM439_HWID_MAIN_CAM_2, main_cam_2);
+static HW_INFO(XIAOMI_SDM439_HWID_MAIN_LENS, main_cam_len);
+static HW_INFO(XIAOMI_SDM439_HWID_FLASHLIGHT, flashlight);
+static HW_INFO(XIAOMI_SDM439_HWID_SUB_CAM, sub_cam);
+static HW_INFO(XIAOMI_SDM439_HWID_GSENSOR, gsensor);
+static HW_INFO(XIAOMI_SDM439_HWID_ALSPS, alsps);
+static HW_INFO(XIAOMI_SDM439_HWID_MSENSOR, msensor);
+static HW_INFO(XIAOMI_SDM439_HWID_GYRO, gyro);
+static HW_INFO(XIAOMI_SDM439_HWID_IRDA, irda);
+static HW_INFO(XIAOMI_SDM439_HWID_FUEL_GAUGE_IC, fuel_gauge_ic);
+static HW_INFO(XIAOMI_SDM439_HWID_NFC, nfc);
+static HW_INFO(XIAOMI_SDM439_HWID_FP, fingerprint);
+//static HW_INFO(XIAOMI_SDM439_HWID_TEE, tee);
+static HW_INFO(XIAOMI_SDM439_HWID_PCBA, pcba_config);
 
 
 static struct pcba_info pcba[] = {
@@ -165,9 +165,9 @@ static ssize_t huaqin_show(struct kobject *kobj, struct attribute *a, char *buf)
 		return snprintf(buf, SNPRINTF_MAXLEN, "Data error\n");
 	}
 
-	if (HWID_VER == hw->hw_id) {
+	if (XIAOMI_SDM439_HWID_VER == hw->hw_id) {
 		count = snprintf(buf, SNPRINTF_MAXLEN, "%s\n", HQ_SYS_FS_VER);
-	} else if (HWID_SUMMARY == hw->hw_id) {
+	} else if (XIAOMI_SDM439_HWID_SUMMARY == hw->hw_id) {
 		//iterate all device and output the detail
 		int iterator = 0;
 		struct hw_info *curent_hw = NULL;
@@ -183,7 +183,7 @@ static ssize_t huaqin_show(struct kobject *kobj, struct attribute *a, char *buf)
 			}
 		}
 
-	} else if (HWID_PCBA == hw->hw_id) {
+	} else if (XIAOMI_SDM439_HWID_PCBA == hw->hw_id) {
 
 		if (xiaomi_sdm439_get_huaqin_pcba_config() > PCBA_UNKNOW && xiaomi_sdm439_get_huaqin_pcba_config() < PCBA_END) {
 			huaqin_pcba_config = xiaomi_sdm439_get_huaqin_pcba_config();
@@ -385,10 +385,10 @@ int xiaomi_sdm439_hq_regiser_hw_info(enum xiaomi_sdm439_hardware_id id, char *de
 			}
 
 			switch (hw->hw_id) {
-			case HWID_MAIN_CAM:
-			case HWID_SUB_CAM:
-			case HWID_MAIN_CAM_2:
-			case HWID_SUB_CAM_2:
+			case XIAOMI_SDM439_HWID_MAIN_CAM:
+			case XIAOMI_SDM439_HWID_SUB_CAM:
+			case XIAOMI_SDM439_HWID_MAIN_CAM_2:
+			case XIAOMI_SDM439_HWID_SUB_CAM_2:
 				/*
 			if(map_cam_drv_to_vendor(device_name))
 				hw->hw_device_name = map_cam_drv_to_vendor(device_name);
