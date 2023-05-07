@@ -23,7 +23,7 @@ MISC_INFO(MISC_OTP_SN, otp_sn);
 extern unsigned int msdc_get_capacity(int get_emmc_total);
 extern char *get_emmc_name(void);
 
-unsigned int round_kbytes_to_readable_mbytes(unsigned int k)
+static unsigned int round_kbytes_to_readable_mbytes(unsigned int k)
 {
 	unsigned int r_size_m = 0;
 	unsigned int in_mega = k/1024;
@@ -58,7 +58,7 @@ unsigned int round_kbytes_to_readable_mbytes(unsigned int k)
 	return r_size_m;
 }
 
-ssize_t hq_emmcinfo(char *buf)
+static ssize_t hq_emmcinfo(char *buf)
 {
 	ssize_t count = -1;
 	struct file *pfile = NULL;

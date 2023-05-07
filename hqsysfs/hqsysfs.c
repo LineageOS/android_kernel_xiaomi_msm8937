@@ -45,7 +45,7 @@ static HW_INFO(HWID_PCBA, pcba_config);
 static HW_INFO(HWID_PMIC, pmic_verison);
 
 
-struct pcba_info pcba[] = {
+static struct pcba_info pcba[] = {
 	{PCBA_UNKNOW, "PCBA_UNKNOW"},
 	{PCBA_OLIVE_P0_1_CN, "PCBA_OLIVE_P0_1_CN"},
 	{PCBA_OLIVE_P0_1_GLOBAL_B28, "PCBA_OLIVE_P0_1_GLOBAL_B28"},

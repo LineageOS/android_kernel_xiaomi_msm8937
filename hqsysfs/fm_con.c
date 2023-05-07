@@ -14,8 +14,8 @@
 #include <linux/err.h>
 #include <linux/regulator/consumer.h>
 
-int fm_lan_enable_pin = -1;
-int gpio_flag = -1;
+static int fm_lan_enable_pin = -1;
+static int gpio_flag = -1;
 static struct class *fm_lan_enable_class;
 static struct device *fm_lan_enable_dev;
 
