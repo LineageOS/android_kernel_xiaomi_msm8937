@@ -11835,6 +11835,14 @@ static const struct snd_kcontrol_new quat_tdm_rx_2_voice_mixer_controls[] = {
 };
 
 static const struct snd_kcontrol_new stub_rx_mixer_controls[] = {
+	SOC_DOUBLE_EXT("VoiceMMode1", SND_SOC_NOPM,
+	MSM_BACKEND_DAI_EXTPROC_RX,
+	MSM_FRONTEND_DAI_VOICEMMODE1, 1, 0, msm_routing_get_voice_mixer,
+	msm_routing_put_voice_mixer),
+	SOC_DOUBLE_EXT("VoiceMMode2", SND_SOC_NOPM,
+	MSM_BACKEND_DAI_EXTPROC_RX,
+	MSM_FRONTEND_DAI_VOICEMMODE2, 1, 0, msm_routing_get_voice_mixer,
+	msm_routing_put_voice_mixer),
 	SOC_DOUBLE_EXT("Voice Stub", SND_SOC_NOPM, MSM_BACKEND_DAI_EXTPROC_RX,
 	MSM_FRONTEND_DAI_VOICE_STUB, 1, 0, msm_routing_get_voice_stub_mixer,
 	msm_routing_put_voice_stub_mixer),
@@ -11847,6 +11855,14 @@ static const struct snd_kcontrol_new stub_rx_mixer_controls[] = {
 };
 
 static const struct snd_kcontrol_new slimbus_1_rx_mixer_controls[] = {
+	SOC_DOUBLE_EXT("VoiceMMode1", SND_SOC_NOPM,
+	MSM_BACKEND_DAI_SLIMBUS_1_RX,
+	MSM_FRONTEND_DAI_VOICEMMODE1, 1, 0, msm_routing_get_voice_mixer,
+	msm_routing_put_voice_mixer),
+	SOC_DOUBLE_EXT("VoiceMMode2", SND_SOC_NOPM,
+	MSM_BACKEND_DAI_SLIMBUS_1_RX,
+	MSM_FRONTEND_DAI_VOICEMMODE2, 1, 0, msm_routing_get_voice_mixer,
+	msm_routing_put_voice_mixer),
 	SOC_DOUBLE_EXT("Voice Stub", SND_SOC_NOPM, MSM_BACKEND_DAI_SLIMBUS_1_RX,
 	MSM_FRONTEND_DAI_VOICE_STUB, 1, 0, msm_routing_get_voice_stub_mixer,
 	msm_routing_put_voice_stub_mixer),
@@ -11859,6 +11875,14 @@ static const struct snd_kcontrol_new slimbus_1_rx_mixer_controls[] = {
 };
 
 static const struct snd_kcontrol_new slimbus_3_rx_mixer_controls[] = {
+	SOC_DOUBLE_EXT("VoiceMMode1", SND_SOC_NOPM,
+	MSM_BACKEND_DAI_SLIMBUS_3_RX,
+	MSM_FRONTEND_DAI_VOICEMMODE1, 1, 0, msm_routing_get_voice_mixer,
+	msm_routing_put_voice_mixer),
+	SOC_DOUBLE_EXT("VoiceMMode2", SND_SOC_NOPM,
+	MSM_BACKEND_DAI_SLIMBUS_3_RX,
+	MSM_FRONTEND_DAI_VOICEMMODE2, 1, 0, msm_routing_get_voice_mixer,
+	msm_routing_put_voice_mixer),
 	SOC_DOUBLE_EXT("Voice Stub", SND_SOC_NOPM, MSM_BACKEND_DAI_SLIMBUS_3_RX,
 	MSM_FRONTEND_DAI_VOICE_STUB, 1, 0, msm_routing_get_voice_stub_mixer,
 	msm_routing_put_voice_stub_mixer),
@@ -21112,14 +21136,22 @@ static const struct snd_soc_dapm_route intercon[] = {
 	{"Voice2 Stub Tx Mixer", "QUAT_MI2S_TX", "QUAT_MI2S_TX"},
 	{"VOICE2_STUB_UL", NULL, "Voice2 Stub Tx Mixer"},
 
+	{"STUB_RX Mixer", "VoiceMMode1", "VOICEMMODE1_DL"},
+	{"STUB_RX Mixer", "VoiceMMode2", "VOICEMMODE2_DL"},
 	{"STUB_RX Mixer", "Voice Stub", "VOICE_STUB_DL"},
 	{"STUB_RX Mixer", "Voice2 Stub", "VOICE2_STUB_DL"},
 	{"STUB_RX Mixer", "VoLTE Stub", "VOLTE_STUB_DL"},
 	{"STUB_RX", NULL, "STUB_RX Mixer"},
+
+	{"SLIMBUS_1_RX Mixer", "VoiceMMode1", "VOICEMMODE1_DL"},
+	{"SLIMBUS_1_RX Mixer", "VoiceMMode2", "VOICEMMODE2_DL"},
 	{"SLIMBUS_1_RX Mixer", "Voice Stub", "VOICE_STUB_DL"},
 	{"SLIMBUS_1_RX Mixer", "Voice2 Stub", "VOICE2_STUB_DL"},
 	{"SLIMBUS_1_RX Mixer", "VoLTE Stub", "VOLTE_STUB_DL"},
 	{"SLIMBUS_1_RX", NULL, "SLIMBUS_1_RX Mixer"},
+
+	{"SLIMBUS_3_RX_Voice Mixer", "VoiceMMode1", "VOICEMMODE1_DL"},
+	{"SLIMBUS_3_RX_Voice Mixer", "VoiceMMode2", "VOICEMMODE2_DL"},
 	{"AFE_PCM_RX_Voice Mixer", "Voice Stub", "VOICE_STUB_DL"},
 	{"AFE_PCM_RX_Voice Mixer", "Voice2 Stub", "VOICE2_STUB_DL"},
 	{"AFE_PCM_RX_Voice Mixer", "VoLTE Stub", "VOLTE_STUB_DL"},
