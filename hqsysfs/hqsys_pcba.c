@@ -16,6 +16,8 @@ static PCBA_CONFIG huaqin_pcba_config;
 
 //struct qpnp_vadc_chip *pcba_vadc;
 
+extern void xiaomi_sdm439_mach_notify_hq_pcba_config(PCBA_CONFIG hq_pcba);
+
 static void read_pcba_config_form_smem(void)
 {
 	PCBA_CONFIG *pcba_config = NULL;
@@ -32,6 +34,8 @@ static void read_pcba_config_form_smem(void)
 
 		huaqin_pcba_config = PCBA_UNKNOW;
 	}
+
+	xiaomi_sdm439_mach_notify_hq_pcba_config(huaqin_pcba_config);
 }
 
 PCBA_CONFIG xiaomi_sdm439_get_huaqin_pcba_config(void)
