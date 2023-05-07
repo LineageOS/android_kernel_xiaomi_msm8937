@@ -1,0 +1,75 @@
+&pmi632_charger {
+	qcom,flash-disable-soc = <5>;
+};
+
+&pmi632_qg {
+	qcom,qg-iterm-ma = <350>;
+};
+
+&pmi632_vib {
+	qcom,vib-ldo-volt-uv = <2800000>;
+};
+
+&pmi632_lcdb {
+	qcom,ttw-enable;
+};
+
+&lcdb_ldo_vreg {
+	regulator-min-microvolt = <6000000>;
+};
+
+&lcdb_ncp_vreg {
+	regulator-min-microvolt = <6000000>;
+};
+
+&pmi632_flash0 {
+	qcom,max-current = <1500>;
+	qcom,current-ma = <1200>;
+};
+
+&pmi632_flash1 {
+	qcom,current-ma = <1200>;
+};
+
+&pmi632_torch0 {
+	qcom,max-current = <120>;
+};
+
+&pmi632_torch1 {
+	qcom,current-ma = <300>;
+};
+
+&led_flash0 {
+	qcom,flash-source = <&pmi632_flash0 &pmi632_flash1>;
+	qcom,torch-source = <&pmi632_torch0 &pmi632_torch1>;
+};
+
+&mtp_batterydata {
+	/delete-node/ qcom,peony-gy-4000mah;
+	/delete-node/ qcom,peony-nvt-4000mah;
+	/delete-node/ qcom,peony-swd-4000mah;
+	/delete-node/ qcom,peony-default-4000mah;
+	#include "batterydata/Olive-SWD-5000mah-330kohm.dtsi"
+	#include "batterydata/Olive-GY-5000mah-100kohm.dtsi"
+	#include "batterydata/Olive-Default-5000mah-330kohm.dtsi"
+};
+
+&quiet_batt_439_trip1 {
+	temperature = <37000>;
+};
+
+&quiet_batt_439_trip2 {
+	temperature = <38000>;
+};
+
+&quiet_batt_439_trip3 {
+	temperature = <40000>;
+};
+
+&quiet_batt_439_trip4 {
+	temperature = <43000>;
+};
+
+&quiet_batt_439_trip5 {
+	temperature = <48000>;
+};

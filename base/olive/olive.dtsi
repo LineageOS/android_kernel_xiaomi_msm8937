@@ -1,0 +1,8 @@
+#include "audio.dtsi"
+#include "ir.dtsi"
+#include "misc.dtsi"
+#include "pinctrl.dtsi"
+#include "pmi632.dtsi"
+#include "regulator.dtsi"
+#include "soc.dtsi"
+#include "touchscreen.dtsi"

@@ -1,0 +1,11 @@
+/* ERROR: Label or path pm8937_l19 not found
+&pm8937_l19 {
+	regulator-min-microvolt = <1350000>;
+	regulator-max-microvolt = <1350000>;
+};
+*/
+
+&pm8953_l19 {
+	regulator-min-microvolt = <1350000>;
+	regulator-max-microvolt = <1350000>;
+};

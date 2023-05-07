@@ -1,0 +1,7 @@
+&i2c_2 {
+	/delete-node/ aw87329@58;
+};
+
+&wsa881x_i2c_45 {
+	status = "disabled";
+};
