@@ -20,9 +20,6 @@ MISC_INFO(MISC_RAM_SIZE, ram_size);
 MISC_INFO(MISC_BOOT_MODE, boot_mode);
 MISC_INFO(MISC_OTP_SN, otp_sn);
 
-extern unsigned int msdc_get_capacity(int get_emmc_total);
-extern char *get_emmc_name(void);
-
 static unsigned int round_kbytes_to_readable_mbytes(unsigned int k)
 {
 	unsigned int r_size_m = 0;
@@ -141,7 +138,6 @@ static ssize_t hq_misc_show(struct kobject *kobj, struct attribute *a, char *buf
 			}
 			break;
 	case MISC_EMMC_SIZE:
-			//count = sprintf(buf,"%dGB",round_kbytes_to_readable_mbytes(msdc_get_capacity(1)/2)/1024);
 				count = hq_emmcinfo(buf);
 			break;
 	case MISC_OTP_SN:
