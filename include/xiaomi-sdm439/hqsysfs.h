@@ -84,7 +84,6 @@ enum xiaomi_sdm439_hardware_id{
 
 	HWID_SUMMARY = 0xF0,
 	HWID_VER,
-	HWID_PMIC,
 	HWID_END
 };
 

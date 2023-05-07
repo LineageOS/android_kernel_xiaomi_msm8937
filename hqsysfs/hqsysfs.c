@@ -65,7 +65,6 @@ static HW_INFO(HWID_NFC, nfc);
 static HW_INFO(HWID_FP, fingerprint);
 //static HW_INFO(HWID_TEE, tee);
 static HW_INFO(HWID_PCBA, pcba_config);
-static HW_INFO(HWID_PMIC, pmic_verison);
 
 
 static struct pcba_info pcba[] = {
@@ -153,7 +152,6 @@ static struct attribute *huaqin_attrs[] = {
 	&hw_info_fingerprint.attr,
 	&hw_info_pcba_config.attr,
 //	&hw_info_tee.attr,
-	&hw_info_pmic_verison.attr,
 	NULL
 };
 
@@ -204,8 +202,6 @@ static ssize_t huaqin_show(struct kobject *kobj, struct attribute *a, char *buf)
 
 		count = snprintf(buf, SNPRINTF_MAXLEN, "%s\n", "PCBA_UNKNOW");
 
-	} else if (HWID_PMIC == hw->hw_id) {
-		count = snprintf(buf, SNPRINTF_MAXLEN, "%s\n", hq_pmic_string);
 	} else {
 
 		if (0 == hw->hw_exist) {
