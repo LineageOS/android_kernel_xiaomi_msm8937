@@ -164,8 +164,8 @@ static ssize_t huaqin_show(struct kobject *kobj, struct attribute *a, char *buf)
 
 	} else if (HWID_PCBA == hw->hw_id) {
 
-		if (get_huaqin_pcba_config() > PCBA_UNKNOW && get_huaqin_pcba_config() < PCBA_END) {
-			huaqin_pcba_config = get_huaqin_pcba_config();
+		if (xiaomi_sdm439_get_huaqin_pcba_config() > PCBA_UNKNOW && xiaomi_sdm439_get_huaqin_pcba_config() < PCBA_END) {
+			huaqin_pcba_config = xiaomi_sdm439_get_huaqin_pcba_config();
 		} else {
 			huaqin_pcba_config = PCBA_UNKNOW;
 		}
@@ -220,7 +220,7 @@ static struct class  *huaqin_class;
 static struct device *huaqin_hw_device;
 
 
-int register_kboj_under_hqsysfs(struct kobject *kobj, struct kobj_type *ktype, const char *fmt, ...)
+int xiaomi_sdm439_register_kboj_under_hqsysfs(struct kobject *kobj, struct kobj_type *ktype, const char *fmt, ...)
 {
 	return kobject_init_and_add(kobj, ktype, &(huaqin_hw_device->kobj), fmt);
 }
@@ -252,7 +252,7 @@ static int __init create_sysfs(void)
 	return 0;
 }
 
-int hq_deregister_hw_info(enum hardware_id id, char *device_name)
+int xiaomi_sdm439_hq_deregister_hw_info(enum xiaomi_sdm439_hardware_id id, char *device_name)
 {
 	int ret = 0;
 	int find_hw_id = 0;
@@ -327,7 +327,7 @@ err:
 }
 
 
-int hq_regiser_hw_info(enum hardware_id id, char *device_name)
+int xiaomi_sdm439_hq_regiser_hw_info(enum xiaomi_sdm439_hardware_id id, char *device_name)
 {
 
 	int ret = 0;

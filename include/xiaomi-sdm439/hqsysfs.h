@@ -40,7 +40,7 @@
 
 #define MAX_HW_DEVICE_NAME (64)
 
-enum hardware_id{
+enum xiaomi_sdm439_hardware_id{
 	HWID_NONE = 0x00,
 	HWID_DDR = 0x10,
 	HWID_EMMC,
@@ -95,7 +95,7 @@ enum hardware_id{
 
 
 struct hw_info{
-	enum hardware_id hw_id;
+	enum xiaomi_sdm439_hardware_id hw_id;
 	struct attribute attr;
 	unsigned int hw_exist;
 //	const char *hw_type_name;
@@ -124,9 +124,9 @@ struct hw_info{
 
 
 
-int hq_regiser_hw_info(enum hardware_id id, char *device_name);
-int hq_deregister_hw_info(enum hardware_id id, char *device_name);
-int register_kboj_under_hqsysfs(struct kobject *kobj, struct kobj_type *ktype, const char *fmt, ...);
+int xiaomi_sdm439_hq_regiser_hw_info(enum xiaomi_sdm439_hardware_id id, char *device_name);
+int xiaomi_sdm439_hq_deregister_hw_info(enum xiaomi_sdm439_hardware_id id, char *device_name);
+int xiaomi_sdm439_register_kboj_under_hqsysfs(struct kobject *kobj, struct kobj_type *ktype, const char *fmt, ...);
 
 
 #endif

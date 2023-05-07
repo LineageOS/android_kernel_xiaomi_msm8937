@@ -34,11 +34,11 @@ static void read_pcba_config_form_smem(void)
 	}
 }
 
-PCBA_CONFIG get_huaqin_pcba_config(void)
+PCBA_CONFIG xiaomi_sdm439_get_huaqin_pcba_config(void)
 {
 	return huaqin_pcba_config;
 }
-EXPORT_SYMBOL_GPL(get_huaqin_pcba_config);
+EXPORT_SYMBOL_GPL(xiaomi_sdm439_get_huaqin_pcba_config);
 
 
 #if 0

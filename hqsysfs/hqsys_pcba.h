@@ -85,6 +85,6 @@ struct pcba_info {
 
 
 
-PCBA_CONFIG get_huaqin_pcba_config(void);
+PCBA_CONFIG xiaomi_sdm439_get_huaqin_pcba_config(void);
 
 #endif

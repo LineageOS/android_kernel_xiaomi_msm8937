@@ -236,7 +236,7 @@ static int __init create_misc(void)
 	int ret;
 
 	/* add kobject */
-	ret = register_kboj_under_hqsysfs(&hq_misc_kobj, &hq_misc_ktype, HUAQIN_MISC_NAME);
+	ret = xiaomi_sdm439_register_kboj_under_hqsysfs(&hq_misc_kobj, &hq_misc_ktype, HUAQIN_MISC_NAME);
 	if (ret < 0) {
 		pr_err("%s fail to add hq_misc_kobj\n", __func__);
 		return ret;
