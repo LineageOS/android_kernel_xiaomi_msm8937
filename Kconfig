@@ -1,0 +1,13 @@
+menu "Xiaomi SDM439 platform"
+	depends on ARCH_SDM439
+
+config MACH_XIAOMI_SDM439
+	bool "Support for Xiaomi SDM439 platform"
+	help
+	  Say Y here to enable support for Xiaomi SDM439 platform.
+
+if MACH_XIAOMI_SDM439
+
+endif # MACH_XIAOMI_SDM439
+
+endmenu
