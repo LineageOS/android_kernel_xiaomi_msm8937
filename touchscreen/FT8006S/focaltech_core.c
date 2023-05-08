@@ -46,7 +46,7 @@
 #define FTS_SUSPEND_LEVEL 1	/* Early-suspend level */
 #endif
 #include "focaltech_core.h"
-#include <linux/hqsysfs.h>
+#include <xiaomi-sdm439/hqsysfs.h>
 
 /*****************************************************************************
 * Private constant and macro definitions using #define
@@ -1377,7 +1377,7 @@ int ctp_hw_info(struct fts_ts_data *ts_data)
 
 	snprintf(tp_info_summary, sizeof(tp_info_summary), "%s:%d\n", FTS_VENDOR_INFO, fw_version);
 	FTS_INFO("%s", tp_info_summary);
-	hq_regiser_hw_info(HWID_CTP, tp_info_summary);
+	xiaomi_sdm439_hq_regiser_hw_info(XIAOMI_SDM439_HWID_CTP, tp_info_summary);
 
 
 	FTS_FUNC_EXIT();

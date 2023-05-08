@@ -743,7 +743,7 @@ info_retry:
 		fw_version = ts->fw_ver;
 		snprintf(nvt_info_summary, sizeof(nvt_info_summary), "%s:%d\n", NVT_VENDOR_INFO, fw_version);
 		NVT_LOG("%s", nvt_info_summary);
-		hq_regiser_hw_info(HWID_CTP, nvt_info_summary);
+		xiaomi_sdm439_hq_regiser_hw_info(XIAOMI_SDM439_HWID_CTP, nvt_info_summary);
 	}
 
 	NVT_LOG("FW type is 0x%02X\n", buf[14]);

@@ -878,7 +878,7 @@ out:
 
 	snprintf(ilk_info_summary, sizeof(ilk_info_summary), "%s:%d.%d.%d.%d\n", ILK_VENDOR_INFO, buf[1], buf[2], buf[3], buf[4]);
 	ipio_info("%s", ilk_info_summary);
-	hq_regiser_hw_info(HWID_CTP, ilk_info_summary);
+	xiaomi_sdm439_hq_regiser_hw_info(XIAOMI_SDM439_HWID_CTP, ilk_info_summary);
 
 	return ret;
 }

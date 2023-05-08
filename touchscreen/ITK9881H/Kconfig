@@ -1,4 +1,4 @@
-config TOUCHSCREEN_ITK9881H
+config TOUCHSCREEN_ITK9881H_MI439
 	bool "ITK9881H Touchscreen"
 	default n
 	help
