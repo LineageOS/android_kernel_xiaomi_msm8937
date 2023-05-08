@@ -817,7 +817,7 @@ extern void ilitek_dump_data(void *data, int type, int len, int row_len, const c
 extern u8 ilitek_calc_packet_checksum(u8 *packet, int len);
 extern void netlink_reply_msg(void *raw, int size);
 extern int katoi(char *str);
-extern void ilitek_call_resume_work(void);
+extern void xiaomi_sdm439_ilitek_call_resume_work(void);
 
 extern void ilitek_tddi_gesture_recovery(void);
 extern int ilitek_gesture_switch(struct input_dev *dev, unsigned int type, unsigned int code, int value);

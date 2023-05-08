@@ -753,7 +753,7 @@ int ilitek_tddi_init(void)
 	return 0;
 }
 
-void ilitek_call_resume_work(void)
+void xiaomi_sdm439_ilitek_call_resume_work(void)
 {
 	int ret = 0;
 	ipio_debug("resume schedule work start ... \n");
