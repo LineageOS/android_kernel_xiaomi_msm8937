@@ -207,7 +207,7 @@ static int dump_i2c_reg(struct ti_lmu_bl_chip *chip)
 	return 0;
 }
 
-int ti_hbm_set(enum xiaomi_sdm439_backlight_hbm_mode hbm_mode)
+int xiaomi_sdm439_ti_hbm_set(enum xiaomi_sdm439_backlight_hbm_mode hbm_mode)
 {
 	struct regmap *regmap = bl_chip->lmu->regmap;
 	int value = 0;
@@ -357,7 +357,7 @@ static int ti_lmu_backlight_update_brightness_register(struct ti_lmu_bl *lmu_bl,
 	return regmap_write(regmap, reg, val);
 }
 
-int lm3697_set_brightness(int brightness)
+int xiaomi_sdm439_lm3697_set_brightness(int brightness)
 {
 	pr_err("[bkl][before]%s brightness = %d\n", __func__, brightness);
 	return ti_lmu_backlight_update_brightness_register(bl_chip->lmu_bl, brightness);

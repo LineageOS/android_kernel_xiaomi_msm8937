@@ -604,7 +604,7 @@ void ktd3137_brightness_set_workfunc(struct ktd3137_chip *chip, int brightness)
 	ktd3137_read_reg(chip->client, 0x08, &value);
 }
 
-int ktd_hbm_set(enum xiaomi_sdm439_backlight_hbm_mode hbm_mode)
+int xiaomi_sdm439_ktd_hbm_set(enum xiaomi_sdm439_backlight_hbm_mode hbm_mode)
 {
 	u8 value = 0;
 	LOG_DBG("%s enter\n", __func__);
@@ -635,7 +635,7 @@ int ktd_hbm_set(enum xiaomi_sdm439_backlight_hbm_mode hbm_mode)
 #define LOWEST_BRIGHTNESS          8
 #endif
 
-int ktd3137_brightness_set(int brightness)
+int xiaomi_sdm439_ktd3137_brightness_set(int brightness)
 {
 	LOG_DBG("%s brightness = %d\n", __func__, brightness);
 #if defined(PROJECT_OLIVE) || defined(PROJECT_OLIVELITE) || defined(PROJECT_OLIVEWOOD)
