@@ -11,6 +11,8 @@ if MACH_XIAOMI_SDM439
 source "techpack/xiaomi-sdm439/hqsysfs/Kconfig"
 source "techpack/xiaomi-sdm439/mach/Kconfig"
 
+source "techpack/xiaomi-sdm439/backlight/Kconfig"
+
 endif # MACH_XIAOMI_SDM439
 
 endmenu
