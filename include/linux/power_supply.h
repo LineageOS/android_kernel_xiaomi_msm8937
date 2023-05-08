@@ -384,6 +384,9 @@ enum power_supply_property {
 	 * MODEL_NAME and SERIAL_NUMBER. Don't add below SERIAL_NUMBER.
 	 */
 	POWER_SUPPLY_PROP_SERIAL_NUMBER,
+	POWER_SUPPLY_PROP_BATTERY_ID,
+	POWER_SUPPLY_PROP_FVCOMP,
+	POWER_SUPPLY_PROP_HVDCP_TYPE3,
 };
 
 enum power_supply_type {

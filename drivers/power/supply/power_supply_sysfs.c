@@ -164,6 +164,11 @@ static ssize_t power_supply_show_property(struct device *dev,
 		ret = sprintf(buf, "%s\n",
 			      power_supply_status_text[value.intval]);
 		break;
+	case POWER_SUPPLY_PROP_HVDCP_TYPE3:
+	case POWER_SUPPLY_PROP_BATTERY_ID:
+	case POWER_SUPPLY_PROP_FVCOMP:
+		ret = sprintf(buf, "%d\n", value.intval);
+		break;
 	case POWER_SUPPLY_PROP_CHARGE_TYPE:
 		ret = sprintf(buf, "%s\n",
 			      power_supply_charge_type_text[value.intval]);
@@ -499,6 +504,9 @@ static struct device_attribute power_supply_attrs[] = {
 	POWER_SUPPLY_ATTR(battery_type),
 	POWER_SUPPLY_ATTR(cycle_counts),
 	POWER_SUPPLY_ATTR(serial_number),
+	POWER_SUPPLY_ATTR(battery_id),
+	POWER_SUPPLY_ATTR(fvcomp),
+	POWER_SUPPLY_ATTR(hvdcp_type3),
 };
 
 static struct attribute *
