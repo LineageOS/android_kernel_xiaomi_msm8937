@@ -46,6 +46,10 @@
 #include <linux/file.h>
 #include <linux/kthread.h>
 #include <linux/dma-buf.h>
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+#include <xiaomi-sdm439/mach.h>
+#include <xiaomi-sdm439/backlight.h>
+#endif
 #include "mdss_fb.h"
 #include "mdss_mdp_splash_logo.h"
 #define CREATE_TRACE_POINTS
@@ -911,6 +915,57 @@ static ssize_t mdss_fb_idle_pc_notify(struct device *dev,
 	return scnprintf(buf, PAGE_SIZE, "idle power collapsed\n");
 }
 
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+static unsigned int xiaomi_sdm439_hbm_mode = 0;
+#if IS_ENABLED(CONFIG_MFD_TI_LMU_MI439)
+extern int xiaomi_sdm439_ti_hbm_set(enum xiaomi_sdm439_backlight_hbm_mode hbm_mode);
+#endif
+#if IS_ENABLED(CONFIG_BACKLIGHT_KTD3136_MI439)
+extern int xiaomi_sdm439_ktd_hbm_set(enum xiaomi_sdm439_backlight_hbm_mode hbm_mode);
+#endif
+#endif
+
+static ssize_t mdss_fb_get_hbm(struct device *dev,
+		struct device_attribute *attr, char *buf)
+{
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+	if (xiaomi_sdm439_mach_get())
+		return scnprintf(buf, PAGE_SIZE, "hbm_mode:%d\n", xiaomi_sdm439_hbm_mode);
+#endif
+
+	return scnprintf(buf, PAGE_SIZE, "hbm is unsupported\n");
+}
+static ssize_t mdss_fb_change_hbm(struct device *dev,
+	struct device_attribute *attr, const char *buf, size_t len)
+{
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+	if (xiaomi_sdm439_mach_get()) {
+		sscanf(buf, "%d", &xiaomi_sdm439_hbm_mode) ;
+		if (xiaomi_sdm439_hbm_mode >= XIAOMI_SDM439_HBM_MODE_LEVEL_MAX)
+			xiaomi_sdm439_hbm_mode = XIAOMI_SDM439_HBM_MODE_LEVEL_MAX - 1;
+		if (xiaomi_sdm439_hbm_mode < XIAOMI_SDM439_HBM_MODE_DEFAULT)
+			xiaomi_sdm439_hbm_mode = XIAOMI_SDM439_HBM_MODE_DEFAULT;
+
+		switch (xiaomi_sdm439_backlight_ic_type_get()) {
+#if IS_ENABLED(CONFIG_MFD_TI_LMU_MI439)
+			case XIAOMI_SDM439_BACKLIGHT_IC_LM3697:
+				xiaomi_sdm439_ti_hbm_set(xiaomi_sdm439_hbm_mode);
+				break;
+#endif
+#if IS_ENABLED(CONFIG_BACKLIGHT_KTD3136_MI439)
+			case XIAOMI_SDM439_BACKLIGHT_IC_KTD3136:
+				xiaomi_sdm439_ktd_hbm_set(xiaomi_sdm439_hbm_mode);
+				break;
+#endif
+			default:
+				break;
+		}
+	}
+#endif
+
+	return len;
+}
+
 static DEVICE_ATTR(msm_fb_type, 0444, mdss_fb_get_type, NULL);
 static DEVICE_ATTR(msm_fb_split, 0644, mdss_fb_show_split,
 					mdss_fb_store_split);
@@ -932,6 +987,8 @@ static DEVICE_ATTR(measured_fps, 0664,
 static DEVICE_ATTR(msm_fb_persist_mode, 0644,
 	mdss_fb_get_persist_mode, mdss_fb_change_persist_mode);
 static DEVICE_ATTR(idle_power_collapse, 0444, mdss_fb_idle_pc_notify, NULL);
+static DEVICE_ATTR(msm_fb_hbm, 0644,
+	mdss_fb_get_hbm, mdss_fb_change_hbm);
 
 static struct attribute *mdss_fb_attrs[] = {
 	&dev_attr_msm_fb_type.attr,
@@ -947,6 +1004,7 @@ static struct attribute *mdss_fb_attrs[] = {
 	&dev_attr_measured_fps.attr,
 	&dev_attr_msm_fb_persist_mode.attr,
 	&dev_attr_idle_power_collapse.attr,
+	&dev_attr_msm_fb_hbm.attr,
 	NULL,
 };
 
