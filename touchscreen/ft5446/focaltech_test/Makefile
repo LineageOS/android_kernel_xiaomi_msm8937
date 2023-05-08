@@ -5,8 +5,8 @@
 
 
 
-obj-$(CONFIG_TOUCHSCREEN_FT5446) += focaltech_test.o
-obj-$(CONFIG_TOUCHSCREEN_FT5446) += focaltech_test_ini.o
-obj-$(CONFIG_TOUCHSCREEN_FT5446) += focaltech_test_detail_threshold.o
-obj-$(CONFIG_TOUCHSCREEN_FT5446) += supported_ic/
+obj-$(CONFIG_TOUCHSCREEN_FT5446_MI439) += focaltech_test.o
+obj-$(CONFIG_TOUCHSCREEN_FT5446_MI439) += focaltech_test_ini.o
+obj-$(CONFIG_TOUCHSCREEN_FT5446_MI439) += focaltech_test_detail_threshold.o
+obj-$(CONFIG_TOUCHSCREEN_FT5446_MI439) += supported_ic/
 

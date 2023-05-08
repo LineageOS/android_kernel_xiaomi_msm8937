@@ -322,7 +322,7 @@ int enable_irq_esd(void)
 {
 	gt1x_irq_enable();
 
-#if CONFIG_GTP_ESD_PROTECT
+#if CONFIG_GTP_ESD_PROTECT_MI439
 	gt1x_esd_switch(SWITCH_ON);
 
 #endif
@@ -334,7 +334,7 @@ int disable_irq_esd(void)
 {
 	gt1x_irq_disable();
 
-#if CONFIG_GTP_ESD_PROTECT
+#if CONFIG_GTP_ESD_PROTECT_MI439
 	gt1x_esd_switch(SWITCH_OFF);
 
 #endif

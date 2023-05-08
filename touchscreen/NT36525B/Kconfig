@@ -1,7 +1,7 @@
 #
 # Novatek NT36xxx touchscreen driver configuration
 #
-config TOUCHSCREEN_NT36525B
+config TOUCHSCREEN_NT36525B_MI439
 	bool "Novatek NT36xxx host download SPI driver"
 	default n
 	help

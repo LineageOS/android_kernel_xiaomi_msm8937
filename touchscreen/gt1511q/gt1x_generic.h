@@ -79,25 +79,25 @@
 #define KEY_GES_REGULAR			KEY_F2	// regular gesture-key
 #define KEY_GES_CUSTOM			KEY_F3	//customize gesture-key
 
-#ifdef CONFIG_GTP_DEBUG_ON
-#define GTP_DEBUG_ON	1
+#ifdef CONFIG_GTP_DEBUG_ON_MI439
+#define GTP_DEBUG_ON_MI439	1
 #else
-#define GTP_DEBUG_ON	0
+#define GTP_DEBUG_ON_MI439	0
 #endif
 
-#ifdef CONFIG_GTP_DEBUG_ARRAY_ON
-#define GTP_DEBUG_ARRAY_ON	1
+#ifdef CONFIG_GTP_DEBUG_ARRAY_ON_MI439
+#define GTP_DEBUG_ARRAY_ON_MI439	1
 #else
-#define GTP_DEBUG_ARRAY_ON	0
+#define GTP_DEBUG_ARRAY_ON_MI439	0
 #endif
 
-#ifdef CONFIG_GTP_DEBUG_FUNC_ON
-#define GTP_DEBUG_FUNC_ON	1
+#ifdef CONFIG_GTP_DEBUG_FUNC_ON_MI439
+#define GTP_DEBUG_FUNC_ON_MI439	1
 #else
-#define GTP_DEBUG_FUNC_ON	0
+#define GTP_DEBUG_FUNC_ON_MI439	0
 #endif
 
-#ifdef CONFIG_GTP_CUSTOM_CFG
+#ifdef CONFIG_GTP_CUSTOM_CFG_MI439
 #define GTP_MAX_HEIGHT		1440
 #define GTP_MAX_WIDTH		720
 #define GTP_INT_TRIGGER		1	//0:Rising 1:Falling
@@ -115,11 +115,11 @@
 
 #define FW_NAME_MAX_LEN	80
 
-#ifdef CONFIG_GTP_WITH_STYLUS
+#ifdef CONFIG_GTP_WITH_STYLUS_MI439
 #define GTP_STYLUS_KEY_TAB {BTN_STYLUS, BTN_STYLUS2}
 #endif
 
-#ifdef CONFIG_GTP_HAVE_TOUCH_KEY
+#ifdef CONFIG_GTP_HAVE_TOUCH_KEY_MI439
 #define GTP_KEY_TAB	 {KEY_BACK, KEY_HOMEPAGE, KEY_MENU, KEY_SEARCH}
 #define GTP_MAX_KEY_NUM  4
 #endif
@@ -199,13 +199,13 @@
 #define TRIGGER_LOC					(GTP_REG_CONFIG_TRIGGER - GTP_REG_CONFIG_DATA)
 #define MODULE_SWITCH3_LOC			(GTP_REG_MODULE_SWITCH3 - GTP_REG_CONFIG_DATA)
 
-#ifdef CONFIG_GTP_WARP_X_ON
+#ifdef CONFIG_GTP_WARP_X_ON_MI439
 #define GTP_WARP_X(x_max, x) (x_max - 1 - x)
 #else
 #define GTP_WARP_X(x_max, x) x
 #endif
 
-#ifdef CONFIG_GTP_WARP_Y_ON
+#ifdef CONFIG_GTP_WARP_Y_ON_MI439
 #define GTP_WARP_Y(y_max, y) (y_max - 1 - y)
 #else
 #define GTP_WARP_Y(y_max, y) y
@@ -217,13 +217,13 @@
 #define GTP_INFO(fmt, arg...)			printk("<<GTP-INF>>[%s:%d] "fmt"\n", __func__, __LINE__, ##arg)
 #define GTP_ERROR(fmt, arg...)			printk("<<GTP-ERR>>[%s:%d] "fmt"\n", __func__, __LINE__, ##arg)
 #define GTP_DEBUG(fmt, arg...)			do {\
-										if (GTP_DEBUG_ON)\
+										if (GTP_DEBUG_ON_MI439)\
 										printk("<<GTP-DBG>>[%s:%d]"fmt"\n", __func__, __LINE__, ##arg);\
 										} while (0)
 #define GTP_DEBUG_ARRAY(array, num)	do {\
 										s32 i;\
 										u8 *a = array;\
-										if (GTP_DEBUG_ARRAY_ON) {\
+										if (GTP_DEBUG_ARRAY_ON_MI439) {\
 											printk("<<GTP-DBG>>");\
 											for (i = 0; i < (num); i++) {\
 												printk("%02x ", (a)[i]);\
@@ -235,7 +235,7 @@
 										} \
 										} while (0)
 #define GTP_DEBUG_FUNC()				do {\
-										if (GTP_DEBUG_FUNC_ON)\
+										if (GTP_DEBUG_FUNC_ON_MI439)\
 										printk("<<GTP-FUNC>> Func:%s@Line:%d\n", __func__, __LINE__);\
 										} while (0)
 
@@ -315,24 +315,24 @@ struct goodix_pinctrl {
 //			Export global variables and functions		*/
 
 // Export from gt1x_extents.c and gt1x_firmware.h */
-#ifdef CONFIG_GTP_HOTKNOT
+#ifdef CONFIG_GTP_HOTKNOT_MI439
 extern u8 hotknot_enabled;
 extern u8 hotknot_transfer_mode;
 extern u8 gt1x_patch_jump_fw[];
 extern u8 hotknot_auth_fw[];
 extern u8 hotknot_transfer_fw[];
 extern void hotknot_wakeup_block(void);
-#ifdef CONFIG_HOTKNOT_BLOCK_RW
+#ifdef CONFIG_HOTKNOT_BLOCK_RW_MI439
 extern s32 hotknot_paired_flag;
 extern s32 hotknot_event_handler(u8 *data);
 #endif
-#endif //GTP_HOTKNOT
-#define CONFIG_GTP_ESD_PROTECT 1
+#endif //GTP_HOTKNOT_MI439
+#define CONFIG_GTP_ESD_PROTECT_MI439 1
 
 extern s32 gt1x_init_node(void);
 extern void gt1x_deinit_node(void);
 
-#ifdef CONFIG_GTP_GESTURE_WAKEUP
+#ifdef CONFIG_GTP_GESTURE_WAKEUP_MI439
 extern DOZE_T gesture_doze_status;
 extern int gesture_enabled;
 extern void gt1x_gesture_debug(int on) ;
@@ -384,7 +384,7 @@ extern int gt1x_load_patch(u8 *patch, u32 patch_size, int offset, int bank_size)
 extern int gt1x_startup_patch(void);
 
 // Export from gt1x_tool.c */
-#ifdef CONFIG_GTP_CREATE_WR_NODE
+#ifdef CONFIG_GTP_CREATE_WR_NODE_MI439
 extern int gt1x_init_tool_node(void);
 extern void gt1x_deinit_tool_node(void);
 #endif
@@ -427,31 +427,31 @@ extern int gt1x_suspend(void);
 extern int gt1x_resume(void);
 extern s32 gtp_test_sysfs_init(void);
 
-#ifdef CONFIG_GTP_HAVE_TOUCH_KEY
+#ifdef CONFIG_GTP_HAVE_TOUCH_KEY_MI439
 extern const u16 gt1x_touch_key_array[];
 #endif
 
-#ifdef CONFIG_GTP_WITH_STYLUS
+#ifdef CONFIG_GTP_WITH_STYLUS_MI439
 extern struct input_dev *pen_dev;
 extern void gt1x_pen_up(s32 id);
 extern void gt1x_pen_down(s32 x, s32 y, s32 size, s32 id);
 #endif
 
-#ifdef CONFIG_GTP_PROXIMITY
+#ifdef CONFIG_GTP_PROXIMITY_MI439
 extern u8 gt1x_proximity_flag;
 extern int gt1x_prox_event_handler(u8 *data);
 #endif
 
-#ifdef CONFIG_GTP_SMART_COVER
+#ifdef CONFIG_GTP_SMART_COVER_MI439
 extern int gt1x_parse_sc_cfg(int sensor_id);
 #endif
 
-#ifdef CONFIG_GTP_ESD_PROTECT
+#ifdef CONFIG_GTP_ESD_PROTECT_MI439
 extern void gt1x_init_esd_protect(void);
 extern void gt1x_esd_switch(s32 on);
 #endif
 
-#ifdef CONFIG_GTP_CHARGER_SWITCH
+#ifdef CONFIG_GTP_CHARGER_SWITCH_MI439
 extern u32 gt1x_get_charger_status(void);
 extern void gt1x_charger_switch(s32 on);
 extern void gt1x_charger_config(s32 dir_update);

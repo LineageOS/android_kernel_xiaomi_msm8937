@@ -17,7 +17,7 @@
 
 
 #include "gt1x_generic.h"
-#ifdef CONFIG_GTP_TYPE_B_PROTOCOL
+#ifdef CONFIG_GTP_TYPE_B_PROTOCOL_MI439
 #include <linux/input/mt.h>
 #endif
 
@@ -25,7 +25,7 @@ static struct input_dev *input_dev;
 static spinlock_t irq_lock;
 static int irq_disabled;
 u8 goodix_flag;
-#ifndef CONFIG_GTP_INT_SEL_SYNC
+#ifndef CONFIG_GTP_INT_SEL_SYNC_MI439
 #include <linux/pinctrl/consumer.h>
 static struct pinctrl *default_pctrl;
 #endif
@@ -182,7 +182,7 @@ int gt1x_debug_proc(u8 *buf, int count)
 	return INVALID;
 }
 
-#ifdef CONFIG_GTP_CHARGER_SWITCH
+#ifdef CONFIG_GTP_CHARGER_SWITCH_MI439
 u32 gt1x_get_charger_status(void)
 {
 	// * Need to get charger status of
@@ -230,12 +230,12 @@ static irqreturn_t gt1x_ts_irq_handler(int irq, void *dev_id)
 
 void gt1x_touch_down(s32 x, s32 y, s32 size, s32 id)
 {
-#ifdef CONFIG_GTP_CHANGE_X2Y
+#ifdef CONFIG_GTP_CHANGE_X2Y_MI439
 	GTP_SWAP(x, y);
 #endif
 
 	input_report_key(input_dev, BTN_TOUCH, 1);
-#ifdef CONFIG_GTP_TYPE_B_PROTOCOL
+#ifdef CONFIG_GTP_TYPE_B_PROTOCOL_MI439
 	input_mt_slot(input_dev, id);
 	input_mt_report_slot_state(input_dev, MT_TOOL_FINGER, true);
 #else
@@ -247,7 +247,7 @@ void gt1x_touch_down(s32 x, s32 y, s32 size, s32 id)
 	input_report_abs(input_dev, ABS_MT_PRESSURE, size);
 	input_report_abs(input_dev, ABS_MT_TOUCH_MAJOR, size);
 
-#ifndef CONFIG_GTP_TYPE_B_PROTOCOL
+#ifndef CONFIG_GTP_TYPE_B_PROTOCOL_MI439
 	input_mt_sync(input_dev);
 #endif
 }
@@ -259,7 +259,7 @@ void gt1x_touch_down(s32 x, s32 y, s32 size, s32 id)
 
 void gt1x_touch_up(s32 id)
 {
-#ifdef CONFIG_GTP_TYPE_B_PROTOCOL
+#ifdef CONFIG_GTP_TYPE_B_PROTOCOL_MI439
 	input_mt_slot(input_dev, id);
 	input_mt_report_slot_state(input_dev, MT_TOOL_FINGER, false);
 #else
@@ -284,7 +284,7 @@ static irqreturn_t gt1x_ts_work_thread(int irq, void *data)
 		return IRQ_HANDLED;
 	}
 
-#ifdef CONFIG_GTP_GESTURE_WAKEUP
+#ifdef CONFIG_GTP_GESTURE_WAKEUP_MI439
 	ret = gesture_event_handler(input_dev);
 	if (ret >= 0)
 		goto exit_work_func;
@@ -298,7 +298,7 @@ static irqreturn_t gt1x_ts_work_thread(int irq, void *data)
 	ret = gt1x_i2c_read(GTP_READ_COOR_ADDR, point_data, sizeof(point_data));
 	if (ret < 0) {
 		GTP_ERROR("I2C transfer error!");
-#ifndef CONFIG_GTP_ESD_PROTECT
+#ifndef CONFIG_GTP_ESD_PROTECT_MI439
 		gt1x_power_reset();
 #endif
 		goto exit_work_func;
@@ -309,7 +309,7 @@ static irqreturn_t gt1x_ts_work_thread(int irq, void *data)
 		gt1x_request_event_handler();
 
 	if ((finger & 0x80) == 0) {
-#ifdef CONFIG_HOTKNOT_BLOCK_RW
+#ifdef CONFIG_HOTKNOT_BLOCK_RW_MI439
 		if (!hotknot_paired_flag)
 #endif
 		{
@@ -317,19 +317,19 @@ static irqreturn_t gt1x_ts_work_thread(int irq, void *data)
 		}
 	}
 
-#ifdef CONFIG_HOTKNOT_BLOCK_RW
+#ifdef CONFIG_HOTKNOT_BLOCK_RW_MI439
 	ret = hotknot_event_handler(point_data);
 	if (!ret)
 		goto exit_work_func;
 #endif
 
-#ifdef CONFIG_GTP_PROXIMITY
+#ifdef CONFIG_GTP_PROXIMITY_MI439
 	ret = gt1x_prox_event_handler(point_data);
 	if (ret > 0)
 		goto exit_work_func;
 #endif
 
-#ifdef CONFIG_GTP_WITH_STYLUS
+#ifdef CONFIG_GTP_WITH_STYLUS_MI439
 	ret = gt1x_touch_event_handler(point_data, input_dev, pen_dev);
 #else
 	ret = gt1x_touch_event_handler(point_data, input_dev, NULL);
@@ -501,7 +501,7 @@ static void gt1x_release_resource(void)
 		gpio_free(GTP_RST_PORT);
 	}
 
-#ifndef CONFIG_GTP_INT_SEL_SYNC
+#ifndef CONFIG_GTP_INT_SEL_SYNC_MI439
 	if (default_pctrl) {
 		pinctrl_put(default_pctrl);
 		default_pctrl = NULL;
@@ -583,7 +583,7 @@ static s32 gt1x_request_irq(void)
 static s8 gt1x_request_input_dev(void)
 {
 	s8 ret = -1;
-#ifdef CONFIG_GTP_HAVE_TOUCH_KEY
+#ifdef CONFIG_GTP_HAVE_TOUCH_KEY_MI439
 	u8 index = 0;
 #endif
 
@@ -594,7 +594,7 @@ static s8 gt1x_request_input_dev(void)
 	}
 
 	input_dev->evbit[0] = BIT_MASK(EV_SYN) | BIT_MASK(EV_KEY) | BIT_MASK(EV_ABS);
-#ifdef CONFIG_GTP_TYPE_B_PROTOCOL
+#ifdef CONFIG_GTP_TYPE_B_PROTOCOL_MI439
 #if (LINUX_VERSION_CODE > KERNEL_VERSION(3, 7, 0))
 	input_mt_init_slots(input_dev, GTP_MAX_TOUCH, INPUT_MT_DIRECT);
 #else
@@ -604,19 +604,19 @@ static s8 gt1x_request_input_dev(void)
 	input_dev->keybit[BIT_WORD(BTN_TOUCH)] = BIT_MASK(BTN_TOUCH);
 	set_bit(INPUT_PROP_DIRECT, input_dev->propbit);
 
-#ifdef CONFIG_GTP_HAVE_TOUCH_KEY
+#ifdef CONFIG_GTP_HAVE_TOUCH_KEY_MI439
 	for (index = 0; index < GTP_MAX_KEY_NUM; index++)
 		input_set_capability(input_dev, EV_KEY, gt1x_touch_key_array[index]);
 #endif
 
-#ifdef CONFIG_GTP_GESTURE_WAKEUP
+#ifdef CONFIG_GTP_GESTURE_WAKEUP_MI439
 	input_set_capability(input_dev, EV_KEY, KEY_GES_REGULAR);
 	input_set_capability(input_dev, EV_KEY, KEY_GES_CUSTOM);
 	input_set_capability(input_dev, EV_KEY, KEY_WAKEUP);
 	input_dev->event = gt1x_gesture_switch;
 #endif
 
-#ifdef CONFIG_GTP_CHANGE_X2Y
+#ifdef CONFIG_GTP_CHANGE_X2Y_MI439
 	input_set_abs_params(input_dev, ABS_MT_POSITION_X, 0, gt1x_abs_y_max, 0, 0);
 	input_set_abs_params(input_dev, ABS_MT_POSITION_Y, 0, gt1x_abs_x_max, 0, 0);
 #else
@@ -885,7 +885,7 @@ static int gt1x_ts_probe(struct i2c_client *client, const struct i2c_device_id *
 	//* your kernel has the output restriction of gpio tied
 	//* to IRQ line(kernel3.13 and later version).
 
-#ifndef CONFIG_GTP_INT_SEL_SYNC
+#ifndef CONFIG_GTP_INT_SEL_SYNC_MI439
 	//default_pctrl = pinctrl_get_select_default(&client->dev);
 	//if (IS_ERR(default_pctrl)) {
 		//GTP_ERROR("Please add default pinctrl state"
@@ -955,13 +955,13 @@ static int gt1x_ts_probe(struct i2c_client *client, const struct i2c_device_id *
 	if (ret < 0)
 		goto err_irq;
 
-#ifdef CONFIG_GTP_ESD_PROTECT
+#ifdef CONFIG_GTP_ESD_PROTECT_MI439
 	//* must before auto update */
 	gt1x_init_esd_protect();
 	gt1x_esd_switch(SWITCH_ON);
 #endif
 
-#ifdef CONFIG_GTP_AUTO_UPDATE
+#ifdef CONFIG_GTP_AUTO_UPDATE_MI439
 	do {
 		struct task_struct *thread = NULL;
 		thread = kthread_run(gt1x_auto_update_proc,
@@ -976,7 +976,7 @@ static int gt1x_ts_probe(struct i2c_client *client, const struct i2c_device_id *
 	gt1x_resume_init();
 #endif
 
-#ifdef	CONFIG_GTP_ITO_TEST_SELF
+#ifdef	CONFIG_GTP_ITO_TEST_SELF_MI439
 	gtp_test_sysfs_init();
 #endif
 	gtp_hw_info();
@@ -1022,7 +1022,7 @@ static int gtp_fb_notifier_callback(struct notifier_block *noti, unsigned long e
 	struct fb_event *ev_data = data;
 	int *blank;
 
-#ifdef CONFIG_GTP_INCELL_PANEL
+#ifdef CONFIG_GTP_INCELL_PANEL_MI439
 #ifndef FB_EARLY_EVENT_BLANK
 	#error Need add FB_EARLY_EVENT_BLANK to fbmem.c
 #endif

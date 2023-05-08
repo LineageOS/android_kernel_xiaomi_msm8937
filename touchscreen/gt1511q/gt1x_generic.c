@@ -17,12 +17,12 @@
 ///
 
 #include "gt1x_generic.h"
-#if defined(CONFIG_GTP_PROXIMITY) && defined(PLATFORM_MTK)
+#if defined(CONFIG_GTP_PROXIMITY_MI439) && defined(PLATFORM_MTK)
 #include <hwmsensor.h>
 #include <hwmsen_dev.h>
 #include <sensors_io.h>
 #endif
-#ifdef CONFIG_GTP_TYPE_B_PROTOCOL
+#ifdef CONFIG_GTP_TYPE_B_PROTOCOL_MI439
 #include <linux/input/mt.h>
 #endif
 
@@ -32,10 +32,10 @@ u8 gt1x_config[GTP_CONFIG_ORG_LENGTH + GTP_CONFIG_EXT_LENGTH];
 u32 gt1x_cfg_length = GTP_CONFIG_MAX_LENGTH;
 gt1x_chip_type_t gt1x_chip_type = CHIP_TYPE_NONE;
 struct gt1x_version_info gt1x_version = { {0} };
-#ifdef CONFIG_GTP_HAVE_TOUCH_KEY
+#ifdef CONFIG_GTP_HAVE_TOUCH_KEY_MI439
 static const u16 gt1x_touch_key_array[] = GTP_KEY_TAB;
 #endif
-#if defined(CONFIG_GTP_WITH_STYLUS) && defined(CONFIG_GTP_HAVE_STYLUS_KEY)
+#if defined(CONFIG_GTP_WITH_STYLUS_MI439) && defined(CONFIG_GTP_HAVE_STYLUS_KEY_MI439)
 static const u16 gt1x_stylus_key_array[] = GTP_STYLUS_KEY_TAB;
 #endif
 #define GOODIX_SYSFS_DIR      "goodix"
@@ -233,7 +233,7 @@ static ssize_t gt1x_debug_write_proc(struct file *file,
 		gt1x_irq_enable();
 		return count;
 	}
-#ifdef CONFIG_GTP_CHARGER_SWITCH
+#ifdef CONFIG_GTP_CHARGER_SWITCH_MI439
 	if (strcmp(mode_str, "charger") == 0) {
 		gt1x_charger_config(mode);
 		return count;
@@ -260,7 +260,7 @@ static ssize_t gt1x_debug_write_proc(struct file *file,
 	}
 
 	if (strcmp(mode_str, "debug_gesture") == 0) {
-#ifdef CONFIG_GTP_GESTURE_WAKEUP
+#ifdef CONFIG_GTP_GESTURE_WAKEUP_MI439
 		gt1x_gesture_debug(!!mode);
 #endif
 	}
@@ -531,7 +531,7 @@ s32 gt1x_get_info(void)
 
 s32 gt1x_send_cfg(u8 *config, int cfg_len)
 {
-#ifdef CONFIG_GTP_DRIVER_SEND_CFG
+#ifdef CONFIG_GTP_DRIVER_SEND_CFG_MI439
 	static DEFINE_MUTEX(mutex_cfg);
 	int i;
 	s32 ret = 0;
@@ -689,7 +689,7 @@ s32 gt1x_init_panel(void)
 	u16 cfg_len = 0;
 	s32 ret = 0;
 
-#ifdef CONFIG_GTP_DRIVER_SEND_CFG
+#ifdef CONFIG_GTP_DRIVER_SEND_CFG_MI439
 #ifdef CONFIG_MTK_PLATFORM
 	struct device *dev = tpd->tpd_dev;
 #else
@@ -707,7 +707,7 @@ s32 gt1x_init_panel(void)
 	// * the_config of driver. */
 	gt1x_config[0] &= 0x7F;
 
-#ifdef CONFIG_GTP_CUSTOM_CFG
+#ifdef CONFIG_GTP_CUSTOM_CFG_MI439
 		gt1x_config[RESOLUTION_LOC] = (u8) GTP_MAX_WIDTH;
 		gt1x_config[RESOLUTION_LOC + 1] = (u8) (GTP_MAX_WIDTH >> 8);
 		gt1x_config[RESOLUTION_LOC + 2] = (u8) GTP_MAX_HEIGHT;
@@ -719,7 +719,7 @@ s32 gt1x_init_panel(void)
 		gt1x_config[TRIGGER_LOC] |= 0x01;
 	}
 	set_reg_bit(gt1x_config[MODULE_SWITCH3_LOC], 5, !gt1x_wakeup_level);
-#endif // END GTP_CUSTOM_CFG */
+#endif // END GTP_CUSTOM_CFG_MI439 */
 
 #else // DRIVER NOT SEND CONFIG */
 	cfg_len = GTP_CONFIG_ORG_LENGTH;
@@ -735,7 +735,7 @@ s32 gt1x_init_panel(void)
 
 			cfg_len += GTP_CONFIG_EXT_LENGTH;
 		}
-#endif // END GTP_DRIVER_SEND_CFG */
+#endif // END GTP_DRIVER_SEND_CFG_MI439 */
 
 	//* match resolution when gt1x_abs_x_max & gt1x_abs_y_max
 	//* have been set already */
@@ -796,7 +796,7 @@ void gt1x_select_addr(void)
 {
 
 	//GTP_GPIO_OUTPUT(GTP_RST_PORT, 0);
-//#ifdef CONFIG_GTP_INT_SEL_SYNC
+//#ifdef CONFIG_GTP_INT_SEL_SYNC_MI439
 	//GTP_GPIO_OUTPUT(GTP_INT_PORT, gt1x_i2c_client->addr == 0x14);
 //#endif
 	//usleep_range(3000, 3030);
@@ -825,7 +825,7 @@ static s32 gt1x_set_reset_status(void)
 		return gt1x_i2c_write(GTP_REG_CMD, value, 1);
 }
 
-#ifdef CONFIG_GTP_INCELL_PANEL
+#ifdef CONFIG_GTP_INCELL_PANEL_MI439
 int gt1x_write_and_readback(u16 addr, u8 *buffer, s32 len)
 {
 		int ret;
@@ -930,7 +930,7 @@ s32 gt1x_reset_guitar(void)
 
 		GTP_INFO("GTP RESET!");
 
-#ifdef CONFIG_GTP_INCELL_PANEL
+#ifdef CONFIG_GTP_INCELL_PANEL_MI439
 		ret = gt1x_incell_reset();
 		if (ret < 0)
 			return ret;
@@ -945,12 +945,12 @@ s32 gt1x_reset_guitar(void)
 //* has finished,if the kernel restricts the output
 //* of the gpio tied to IRQ line(kernel3.13 and
 //* later version), do the following steps:
-//*   1) select N to CONFIG_GTP_INT_SEL_SYNC
+//*   1) select N to CONFIG_GTP_INT_SEL_SYNC_MI439
 //*      in menuconfig.
 //*   2) config pinctrl dts, pull-up INT gpio.
 //*   3) chose falling-edge IRQ trigger type.
 
-#ifdef CONFIG_GTP_INT_SEL_SYNC
+#ifdef CONFIG_GTP_INT_SEL_SYNC_MI439
 	//GTP_GPIO_OUTPUT(GTP_INT_PORT, 0);
 	gt1x_int_output(0);
 	msleep(50);
@@ -1082,13 +1082,13 @@ s32 gt1x_get_chip_type(void)
 
 static s32 gt1x_enter_sleep(void)
 {
-#ifdef CONFIG_GTP_POWER_CTRL_SLEEP
+#ifdef CONFIG_GTP_POWER_CTRL_SLEEP_MI439
 	gt1x_power_switch(SWITCH_OFF);
 	return 0;
 #else
 	{
 		s32 retry = 0;
-#ifdef CONFIG_GTP_INT_SEL_SYNC
+#ifdef CONFIG_GTP_INT_SEL_SYNC_MI439
 		if (gt1x_wakeup_level == 1)
 			// high level wakeup */
 			//GTP_GPIO_OUTPUT(GTP_INT_PORT, 0);
@@ -1117,7 +1117,7 @@ static s32 gt1x_enter_sleep(void)
 
 static s32 gt1x_wakeup_sleep(void)
 {
-#ifndef CONFIG_GTP_POWER_CTRL_SLEEP
+#ifndef CONFIG_GTP_POWER_CTRL_SLEEP_MI439
 	u8 retry = 0;
 	s32 ret = -1;
 	int flag = 0;
@@ -1126,7 +1126,7 @@ static s32 gt1x_wakeup_sleep(void)
 	GTP_DEBUG("Wake up begin.");
 	gt1x_irq_disable();
 
-#ifdef CONFIG_GTP_POWER_CTRL_SLEEP
+#ifdef CONFIG_GTP_POWER_CTRL_SLEEP_MI439
 	// power manager unit control the procedure */
 	gt1x_power_reset();
 	GTP_INFO("Wakeup by poweron");
@@ -1134,7 +1134,7 @@ static s32 gt1x_wakeup_sleep(void)
 #else
 	// gesture wakeup & int port wakeup */
 	while (retry++ < 2) {
-#ifdef CONFIG_GTP_GESTURE_WAKEUP
+#ifdef CONFIG_GTP_GESTURE_WAKEUP_MI439
 		if (gesture_enabled) {
 #ifndef CONFIG_MTK_PLATFORM
 			disable_irq_wake(gt1x_i2c_client->irq);
@@ -1146,7 +1146,7 @@ static s32 gt1x_wakeup_sleep(void)
 		} else
 #endif
 		{
-#ifdef CONFIG_GTP_INT_SEL_SYNC
+#ifdef CONFIG_GTP_INT_SEL_SYNC_MI439
 			// wake up through int port */
 			//GTP_GPIO_OUTPUT(GTP_INT_PORT, gt1x_wakeup_level);
 			gt1x_int_output(gt1x_wakeup_level);
@@ -1189,7 +1189,7 @@ static s32 gt1x_wakeup_sleep(void)
 		GTP_INFO("Wake up end.");
 		return 0;
 	}
-#endif // END GTP_POWER_CTRL_SLEEP */
+#endif // END GTP_POWER_CTRL_SLEEP_MI439 */
 }
 
 //**
@@ -1281,7 +1281,7 @@ s32 gt1x_request_event_handler(void)
 	case GTP_RQST_MAIN_CLOCK:
 		GTP_INFO("Request main clock.");
 		break;
-#ifdef CONFIG_GTP_HOTKNOT
+#ifdef CONFIG_GTP_HOTKNOT_MI439
 	case GTP_RQST_HOTKNOT_CODE:
 		GTP_INFO("Request HotKnot Code.");
 		break;
@@ -1366,7 +1366,7 @@ s32 gt1x_touch_event_handler(u8 *data, struct input_dev *dev,
 	key_value = touch_data[1 + 8 * touch_num];
 //  start check current event */
 	if ((touch_data[0] & 0x10) && key_value) {
-#if  defined(CONFIG_GTP_HAVE_STYLUS_KEY) || defined(CONFIG_GTP_HAVE_TOUCH_KEY) || defined(CONFIG_TPD_HAVE_BUTTON)
+#if  defined(CONFIG_GTP_HAVE_STYLUS_KEY_MI439) || defined(CONFIG_GTP_HAVE_TOUCH_KEY_MI439) || defined(CONFIG_TPD_HAVE_BUTTON_MI439)
 		// get current key states */
 		if (key_value & 0xF0) {
 			SET_BIT(cur_event, BIT_STYLUS_KEY);
@@ -1375,7 +1375,7 @@ s32 gt1x_touch_event_handler(u8 *data, struct input_dev *dev,
 		}
 #endif
 	}
-#ifdef CONFIG_GTP_WITH_STYLUS
+#ifdef CONFIG_GTP_WITH_STYLUS_MI439
 	else if (touch_data[1] & 0x80) {
 		SET_BIT(cur_event, BIT_STYLUS);
 	}
@@ -1385,7 +1385,7 @@ s32 gt1x_touch_event_handler(u8 *data, struct input_dev *dev,
 	}
 
 // start handle current event and pre-event */
-#ifdef CONFIG_GTP_HAVE_STYLUS_KEY
+#ifdef CONFIG_GTP_HAVE_STYLUS_KEY_MI439
 	if (CHK_BIT(cur_event, BIT_STYLUS_KEY) || CHK_BIT(pre_event, BIT_STYLUS_KEY)) {
 		//*
 		// * 0x10 -- stylus key0 down
@@ -1401,7 +1401,7 @@ s32 gt1x_touch_event_handler(u8 *data, struct input_dev *dev,
 	}
 #endif
 
-#ifdef CONFIG_GTP_WITH_STYLUS
+#ifdef CONFIG_GTP_WITH_STYLUS_MI439
 	if (CHK_BIT(cur_event, BIT_STYLUS)) {
 		coor_data = &touch_data[1];
 		id = coor_data[0] & 0x7F;
@@ -1420,7 +1420,7 @@ s32 gt1x_touch_event_handler(u8 *data, struct input_dev *dev,
 	}
 #endif
 
-#ifdef CONFIG_GTP_HAVE_TOUCH_KEY
+#ifdef CONFIG_GTP_HAVE_TOUCH_KEY_MI439
 	if (CHK_BIT(cur_event, BIT_TOUCH_KEY) || CHK_BIT(pre_event, BIT_TOUCH_KEY)) {
 		for (i = 0; i < GTP_MAX_KEY_NUM; i++) {
 			input_report_key(dev, gt1x_touch_key_array[i],
@@ -1432,7 +1432,7 @@ s32 gt1x_touch_event_handler(u8 *data, struct input_dev *dev,
 			GTP_DEBUG("Key Up.");
 		}
 	}
-#elif defined(CONFIG_TPD_HAVE_BUTTON)
+#elif defined(CONFIG_TPD_HAVE_BUTTON_MI439)
 		if (tpd_dts_data.use_tpd_button) {
 		if (CHK_BIT(cur_event, BIT_TOUCH_KEY) || CHK_BIT(pre_event, BIT_TOUCH_KEY)) {
 			for (i = 0; i < tpd_dts_data.tpd_key_num; i++)
@@ -1468,14 +1468,14 @@ s32 gt1x_touch_event_handler(u8 *data, struct input_dev *dev,
 				}
 				pre_index |= 0x01 << i;
 			} else if (pre_index & (0x01 << i)) {
-#ifdef CONFIG_GTP_TYPE_B_PROTOCOL
+#ifdef CONFIG_GTP_TYPE_B_PROTOCOL_MI439
 				gt1x_touch_up(i);
 #endif
 				pre_index &= ~(0x01 << i);
 			}
 		}
 	} else if (CHK_BIT(pre_event, BIT_TOUCH)) {
-#ifdef CONFIG_GTP_TYPE_B_PROTOCOL
+#ifdef CONFIG_GTP_TYPE_B_PROTOCOL_MI439
 		int cycles = pre_index < 3 ? 3 : GTP_MAX_TOUCH;
 		input_report_key(dev, BTN_TOUCH, 0);
 		for (i = 0; i < cycles; i++) {
@@ -1511,7 +1511,7 @@ s32 gt1x_touch_event_handler(u8 *data, struct input_dev *dev,
 	return 0;
 }
 
-#ifdef CONFIG_GTP_WITH_STYLUS
+#ifdef CONFIG_GTP_WITH_STYLUS_MI439
 struct input_dev *pen_dev;
 
 static void gt1x_pen_init(void)
@@ -1530,7 +1530,7 @@ static void gt1x_pen_init(void)
 	set_bit(BTN_TOOL_PEN, pen_dev->keybit);
 	set_bit(INPUT_PROP_DIRECT, pen_dev->propbit);
 
-#ifdef CONFIG_GTP_HAVE_STYLUS_KEY
+#ifdef CONFIG_GTP_HAVE_STYLUS_KEY_MI439
 	input_set_capability(pen_dev, EV_KEY, BTN_STYLUS);
 	input_set_capability(pen_dev, EV_KEY, BTN_STYLUS2);
 #endif
@@ -1555,11 +1555,11 @@ static void gt1x_pen_init(void)
 void gt1x_pen_down(s32 x, s32 y, s32 size, s32 id)
 {
 	input_report_key(pen_dev, BTN_TOOL_PEN, 1);
-#ifdef CONFIG_GTP_CHANGE_X2Y
+#ifdef CONFIG_GTP_CHANGE_X2Y_MI439
 	GTP_SWAP(x, y);
 #endif
 
-#ifdef CONFIG_GTP_TYPE_B_PROTOCOL
+#ifdef CONFIG_GTP_TYPE_B_PROTOCOL_MI439
 	input_mt_slot(pen_dev, id);
 	input_report_abs(pen_dev, ABS_MT_PRESSURE, size);
 	input_report_abs(pen_dev, ABS_MT_TOUCH_MAJOR, size);
@@ -1586,7 +1586,7 @@ void gt1x_pen_down(s32 x, s32 y, s32 size, s32 id)
 void gt1x_pen_up(s32 id)
 {
 	input_report_key(pen_dev, BTN_TOOL_PEN, 0);
-#ifdef CONFIG_GTP_TYPE_B_PROTOCOL
+#ifdef CONFIG_GTP_TYPE_B_PROTOCOL_MI439
 	input_mt_slot(pen_dev, id);
 	input_report_abs(pen_dev, ABS_MT_TRACKING_ID, -1);
 #else
@@ -1599,7 +1599,7 @@ void gt1x_pen_up(s32 id)
 //**
 // *		Proximity Module
 
-#ifdef CONFIG_GTP_PROXIMITY
+#ifdef CONFIG_GTP_PROXIMITY_MI439
 #define GTP_PS_DEV_NAME				"goodix_proximity"
 #define GTP_REG_PROXIMITY_ENABLE	0x8049
 #define PS_FARAWAY					1
@@ -1910,12 +1910,12 @@ static void gt1x_ps_deinit(void)
 		}
 }
 
-#endif //GTP_PROXIMITY */
+#endif //GTP_PROXIMITY_MI439 */
 
 //**
 //*			ESD Protect Module
 
-#ifdef CONFIG_GTP_ESD_PROTECT
+#ifdef CONFIG_GTP_ESD_PROTECT_MI439
 static int esd_work_cycle = 200;
 static struct delayed_work esd_check_work;
 static int esd_running;
@@ -2005,7 +2005,7 @@ static void gt1x_esd_check_func(struct work_struct *work)
 //**
 //*              Smart Cover Module
 
-#ifdef CONFIG_GTP_SMART_COVER
+#ifdef CONFIG_GTP_SMART_COVER_MI439
 struct smart_cover_device{
 		int enabled;
 		int state; // 0:cover faraway 1:near
@@ -2032,7 +2032,7 @@ static int gt1x_smart_cover_update_state(void)
 		if (dev->state) {  // near */
 			ret = gt1x_send_cfg(dev->config, dev->cfg_len);
 		} else {
-		#ifdef CONFIG_GTP_CHARGER_SWITCH
+		#ifdef CONFIG_GTP_CHARGER_SWITCH_MI439
 			gt1x_charger_config(1);	// charger detector module check and
 									// send a config
 		#else
@@ -2172,7 +2172,7 @@ static void gt1x_smart_cover_deinit(void)
 //**
 //*              Charger Detect & Switch Module
 
-#ifdef CONFIG_GTP_CHARGER_SWITCH
+#ifdef CONFIG_GTP_CHARGER_SWITCH_MI439
 static u8 gt1x_config_charger[GTP_CONFIG_ORG_LENGTH +
 		GTP_CONFIG_EXT_LENGTH] = { 0 };
 static struct delayed_work charger_switch_work;
@@ -2266,7 +2266,7 @@ void gt1x_charger_config(s32 dir_update)
 {
 	static u8 chr_pluggedin;
 
-#ifdef CONFIG_GTP_SMART_COVER
+#ifdef CONFIG_GTP_SMART_COVER_MI439
 		if (gt1x_sc_dev && gt1x_sc_dev->enabled
 			&& gt1x_sc_dev->state) {
 			return;
@@ -2318,29 +2318,29 @@ static void gt1x_charger_work_func(struct work_struct *work)
 int gt1x_suspend(void)
 {
 	s32 ret = -1;
-#if defined(CONFIG_GTP_HOTKNOT) && !defined(CONFIG_HOTKNOT_BLOCK_RW)
+#if defined(CONFIG_GTP_HOTKNOT_MI439) && !defined(CONFIG_HOTKNOT_BLOCK_RW_MI439)
 	u8 buf[1] = { 0 };
 #endif
 
 		if (update_info.status) {
 			return 0;
 		}
-#ifdef CONFIG_GTP_SMART_COVER
+#ifdef CONFIG_GTP_SMART_COVER_MI439
 		if (gt1x_sc_dev) {
 			gt1x_sc_dev->suspended = 1;
 		}
 #endif
 	GTP_INFO("Suspend start...");
-#ifdef CONFIG_GTP_PROXIMITY
+#ifdef CONFIG_GTP_PROXIMITY_MI439
 	if (gt1x_ps_dev && gt1x_ps_dev->enabled) {
 		GTP_INFO("proximity is detected!");
 		return 0;
 	}
 #endif
 
-#ifdef CONFIG_GTP_HOTKNOT
+#ifdef CONFIG_GTP_HOTKNOT_MI439
 	if (hotknot_enabled) {
-#ifdef CONFIG_HOTKNOT_BLOCK_RW
+#ifdef CONFIG_HOTKNOT_BLOCK_RW_MI439
 		if (hotknot_paired_flag) {
 			GTP_INFO("hotknot is paired!");
 			return 0;
@@ -2357,15 +2357,15 @@ int gt1x_suspend(void)
 #endif
 
 	gt1x_halt = 1;
-#ifdef CONFIG_GTP_ESD_PROTECT
+#ifdef CONFIG_GTP_ESD_PROTECT_MI439
 	gt1x_esd_switch(SWITCH_OFF);
 #endif
-#ifdef CONFIG_GTP_CHARGER_SWITCH
+#ifdef CONFIG_GTP_CHARGER_SWITCH_MI439
 	gt1x_charger_switch(SWITCH_OFF);
 #endif
 	gt1x_irq_disable();
 
-#ifdef CONFIG_GTP_GESTURE_WAKEUP
+#ifdef CONFIG_GTP_GESTURE_WAKEUP_MI439
 	gesture_clear_wakeup_data();
 	if (gesture_enabled) {
 		gesture_enter_doze();
@@ -2398,23 +2398,23 @@ int gt1x_resume(void)
 			return 0;
 		}
 
-#ifdef CONFIG_GTP_SMART_COVER
+#ifdef CONFIG_GTP_SMART_COVER_MI439
 		if (gt1x_sc_dev) {
 			gt1x_sc_dev->suspended = 0;
 		}
 #endif
 	GTP_INFO("Resume start...");
 
-#ifdef CONFIG_GTP_PROXIMITY
+#ifdef CONFIG_GTP_PROXIMITY_MI439
 	if (gt1x_ps_dev && gt1x_ps_dev->enabled) {
 		GTP_INFO("Proximity is on!");
 		return 0;
 	}
 #endif
 
-#ifdef CONFIG_GTP_HOTKNOT
+#ifdef CONFIG_GTP_HOTKNOT_MI439
 	if (hotknot_enabled) {
-	#ifdef CONFIG_HOTKNOT_BLOCK_RW
+	#ifdef CONFIG_HOTKNOT_BLOCK_RW_MI439
 		if (hotknot_paired_flag) {
 			hotknot_paired_flag = 0;
 			hotknot_wakeup_block();
@@ -2425,7 +2425,7 @@ int gt1x_resume(void)
 	}
 #endif
 
-#ifdef CONFIG_GTP_GESTURE_WAKEUP
+#ifdef CONFIG_GTP_GESTURE_WAKEUP_MI439
 		// just return 0 if IC does not suspend */
 		if (!gesture_enabled && !gt1x_halt) {
 				return 0;
@@ -2440,13 +2440,13 @@ int gt1x_resume(void)
 	if (ret < 0) {
 		GTP_ERROR("Resume failed.");
 	}
-#ifdef CONFIG_GTP_HOTKNOT
+#ifdef CONFIG_GTP_HOTKNOT_MI439
 	if (!hotknot_enabled) {
 		gt1x_send_cmd(GTP_CMD_HN_EXIT_SLAVE, 0);
 	}
 #endif
 
-#ifdef CONFIG_GTP_CHARGER_SWITCH
+#ifdef CONFIG_GTP_CHARGER_SWITCH_MI439
 	gt1x_charger_config(0);
 	gt1x_charger_switch(SWITCH_ON);
 #endif
@@ -2454,7 +2454,7 @@ int gt1x_resume(void)
 	gt1x_halt = 0;
 	gt1x_irq_enable();
 
-#ifdef CONFIG_GTP_ESD_PROTECT
+#ifdef CONFIG_GTP_ESD_PROTECT_MI439
 	gt1x_esd_switch(SWITCH_ON);
 #endif
 
@@ -2482,7 +2482,7 @@ s32 gt1x_init(void)
 			msleep(20);
 		}
 
-#ifndef CONFIG_GTP_AUTO_UPDATE
+#ifndef CONFIG_GTP_AUTO_UPDATE_MI439
 			// debug info  */
 			ret = gt1x_i2c_read_dbl_check(GTP_REG_FW_CHK_SUBSYS, reg_val, 1);
 			if (!ret && reg_val[0] == 0xAA) {
@@ -2523,33 +2523,33 @@ s32 gt1x_init(void)
 	// init auxiliary node and functions */
 	gt1x_init_debug_node();
 
-#ifdef CONFIG_GTP_CREATE_WR_NODE
+#ifdef CONFIG_GTP_CREATE_WR_NODE_MI439
 	gt1x_init_tool_node();
 #endif
 
-#if defined(CONFIG_GTP_GESTURE_WAKEUP) || defined(CONFIG_GTP_HOTKNOT)
+#if defined(CONFIG_GTP_GESTURE_WAKEUP_MI439) || defined(CONFIG_GTP_HOTKNOT_MI439)
 	gt1x_init_node();
 #endif
 
-#ifdef CONFIG_GTP_PROXIMITY
+#ifdef CONFIG_GTP_PROXIMITY_MI439
 	gt1x_ps_init();
 #endif
 
-#ifdef CONFIG_GTP_CHARGER_SWITCH
+#ifdef CONFIG_GTP_CHARGER_SWITCH_MI439
 	gt1x_init_charger();
 	gt1x_charger_config(1);
 	gt1x_charger_switch(SWITCH_ON);
 #endif
 
-#ifdef CONFIG_GTP_SMART_COVER
+#ifdef CONFIG_GTP_SMART_COVER_MI439
 	gt1x_smart_cover_init();
 #endif
 
-#ifdef CONFIG_GTP_EDGE_INHIBITION
+#ifdef CONFIG_GTP_EDGE_INHIBITION_MI439
 	gt1x_edge_inhibition_init();
 #endif
 
-#ifdef CONFIG_GTP_WITH_STYLUS
+#ifdef CONFIG_GTP_WITH_STYLUS_MI439
 	gt1x_pen_init();
 #endif
 
@@ -2560,27 +2560,27 @@ void gt1x_deinit(void)
 {
 	gt1x_deinit_debug_node();
 
-#if defined(CONFIG_GTP_GESTURE_WAKEUP) || defined(CONFIG_GTP_HOTKNOT)
+#if defined(CONFIG_GTP_GESTURE_WAKEUP_MI439) || defined(CONFIG_GTP_HOTKNOT_MI439)
 	gt1x_deinit_node();
 #endif
 
-#ifdef CONFIG_GTP_CREATE_WR_NODE
+#ifdef CONFIG_GTP_CREATE_WR_NODE_MI439
 	gt1x_deinit_tool_node();
 #endif
 
-#ifdef CONFIG_GTP_ESD_PROTECT
+#ifdef CONFIG_GTP_ESD_PROTECT_MI439
 	gt1x_deinit_esd_protect();
 #endif
 
-#ifdef CONFIG_GTP_CHARGER_SWITCH
+#ifdef CONFIG_GTP_CHARGER_SWITCH_MI439
 	gt1x_charger_switch(SWITCH_OFF);
 #endif
 
-#ifdef CONFIG_GTP_PROXIMITY
+#ifdef CONFIG_GTP_PROXIMITY_MI439
 	gt1x_ps_deinit();
 #endif
 
-#ifdef CONFIG_GTP_SMART_COVER
+#ifdef CONFIG_GTP_SMART_COVER_MI439
 	gt1x_smart_cover_deinit();
 #endif
 

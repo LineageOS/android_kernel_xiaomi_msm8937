@@ -224,7 +224,7 @@ u32 getUint(u8 *buffer, int len)
 
 int gt1x_auto_update_proc(void *data)
 {
-#ifdef CONFIG_GTP_REQUEST_FW_UPDATE
+#ifdef CONFIG_GTP_REQUEST_FW_UPDATE_MI439
 	int ret = 0;
 	GTP_INFO("Start auto update thread from request...");
 	ret = gt1x_update_firmware(NULL);
@@ -279,7 +279,7 @@ int gt1x_auto_update_proc(void *data)
 #endif
 }
 
-#if !defined(CONFIG_GTP_REQUEST_FW_UPDATE)
+#if !defined(CONFIG_GTP_REQUEST_FW_UPDATE_MI439)
 static int gt1x_search_update_files(void)
 {
 	int retry = 20 * 2;	//wait 10s(max) if fs is not ready
@@ -351,10 +351,10 @@ static int gt1x_search_update_files(void)
 void gt1x_enter_update_mode(void)
 {
 	GTP_DEBUG("Enter FW update mode.");
-#ifdef CONFIG_GTP_ESD_PROTECT
+#ifdef CONFIG_GTP_ESD_PROTECT_MI439
 	gt1x_esd_switch(SWITCH_OFF);
 #endif
-#ifdef CONFIG_GTP_CHARGER_SWITCH
+#ifdef CONFIG_GTP_CHARGER_SWITCH_MI439
 	gt1x_charger_switch(SWITCH_OFF);
 #endif
 	gt1x_irq_disable();
@@ -387,7 +387,7 @@ int gt1x_update_firmware(void *filename)
 		update_info.status = UPDATE_STATUS_ABORT;
 		goto gt1x_update_exit;
 	}
-#ifdef CONFIG_GTP_FW_UPDATE_VERIFY
+#ifdef CONFIG_GTP_FW_UPDATE_VERIFY_MI439
 	update_info.max_progress =
 		6 + update_info.firmware_info->subsystem_count;
 #else
@@ -433,7 +433,7 @@ int gt1x_update_firmware(void *filename)
 		update_info.progress++;
 	}
 
-#ifdef CONFIG_GTP_FW_UPDATE_VERIFY
+#ifdef CONFIG_GTP_FW_UPDATE_VERIFY_MI439
 	gt1x_reset_guitar();
 
 	p = gt1x_get_fw_data(update_info.firmware_info->subsystem[0].offset, update_info.firmware_info->subsystem[0].length);
@@ -477,10 +477,10 @@ gt1x_update_exit:
 	} else if (gt1x_init_failed) {
 		gt1x_read_version(&gt1x_version);
 		gt1x_init_panel();
-	#ifdef CONFIG_GTP_CHARGER_SWITCH
+	#ifdef CONFIG_GTP_CHARGER_SWITCH_MI439
 		gt1x_parse_chr_cfg(gt1x_version.sensor_id);
 	#endif
-	#ifdef CONFIG_GTP_SMART_COVER
+	#ifdef CONFIG_GTP_SMART_COVER_MI439
 		gt1x_parse_sc_cfg(gt1x_version.sensor_id);
 	#endif
 	}
@@ -739,7 +739,7 @@ _reset:
 		return 0;
 	}
 
-#ifdef CONFIG_GTP_DEBUG_ON
+#ifdef CONFIG_GTP_DEBUG_ON_MI439
 	if (update_info.force_update) {
 		GTP_DEBUG("Debug mode, force update fw.");
 		return 0;
@@ -1344,10 +1344,10 @@ void gt1x_leave_update_mode(void)
 	if (update_info.status != UPDATE_STATUS_ABORT)
 		gt1x_reset_guitar();
 
-#ifdef CONFIG_GTP_CHARGER_SWITCH
+#ifdef CONFIG_GTP_CHARGER_SWITCH_MI439
 	gt1x_charger_switch(SWITCH_ON);
 #endif
-#ifdef CONFIG_GTP_ESD_PROTECT
+#ifdef CONFIG_GTP_ESD_PROTECT_MI439
 	gt1x_esd_switch(SWITCH_ON);
 #endif
 

@@ -293,13 +293,13 @@ static ssize_t gt1x_tool_write(struct file *filp, const char __user *buff, size_
 		return cmd_head.data_len + CMD_HEAD_LENGTH;
 	} else if (7 == cmd_head.wr) {	//disable irq!
 		gt1x_irq_disable();
-#ifdef CONFIG_GTP_ESD_PROTECT
+#ifdef CONFIG_GTP_ESD_PROTECT_MI439
 		gt1x_esd_switch(SWITCH_OFF);
 #endif
 		return CMD_HEAD_LENGTH;
 	} else if (9 == cmd_head.wr) {	//enable irq!
 		gt1x_irq_enable();
-#ifdef CONFIG_GTP_ESD_PROTECT
+#ifdef CONFIG_GTP_ESD_PROTECT_MI439
 		gt1x_esd_switch(SWITCH_ON);
 #endif
 		return CMD_HEAD_LENGTH;
