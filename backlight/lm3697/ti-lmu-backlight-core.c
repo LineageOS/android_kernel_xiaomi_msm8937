@@ -28,6 +28,8 @@
 #include <linux/io.h>
 #include <xiaomi-sdm439/backlight.h>
 
+#include "ti-lmu-backlight-data.h"
+
 #define NUM_DUAL_CHANNEL			2
 #define LMU_BACKLIGHT_DUAL_CHANNEL_USED		(BIT(0) | BIT(1))
 #define LMU_BACKLIGHT_11BIT_LSB_MASK		(BIT(0) | BIT(1) | BIT(2))

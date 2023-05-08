@@ -318,6 +318,4 @@ struct ti_lmu_bl {
 	unsigned int pwm_period;
 	struct pwm_device *pwm;
 };
-
-extern struct ti_lmu_bl_cfg lmu_bl_cfg[LMU_MAX_ID];
 #endif
