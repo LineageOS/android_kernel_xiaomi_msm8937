@@ -187,8 +187,8 @@ static int RxLinearity[TX_NUM_MAX][RX_NUM_MAX] = { {0} };
 /*****************************************************************************
 * Global variable or extern global variabls/functions
 *****************************************************************************/
-struct stCfg_FT5X46_TestItem g_stCfg_FT5X46_TestItem;
-struct stCfg_FT5X46_BasicThreshold g_stCfg_FT5X46_BasicThreshold;
+struct stCfg_FT5X46_TestItem xiaomi_sdm439_ft5446_g_stCfg_FT5X46_TestItem;
+struct stCfg_FT5X46_BasicThreshold xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold;
 
 /*****************************************************************************
 * Static function prototypes
@@ -207,23 +207,23 @@ static bool GetTestCondition(int iTestType, unsigned char ucChannelValue);
 static unsigned char GetChannelNumNoMapping(void);
 static unsigned char SwitchToNoMapping(void);
 static unsigned char WeakShort_GetAdcData(int AllAdcDataLen, int *pRevBuffer);
-unsigned char FT5X46_TestItem_EnterFactoryMode(void);
-unsigned char FT5X46_TestItem_RawDataTest(bool *bTestResult);
-unsigned char FT5X46_TestItem_SCapRawDataTest(bool *bTestResult);
-unsigned char FT5X46_TestItem_SCapCbTest(bool *bTestResult);
-unsigned char FT5X46_TestItem_PanelDifferTest(bool *bTestResult);
-unsigned char FT5X46_TestItem_PanelDiffer_Uniformity_Test(bool *bTestResult);
-unsigned char FT5X46_TestItem_WeakShortTest(bool *bTestResult);
+unsigned char xiaomi_sdm439_ft5446_FT5X46_TestItem_EnterFactoryMode(void);
+unsigned char xiaomi_sdm439_ft5446_FT5X46_TestItem_RawDataTest(bool *bTestResult);
+unsigned char xiaomi_sdm439_ft5446_FT5X46_TestItem_SCapRawDataTest(bool *bTestResult);
+unsigned char xiaomi_sdm439_ft5446_FT5X46_TestItem_SCapCbTest(bool *bTestResult);
+unsigned char xiaomi_sdm439_ft5446_FT5X46_TestItem_PanelDifferTest(bool *bTestResult);
+unsigned char xiaomi_sdm439_ft5446_FT5X46_TestItem_PanelDiffer_Uniformity_Test(bool *bTestResult);
+unsigned char xiaomi_sdm439_ft5446_FT5X46_TestItem_WeakShortTest(bool *bTestResult);
 
 
 /************************************************************************
-* Name: start_test_ft5x46
+* Name: xiaomi_sdm439_ft5446_start_test_ft5x46
 * Brief:  Test entry. Determine which test item to test
 * Input: none
 * Output: none
 * Return: Test Result, PASS or FAIL
 ***********************************************************************/
-bool start_test_ft5x46(void)
+bool xiaomi_sdm439_ft5446_start_test_ft5x46(void)
 {
 	bool bTestResult = true;
 	bool bTempResult = 1;
@@ -233,94 +233,94 @@ bool start_test_ft5x46(void)
 	FTS_TEST_FUNC_ENTER();
 
 	//--------------2. test item
-	if (0 == test_data.test_num)
+	if (0 == xiaomi_sdm439_ft5446_test_data.test_num)
 		bTestResult = false;
 
-	for (iItemCount = 0; iItemCount < test_data.test_num; iItemCount++) {
-		test_data.test_item_code = test_data.test_item[iItemCount].itemcode;
+	for (iItemCount = 0; iItemCount < xiaomi_sdm439_ft5446_test_data.test_num; iItemCount++) {
+		xiaomi_sdm439_ft5446_test_data.test_item_code = xiaomi_sdm439_ft5446_test_data.test_item[iItemCount].itemcode;
 
 		///////////////////////////////////////////////////////FT5X46_ENTER_FACTORY_MODE
-		if (Code_FT5X46_ENTER_FACTORY_MODE == test_data.test_item[iItemCount].itemcode
+		if (Code_FT5X46_ENTER_FACTORY_MODE == xiaomi_sdm439_ft5446_test_data.test_item[iItemCount].itemcode
 		  ) {
 
-			ReCode = FT5X46_TestItem_EnterFactoryMode();
+			ReCode = xiaomi_sdm439_ft5446_FT5X46_TestItem_EnterFactoryMode();
 			if (ERROR_CODE_OK != ReCode || (!bTempResult)) {
 				bTestResult = false;
-				test_data.test_item[iItemCount].testresult = RESULT_NG;
+				xiaomi_sdm439_ft5446_test_data.test_item[iItemCount].testresult = RESULT_NG;
 				break;//if this item FAIL, no longer test.
 			} else
-				test_data.test_item[iItemCount].testresult = RESULT_PASS;
+				xiaomi_sdm439_ft5446_test_data.test_item[iItemCount].testresult = RESULT_PASS;
 		}
 
 		///////////////////////////////////////////////////////FT5X46_RAWDATA_TEST
-		if (Code_FT5X46_RAWDATA_TEST == test_data.test_item[iItemCount].itemcode
+		if (Code_FT5X46_RAWDATA_TEST == xiaomi_sdm439_ft5446_test_data.test_item[iItemCount].itemcode
 		  ) {
 
-			ReCode = FT5X46_TestItem_RawDataTest(&bTempResult);
+			ReCode = xiaomi_sdm439_ft5446_FT5X46_TestItem_RawDataTest(&bTempResult);
 			if (ERROR_CODE_OK != ReCode || (!bTempResult)) {
 				bTestResult = false;
-				test_data.test_item[iItemCount].testresult = RESULT_NG;
+				xiaomi_sdm439_ft5446_test_data.test_item[iItemCount].testresult = RESULT_NG;
 			} else
-				test_data.test_item[iItemCount].testresult = RESULT_PASS;
+				xiaomi_sdm439_ft5446_test_data.test_item[iItemCount].testresult = RESULT_PASS;
 		}
 
 
 		///////////////////////////////////////////////////////FT5X46_SCAP_CB_TEST
-		if (Code_FT5X46_SCAP_CB_TEST == test_data.test_item[iItemCount].itemcode
+		if (Code_FT5X46_SCAP_CB_TEST == xiaomi_sdm439_ft5446_test_data.test_item[iItemCount].itemcode
 		  ) {
-			ReCode = FT5X46_TestItem_SCapCbTest(&bTempResult);
+			ReCode = xiaomi_sdm439_ft5446_FT5X46_TestItem_SCapCbTest(&bTempResult);
 			if (ERROR_CODE_OK != ReCode || (!bTempResult)) {
 				bTestResult = false;
-				test_data.test_item[iItemCount].testresult = RESULT_NG;
+				xiaomi_sdm439_ft5446_test_data.test_item[iItemCount].testresult = RESULT_NG;
 			} else
-				test_data.test_item[iItemCount].testresult = RESULT_PASS;
+				xiaomi_sdm439_ft5446_test_data.test_item[iItemCount].testresult = RESULT_PASS;
 		}
 
 		///////////////////////////////////////////////////////FT5X46_SCAP_RAWDATA_TEST
-		if (Code_FT5X46_SCAP_RAWDATA_TEST == test_data.test_item[iItemCount].itemcode
+		if (Code_FT5X46_SCAP_RAWDATA_TEST == xiaomi_sdm439_ft5446_test_data.test_item[iItemCount].itemcode
 		  ) {
-			ReCode = FT5X46_TestItem_SCapRawDataTest(&bTempResult);
+			ReCode = xiaomi_sdm439_ft5446_FT5X46_TestItem_SCapRawDataTest(&bTempResult);
 			if (ERROR_CODE_OK != ReCode || (!bTempResult)) {
 				bTestResult = false;
-				test_data.test_item[iItemCount].testresult = RESULT_NG;
+				xiaomi_sdm439_ft5446_test_data.test_item[iItemCount].testresult = RESULT_NG;
 			} else
-				test_data.test_item[iItemCount].testresult = RESULT_PASS;
+				xiaomi_sdm439_ft5446_test_data.test_item[iItemCount].testresult = RESULT_PASS;
 		}
 
 		/////////////////////////////////////////////////////// Code_FT5X46_PANELDIFFER_TEST,
-		if (Code_FT5X46_PANELDIFFER_TEST == test_data.test_item[iItemCount].itemcode
+		if (Code_FT5X46_PANELDIFFER_TEST == xiaomi_sdm439_ft5446_test_data.test_item[iItemCount].itemcode
 		  ) {
 
-			ReCode = FT5X46_TestItem_PanelDifferTest(&bTempResult);
+			ReCode = xiaomi_sdm439_ft5446_FT5X46_TestItem_PanelDifferTest(&bTempResult);
 			if (ERROR_CODE_OK != ReCode || (!bTempResult)) {
 				bTestResult = false;
-				test_data.test_item[iItemCount].testresult = RESULT_NG;
+				xiaomi_sdm439_ft5446_test_data.test_item[iItemCount].testresult = RESULT_NG;
 			} else
-				test_data.test_item[iItemCount].testresult = RESULT_PASS;
+				xiaomi_sdm439_ft5446_test_data.test_item[iItemCount].testresult = RESULT_PASS;
 		}
 
 		/////////////////////////////////////////////////////// Code_FT5X46_PANELDIFFER_UNIFORMITY_TEST,
-		if (Code_FT5X46_PANELDIFFER_UNIFORMITY_TEST == test_data.test_item[iItemCount].itemcode
+		if (Code_FT5X46_PANELDIFFER_UNIFORMITY_TEST == xiaomi_sdm439_ft5446_test_data.test_item[iItemCount].itemcode
 		  ) {
 
-			ReCode = FT5X46_TestItem_PanelDiffer_Uniformity_Test(&bTempResult);
+			ReCode = xiaomi_sdm439_ft5446_FT5X46_TestItem_PanelDiffer_Uniformity_Test(&bTempResult);
 			if (ERROR_CODE_OK != ReCode || (!bTempResult)) {
 				bTestResult = false;
-				test_data.test_item[iItemCount].testresult = RESULT_NG;
+				xiaomi_sdm439_ft5446_test_data.test_item[iItemCount].testresult = RESULT_NG;
 			} else
-				test_data.test_item[iItemCount].testresult = RESULT_PASS;
+				xiaomi_sdm439_ft5446_test_data.test_item[iItemCount].testresult = RESULT_PASS;
 		}
 
 		///////////////////////////////////////////////////////Code_FT5X46_WEAK_SHORT_CIRCUIT_TEST
-		if (Code_FT5X46_WEAK_SHORT_CIRCUIT_TEST == test_data.test_item[iItemCount].itemcode
+		if (Code_FT5X46_WEAK_SHORT_CIRCUIT_TEST == xiaomi_sdm439_ft5446_test_data.test_item[iItemCount].itemcode
 		  ) {
 
-			ReCode = FT5X46_TestItem_WeakShortTest(&bTempResult);
+			ReCode = xiaomi_sdm439_ft5446_FT5X46_TestItem_WeakShortTest(&bTempResult);
 			if (ERROR_CODE_OK != ReCode || (!bTempResult)) {
 				bTestResult = false;
-				test_data.test_item[iItemCount].testresult = RESULT_NG;
+				xiaomi_sdm439_ft5446_test_data.test_item[iItemCount].testresult = RESULT_NG;
 			} else
-				test_data.test_item[iItemCount].testresult = RESULT_PASS;
+				xiaomi_sdm439_ft5446_test_data.test_item[iItemCount].testresult = RESULT_PASS;
 		}
 
 
@@ -330,7 +330,7 @@ bool start_test_ft5x46(void)
 	return bTestResult;
 }
 
-bool start_selftest_ft5x46(int temp)
+bool xiaomi_sdm439_ft5446_start_selftest_ft5x46(int temp)
 {
 	bool bTestResult = true;
 	bool bTempResult = 1;
@@ -341,7 +341,7 @@ bool start_selftest_ft5x46(int temp)
 	//--------------2. teset part
 	if (temp) {
 		///////////////////////////////////////////////////////FT5X46_ENTER_FACTORY_MODE
-			ReCode = FT5X46_TestItem_EnterFactoryMode();
+			ReCode = xiaomi_sdm439_ft5446_FT5X46_TestItem_EnterFactoryMode();
 			if (ERROR_CODE_OK != ReCode || (!bTempResult)) {
 				bTestResult = false;
 				FTS_TEST_ERROR("EnterFactoryMode error.\n");
@@ -350,7 +350,7 @@ bool start_selftest_ft5x46(int temp)
 		switch (temp) {
 		case TP_SELFTEST_SHORT:
 			///////////////////////////////////////////////////////Code_FT5X46_WEAK_SHORT_CIRCUIT_TEST
-			ReCode = FT5X46_TestItem_WeakShortTest(&bTempResult);
+			ReCode = xiaomi_sdm439_ft5446_FT5X46_TestItem_WeakShortTest(&bTempResult);
 			if (ERROR_CODE_OK != ReCode || (!bTempResult)) {
 				bTestResult = false;
 				FTS_TEST_ERROR("WeakShortTest error.\n");
@@ -358,14 +358,14 @@ bool start_selftest_ft5x46(int temp)
 			break;
 		case TP_SELFTEST_OPEN:
 			/////////////////////////////////////////////////////// Code_FT5X46_PANELDIFFER_TEST,
-			ReCode = FT5X46_TestItem_PanelDifferTest(&bTempResult);
+			ReCode = xiaomi_sdm439_ft5446_FT5X46_TestItem_PanelDifferTest(&bTempResult);
 			if (ERROR_CODE_OK != ReCode || (!bTempResult)) {
 				bTestResult = false;
 				FTS_TEST_ERROR("PanelDifferTest error.\n");
 				break;
 			}
 			/////////////////////////////////////////////////////// Code_FT5X46_PANELDIFFER_UNIFORMITY_TEST,
-			ReCode = FT5X46_TestItem_PanelDiffer_Uniformity_Test(&bTempResult);
+			ReCode = xiaomi_sdm439_ft5446_FT5X46_TestItem_PanelDiffer_Uniformity_Test(&bTempResult);
 			if (ERROR_CODE_OK != ReCode || (!bTempResult)) {
 				bTestResult = false;
 				FTS_TEST_ERROR("Uniformity_Test error.\n");
@@ -379,13 +379,13 @@ bool start_selftest_ft5x46(int temp)
 }
 
 /************************************************************************
-* Name: FT5X46_TestItem_EnterFactoryMode
+* Name: xiaomi_sdm439_ft5446_FT5X46_TestItem_EnterFactoryMode
 * Brief:  Check whether TP can enter Factory Mode, and do some thing
 * Input: none
 * Output: none
 * Return: Comm Code. Code = 0x00 is OK, else fail.
 ***********************************************************************/
-unsigned char FT5X46_TestItem_EnterFactoryMode(void)
+unsigned char xiaomi_sdm439_ft5446_FT5X46_TestItem_EnterFactoryMode(void)
 {
 	unsigned char ReCode = ERROR_CODE_INVALID_PARAM;
 	int iRedo = 5; //If failed, repeat 5 times.
@@ -394,13 +394,13 @@ unsigned char FT5X46_TestItem_EnterFactoryMode(void)
 
 	FTS_TEST_FUNC_ENTER();
 
-	sys_delay(150);
+	xiaomi_sdm439_ft5446_sys_delay(150);
 	for (i = 1; i <= iRedo; i++) {
-		ReCode = enter_factory_mode();
+		ReCode = xiaomi_sdm439_ft5446_enter_factory_mode();
 		if (ERROR_CODE_OK != ReCode) {
 			FTS_TEST_SAVE_INFO("\nFailed to Enter factory mode...\n");
 			if (i < iRedo) {
-				sys_delay(50);
+				xiaomi_sdm439_ft5446_sys_delay(50);
 				continue;
 			}
 		} else {
@@ -408,7 +408,7 @@ unsigned char FT5X46_TestItem_EnterFactoryMode(void)
 		}
 
 	}
-	sys_delay(300);
+	xiaomi_sdm439_ft5446_sys_delay(300);
 
 
 	if (ReCode != ERROR_CODE_OK) {
@@ -419,7 +419,7 @@ unsigned char FT5X46_TestItem_EnterFactoryMode(void)
 	ReCode = GetChannelNum();
 
 	// to determine whether the V3 screen body
-	ReCode = read_reg(REG_PATTERN, &chPattern);
+	ReCode = xiaomi_sdm439_ft5446_read_reg(REG_PATTERN, &chPattern);
 	if (chPattern == 1) {
 		m_bV3TP = true;
 	} else {
@@ -429,13 +429,13 @@ unsigned char FT5X46_TestItem_EnterFactoryMode(void)
 	return ReCode;
 }
 /************************************************************************
-* Name: FT5X46_TestItem_RawDataTest
+* Name: xiaomi_sdm439_ft5446_FT5X46_TestItem_RawDataTest
 * Brief:  TestItem: RawDataTest. Check if MCAP RawData is within the range.
 * Input: none
 * Output: bTestResult, PASS or FAIL
 * Return: Comm Code. Code = 0x00 is OK, else fail.
 ***********************************************************************/
-unsigned char FT5X46_TestItem_RawDataTest(bool *bTestResult)
+unsigned char xiaomi_sdm439_ft5446_FT5X46_TestItem_RawDataTest(bool *bTestResult)
 {
 	unsigned char ReCode = 0;
 	bool btmpresult = true;
@@ -452,7 +452,7 @@ unsigned char FT5X46_TestItem_RawDataTest(bool *bTestResult)
 
 
 	FTS_TEST_SAVE_INFO("\n\n\n==============================Test Item: -------- Raw Data  Test \n");
-	ReCode = enter_factory_mode();
+	ReCode = xiaomi_sdm439_ft5446_enter_factory_mode();
 	if (ReCode != ERROR_CODE_OK) {
 		FTS_TEST_SAVE_INFO("\n\n\n// Failed to Enter factory Mode. Error Code: %d", ReCode);
 		goto TEST_ERR;
@@ -462,14 +462,14 @@ unsigned char FT5X46_TestItem_RawDataTest(bool *bTestResult)
 	//and check the mapping type is right or not,if not, write the register
 	//rawdata test mapping before mapping 0x54=1;after mapping 0x54=0;
 	if (m_bV3TP) {
-		ReCode = read_reg(REG_MAPPING_SWITCH, &strSwitch);
+		ReCode = xiaomi_sdm439_ft5446_read_reg(REG_MAPPING_SWITCH, &strSwitch);
 		if (ReCode != ERROR_CODE_OK) {
 			FTS_TEST_SAVE_INFO("\n\n Read REG_MAPPING_SWITCH error. Error Code: %d",  ReCode);
 			goto TEST_ERR;
 		}
 
 		if (strSwitch != 0) {
-			ReCode = write_reg(REG_MAPPING_SWITCH, 0);
+			ReCode = xiaomi_sdm439_ft5446_write_reg(REG_MAPPING_SWITCH, 0);
 			if (ReCode != ERROR_CODE_OK) {
 				FTS_TEST_SAVE_INFO("\n\n Write REG_MAPPING_SWITCH error. Error Code: %d",  ReCode);
 				goto TEST_ERR;
@@ -484,25 +484,25 @@ unsigned char FT5X46_TestItem_RawDataTest(bool *bTestResult)
 	}
 
 	//Line by line one after the rawdata value, the default 0X16=0
-	ReCode = read_reg(REG_NORMALIZE_TYPE, &OriginValue);// read the original value
+	ReCode = xiaomi_sdm439_ft5446_read_reg(REG_NORMALIZE_TYPE, &OriginValue);// read the original value
 	if (ReCode != ERROR_CODE_OK) {
 		FTS_TEST_SAVE_INFO("\n\n Read  REG_NORMALIZE_TYPE error. Error Code: %d",  ReCode);
 		goto TEST_ERR;
 	}
-	ReCode =  read_reg(0x0A, &ucFre);
+	ReCode =  xiaomi_sdm439_ft5446_read_reg(0x0A, &ucFre);
 	if (ReCode != ERROR_CODE_OK) {
 		FTS_TEST_SAVE_INFO("\n\n Read  0x0A error. Error Code: %d",  ReCode);
 		goto TEST_ERR;
 	}
-	ReCode =  read_reg(0xFB, &ucFir);
+	ReCode =  xiaomi_sdm439_ft5446_read_reg(0xFB, &ucFir);
 	if (ReCode != ERROR_CODE_OK) {
 		FTS_TEST_SAVE_INFO("\n\n Read  0xFB error. Error Code: %d",  ReCode);
 		goto TEST_ERR;
 	}
 
-	if (test_data.screen_param.normalize == AUTO_NORMALIZE) {
+	if (xiaomi_sdm439_ft5446_test_data.screen_param.normalize == AUTO_NORMALIZE) {
 		if (OriginValue != 1) { //if original value is not the value needed,write the register to change
-			ReCode = write_reg(REG_NORMALIZE_TYPE, 0x01);
+			ReCode = xiaomi_sdm439_ft5446_write_reg(REG_NORMALIZE_TYPE, 0x01);
 			if (ReCode != ERROR_CODE_OK) {
 				FTS_TEST_SAVE_INFO("\n\n write  REG_NORMALIZE_TYPE error. Error Code: %d",  ReCode);
 				goto TEST_ERR;
@@ -511,14 +511,14 @@ unsigned char FT5X46_TestItem_RawDataTest(bool *bTestResult)
 		//Set Frequecy High
 
 		FTS_TEST_SAVE_INFO("\n=========Set Frequecy High\n");
-		ReCode = write_reg(0x0A, 0x81);
+		ReCode = xiaomi_sdm439_ft5446_write_reg(0x0A, 0x81);
 		if (ReCode != ERROR_CODE_OK) {
 			FTS_TEST_SAVE_INFO("\n\n Set Frequecy High error. Error Code: %d",  ReCode);
 			goto TEST_ERR;
 		}
 
 		FTS_TEST_SAVE_INFO("\n=========FIR State: ON \n");
-		ReCode = write_reg(0xFB, 1);//FIR OFF  0:close, 1:open
+		ReCode = xiaomi_sdm439_ft5446_write_reg(0xFB, 1);//FIR OFF  0:close, 1:open
 		if (ReCode != ERROR_CODE_OK) {
 			FTS_TEST_SAVE_INFO("\n\n FIR State: ON error. Error Code: %d",  ReCode);
 			goto TEST_ERR;
@@ -537,12 +537,12 @@ unsigned char FT5X46_TestItem_RawDataTest(bool *bTestResult)
 		ShowRawData();
 
 		////////////////////////////////To Determine RawData if in Range or not
-		for (iRow = 0; iRow < test_data.screen_param.tx_num; iRow++) {
-			for (iCol = 0; iCol < test_data.screen_param.rx_num; iCol++) {
-				if (test_data.mcap_detail_thr.invalid_node[iRow][iCol] == 0)
+		for (iRow = 0; iRow < xiaomi_sdm439_ft5446_test_data.screen_param.tx_num; iRow++) {
+			for (iCol = 0; iCol < xiaomi_sdm439_ft5446_test_data.screen_param.rx_num; iCol++) {
+				if (xiaomi_sdm439_ft5446_test_data.mcap_detail_thr.invalid_node[iRow][iCol] == 0)
 					continue; //Invalid Node
-				RawDataMin = test_data.mcap_detail_thr.rawdata_test_high_min[iRow][iCol];
-				RawDataMax = test_data.mcap_detail_thr.rawdata_test_high_max[iRow][iCol];
+				RawDataMin = xiaomi_sdm439_ft5446_test_data.mcap_detail_thr.rawdata_test_high_min[iRow][iCol];
+				RawDataMax = xiaomi_sdm439_ft5446_test_data.mcap_detail_thr.rawdata_test_high_max[iRow][iCol];
 				iValue = m_RawData[iRow][iCol];
 				if (iValue < RawDataMin || iValue > RawDataMax) {
 					btmpresult = false;
@@ -553,10 +553,10 @@ unsigned char FT5X46_TestItem_RawDataTest(bool *bTestResult)
 		}
 
 		//////////////////////////////Save Test Data
-		Save_Test_Data(m_RawData, "RawData Test", 0, test_data.screen_param.tx_num, test_data.screen_param.rx_num, 2);
+		Save_Test_Data(m_RawData, "RawData Test", 0, xiaomi_sdm439_ft5446_test_data.screen_param.tx_num, xiaomi_sdm439_ft5446_test_data.screen_param.rx_num, 2);
 	} else {
 		if (OriginValue != 0) { //if original value is not the value needed,write the register to change
-			ReCode = write_reg(REG_NORMALIZE_TYPE, 0x00);
+			ReCode = xiaomi_sdm439_ft5446_write_reg(REG_NORMALIZE_TYPE, 0x00);
 			if (ReCode != ERROR_CODE_OK) {
 				FTS_TEST_SAVE_INFO("\n\n write REG_NORMALIZE_TYPE error. Error Code: %d",  ReCode);
 				goto TEST_ERR;
@@ -564,9 +564,9 @@ unsigned char FT5X46_TestItem_RawDataTest(bool *bTestResult)
 		}
 
 		//Set Frequecy Low
-		if (g_stCfg_FT5X46_BasicThreshold.RawDataTest_SetLowFreq) {
+		if (xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.RawDataTest_SetLowFreq) {
 			FTS_TEST_SAVE_INFO("\n\n=========Set Frequecy Low");
-			ReCode = write_reg(0x0A, 0x80);
+			ReCode = xiaomi_sdm439_ft5446_write_reg(0x0A, 0x80);
 			if (ReCode != ERROR_CODE_OK) {
 				FTS_TEST_SAVE_INFO("\n\n write frequency error. Error Code: %d",  ReCode);
 				goto TEST_ERR;
@@ -575,12 +575,12 @@ unsigned char FT5X46_TestItem_RawDataTest(bool *bTestResult)
 			//FIR OFF  0:close, 1:open
 
 			FTS_TEST_SAVE_INFO("\n\n=========FIR State: OFF\n");
-			ReCode = write_reg(0xFB, 0);
+			ReCode = xiaomi_sdm439_ft5446_write_reg(0xFB, 0);
 			if (ReCode != ERROR_CODE_OK) {
 				FTS_TEST_SAVE_INFO("\n\n FIR State: OFF error. Error Code: %d",  ReCode);
 				goto TEST_ERR;
 			}
-			sys_delay(100);
+			xiaomi_sdm439_ft5446_sys_delay(100);
 			for (index = 0, nRawDataOK = 0; index < 10 && nRawDataOK < 3; ++index) {
 				ReCode = GetRawData();
 				if (ReCode != ERROR_CODE_OK) {
@@ -596,13 +596,13 @@ unsigned char FT5X46_TestItem_RawDataTest(bool *bTestResult)
 			ShowRawData();
 
 			////////////////////////////////To Determine RawData if in Range or not
-			for (iRow = 0; iRow < test_data.screen_param.tx_num; iRow++) {
+			for (iRow = 0; iRow < xiaomi_sdm439_ft5446_test_data.screen_param.tx_num; iRow++) {
 
-				for (iCol = 0; iCol < test_data.screen_param.rx_num; iCol++) {
-					if (test_data.mcap_detail_thr.invalid_node[iRow][iCol] == 0)
+				for (iCol = 0; iCol < xiaomi_sdm439_ft5446_test_data.screen_param.rx_num; iCol++) {
+					if (xiaomi_sdm439_ft5446_test_data.mcap_detail_thr.invalid_node[iRow][iCol] == 0)
 						continue; //Invalid Node
-					RawDataMin = test_data.mcap_detail_thr.rawdata_test_low_min[iRow][iCol];
-					RawDataMax = test_data.mcap_detail_thr.rawdata_test_low_max[iRow][iCol];
+					RawDataMin = xiaomi_sdm439_ft5446_test_data.mcap_detail_thr.rawdata_test_low_min[iRow][iCol];
+					RawDataMax = xiaomi_sdm439_ft5446_test_data.mcap_detail_thr.rawdata_test_low_max[iRow][iCol];
 					iValue = m_RawData[iRow][iCol];
 					if (iValue < RawDataMin || iValue > RawDataMax) {
 						btmpresult = false;
@@ -613,15 +613,15 @@ unsigned char FT5X46_TestItem_RawDataTest(bool *bTestResult)
 			}
 
 			//////////////////////////////Save Test Data
-			Save_Test_Data(m_RawData, "RawData Test", 0, test_data.screen_param.tx_num, test_data.screen_param.rx_num, 1);
+			Save_Test_Data(m_RawData, "RawData Test", 0, xiaomi_sdm439_ft5446_test_data.screen_param.tx_num, xiaomi_sdm439_ft5446_test_data.screen_param.rx_num, 1);
 		}
 
 
 		//Set Frequecy High
-		if (g_stCfg_FT5X46_BasicThreshold.RawDataTest_SetHighFreq) {
+		if (xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.RawDataTest_SetHighFreq) {
 
 			FTS_TEST_SAVE_INFO("\n=========Set Frequecy High");
-			ReCode = write_reg(0x0A, 0x81);
+			ReCode = xiaomi_sdm439_ft5446_write_reg(0x0A, 0x81);
 			if (ReCode != ERROR_CODE_OK) {
 				FTS_TEST_SAVE_INFO("\n\n Set Frequecy High error. Error Code: %d",  ReCode);
 				goto TEST_ERR;
@@ -630,12 +630,12 @@ unsigned char FT5X46_TestItem_RawDataTest(bool *bTestResult)
 			//FIR OFF  0:close, 1:open
 
 			FTS_TEST_SAVE_INFO("\n\n=========FIR State: OFF\n");
-			ReCode = write_reg(0xFB, 0);
+			ReCode = xiaomi_sdm439_ft5446_write_reg(0xFB, 0);
 			if (ReCode != ERROR_CODE_OK) {
 				FTS_TEST_SAVE_INFO("\n\n FIR State: OFF error. Error Code: %d",  ReCode);
 				goto TEST_ERR;
 			}
-			sys_delay(100);
+			xiaomi_sdm439_ft5446_sys_delay(100);
 			//change register value before,need to lose 3 frame data
 			for (index = 0; index < 3; ++index) {
 				ReCode = GetRawData();
@@ -649,13 +649,13 @@ unsigned char FT5X46_TestItem_RawDataTest(bool *bTestResult)
 			ShowRawData();
 
 			////////////////////////////////To Determine RawData if in Range or not
-			for (iRow = 0; iRow < test_data.screen_param.tx_num; iRow++) {
+			for (iRow = 0; iRow < xiaomi_sdm439_ft5446_test_data.screen_param.tx_num; iRow++) {
 
-				for (iCol = 0; iCol < test_data.screen_param.rx_num; iCol++) {
-					if (test_data.mcap_detail_thr.invalid_node[iRow][iCol] == 0)
+				for (iCol = 0; iCol < xiaomi_sdm439_ft5446_test_data.screen_param.rx_num; iCol++) {
+					if (xiaomi_sdm439_ft5446_test_data.mcap_detail_thr.invalid_node[iRow][iCol] == 0)
 						continue; //Invalid Node
-					RawDataMin = test_data.mcap_detail_thr.rawdata_test_high_min[iRow][iCol];
-					RawDataMax = test_data.mcap_detail_thr.rawdata_test_high_max[iRow][iCol];
+					RawDataMin = xiaomi_sdm439_ft5446_test_data.mcap_detail_thr.rawdata_test_high_min[iRow][iCol];
+					RawDataMax = xiaomi_sdm439_ft5446_test_data.mcap_detail_thr.rawdata_test_high_max[iRow][iCol];
 					iValue = m_RawData[iRow][iCol];
 					if (iValue < RawDataMin || iValue > RawDataMax) {
 						btmpresult = false;
@@ -666,22 +666,22 @@ unsigned char FT5X46_TestItem_RawDataTest(bool *bTestResult)
 			}
 
 			//////////////////////////////Save Test Data
-			Save_Test_Data(m_RawData, "RawData Test", 0, test_data.screen_param.tx_num, test_data.screen_param.rx_num, 2);
+			Save_Test_Data(m_RawData, "RawData Test", 0, xiaomi_sdm439_ft5446_test_data.screen_param.tx_num, xiaomi_sdm439_ft5446_test_data.screen_param.rx_num, 2);
 		}
 
 	}
 
-	ReCode = write_reg(REG_NORMALIZE_TYPE, OriginValue);//set the origin value
+	ReCode = xiaomi_sdm439_ft5446_write_reg(REG_NORMALIZE_TYPE, OriginValue);//set the origin value
 	if (ReCode != ERROR_CODE_OK) {
 		FTS_TEST_SAVE_INFO("\n\n Write REG_NORMALIZE_TYPE error. Error Code: %d",  ReCode);
 		goto TEST_ERR;
 	}
-	ReCode = write_reg(0x0A, ucFre);//set the origin value
+	ReCode = xiaomi_sdm439_ft5446_write_reg(0x0A, ucFre);//set the origin value
 	if (ReCode != ERROR_CODE_OK) {
 		FTS_TEST_SAVE_INFO("\n\n Write 0x0A error. Error Code: %d",  ReCode);
 		goto TEST_ERR;
 	}
-	ReCode = write_reg(0xFB, ucFir);//set the origin value
+	ReCode = xiaomi_sdm439_ft5446_write_reg(0xFB, ucFir);//set the origin value
 	if (ReCode != ERROR_CODE_OK) {
 		FTS_TEST_SAVE_INFO("\n\n Write 0xFB error. Error Code: %d",  ReCode);
 		goto TEST_ERR;
@@ -689,7 +689,7 @@ unsigned char FT5X46_TestItem_RawDataTest(bool *bTestResult)
 
 	//set V3 TP the origin mapping value
 	if (m_bV3TP) {
-		ReCode = write_reg(REG_MAPPING_SWITCH, strSwitch);
+		ReCode = xiaomi_sdm439_ft5446_write_reg(REG_MAPPING_SWITCH, strSwitch);
 		if (ReCode != ERROR_CODE_OK) {
 			FTS_TEST_SAVE_INFO("\n\n Write REG_MAPPING_SWITCH error. Error Code: %d",  ReCode);
 			goto TEST_ERR;
@@ -714,13 +714,13 @@ TEST_ERR:
 
 }
 /************************************************************************
-* Name: FT5X46_TestItem_SCapRawDataTest
+* Name: xiaomi_sdm439_ft5446_FT5X46_TestItem_SCapRawDataTest
 * Brief:  TestItem: SCapRawDataTest. Check if SCAP RawData is within the range.
 * Input: none
 * Output: bTestResult, PASS or FAIL
 * Return: Comm Code. Code = 0x00 is OK, else fail.
 ***********************************************************************/
-unsigned char FT5X46_TestItem_SCapRawDataTest(bool *bTestResult)
+unsigned char xiaomi_sdm439_ft5446_FT5X46_TestItem_SCapRawDataTest(bool *bTestResult)
 {
 	int i = 0;
 	int RawDataMin = 0;
@@ -740,14 +740,14 @@ unsigned char FT5X46_TestItem_SCapRawDataTest(bool *bTestResult)
 	FTS_TEST_SAVE_INFO("\n\n\n==============================Test Item: -------- Scap RawData Test \n");
 	//-------1.Preparatory work
 	//in Factory Mode
-	ReCode = enter_factory_mode();
+	ReCode = xiaomi_sdm439_ft5446_enter_factory_mode();
 	if (ReCode != ERROR_CODE_OK) {
 		FTS_TEST_SAVE_INFO("\n\n\n// Failed to Enter factory Mode. Error Code: %d", ReCode);
 		goto TEST_ERR;
 	}
 
 	//get waterproof channel setting, to check if Tx/Rx channel need to test
-	ReCode = read_reg(REG_WATER_CHANNEL_SELECT, &wc_value);
+	ReCode = xiaomi_sdm439_ft5446_read_reg(REG_WATER_CHANNEL_SELECT, &wc_value);
 	if (ReCode != ERROR_CODE_OK) {
 		FTS_TEST_SAVE_INFO("\n\n\n// Failed to read REG_WATER_CHANNEL_SELECT. Error Code: %d", ReCode);
 		goto TEST_ERR;
@@ -770,25 +770,25 @@ unsigned char FT5X46_TestItem_SCapRawDataTest(bool *bTestResult)
 		memset(m_iTempRawData, 0, sizeof(m_iTempRawData));
 
 		//water rawdata
-		ByteNum = (test_data.screen_param.tx_num + test_data.screen_param.rx_num) * 2;
+		ByteNum = (xiaomi_sdm439_ft5446_test_data.screen_param.tx_num + xiaomi_sdm439_ft5446_test_data.screen_param.rx_num) * 2;
 		ReCode = ReadRawData(0, 0xAC, ByteNum, m_iTempRawData);
 		if (ReCode != ERROR_CODE_OK) {
 			FTS_TEST_SAVE_INFO("\nFailed to ReadRawData water! ");
 			goto TEST_ERR;
 		}
 
-		memcpy(m_RawData[0 + test_data.screen_param.tx_num], m_iTempRawData, sizeof(int)*test_data.screen_param.rx_num);
-		memcpy(m_RawData[1 + test_data.screen_param.tx_num], m_iTempRawData + test_data.screen_param.rx_num, sizeof(int)*test_data.screen_param.tx_num);
+		memcpy(m_RawData[0 + xiaomi_sdm439_ft5446_test_data.screen_param.tx_num], m_iTempRawData, sizeof(int)*xiaomi_sdm439_ft5446_test_data.screen_param.rx_num);
+		memcpy(m_RawData[1 + xiaomi_sdm439_ft5446_test_data.screen_param.tx_num], m_iTempRawData + xiaomi_sdm439_ft5446_test_data.screen_param.rx_num, sizeof(int)*xiaomi_sdm439_ft5446_test_data.screen_param.tx_num);
 
 		//No water rawdata
-		ByteNum = (test_data.screen_param.tx_num + test_data.screen_param.rx_num) * 2;
+		ByteNum = (xiaomi_sdm439_ft5446_test_data.screen_param.tx_num + xiaomi_sdm439_ft5446_test_data.screen_param.rx_num) * 2;
 		ReCode = ReadRawData(0, 0xAB, ByteNum, m_iTempRawData);
 		if (ReCode != ERROR_CODE_OK) {
 			FTS_TEST_SAVE_INFO("\nFailed to ReadRawData no water! ");
 			goto TEST_ERR;
 		}
-		memcpy(m_RawData[2 + test_data.screen_param.tx_num], m_iTempRawData, sizeof(int)*test_data.screen_param.rx_num);
-		memcpy(m_RawData[3 + test_data.screen_param.tx_num], m_iTempRawData + test_data.screen_param.rx_num, sizeof(int)*test_data.screen_param.tx_num);
+		memcpy(m_RawData[2 + xiaomi_sdm439_ft5446_test_data.screen_param.tx_num], m_iTempRawData, sizeof(int)*xiaomi_sdm439_ft5446_test_data.screen_param.rx_num);
+		memcpy(m_RawData[3 + xiaomi_sdm439_ft5446_test_data.screen_param.tx_num], m_iTempRawData + xiaomi_sdm439_ft5446_test_data.screen_param.rx_num, sizeof(int)*xiaomi_sdm439_ft5446_test_data.screen_param.tx_num);
 	}
 
 
@@ -796,33 +796,33 @@ unsigned char FT5X46_TestItem_SCapRawDataTest(bool *bTestResult)
 
 	//Waterproof ON
 	bFlag = GetTestCondition(WT_NeedProofOnTest, wc_value);
-	if (g_stCfg_FT5X46_BasicThreshold.SCapRawDataTest_SetWaterproof_ON && bFlag) {
+	if (xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.SCapRawDataTest_SetWaterproof_ON && bFlag) {
 
 		// Show Scap rawdata in WaterProof On Mode
 		FTS_TEST_SAVE_INFO("\n////////////SCapRawdataTest in WaterProof On Mode:  \n");
 		FTS_TEST_SAVE_INFO("\nSCap Rawdata_Rx:  ");
-		for (i = 0; i < test_data.screen_param.rx_num; i++) {
-			FTS_TEST_SAVE_INFO("%5d    ", m_RawData[0 + test_data.screen_param.tx_num][i]);
+		for (i = 0; i < xiaomi_sdm439_ft5446_test_data.screen_param.rx_num; i++) {
+			FTS_TEST_SAVE_INFO("%5d    ", m_RawData[0 + xiaomi_sdm439_ft5446_test_data.screen_param.tx_num][i]);
 		}
 		FTS_TEST_SAVE_INFO("\n \nSCap Rawdata_Tx:  ");
-		for (i = 0; i < test_data.screen_param.tx_num; i++) {
-			FTS_TEST_SAVE_INFO("%5d    ", m_RawData[1 + test_data.screen_param.tx_num][i]);
+		for (i = 0; i < xiaomi_sdm439_ft5446_test_data.screen_param.tx_num; i++) {
+			FTS_TEST_SAVE_INFO("%5d    ", m_RawData[1 + xiaomi_sdm439_ft5446_test_data.screen_param.tx_num][i]);
 		}
 
 		iCount = 0;
-		RawDataMin = g_stCfg_FT5X46_BasicThreshold.SCapRawDataTest_ON_Min;
-		RawDataMax = g_stCfg_FT5X46_BasicThreshold.SCapRawDataTest_ON_Max;
-		iMax = -m_RawData[0 + test_data.screen_param.tx_num][0];
-		iMin = 2 * m_RawData[0 + test_data.screen_param.tx_num][0];
+		RawDataMin = xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.SCapRawDataTest_ON_Min;
+		RawDataMax = xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.SCapRawDataTest_ON_Max;
+		iMax = -m_RawData[0 + xiaomi_sdm439_ft5446_test_data.screen_param.tx_num][0];
+		iMin = 2 * m_RawData[0 + xiaomi_sdm439_ft5446_test_data.screen_param.tx_num][0];
 		iAvg = 0;
 		Value = 0;
 		bFlag = GetTestCondition(WT_NeedRxOnVal, wc_value);
-		for (i = 0; bFlag && i < test_data.screen_param.rx_num; i++) {
-			if (test_data.mcap_detail_thr.invalid_node_sc[0][i] == 0)
+		for (i = 0; bFlag && i < xiaomi_sdm439_ft5446_test_data.screen_param.rx_num; i++) {
+			if (xiaomi_sdm439_ft5446_test_data.mcap_detail_thr.invalid_node_sc[0][i] == 0)
 				continue;
-			RawDataMin = test_data.mcap_detail_thr.scap_rawdata_on_min[0][i];
-			RawDataMax = test_data.mcap_detail_thr.scap_rawdata_on_max[0][i];
-			Value = m_RawData[0 + test_data.screen_param.tx_num][i];
+			RawDataMin = xiaomi_sdm439_ft5446_test_data.mcap_detail_thr.scap_rawdata_on_min[0][i];
+			RawDataMax = xiaomi_sdm439_ft5446_test_data.mcap_detail_thr.scap_rawdata_on_max[0][i];
+			Value = m_RawData[0 + xiaomi_sdm439_ft5446_test_data.screen_param.tx_num][i];
 			iAvg += Value;
 			if (iMax < Value)
 				iMax = Value; //find the Max value
@@ -835,12 +835,12 @@ unsigned char FT5X46_TestItem_SCapRawDataTest(bool *bTestResult)
 			iCount++;
 		}
 		bFlag = GetTestCondition(WT_NeedTxOnVal, wc_value);
-		for (i = 0; bFlag && i < test_data.screen_param.tx_num; i++) {
-			if (test_data.mcap_detail_thr.invalid_node_sc[1][i] == 0)
+		for (i = 0; bFlag && i < xiaomi_sdm439_ft5446_test_data.screen_param.tx_num; i++) {
+			if (xiaomi_sdm439_ft5446_test_data.mcap_detail_thr.invalid_node_sc[1][i] == 0)
 				continue;
-			RawDataMin = test_data.mcap_detail_thr.scap_rawdata_on_min[1][i];
-			RawDataMax = test_data.mcap_detail_thr.scap_rawdata_on_max[1][i];
-			Value = m_RawData[1 + test_data.screen_param.tx_num][i];
+			RawDataMin = xiaomi_sdm439_ft5446_test_data.mcap_detail_thr.scap_rawdata_on_min[1][i];
+			RawDataMax = xiaomi_sdm439_ft5446_test_data.mcap_detail_thr.scap_rawdata_on_max[1][i];
+			Value = m_RawData[1 + xiaomi_sdm439_ft5446_test_data.screen_param.tx_num][i];
 			iAvg += Value;
 			if (iMax < Value)
 				iMax = Value; //find the Max value
@@ -858,37 +858,37 @@ unsigned char FT5X46_TestItem_SCapRawDataTest(bool *bTestResult)
 			iMin = 0;
 		} else
 			iAvg = iAvg / iCount;
-		Save_Test_Data(m_RawData, "SCap RawData Test", test_data.screen_param.tx_num + 0, 2, test_data.screen_param.rx_num, 1);
+		Save_Test_Data(m_RawData, "SCap RawData Test", xiaomi_sdm439_ft5446_test_data.screen_param.tx_num + 0, 2, xiaomi_sdm439_ft5446_test_data.screen_param.rx_num, 1);
 	}
 
 	//Waterproof OFF
 	bFlag = GetTestCondition(WT_NeedProofOffTest, wc_value);
-	if (g_stCfg_FT5X46_BasicThreshold.SCapRawDataTest_SetWaterproof_OFF && bFlag) {
+	if (xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.SCapRawDataTest_SetWaterproof_OFF && bFlag) {
 		// Show Scap rawdata in WaterProof Off Mode
 		FTS_TEST_SAVE_INFO("\n\n ////////////SCapRawdataTest in WaterProof Off Mode:  \n");
 		FTS_TEST_SAVE_INFO("\nSCap Rawdata_Rx:  ");
-		for (i = 0; i < test_data.screen_param.rx_num; i++) {
-			FTS_TEST_SAVE_INFO("%5d    ", m_RawData[2 + test_data.screen_param.tx_num][i]);
+		for (i = 0; i < xiaomi_sdm439_ft5446_test_data.screen_param.rx_num; i++) {
+			FTS_TEST_SAVE_INFO("%5d    ", m_RawData[2 + xiaomi_sdm439_ft5446_test_data.screen_param.tx_num][i]);
 		}
 		FTS_TEST_SAVE_INFO("\n \nSCap Rawdata_Tx:  ");
-		for (i = 0; i < test_data.screen_param.tx_num; i++) {
-			FTS_TEST_SAVE_INFO("%5d    ", m_RawData[3 + test_data.screen_param.tx_num][i]);
+		for (i = 0; i < xiaomi_sdm439_ft5446_test_data.screen_param.tx_num; i++) {
+			FTS_TEST_SAVE_INFO("%5d    ", m_RawData[3 + xiaomi_sdm439_ft5446_test_data.screen_param.tx_num][i]);
 		}
 
 		iCount = 0;
-		RawDataMin = g_stCfg_FT5X46_BasicThreshold.SCapRawDataTest_OFF_Min;
-		RawDataMax = g_stCfg_FT5X46_BasicThreshold.SCapRawDataTest_OFF_Max;
-		iMax = -m_RawData[2 + test_data.screen_param.tx_num][0];
-		iMin = 2 * m_RawData[2 + test_data.screen_param.tx_num][0];
+		RawDataMin = xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.SCapRawDataTest_OFF_Min;
+		RawDataMax = xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.SCapRawDataTest_OFF_Max;
+		iMax = -m_RawData[2 + xiaomi_sdm439_ft5446_test_data.screen_param.tx_num][0];
+		iMin = 2 * m_RawData[2 + xiaomi_sdm439_ft5446_test_data.screen_param.tx_num][0];
 		iAvg = 0;
 		Value = 0;
 		bFlag = GetTestCondition(WT_NeedRxOffVal, wc_value);
-		for (i = 0; bFlag && i < test_data.screen_param.rx_num; i++) {
-			if (test_data.mcap_detail_thr.invalid_node_sc[0][i] == 0)
+		for (i = 0; bFlag && i < xiaomi_sdm439_ft5446_test_data.screen_param.rx_num; i++) {
+			if (xiaomi_sdm439_ft5446_test_data.mcap_detail_thr.invalid_node_sc[0][i] == 0)
 				continue;
-			RawDataMin = test_data.mcap_detail_thr.scap_rawdata_off_min[0][i];
-			RawDataMax = test_data.mcap_detail_thr.scap_rawdata_off_max[0][i];
-			Value = m_RawData[2 + test_data.screen_param.tx_num][i];
+			RawDataMin = xiaomi_sdm439_ft5446_test_data.mcap_detail_thr.scap_rawdata_off_min[0][i];
+			RawDataMax = xiaomi_sdm439_ft5446_test_data.mcap_detail_thr.scap_rawdata_off_max[0][i];
+			Value = m_RawData[2 + xiaomi_sdm439_ft5446_test_data.screen_param.tx_num][i];
 			iAvg += Value;
 
 			//FTS_TEST_SAVE_INFO("\nzaxzax3 Value %d RawDataMin %d  RawDataMax %d  ",  Value, RawDataMin, RawDataMax);
@@ -904,13 +904,13 @@ unsigned char FT5X46_TestItem_SCapRawDataTest(bool *bTestResult)
 			iCount++;
 		}
 		bFlag = GetTestCondition(WT_NeedTxOffVal, wc_value);
-		for (i = 0; bFlag && i < test_data.screen_param.tx_num; i++) {
-			if (test_data.mcap_detail_thr.invalid_node_sc[1][i] == 0)
+		for (i = 0; bFlag && i < xiaomi_sdm439_ft5446_test_data.screen_param.tx_num; i++) {
+			if (xiaomi_sdm439_ft5446_test_data.mcap_detail_thr.invalid_node_sc[1][i] == 0)
 				continue;
 
-			Value = m_RawData[3 + test_data.screen_param.tx_num][i];
-			RawDataMin = test_data.mcap_detail_thr.scap_rawdata_off_min[1][i];
-			RawDataMax = test_data.mcap_detail_thr.scap_rawdata_off_max[1][i];
+			Value = m_RawData[3 + xiaomi_sdm439_ft5446_test_data.screen_param.tx_num][i];
+			RawDataMin = xiaomi_sdm439_ft5446_test_data.mcap_detail_thr.scap_rawdata_off_min[1][i];
+			RawDataMax = xiaomi_sdm439_ft5446_test_data.mcap_detail_thr.scap_rawdata_off_max[1][i];
 			//FTS_TEST_SAVE_INFO("\nzaxzax4 Value %d RawDataMin %d  RawDataMax %d  ",  Value, RawDataMin, RawDataMax);
 			iAvg += Value;
 			if (iMax < Value)
@@ -929,19 +929,19 @@ unsigned char FT5X46_TestItem_SCapRawDataTest(bool *bTestResult)
 			iMin = 0;
 		} else
 			iAvg = iAvg / iCount;
-		Save_Test_Data(m_RawData, "SCap RawData Test", test_data.screen_param.tx_num + 2, 2, test_data.screen_param.rx_num, 2);
+		Save_Test_Data(m_RawData, "SCap RawData Test", xiaomi_sdm439_ft5446_test_data.screen_param.tx_num + 2, 2, xiaomi_sdm439_ft5446_test_data.screen_param.rx_num, 2);
 	}
 	//-----4. post-stage work
 	if (m_bV3TP) {
-		ReCode = read_reg(REG_MAPPING_SWITCH, &ucValue);
+		ReCode = xiaomi_sdm439_ft5446_read_reg(REG_MAPPING_SWITCH, &ucValue);
 		if (ReCode != ERROR_CODE_OK) {
 			FTS_TEST_SAVE_INFO("\n\n Read REG_MAPPING_SWITCH error. Error Code: %d",  ReCode);
 			goto TEST_ERR;
 		}
 
 		if (0 != ucValue) {
-			ReCode = write_reg(REG_MAPPING_SWITCH, 0);
-			sys_delay(10);
+			ReCode = xiaomi_sdm439_ft5446_write_reg(REG_MAPPING_SWITCH, 0);
+			xiaomi_sdm439_ft5446_sys_delay(10);
 			if (ReCode != ERROR_CODE_OK) {
 				FTS_TEST_SAVE_INFO("\nFailed to switch mapping type!\n ");
 				btmpresult = false;
@@ -973,13 +973,13 @@ TEST_ERR:
 }
 
 /************************************************************************
-* Name: FT5X46_TestItem_SCapCbTest
+* Name: xiaomi_sdm439_ft5446_FT5X46_TestItem_SCapCbTest
 * Brief:  TestItem: SCapCbTest. Check if SCAP Cb is within the range.
 * Input: none
 * Output: bTestResult, PASS or FAIL
 * Return: Comm Code. Code = 0x00 is OK, else fail.
 ***********************************************************************/
-unsigned char FT5X46_TestItem_SCapCbTest(bool *bTestResult)
+unsigned char xiaomi_sdm439_ft5446_FT5X46_TestItem_SCapCbTest(bool *bTestResult)
 {
 	int i,/* j, iOutNum,*/index, Value, CBMin, CBMax;
 	bool bFlag = true;
@@ -995,19 +995,19 @@ unsigned char FT5X46_TestItem_SCapCbTest(bool *bTestResult)
 	FTS_TEST_SAVE_INFO("\n\n\n==============================Test Item: -----  Scap CB Test \n");
 	//-------1.Preparatory work
 	//in Factory Mode
-	ReCode = enter_factory_mode();
+	ReCode = xiaomi_sdm439_ft5446_enter_factory_mode();
 	if (ReCode != ERROR_CODE_OK) {
 		FTS_TEST_SAVE_INFO("\n\n\n// Failed to Enter factory Mode. Error Code: %d", ReCode);
 		goto TEST_ERR;
 	}
 
 	//get waterproof channel setting, to check if Tx/Rx channel need to test
-	ReCode = read_reg(REG_WATER_CHANNEL_SELECT, &wc_value);
+	ReCode = xiaomi_sdm439_ft5446_read_reg(REG_WATER_CHANNEL_SELECT, &wc_value);
 	if (ReCode != ERROR_CODE_OK) {
 		FTS_TEST_SAVE_INFO("\n\n Read REG_WATER_CHANNEL_SELECT error. Error Code: %d",  ReCode);
 		goto TEST_ERR;
 	}
-	ReCode = read_reg(REG_ScWorkMode, &sc_wrok_mode);
+	ReCode = xiaomi_sdm439_ft5446_read_reg(REG_ScWorkMode, &sc_wrok_mode);
 	if (ReCode != ERROR_CODE_OK) {
 		FTS_TEST_SAVE_INFO("\n\n Read REG_ScWorkMode error. Error Code: %d",  ReCode);
 		goto TEST_ERR;
@@ -1034,7 +1034,7 @@ unsigned char FT5X46_TestItem_SCapCbTest(bool *bTestResult)
 		memset(m_ucTempData, 0, sizeof(m_ucTempData));
 
 		//waterproof CB
-		ReCode = write_reg(REG_ScWorkMode, 1);//ScWorkMode:  1:waterproof 0:Non-waterproof
+		ReCode = xiaomi_sdm439_ft5446_write_reg(REG_ScWorkMode, 1);//ScWorkMode:  1:waterproof 0:Non-waterproof
 		if (ReCode != ERROR_CODE_OK) {
 			FTS_TEST_SAVE_INFO("\nGet REG_ScWorkMode Failed!");
 			goto TEST_ERR;
@@ -1046,27 +1046,27 @@ unsigned char FT5X46_TestItem_SCapCbTest(bool *bTestResult)
 			goto TEST_ERR;
 		}
 
-		ReCode = write_reg(REG_ScCbAddrR, 0);
+		ReCode = xiaomi_sdm439_ft5446_write_reg(REG_ScCbAddrR, 0);
 		if (ReCode != ERROR_CODE_OK) {
 			FTS_TEST_SAVE_INFO("\nWrite REG_ScCbAddrR Failed!");
 			goto TEST_ERR;
 		}
 
-		ReCode = GetTxSC_CB(test_data.screen_param.tx_num + test_data.screen_param.rx_num + 128, m_ucTempData);
+		ReCode = GetTxSC_CB(xiaomi_sdm439_ft5446_test_data.screen_param.tx_num + xiaomi_sdm439_ft5446_test_data.screen_param.rx_num + 128, m_ucTempData);
 		if (ReCode != ERROR_CODE_OK) {
 			FTS_TEST_SAVE_INFO("\nGetTxSC_CB Failed!");
 			goto TEST_ERR;
 		}
 
-		for (index = 0; index < test_data.screen_param.rx_num; ++index) {
-			m_RawData[0 + test_data.screen_param.tx_num][index] = m_ucTempData[index];
+		for (index = 0; index < xiaomi_sdm439_ft5446_test_data.screen_param.rx_num; ++index) {
+			m_RawData[0 + xiaomi_sdm439_ft5446_test_data.screen_param.tx_num][index] = m_ucTempData[index];
 		}
-		for (index = 0; index < test_data.screen_param.tx_num; ++index) {
-			m_RawData[1 + test_data.screen_param.tx_num][index] = m_ucTempData[index + test_data.screen_param.rx_num];
+		for (index = 0; index < xiaomi_sdm439_ft5446_test_data.screen_param.tx_num; ++index) {
+			m_RawData[1 + xiaomi_sdm439_ft5446_test_data.screen_param.tx_num][index] = m_ucTempData[index + xiaomi_sdm439_ft5446_test_data.screen_param.rx_num];
 		}
 
 		//Non-waterproof rawdata
-		ReCode = write_reg(REG_ScWorkMode, 0);//ScWorkMode:  1:waterproof 0:Non-waterproof
+		ReCode = xiaomi_sdm439_ft5446_write_reg(REG_ScWorkMode, 0);//ScWorkMode:  1:waterproof 0:Non-waterproof
 		if (ReCode != ERROR_CODE_OK) {
 			FTS_TEST_SAVE_INFO("\nGet REG_ScWorkMode Failed!");
 			goto TEST_ERR;
@@ -1078,22 +1078,22 @@ unsigned char FT5X46_TestItem_SCapCbTest(bool *bTestResult)
 			goto TEST_ERR;
 		}
 
-		ReCode = write_reg(REG_ScCbAddrR, 0);
+		ReCode = xiaomi_sdm439_ft5446_write_reg(REG_ScCbAddrR, 0);
 		if (ReCode != ERROR_CODE_OK) {
 			FTS_TEST_SAVE_INFO("\nWrite REG_ScCbAddrR Failed!");
 			goto TEST_ERR;
 		}
 
-		ReCode = GetTxSC_CB(test_data.screen_param.tx_num + test_data.screen_param.rx_num + 128, m_ucTempData);
+		ReCode = GetTxSC_CB(xiaomi_sdm439_ft5446_test_data.screen_param.tx_num + xiaomi_sdm439_ft5446_test_data.screen_param.rx_num + 128, m_ucTempData);
 		if (ReCode != ERROR_CODE_OK) {
 			FTS_TEST_SAVE_INFO("\nGetTxSC_CB Failed!");
 			goto TEST_ERR;
 		}
-		for (index = 0; index < test_data.screen_param.rx_num; ++index) {
-			m_RawData[2 + test_data.screen_param.tx_num][index] = m_ucTempData[index];
+		for (index = 0; index < xiaomi_sdm439_ft5446_test_data.screen_param.rx_num; ++index) {
+			m_RawData[2 + xiaomi_sdm439_ft5446_test_data.screen_param.tx_num][index] = m_ucTempData[index];
 		}
-		for (index = 0; index < test_data.screen_param.tx_num; ++index) {
-			m_RawData[3 + test_data.screen_param.tx_num][index] = m_ucTempData[index + test_data.screen_param.rx_num];
+		for (index = 0; index < xiaomi_sdm439_ft5446_test_data.screen_param.tx_num; ++index) {
+			m_RawData[3 + xiaomi_sdm439_ft5446_test_data.screen_param.tx_num][index] = m_ucTempData[index + xiaomi_sdm439_ft5446_test_data.screen_param.rx_num];
 		}
 
 		if (ReCode != ERROR_CODE_OK) {
@@ -1108,30 +1108,30 @@ unsigned char FT5X46_TestItem_SCapCbTest(bool *bTestResult)
 
 	//Waterproof ON
 	bFlag = GetTestCondition(WT_NeedProofOnTest, wc_value);
-	if (g_stCfg_FT5X46_BasicThreshold.SCapCbTest_SetWaterproof_ON && bFlag) {
+	if (xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.SCapCbTest_SetWaterproof_ON && bFlag) {
 		// Show Scap CB in WaterProof On Mode
 		FTS_TEST_SAVE_INFO("\n////////////SCapCbTest in WaterProof On Mode:  \n");
 		FTS_TEST_SAVE_INFO("\nSCap CB_Rx:  ");
-		for (i = 0; i < test_data.screen_param.rx_num; i++) {
-			FTS_TEST_SAVE_INFO("%5d", m_RawData[0 + test_data.screen_param.tx_num][i]);
+		for (i = 0; i < xiaomi_sdm439_ft5446_test_data.screen_param.rx_num; i++) {
+			FTS_TEST_SAVE_INFO("%5d", m_RawData[0 + xiaomi_sdm439_ft5446_test_data.screen_param.tx_num][i]);
 		}
 		FTS_TEST_SAVE_INFO("\n \nSCap CB_Tx:  ");
-		for (i = 0; i < test_data.screen_param.tx_num; i++) {
-			FTS_TEST_SAVE_INFO("%5d", m_RawData[1 + test_data.screen_param.tx_num][i]);
+		for (i = 0; i < xiaomi_sdm439_ft5446_test_data.screen_param.tx_num; i++) {
+			FTS_TEST_SAVE_INFO("%5d", m_RawData[1 + xiaomi_sdm439_ft5446_test_data.screen_param.tx_num][i]);
 		}
 
-		iMax = -m_RawData[0 + test_data.screen_param.tx_num][0];
-		iMin = 2 * m_RawData[0 + test_data.screen_param.tx_num][0];
+		iMax = -m_RawData[0 + xiaomi_sdm439_ft5446_test_data.screen_param.tx_num][0];
+		iMin = 2 * m_RawData[0 + xiaomi_sdm439_ft5446_test_data.screen_param.tx_num][0];
 		iAvg = 0;
 		Value = 0;
 		iCount = 0;
 		bFlag = GetTestCondition(WT_NeedRxOnVal, wc_value);
-		for (i = 0; bFlag && i < test_data.screen_param.rx_num; i++) {
-			if (test_data.mcap_detail_thr.invalid_node_sc[0][i] == 0)
+		for (i = 0; bFlag && i < xiaomi_sdm439_ft5446_test_data.screen_param.rx_num; i++) {
+			if (xiaomi_sdm439_ft5446_test_data.mcap_detail_thr.invalid_node_sc[0][i] == 0)
 				continue;
-			CBMin = test_data.mcap_detail_thr.scap_cb_test_on_min[0][i];
-			CBMax = test_data.mcap_detail_thr.scap_cb_test_on_max[0][i];
-			Value = m_RawData[0 + test_data.screen_param.tx_num][i];
+			CBMin = xiaomi_sdm439_ft5446_test_data.mcap_detail_thr.scap_cb_test_on_min[0][i];
+			CBMax = xiaomi_sdm439_ft5446_test_data.mcap_detail_thr.scap_cb_test_on_max[0][i];
+			Value = m_RawData[0 + xiaomi_sdm439_ft5446_test_data.screen_param.tx_num][i];
 			iAvg += Value;
 
 			if (iMax < Value)
@@ -1145,12 +1145,12 @@ unsigned char FT5X46_TestItem_SCapCbTest(bool *bTestResult)
 			iCount++;
 		}
 		bFlag = GetTestCondition(WT_NeedTxOnVal, wc_value);
-		for (i = 0; bFlag &&  i < test_data.screen_param.tx_num; i++) {
-			if (test_data.mcap_detail_thr.invalid_node_sc[1][i] == 0)
+		for (i = 0; bFlag &&  i < xiaomi_sdm439_ft5446_test_data.screen_param.tx_num; i++) {
+			if (xiaomi_sdm439_ft5446_test_data.mcap_detail_thr.invalid_node_sc[1][i] == 0)
 				continue;
-			CBMin = test_data.mcap_detail_thr.scap_cb_test_on_min[1][i];
-			CBMax = test_data.mcap_detail_thr.scap_cb_test_on_max[1][i];
-			Value = m_RawData[1 + test_data.screen_param.tx_num][i];
+			CBMin = xiaomi_sdm439_ft5446_test_data.mcap_detail_thr.scap_cb_test_on_min[1][i];
+			CBMax = xiaomi_sdm439_ft5446_test_data.mcap_detail_thr.scap_cb_test_on_max[1][i];
+			Value = m_RawData[1 + xiaomi_sdm439_ft5446_test_data.screen_param.tx_num][i];
 			iAvg += Value;
 			if (iMax < Value)
 				iMax = Value;
@@ -1169,34 +1169,34 @@ unsigned char FT5X46_TestItem_SCapCbTest(bool *bTestResult)
 			iMin = 0;
 		} else
 			iAvg = iAvg / iCount;
-		Save_Test_Data(m_RawData, "SCap CB Test", test_data.screen_param.tx_num + 0, 2, test_data.screen_param.rx_num, 1);
+		Save_Test_Data(m_RawData, "SCap CB Test", xiaomi_sdm439_ft5446_test_data.screen_param.tx_num + 0, 2, xiaomi_sdm439_ft5446_test_data.screen_param.rx_num, 1);
 	}
 
 	bFlag = GetTestCondition(WT_NeedProofOffTest, wc_value);
-	if (g_stCfg_FT5X46_BasicThreshold.SCapCbTest_SetWaterproof_OFF && bFlag) {
+	if (xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.SCapCbTest_SetWaterproof_OFF && bFlag) {
 		// Show Scap CB in WaterProof Off Mode
 		FTS_TEST_SAVE_INFO("\n\n////////////SCapCbTest in WaterProof Off Mode:  \n");
 		FTS_TEST_SAVE_INFO("\nSCap CB_Rx:  ");
-		for (i = 0; i < test_data.screen_param.rx_num; i++) {
-			FTS_TEST_SAVE_INFO("%5d", m_RawData[2 + test_data.screen_param.tx_num][i]);
+		for (i = 0; i < xiaomi_sdm439_ft5446_test_data.screen_param.rx_num; i++) {
+			FTS_TEST_SAVE_INFO("%5d", m_RawData[2 + xiaomi_sdm439_ft5446_test_data.screen_param.tx_num][i]);
 		}
 		FTS_TEST_SAVE_INFO("\n \nSCap CB_Tx:  ");
-		for (i = 0; i < test_data.screen_param.tx_num; i++) {
-			FTS_TEST_SAVE_INFO("%5d", m_RawData[3 + test_data.screen_param.tx_num][i]);
+		for (i = 0; i < xiaomi_sdm439_ft5446_test_data.screen_param.tx_num; i++) {
+			FTS_TEST_SAVE_INFO("%5d", m_RawData[3 + xiaomi_sdm439_ft5446_test_data.screen_param.tx_num][i]);
 		}
 
-		iMax = -m_RawData[2 + test_data.screen_param.tx_num][0];
-		iMin = 2 * m_RawData[2 + test_data.screen_param.tx_num][0];
+		iMax = -m_RawData[2 + xiaomi_sdm439_ft5446_test_data.screen_param.tx_num][0];
+		iMin = 2 * m_RawData[2 + xiaomi_sdm439_ft5446_test_data.screen_param.tx_num][0];
 		iAvg = 0;
 		Value = 0;
 		iCount = 0;
 		bFlag = GetTestCondition(WT_NeedRxOffVal, wc_value);
-		for (i = 0; bFlag &&  i < test_data.screen_param.rx_num; i++) {
-			if (test_data.mcap_detail_thr.invalid_node_sc[0][i] == 0)
+		for (i = 0; bFlag &&  i < xiaomi_sdm439_ft5446_test_data.screen_param.rx_num; i++) {
+			if (xiaomi_sdm439_ft5446_test_data.mcap_detail_thr.invalid_node_sc[0][i] == 0)
 				continue;
-			CBMin = test_data.mcap_detail_thr.scap_cb_test_off_min[0][i];
-			CBMax = test_data.mcap_detail_thr.scap_cb_test_off_max[0][i];
-			Value = m_RawData[2 + test_data.screen_param.tx_num][i];
+			CBMin = xiaomi_sdm439_ft5446_test_data.mcap_detail_thr.scap_cb_test_off_min[0][i];
+			CBMax = xiaomi_sdm439_ft5446_test_data.mcap_detail_thr.scap_cb_test_off_max[0][i];
+			Value = m_RawData[2 + xiaomi_sdm439_ft5446_test_data.screen_param.tx_num][i];
 			iAvg += Value;
 
 			if (iMax < Value)
@@ -1210,13 +1210,13 @@ unsigned char FT5X46_TestItem_SCapCbTest(bool *bTestResult)
 			iCount++;
 		}
 		bFlag = GetTestCondition(WT_NeedTxOffVal, wc_value);
-		for (i = 0; bFlag && i < test_data.screen_param.tx_num; i++) {
+		for (i = 0; bFlag && i < xiaomi_sdm439_ft5446_test_data.screen_param.tx_num; i++) {
 			//if(m_ScapInvalide[1][i] == 0)      continue;
-			if (test_data.mcap_detail_thr.invalid_node_sc[1][i] == 0)
+			if (xiaomi_sdm439_ft5446_test_data.mcap_detail_thr.invalid_node_sc[1][i] == 0)
 				continue;
-			CBMin = test_data.mcap_detail_thr.scap_cb_test_off_min[1][i];
-			CBMax = test_data.mcap_detail_thr.scap_cb_test_off_max[1][i];
-			Value = m_RawData[3 + test_data.screen_param.tx_num][i];
+			CBMin = xiaomi_sdm439_ft5446_test_data.mcap_detail_thr.scap_cb_test_off_min[1][i];
+			CBMax = xiaomi_sdm439_ft5446_test_data.mcap_detail_thr.scap_cb_test_off_max[1][i];
+			Value = m_RawData[3 + xiaomi_sdm439_ft5446_test_data.screen_param.tx_num][i];
 
 			iAvg += Value;
 			if (iMax < Value)
@@ -1236,19 +1236,19 @@ unsigned char FT5X46_TestItem_SCapCbTest(bool *bTestResult)
 			iMin = 0;
 		} else
 			iAvg = iAvg / iCount;
-		Save_Test_Data(m_RawData, "SCap CB Test", test_data.screen_param.tx_num + 2, 2, test_data.screen_param.rx_num, 2);
+		Save_Test_Data(m_RawData, "SCap CB Test", xiaomi_sdm439_ft5446_test_data.screen_param.tx_num + 2, 2, xiaomi_sdm439_ft5446_test_data.screen_param.rx_num, 2);
 	}
 	//-----4. post-stage work
 	if (m_bV3TP) {
-		ReCode = read_reg(REG_MAPPING_SWITCH, &ucValue);
+		ReCode = xiaomi_sdm439_ft5446_read_reg(REG_MAPPING_SWITCH, &ucValue);
 		if (ReCode != ERROR_CODE_OK) {
 			FTS_TEST_SAVE_INFO("\n\n Read REG_MAPPING_SWITCH error. Error Code: %d",  ReCode);
 			goto TEST_ERR;
 		}
 
 		if (0 != ucValue) {
-			ReCode = write_reg(REG_MAPPING_SWITCH, 0);
-			sys_delay(10);
+			ReCode = xiaomi_sdm439_ft5446_write_reg(REG_MAPPING_SWITCH, 0);
+			xiaomi_sdm439_ft5446_sys_delay(10);
 			if (ReCode != ERROR_CODE_OK) {
 				FTS_TEST_SAVE_INFO("\nFailed to switch mapping type!\n ");
 				btmpresult = false;
@@ -1263,7 +1263,7 @@ unsigned char FT5X46_TestItem_SCapCbTest(bool *bTestResult)
 		}
 	}
 
-	ReCode = write_reg(REG_ScWorkMode, sc_wrok_mode);//set the origin value
+	ReCode = xiaomi_sdm439_ft5446_write_reg(REG_ScWorkMode, sc_wrok_mode);//set the origin value
 	if (ReCode != ERROR_CODE_OK) {
 		FTS_TEST_SAVE_INFO("\n\n Write REG_ScWorkMode error. Error Code: %d",  ReCode);
 		goto TEST_ERR;
@@ -1289,13 +1289,13 @@ TEST_ERR:
 }
 
 /************************************************************************
-* Name: FT5X46_TestItem_PanelDifferTest
+* Name: xiaomi_sdm439_ft5446_FT5X46_TestItem_PanelDifferTest
 * Brief:  TestItem: PanelDifferTest. Check if Panel Differ is within the range.
 * Input: none
 * Output: bTestResult, PASS or FAIL
 * Return: Comm Code. Code = 0x00 is OK, else fail.
 ***********************************************************************/
-unsigned char FT5X46_TestItem_PanelDifferTest(bool *bTestResult)
+unsigned char xiaomi_sdm439_ft5446_FT5X46_TestItem_PanelDifferTest(bool *bTestResult)
 {
 	int index = 0;
 	int iRow = 0, iCol = 0;
@@ -1316,8 +1316,8 @@ unsigned char FT5X46_TestItem_PanelDifferTest(bool *bTestResult)
 
 	FTS_TEST_SAVE_INFO("\n\r\n\r\n\r\n==============================Test Item: -------- Panel Differ Test  \r\n\r\n");
 
-	ReCode = enter_factory_mode();
-	sys_delay(20);
+	ReCode = xiaomi_sdm439_ft5446_enter_factory_mode();
+	xiaomi_sdm439_ft5446_sys_delay(20);
 	if (ReCode != ERROR_CODE_OK) {
 		FTS_TEST_SAVE_INFO("\n\n\n// Failed to Enter factory Mode. Error Code: %d", ReCode);
 		goto TEST_ERR;
@@ -1327,14 +1327,14 @@ unsigned char FT5X46_TestItem_PanelDifferTest(bool *bTestResult)
 	//and check the mapping type is right or not,if not, write the register
 	//rawdata test mapping¡ê?before mapping¡êo0x54=1;after mapping¡êo0x54=0;
 	if (m_bV3TP) {
-		ReCode = read_reg(REG_MAPPING_SWITCH, &strSwitch);
+		ReCode = xiaomi_sdm439_ft5446_read_reg(REG_MAPPING_SWITCH, &strSwitch);
 		if (ReCode != ERROR_CODE_OK) {
 			FTS_TEST_SAVE_INFO("\n\n Read REG_MAPPING_SWITCH error. Error Code: %d",  ReCode);
 			goto TEST_ERR;
 		}
 
 		if (strSwitch != 0) {
-			ReCode = write_reg(REG_MAPPING_SWITCH, 0);
+			ReCode = xiaomi_sdm439_ft5446_write_reg(REG_MAPPING_SWITCH, 0);
 			if (ReCode != ERROR_CODE_OK) {
 				FTS_TEST_SAVE_INFO("\n\n Write REG_MAPPING_SWITCH error. Error Code: %d",  ReCode);
 				goto TEST_ERR;
@@ -1352,7 +1352,7 @@ unsigned char FT5X46_TestItem_PanelDifferTest(bool *bTestResult)
 
 	///////////
 	FTS_TEST_SAVE_INFO("\n\r\n=========Set Auto Equalization:\r\n");
-	ReCode = read_reg(REG_NORMALIZE_TYPE, &OriginRawDataType);//Read the original value
+	ReCode = xiaomi_sdm439_ft5446_read_reg(REG_NORMALIZE_TYPE, &OriginRawDataType);//Read the original value
 	if (ReCode != ERROR_CODE_OK) {
 		FTS_TEST_SAVE_INFO("\nRead  REG_NORMALIZE_TYPE error. Error Code: %d",  ReCode);
 		btmpresult = false;
@@ -1360,8 +1360,8 @@ unsigned char FT5X46_TestItem_PanelDifferTest(bool *bTestResult)
 	}
 
 	if (OriginRawDataType != 0) {
-		ReCode = write_reg(REG_NORMALIZE_TYPE, 0x00);
-		sys_delay(50);
+		ReCode = xiaomi_sdm439_ft5446_write_reg(REG_NORMALIZE_TYPE, 0x00);
+		xiaomi_sdm439_ft5446_sys_delay(50);
 		if (ReCode != ERROR_CODE_OK) {
 			btmpresult = false;
 			FTS_TEST_SAVE_INFO("\nWrite reg REG_NORMALIZE_TYPE Failed.");
@@ -1372,15 +1372,15 @@ unsigned char FT5X46_TestItem_PanelDifferTest(bool *bTestResult)
 
 	//Set Frequecy High
 	FTS_TEST_SAVE_INFO("\n=========Set Frequecy High");
-	ReCode = read_reg(0x0A, &OriginFrequecy); //Read the original value
+	ReCode = xiaomi_sdm439_ft5446_read_reg(0x0A, &OriginFrequecy); //Read the original value
 	if (ReCode != ERROR_CODE_OK) {
 		FTS_TEST_SAVE_INFO("\nRead reg 0x0A error. Error Code: %d",  ReCode);
 		btmpresult = false;
 		goto TEST_ERR;
 	}
 
-	ReCode = write_reg(0x0A, 0x81);
-	sys_delay(10);
+	ReCode = xiaomi_sdm439_ft5446_write_reg(0x0A, 0x81);
+	xiaomi_sdm439_ft5446_sys_delay(10);
 	if (ReCode != ERROR_CODE_OK) {
 		btmpresult = false;
 		FTS_TEST_SAVE_INFO("\nWrite reg 0x0A Failed.");
@@ -1388,14 +1388,14 @@ unsigned char FT5X46_TestItem_PanelDifferTest(bool *bTestResult)
 	}
 
 	FTS_TEST_SAVE_INFO("\n=========FIR State: OFF");
-	ReCode = read_reg(0xFB, &OriginFirState);//Read the original value
+	ReCode = xiaomi_sdm439_ft5446_read_reg(0xFB, &OriginFirState);//Read the original value
 	if (ReCode != ERROR_CODE_OK) {
 		FTS_TEST_SAVE_INFO("\nRead reg 0xFB error. Error Code: %d",  ReCode);
 		btmpresult = false;
 		goto TEST_ERR;
 	}
-	ReCode = write_reg(0xFB, 0);
-	sys_delay(50);
+	ReCode = xiaomi_sdm439_ft5446_write_reg(0xFB, 0);
+	xiaomi_sdm439_ft5446_sys_delay(50);
 	if (ReCode != ERROR_CODE_OK) {
 		FTS_TEST_SAVE_INFO("\nWrite reg 0xFB Failed.");
 		btmpresult = false;
@@ -1414,8 +1414,8 @@ unsigned char FT5X46_TestItem_PanelDifferTest(bool *bTestResult)
 	}
 
 	////Differ = RawData * 1/10
-	for (i = 0; i < test_data.screen_param.tx_num; i++) {
-		for (j = 0; j < test_data.screen_param.rx_num; j++) {
+	for (i = 0; i < xiaomi_sdm439_ft5446_test_data.screen_param.tx_num; i++) {
+		for (j = 0; j < xiaomi_sdm439_ft5446_test_data.screen_param.rx_num; j++) {
 			m_DifferData[i][j] = m_RawData[i][j] / 10;
 		}
 	}
@@ -1423,9 +1423,9 @@ unsigned char FT5X46_TestItem_PanelDifferTest(bool *bTestResult)
 	////////////////////////////////To show value
 #if 1
 	FTS_TEST_SAVE_INFO("\nPannelDiffer :\n");
-	for (iRow = 0; iRow < test_data.screen_param.tx_num; iRow++) {
+	for (iRow = 0; iRow < xiaomi_sdm439_ft5446_test_data.screen_param.tx_num; iRow++) {
 		FTS_TEST_SAVE_INFO("\n\nTx%2d:    ", iRow + 1);
-		for (iCol = 0; iCol < test_data.screen_param.rx_num; iCol++) {
+		for (iCol = 0; iCol < xiaomi_sdm439_ft5446_test_data.screen_param.rx_num; iCol++) {
 			iValue = m_DifferData[iRow][iCol];
 			FTS_TEST_SAVE_INFO("%4d,  ", iValue);
 		}
@@ -1436,14 +1436,14 @@ unsigned char FT5X46_TestItem_PanelDifferTest(bool *bTestResult)
 
 	///whether threshold is in range
 	////////////////////////////////To Determine  if in Range or not
-	for (iRow = 0; iRow < test_data.screen_param.tx_num; iRow++) { //  iRow = 1
-		for (iCol = 0; iCol < test_data.screen_param.rx_num; iCol++) {
-			if (test_data.mcap_detail_thr.invalid_node[iRow][iCol] == 0)
+	for (iRow = 0; iRow < xiaomi_sdm439_ft5446_test_data.screen_param.tx_num; iRow++) { //  iRow = 1
+		for (iCol = 0; iCol < xiaomi_sdm439_ft5446_test_data.screen_param.rx_num; iCol++) {
+			if (xiaomi_sdm439_ft5446_test_data.mcap_detail_thr.invalid_node[iRow][iCol] == 0)
 				continue; //Invalid Node
 
 			iValue = m_DifferData[iRow][iCol];
-			iMin =  test_data.mcap_detail_thr.panel_differ_test_min[iRow][iCol];
-			iMax = test_data.mcap_detail_thr.panel_differ_test_max[iRow][iCol];
+			iMin =  xiaomi_sdm439_ft5446_test_data.mcap_detail_thr.panel_differ_test_min[iRow][iCol];
+			iMax = xiaomi_sdm439_ft5446_test_data.mcap_detail_thr.panel_differ_test_max[iRow][iCol];
 			//FTS_TEST_SAVE_INFO("\n Node=(%d,  %d), Get_value=%d,  Set_Range=(%d, %d) \n", iRow+1, iCol+1, iValue, iMin, iMax);
 			if (iValue < iMin || iValue > iMax) {
 				btmpresult = false;
@@ -1455,10 +1455,10 @@ unsigned char FT5X46_TestItem_PanelDifferTest(bool *bTestResult)
 	/////////////////////////// end determine
 
 	////>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>get test data ,and save to .csv file
-	for (i = 0; i <  test_data.screen_param.tx_num; i++) {
-		for (j = 0; j <  test_data.screen_param.rx_num; j++) {
+	for (i = 0; i <  xiaomi_sdm439_ft5446_test_data.screen_param.tx_num; i++) {
+		for (j = 0; j <  xiaomi_sdm439_ft5446_test_data.screen_param.rx_num; j++) {
 			m_absDifferData[i][j] = abs(m_DifferData[i][j]);
-			if (NODE_AST_TYPE == test_data.mcap_detail_thr.invalid_node[i][j] || NODE_INVALID_TYPE == test_data.mcap_detail_thr.invalid_node[i][j]) {
+			if (NODE_AST_TYPE == xiaomi_sdm439_ft5446_test_data.mcap_detail_thr.invalid_node[i][j] || NODE_INVALID_TYPE == xiaomi_sdm439_ft5446_test_data.mcap_detail_thr.invalid_node[i][j]) {
 				InvalidNum++;
 				continue;
 			}
@@ -1467,19 +1467,19 @@ unsigned char FT5X46_TestItem_PanelDifferTest(bool *bTestResult)
 			AvgValue += m_DifferData[i][j];
 		}
 	}
-	Save_Test_Data(m_absDifferData, "Panel Differ Test", 0, test_data.screen_param.tx_num, test_data.screen_param.rx_num, 1);
+	Save_Test_Data(m_absDifferData, "Panel Differ Test", 0, xiaomi_sdm439_ft5446_test_data.screen_param.tx_num, xiaomi_sdm439_ft5446_test_data.screen_param.rx_num, 1);
 	////<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<get test data ,and save to .csv file
 
-	AvgValue = AvgValue / (test_data.screen_param.tx_num * test_data.screen_param.rx_num - InvalidNum);
+	AvgValue = AvgValue / (xiaomi_sdm439_ft5446_test_data.screen_param.tx_num * xiaomi_sdm439_ft5446_test_data.screen_param.rx_num - InvalidNum);
 	FTS_TEST_SAVE_INFO("\nPanelDiffer:Max: %d, Min: %d, Avg: %d ", maxValue, minValue, AvgValue);
 
-	ReCode = write_reg(REG_NORMALIZE_TYPE, OriginRawDataType);//set to original value
-	ReCode = write_reg(0x0A, OriginFrequecy);//set to original value
-	ReCode = write_reg(0xFB, OriginFirState);//set to original value
+	ReCode = xiaomi_sdm439_ft5446_write_reg(REG_NORMALIZE_TYPE, OriginRawDataType);//set to original value
+	ReCode = xiaomi_sdm439_ft5446_write_reg(0x0A, OriginFrequecy);//set to original value
+	ReCode = xiaomi_sdm439_ft5446_write_reg(0xFB, OriginFirState);//set to original value
 
 	//set V3 TP the origin mapping value
 	if (m_bV3TP) {
-		ReCode = write_reg(REG_MAPPING_SWITCH, strSwitch);
+		ReCode = xiaomi_sdm439_ft5446_write_reg(REG_MAPPING_SWITCH, strSwitch);
 		if (ReCode != ERROR_CODE_OK) {
 			FTS_TEST_SAVE_INFO("\nFailed to restore mapping type!");
 			btmpresult = false;
@@ -1505,13 +1505,13 @@ TEST_ERR:
 }
 
 /************************************************************************
-* Name: FT5X46_TestItem_PanelDiffer_Uniformity_Test
+* Name: xiaomi_sdm439_ft5446_FT5X46_TestItem_PanelDiffer_Uniformity_Test
 * Brief:  TestItem: PanelDifferTest. Check if Panel Differ is within the range.
 * Input: none
 * Output: bTestResult, PASS or FAIL
 * Return: Comm Code. Code = 0x00 is OK, else fail.
 ***********************************************************************/
-unsigned char FT5X46_TestItem_PanelDiffer_Uniformity_Test(bool *bTestResult)
+unsigned char xiaomi_sdm439_ft5446_FT5X46_TestItem_PanelDiffer_Uniformity_Test(bool *bTestResult)
 {
 	int iRow = 0, iCol = 0;
 	unsigned char ReCode = 0;
@@ -1526,10 +1526,10 @@ unsigned char FT5X46_TestItem_PanelDiffer_Uniformity_Test(bool *bTestResult)
 	FTS_TEST_SAVE_INFO("\n\r\n\r\n\r\n==============================Test Item: -------- Panel Differ Uniformity Test  \r\n\r\n");
 
 
-	if (g_stCfg_FT5X46_BasicThreshold.PanelDiffer_Uniformity_CheckTx) {
+	if (xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.PanelDiffer_Uniformity_CheckTx) {
 		FTS_TEST_SAVE_INFO("\r\n=========PanelDiffer Uniformity Check Tx Linearity \r\n");
-		for (iRow = 0; iRow < test_data.screen_param.tx_num; ++iRow) {
-			for (iCol = 1; iCol <  test_data.screen_param.rx_num; ++iCol) {
+		for (iRow = 0; iRow < xiaomi_sdm439_ft5446_test_data.screen_param.tx_num; ++iRow) {
+			for (iCol = 1; iCol <  xiaomi_sdm439_ft5446_test_data.screen_param.rx_num; ++iCol) {
 				Deviation = abs(m_DifferData[iRow][iCol] - m_DifferData[iRow][iCol-1]);
 				Max = max(m_DifferData[iRow][iCol], m_DifferData[iRow][iCol-1]);
 				Max = Max ? Max : 1;
@@ -1539,9 +1539,9 @@ unsigned char FT5X46_TestItem_PanelDiffer_Uniformity_Test(bool *bTestResult)
 		/*To show value */
 #if 1
 		FTS_TEST_SAVE_INFO("Tx Linearity:\n");
-		for (iRow = 0; iRow < test_data.screen_param.tx_num; iRow++) {
+		for (iRow = 0; iRow < xiaomi_sdm439_ft5446_test_data.screen_param.tx_num; iRow++) {
 			FTS_TEST_SAVE_INFO("\nTx%2d:    ", iRow+1);
-			for (iCol = 1; iCol < test_data.screen_param.rx_num; iCol++) {
+			for (iCol = 1; iCol < xiaomi_sdm439_ft5446_test_data.screen_param.rx_num; iCol++) {
 				Value = TxLinearity[iRow][iCol];
 				FTS_TEST_SAVE_INFO("%4d,  ", Value);
 			}
@@ -1551,14 +1551,14 @@ unsigned char FT5X46_TestItem_PanelDiffer_Uniformity_Test(bool *bTestResult)
 #endif
 
 		/*To Determine  if in Range or not*/
-		for (iRow = 0; iRow < test_data.screen_param.tx_num; iRow++) {
-			for (iCol = 1; iCol < test_data.screen_param.rx_num; iCol++) {
-				if (test_data.mcap_detail_thr.invalid_node[iRow][iCol] == 0)
+		for (iRow = 0; iRow < xiaomi_sdm439_ft5446_test_data.screen_param.tx_num; iRow++) {
+			for (iCol = 1; iCol < xiaomi_sdm439_ft5446_test_data.screen_param.rx_num; iCol++) {
+				if (xiaomi_sdm439_ft5446_test_data.mcap_detail_thr.invalid_node[iRow][iCol] == 0)
 					continue; //Invalid Node
 
 				Min = 0;
-				Max = g_stCfg_FT5X46_BasicThreshold.PanelDiffer_Uniformity_Tx_Hole;
-				base = test_data.mcap_detail_thr.PanelDiffer_Uniformity_TxLinearityTest_Max[iRow][iCol];
+				Max = xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.PanelDiffer_Uniformity_Tx_Hole;
+				base = xiaomi_sdm439_ft5446_test_data.mcap_detail_thr.PanelDiffer_Uniformity_TxLinearityTest_Max[iRow][iCol];
 				tmp = TxLinearity[iRow][iCol];
 				Value = abs(tmp - base);
 				if (Value < Min || Value > Max) {
@@ -1568,13 +1568,13 @@ unsigned char FT5X46_TestItem_PanelDiffer_Uniformity_Test(bool *bTestResult)
 				}
 			}
 		}
-		Save_Test_Data(TxLinearity, "Check Tx Linearity", 0, test_data.screen_param.tx_num, test_data.screen_param.rx_num, 1);
+		Save_Test_Data(TxLinearity, "Check Tx Linearity", 0, xiaomi_sdm439_ft5446_test_data.screen_param.tx_num, xiaomi_sdm439_ft5446_test_data.screen_param.rx_num, 1);
 	}
 
-	if (g_stCfg_FT5X46_BasicThreshold.PanelDiffer_Uniformity_CheckRx) {
+	if (xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.PanelDiffer_Uniformity_CheckRx) {
 		FTS_TEST_SAVE_INFO("\r\n=========PanelDiffer Uniformity Check Rx Linearity \r\n");
-		for (iRow = 1; iRow < test_data.screen_param.tx_num; ++iRow) {
-			for (iCol = 0; iCol < test_data.screen_param.rx_num; ++iCol) {
+		for (iRow = 1; iRow < xiaomi_sdm439_ft5446_test_data.screen_param.tx_num; ++iRow) {
+			for (iCol = 0; iCol < xiaomi_sdm439_ft5446_test_data.screen_param.rx_num; ++iCol) {
 				Deviation = abs(m_DifferData[iRow][iCol] - m_DifferData[iRow-1][iCol]);
 				Max = max(m_DifferData[iRow][iCol], m_DifferData[iRow-1][iCol]);
 				Max = Max ? Max : 1;
@@ -1585,9 +1585,9 @@ unsigned char FT5X46_TestItem_PanelDiffer_Uniformity_Test(bool *bTestResult)
 		/*To show value*/
 #if 1
 		FTS_TEST_SAVE_INFO("Rx Linearity:\n");
-		for (iRow = 1; iRow < test_data.screen_param.tx_num; iRow++) {
+		for (iRow = 1; iRow < xiaomi_sdm439_ft5446_test_data.screen_param.tx_num; iRow++) {
 			FTS_TEST_SAVE_INFO("\nTx%2d:    ", iRow+1);
-			for (iCol = 0; iCol < test_data.screen_param.rx_num; iCol++) {
+			for (iCol = 0; iCol < xiaomi_sdm439_ft5446_test_data.screen_param.rx_num; iCol++) {
 				Value = RxLinearity[iRow][iCol];
 				FTS_TEST_SAVE_INFO("%4d,  ", Value);
 			}
@@ -1597,14 +1597,14 @@ unsigned char FT5X46_TestItem_PanelDiffer_Uniformity_Test(bool *bTestResult)
 #endif
 
 		/*To Determine  if in Range or not*/
-		for (iRow = 1; iRow < test_data.screen_param.tx_num; iRow++) {
-			for (iCol = 0; iCol < test_data.screen_param.rx_num; iCol++) {
-				if (test_data.mcap_detail_thr.invalid_node[iRow][iCol] == 0)
+		for (iRow = 1; iRow < xiaomi_sdm439_ft5446_test_data.screen_param.tx_num; iRow++) {
+			for (iCol = 0; iCol < xiaomi_sdm439_ft5446_test_data.screen_param.rx_num; iCol++) {
+				if (xiaomi_sdm439_ft5446_test_data.mcap_detail_thr.invalid_node[iRow][iCol] == 0)
 					continue; //Invalid Node
 
 				Min = 0 ; // minHole[iRow][iCol];
-				Max = g_stCfg_FT5X46_BasicThreshold.PanelDiffer_Uniformity_Rx_Hole;
-				base = test_data.mcap_detail_thr.PanelDiffer_Uniformity_RxLinearityTest_Max[iRow][iCol];
+				Max = xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.PanelDiffer_Uniformity_Rx_Hole;
+				base = xiaomi_sdm439_ft5446_test_data.mcap_detail_thr.PanelDiffer_Uniformity_RxLinearityTest_Max[iRow][iCol];
 				tmp = RxLinearity[iRow][iCol];
 				Value = abs(tmp - base);
 				if (Value < Min || Value > Max) {
@@ -1614,7 +1614,7 @@ unsigned char FT5X46_TestItem_PanelDiffer_Uniformity_Test(bool *bTestResult)
 				}
 			}
 		}
-		Save_Test_Data(RxLinearity, "Check Rx Linearity", 0, test_data.screen_param.tx_num, test_data.screen_param.rx_num, 2);
+		Save_Test_Data(RxLinearity, "Check Rx Linearity", 0, xiaomi_sdm439_ft5446_test_data.screen_param.tx_num, xiaomi_sdm439_ft5446_test_data.screen_param.rx_num, 2);
 	}
 
 	/*Test Result*/
@@ -1629,13 +1629,13 @@ unsigned char FT5X46_TestItem_PanelDiffer_Uniformity_Test(bool *bTestResult)
 }
 
 /************************************************************************
-* Name: FT5X46_TestItem_WeakShortTest
+* Name: xiaomi_sdm439_ft5446_FT5X46_TestItem_WeakShortTest
 * Brief:  TestItem: WeakShortTest. Check if Tp is short or not .
 * Input: none
 * Output: bTestResult, PASS or FAIL
 * Return: Comm Code. Code = 0x00 is OK, else fail.
 ***********************************************************************/
-unsigned char FT5X46_TestItem_WeakShortTest(bool *bTestResult)
+unsigned char xiaomi_sdm439_ft5446_FT5X46_TestItem_WeakShortTest(bool *bTestResult)
 {
 
 	unsigned char ReCode = ERROR_CODE_COMM_ERROR;
@@ -1661,16 +1661,16 @@ unsigned char FT5X46_TestItem_WeakShortTest(bool *bTestResult)
 
 	FTS_TEST_SAVE_INFO("\n\n\n\n\n==============================Test Item: -----  Weak Short-Circuit Test \r\n\r\n");
 
-	ReCode = enter_work_mode();   //
+	ReCode = xiaomi_sdm439_ft5446_enter_work_mode();   //
 	if (ReCode != ERROR_CODE_OK) {
-		FTS_TEST_SAVE_INFO("\n enter_work_mode failed.. Error Code: %d", ReCode);
+		FTS_TEST_SAVE_INFO("\n xiaomi_sdm439_ft5446_enter_work_mode failed.. Error Code: %d", ReCode);
 		btmpresult = false;
 		goto TEST_ERR;
 	}
-	sys_delay(200);
+	xiaomi_sdm439_ft5446_sys_delay(200);
 
 	//read 0xb1, <=0x05||==0xff:version E     =0x06 || others:version F
-	ReCode = read_reg(0xB1, &IcValue);//Get IC type
+	ReCode = xiaomi_sdm439_ft5446_read_reg(0xB1, &IcValue);//Get IC type
 	if (ReCode != ERROR_CODE_OK) {
 		FTS_TEST_SAVE_INFO("\n\n Read 0xB1 IcValue error. Error Code: %d\n", ReCode);
 		btmpresult = false;
@@ -1680,15 +1680,15 @@ unsigned char FT5X46_TestItem_WeakShortTest(bool *bTestResult)
 
 	iRsen = 57;
 	//New test item only for Weak Short Test
-	iCCRsen = g_stCfg_FT5X46_BasicThreshold.WeakShortTest_CC_Rsen;
-	bCapShortTest = g_stCfg_FT5X46_BasicThreshold.WeakShortTest_CapShortTest;
+	iCCRsen = xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.WeakShortTest_CC_Rsen;
+	bCapShortTest = xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.WeakShortTest_CapShortTest;
 	FTS_TEST_SAVE_INFO("\n iCCRsen:%d.  \n", iCCRsen);
 	FTS_TEST_SAVE_INFO("\n bCapShortTest:%d.  \n", bCapShortTest);
 
-	ReCode = enter_factory_mode();
-	sys_delay(100);
+	ReCode = xiaomi_sdm439_ft5446_enter_factory_mode();
+	xiaomi_sdm439_ft5446_sys_delay(100);
 	if (ReCode != ERROR_CODE_OK) {
-		FTS_TEST_SAVE_INFO("\n enter_factory_mode failed.. Error Code: %d", ReCode);
+		FTS_TEST_SAVE_INFO("\n xiaomi_sdm439_ft5446_enter_factory_mode failed.. Error Code: %d", ReCode);
 		btmpresult = false;
 		goto TEST_ERR;
 	}
@@ -1697,24 +1697,24 @@ unsigned char FT5X46_TestItem_WeakShortTest(bool *bTestResult)
 	//and check the mapping type is right or not,if not, write the register
 	//weakshort test mapping,  before mapping 0x54=1;after mapping 0x54=0;
 	if (m_bV3TP) {
-		ReCode = read_reg(REG_MAPPING_SWITCH, &strSwitch);
+		ReCode = xiaomi_sdm439_ft5446_read_reg(REG_MAPPING_SWITCH, &strSwitch);
 		if (strSwitch != 1) {
-			ReCode = write_reg(REG_MAPPING_SWITCH, 1);
-			sys_delay(20);
+			ReCode = xiaomi_sdm439_ft5446_write_reg(REG_MAPPING_SWITCH, 1);
+			xiaomi_sdm439_ft5446_sys_delay(20);
 			if (ReCode != ERROR_CODE_OK) {
 				FTS_TEST_SAVE_INFO("\n\r\nFailed to restore mapping type!\r\n ");
 				btmpresult = false;
 			}
 			GetChannelNumNoMapping();
 
-			tx_num = test_data.screen_param.tx_num;
-			rx_num = test_data.screen_param.rx_num;
+			tx_num = xiaomi_sdm439_ft5446_test_data.screen_param.tx_num;
+			rx_num = xiaomi_sdm439_ft5446_test_data.screen_param.rx_num;
 		}
 	} else {
 		//TxNum register 0x02(Read Only)
 		//RxNum register 0x03(Read Only)
-		ReCode = read_reg(0x02, &tx_num);//Get Tx
-		ReCode = read_reg(0x03, &rx_num);//Get Rx
+		ReCode = xiaomi_sdm439_ft5446_read_reg(0x02, &tx_num);//Get Tx
+		ReCode = xiaomi_sdm439_ft5446_read_reg(0x03, &rx_num);//Get Rx
 		FTS_TEST_SAVE_INFO("\nNewly acquired TxNum:%d, RxNum:%d", tx_num, rx_num);
 	}
 
@@ -1734,13 +1734,13 @@ unsigned char FT5X46_TestItem_WeakShortTest(bool *bTestResult)
 		GetRawData();
 	}
 
-	iAdcData = fts_malloc(iAllAdcDataNum * sizeof(int));
+	iAdcData = xiaomi_sdm439_ft5446_fts_malloc(iAllAdcDataNum * sizeof(int));
 	memset(iAdcData, 0, iAllAdcDataNum);    //  memset(iAdcData, 0, sizeof(iAdcData));
 
 	for (i = 0; i < 5; i++) {
 		memset(iAdcData, 0, iAllAdcDataNum);
 		ReCode = WeakShort_GetAdcData(iAllAdcDataNum * 2, iAdcData);
-		sys_delay(50);
+		xiaomi_sdm439_ft5446_sys_delay(50);
 		if (ReCode != ERROR_CODE_OK) {
 			continue;
 		} else {    //  adc function ok
@@ -1800,13 +1800,13 @@ unsigned char FT5X46_TestItem_WeakShortTest(bool *bTestResult)
 
 
 
-	fMShortResistance = fts_malloc(iChannelNum * sizeof(int));      //  fMShortResistance = new float[iChannelNum];
+	fMShortResistance = xiaomi_sdm439_ft5446_fts_malloc(iChannelNum * sizeof(int));      //  fMShortResistance = new float[iChannelNum];
 	memset(fMShortResistance, 0, iChannelNum);
-	fGShortResistance =  fts_malloc(iChannelNum * sizeof(int)); //      fGShortResistance = new float[iChannelNum];
+	fGShortResistance =  xiaomi_sdm439_ft5446_fts_malloc(iChannelNum * sizeof(int)); //      fGShortResistance = new float[iChannelNum];
 	memset(fGShortResistance, 0, iChannelNum);
 
 	/////////////////////////////////////////////Channel and Ground
-	iMin_CG = g_stCfg_FT5X46_BasicThreshold.WeakShortTest_CG;
+	iMin_CG = xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.WeakShortTest_CG;
 
 	iDoffset = iOffset - 1024;
 	iDrefn = iClbData_Ground;
@@ -1856,7 +1856,7 @@ unsigned char FT5X46_TestItem_WeakShortTest(bool *bTestResult)
 	}
 
 	/////////////////////////////////////////////Channel and Channel
-	iMin_CC = g_stCfg_FT5X46_BasicThreshold.WeakShortTest_CC;
+	iMin_CC = xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.WeakShortTest_CC;
 
 	if ((IcValue == 0x06 || IcValue < 0xff) && iRsen != iCCRsen) {
 		iRsen = iCCRsen;
@@ -1919,8 +1919,8 @@ unsigned char FT5X46_TestItem_WeakShortTest(bool *bTestResult)
 
 	//set V3 TP the origin mapping value
 	if (m_bV3TP) {
-		ReCode = write_reg(REG_MAPPING_SWITCH, strSwitch);
-		sys_delay(50);
+		ReCode = xiaomi_sdm439_ft5446_write_reg(REG_MAPPING_SWITCH, strSwitch);
+		xiaomi_sdm439_ft5446_sys_delay(50);
 		if (ReCode != ERROR_CODE_OK) {
 			FTS_TEST_SAVE_INFO("\nFailed to restore mapping type!\r\n ");
 			btmpresult = false;
@@ -1969,7 +1969,7 @@ TEST_ERR:
 ***********************************************************************/
 static unsigned char GetPanelRows(unsigned char *pPanelRows)
 {
-	return read_reg(REG_TX_NUM, pPanelRows);
+	return xiaomi_sdm439_ft5446_read_reg(REG_TX_NUM, pPanelRows);
 }
 
 /************************************************************************
@@ -1981,7 +1981,7 @@ static unsigned char GetPanelRows(unsigned char *pPanelRows)
 ***********************************************************************/
 static unsigned char GetPanelCols(unsigned char *pPanelCols)
 {
-	return read_reg(REG_RX_NUM, pPanelCols);
+	return xiaomi_sdm439_ft5446_read_reg(REG_RX_NUM, pPanelCols);
 }
 /************************************************************************
 * Name: StartScan(Same function name as FT_MultipleTest)
@@ -1997,14 +1997,14 @@ static int StartScan(void)
 	const unsigned char MaxTimes = 250;  //The longest wait 160ms
 	unsigned char ReCode = ERROR_CODE_COMM_ERROR;
 
-	ReCode = read_reg(DEVIDE_MODE_ADDR, &RegVal);
+	ReCode = xiaomi_sdm439_ft5446_read_reg(DEVIDE_MODE_ADDR, &RegVal);
 	if (ReCode == ERROR_CODE_OK) {
 		RegVal |= 0x80;     //Top bit position 1, start scan
-		ReCode = write_reg(DEVIDE_MODE_ADDR, RegVal);
+		ReCode = xiaomi_sdm439_ft5446_write_reg(DEVIDE_MODE_ADDR, RegVal);
 		if (ReCode == ERROR_CODE_OK) {
 			while (times++ < MaxTimes) {    //Wait for the scan to complete
-				sys_delay(16);   //16ms
-				ReCode = read_reg(DEVIDE_MODE_ADDR, &RegVal);
+				xiaomi_sdm439_ft5446_sys_delay(16);   //16ms
+				ReCode = xiaomi_sdm439_ft5446_read_reg(DEVIDE_MODE_ADDR, &RegVal);
 				if (ReCode == ERROR_CODE_OK) {
 					if ((RegVal >> 7) == 0)
 						break;
@@ -2052,7 +2052,7 @@ unsigned char ReadRawData(unsigned char Freq, unsigned char LineNum, int ByteNum
 		BytesNumInTestMode1 = BYTES_PER_TIME;
 	}
 
-	ReCode = write_reg(REG_LINE_NUM, LineNum);//Set row addr;
+	ReCode = xiaomi_sdm439_ft5446_write_reg(REG_LINE_NUM, LineNum);//Set row addr;
 
 	if (ReCode != ERROR_CODE_OK) {
 		FTS_TEST_SAVE_INFO("\nFailed to write REG_LINE_NUM! ");
@@ -2062,9 +2062,9 @@ unsigned char ReadRawData(unsigned char Freq, unsigned char LineNum, int ByteNum
 	//***********************************************************Read raw data
 	I2C_wBuffer[0] = REG_RawBuf0;   //set begin address
 	if (ReCode == ERROR_CODE_OK) {
-		ReCode = fts_i2c_read_write(I2C_wBuffer, 1, m_ucTempData, BytesNumInTestMode1);
+		ReCode = xiaomi_sdm439_ft5446_fts_i2c_read_write(I2C_wBuffer, 1, m_ucTempData, BytesNumInTestMode1);
 		if (ReCode != ERROR_CODE_OK) {
-			FTS_TEST_SAVE_INFO("\nread rawdata fts_i2c_read_write Failed!1 ");
+			FTS_TEST_SAVE_INFO("\nread rawdata xiaomi_sdm439_ft5446_fts_i2c_read_write Failed!1 ");
 			goto READ_ERR;
 		}
 	}
@@ -2074,16 +2074,16 @@ unsigned char ReadRawData(unsigned char Freq, unsigned char LineNum, int ByteNum
 			break;
 
 		if (i == iReadNum - 1) { //last packet
-			ReCode = fts_i2c_read_write(NULL, 0, m_ucTempData + BYTES_PER_TIME * i, ByteNum - BYTES_PER_TIME * i);
+			ReCode = xiaomi_sdm439_ft5446_fts_i2c_read_write(NULL, 0, m_ucTempData + BYTES_PER_TIME * i, ByteNum - BYTES_PER_TIME * i);
 			if (ReCode != ERROR_CODE_OK) {
-				FTS_TEST_SAVE_INFO("\nread rawdata fts_i2c_read_write Failed!2 ");
+				FTS_TEST_SAVE_INFO("\nread rawdata xiaomi_sdm439_ft5446_fts_i2c_read_write Failed!2 ");
 				goto READ_ERR;
 			}
 		} else {
-			ReCode = fts_i2c_read_write(NULL, 0, m_ucTempData + BYTES_PER_TIME * i, BYTES_PER_TIME);
+			ReCode = xiaomi_sdm439_ft5446_fts_i2c_read_write(NULL, 0, m_ucTempData + BYTES_PER_TIME * i, BYTES_PER_TIME);
 
 			if (ReCode != ERROR_CODE_OK) {
-				FTS_TEST_SAVE_INFO("\nread rawdata fts_i2c_read_write Failed!3 ");
+				FTS_TEST_SAVE_INFO("\nread rawdata xiaomi_sdm439_ft5446_fts_i2c_read_write Failed!3 ");
 				goto READ_ERR;
 			}
 		}
@@ -2123,8 +2123,8 @@ unsigned char GetTxSC_CB(unsigned char index, unsigned char *pcbValue)
 
 	if (index < 128) { //single read
 		*pcbValue = 0;
-		write_reg(REG_ScCbAddrR, index);
-		ReCode = read_reg(REG_ScCbBuf0, pcbValue);
+		xiaomi_sdm439_ft5446_write_reg(REG_ScCbAddrR, index);
+		ReCode = xiaomi_sdm439_ft5446_read_reg(REG_ScCbBuf0, pcbValue);
 	} else { //Sequential Read length index-128
 		byte_num = index - 128;
 		packet_num = byte_num / BYTES_PER_TIME;
@@ -2141,9 +2141,9 @@ unsigned char GetTxSC_CB(unsigned char index, unsigned char *pcbValue)
 			if ((i == (packet_num - 1)) && packet_remainder) {
 				read_num = packet_remainder;
 			}
-			write_reg(REG_ScCbAddrR, 0);
+			xiaomi_sdm439_ft5446_write_reg(REG_ScCbAddrR, 0);
 			wBuffer[0] = REG_ScCbBuf0;
-			ReCode = fts_i2c_read_write(wBuffer, 1, pcbValue, read_num);
+			ReCode = xiaomi_sdm439_ft5446_fts_i2c_read_write(wBuffer, 1, pcbValue, read_num);
 		}
 
 	}
@@ -2165,24 +2165,24 @@ static void Save_Test_Data(int iData[TX_NUM_MAX][RX_NUM_MAX], char *test_num, in
 	int i = 0, j = 0;
 
 	//Save  Msg (itemcode is enough, ItemName is not necessary, so set it to "NA".)
-	iLen = snprintf(test_data.tmp_buffer, PAGE_SIZE, \
-				   "%s, %d, %d, %d, %d, %d, ", test_num, test_data.test_item_code, Row, Col, test_data.start_line, ItemCount);
-	memcpy(test_data.msg_area_line2 + test_data.len_msg_area_line2, test_data.tmp_buffer, iLen);
-	test_data.len_msg_area_line2 += iLen;
+	iLen = snprintf(xiaomi_sdm439_ft5446_test_data.tmp_buffer, PAGE_SIZE, \
+				   "%s, %d, %d, %d, %d, %d, ", test_num, xiaomi_sdm439_ft5446_test_data.test_item_code, Row, Col, xiaomi_sdm439_ft5446_test_data.start_line, ItemCount);
+	memcpy(xiaomi_sdm439_ft5446_test_data.msg_area_line2 + xiaomi_sdm439_ft5446_test_data.len_msg_area_line2, xiaomi_sdm439_ft5446_test_data.tmp_buffer, iLen);
+	xiaomi_sdm439_ft5446_test_data.len_msg_area_line2 += iLen;
 
-	test_data.start_line += Row;
-	test_data.test_data_count++;
+	xiaomi_sdm439_ft5446_test_data.start_line += Row;
+	xiaomi_sdm439_ft5446_test_data.test_data_count++;
 
 	//Save Data
 	for (i = 0 + iArrayIndex; (i < Row + iArrayIndex)  && (i < TX_NUM_MAX); i++) {
 		for (j = 0; (j < Col) && (j < RX_NUM_MAX); j++) {
 			if (j == (Col - 1)) //The Last Data of the Row, add "\n"
-				iLen = snprintf(test_data.tmp_buffer, PAGE_SIZE, "%d, \n",  iData[i][j]);
+				iLen = snprintf(xiaomi_sdm439_ft5446_test_data.tmp_buffer, PAGE_SIZE, "%d, \n",  iData[i][j]);
 			else
-				iLen = snprintf(test_data.tmp_buffer, PAGE_SIZE, "%d, ", iData[i][j]);
+				iLen = snprintf(xiaomi_sdm439_ft5446_test_data.tmp_buffer, PAGE_SIZE, "%d, ", iData[i][j]);
 
-			memcpy(test_data.store_data_area + test_data.len_store_data_area, test_data.tmp_buffer, iLen);
-			test_data.len_store_data_area += iLen;
+			memcpy(xiaomi_sdm439_ft5446_test_data.store_data_area + xiaomi_sdm439_ft5446_test_data.len_store_data_area, xiaomi_sdm439_ft5446_test_data.tmp_buffer, iLen);
+			xiaomi_sdm439_ft5446_test_data.len_store_data_area += iLen;
 		}
 	}
 
@@ -2203,11 +2203,11 @@ static unsigned char GetChannelNum(void)
 	//m_strCurrentTestMsg = "Get Tx Num...";
 	ReCode = GetPanelRows(rBuffer);
 	if (ReCode == ERROR_CODE_OK) {
-		test_data.screen_param.tx_num = rBuffer[0];
-		if (test_data.screen_param.tx_num > test_data.screen_param.used_max_tx_num) {
+		xiaomi_sdm439_ft5446_test_data.screen_param.tx_num = rBuffer[0];
+		if (xiaomi_sdm439_ft5446_test_data.screen_param.tx_num > xiaomi_sdm439_ft5446_test_data.screen_param.used_max_tx_num) {
 			FTS_TEST_SAVE_INFO("\nFailed to get Tx number, Get num = %d, UsedMaxNum = %d",
-							   test_data.screen_param.tx_num, test_data.screen_param.used_max_tx_num);
-			test_data.screen_param.tx_num = 0;
+							   xiaomi_sdm439_ft5446_test_data.screen_param.tx_num, xiaomi_sdm439_ft5446_test_data.screen_param.used_max_tx_num);
+			xiaomi_sdm439_ft5446_test_data.screen_param.tx_num = 0;
 			return ERROR_CODE_INVALID_PARAM;
 		}
 	} else {
@@ -2218,11 +2218,11 @@ static unsigned char GetChannelNum(void)
 
 	ReCode = GetPanelCols(rBuffer);
 	if (ReCode == ERROR_CODE_OK) {
-		test_data.screen_param.rx_num = rBuffer[0];
-		if (test_data.screen_param.rx_num > test_data.screen_param.used_max_rx_num) {
+		xiaomi_sdm439_ft5446_test_data.screen_param.rx_num = rBuffer[0];
+		if (xiaomi_sdm439_ft5446_test_data.screen_param.rx_num > xiaomi_sdm439_ft5446_test_data.screen_param.used_max_rx_num) {
 			FTS_TEST_SAVE_INFO("\nFailed to get Rx number, Get num = %d, UsedMaxNum = %d",
-							   test_data.screen_param.rx_num, test_data.screen_param.used_max_rx_num);
-			test_data.screen_param.rx_num = 0;
+							   xiaomi_sdm439_ft5446_test_data.screen_param.rx_num, xiaomi_sdm439_ft5446_test_data.screen_param.used_max_rx_num);
+			xiaomi_sdm439_ft5446_test_data.screen_param.rx_num = 0;
 			return ERROR_CODE_INVALID_PARAM;
 		}
 	} else {
@@ -2246,7 +2246,7 @@ static unsigned char GetRawData(void)
 	int iCol = 0;
 
 	//--------------------------------------------Enter Factory Mode
-	ReCode = enter_factory_mode();
+	ReCode = xiaomi_sdm439_ft5446_enter_factory_mode();
 	if (ERROR_CODE_OK != ReCode) {
 		FTS_TEST_SAVE_INFO("\nFailed to Enter Factory Mode...");
 		return ReCode;
@@ -2254,7 +2254,7 @@ static unsigned char GetRawData(void)
 
 
 	//--------------------------------------------Check Num of Channel
-	if (0 == (test_data.screen_param.tx_num + test_data.screen_param.rx_num)) {
+	if (0 == (xiaomi_sdm439_ft5446_test_data.screen_param.tx_num + xiaomi_sdm439_ft5446_test_data.screen_param.rx_num)) {
 		ReCode = GetChannelNum();
 		if (ERROR_CODE_OK != ReCode) {
 			FTS_TEST_SAVE_INFO("\nError Channel Num...");
@@ -2271,10 +2271,10 @@ static unsigned char GetRawData(void)
 
 	//--------------------------------------------Read RawData, Only MCAP
 	memset(m_RawData, 0, sizeof(m_RawData));
-	ReCode = ReadRawData(1, 0xAA, (test_data.screen_param.tx_num * test_data.screen_param.rx_num) * 2, m_iTempRawData);
-	for (iRow = 0; iRow < test_data.screen_param.tx_num; iRow++) {
-		for (iCol = 0; iCol < test_data.screen_param.rx_num; iCol++) {
-			m_RawData[iRow][iCol] = m_iTempRawData[iRow * test_data.screen_param.rx_num + iCol];
+	ReCode = ReadRawData(1, 0xAA, (xiaomi_sdm439_ft5446_test_data.screen_param.tx_num * xiaomi_sdm439_ft5446_test_data.screen_param.rx_num) * 2, m_iTempRawData);
+	for (iRow = 0; iRow < xiaomi_sdm439_ft5446_test_data.screen_param.tx_num; iRow++) {
+		for (iCol = 0; iCol < xiaomi_sdm439_ft5446_test_data.screen_param.rx_num; iCol++) {
+			m_RawData[iRow][iCol] = m_iTempRawData[iRow * xiaomi_sdm439_ft5446_test_data.screen_param.rx_num + iCol];
 		}
 	}
 	return ReCode;
@@ -2290,9 +2290,9 @@ static void ShowRawData(void)
 {
 	int iRow, iCol;
 	//----------------------------------------------------------Show RawData
-	for (iRow = 0; iRow < test_data.screen_param.tx_num; iRow++) {
+	for (iRow = 0; iRow < xiaomi_sdm439_ft5446_test_data.screen_param.tx_num; iRow++) {
 		FTS_TEST_SAVE_INFO("\nTx%2d:", iRow + 1);
-		for (iCol = 0; iCol < test_data.screen_param.rx_num; iCol++) {
+		for (iCol = 0; iCol < xiaomi_sdm439_ft5446_test_data.screen_param.rx_num; iCol++) {
 			FTS_TEST_SAVE_INFO("%5d    ", m_RawData[iRow][iCol]);
 		}
 		FTS_TEST_SAVE_INFO("\n");
@@ -2313,18 +2313,18 @@ static unsigned char GetChannelNumNoMapping(void)
 
 
 	FTS_TEST_SAVE_INFO("\nGet Tx Num...");
-	ReCode = read_reg(REG_TX_NOMAPPING_NUM,  rBuffer);
+	ReCode = xiaomi_sdm439_ft5446_read_reg(REG_TX_NOMAPPING_NUM,  rBuffer);
 	if (ReCode == ERROR_CODE_OK) {
-		test_data.screen_param.tx_num = rBuffer[0];
+		xiaomi_sdm439_ft5446_test_data.screen_param.tx_num = rBuffer[0];
 	} else {
 		FTS_TEST_SAVE_INFO("\nFailed to get Tx number");
 	}
 
 
 	FTS_TEST_SAVE_INFO("\nGet Rx Num...");
-	ReCode = read_reg(REG_RX_NOMAPPING_NUM,  rBuffer);
+	ReCode = xiaomi_sdm439_ft5446_read_reg(REG_RX_NOMAPPING_NUM,  rBuffer);
 	if (ReCode == ERROR_CODE_OK) {
-		test_data.screen_param.rx_num = rBuffer[0];
+		xiaomi_sdm439_ft5446_test_data.screen_param.rx_num = rBuffer[0];
 	} else {
 		FTS_TEST_SAVE_INFO("\nFailed to get Rx number");
 	}
@@ -2343,7 +2343,7 @@ static unsigned char SwitchToNoMapping(void)
 	unsigned char chPattern = -1;
 	unsigned char ReCode = ERROR_CODE_OK;
 	unsigned char RegData = -1;
-	ReCode = read_reg(REG_PATTERN, &chPattern);//
+	ReCode = xiaomi_sdm439_ft5446_read_reg(REG_PATTERN, &chPattern);//
 	if (ReCode != ERROR_CODE_OK) {
 		FTS_TEST_SAVE_INFO("\nSwitch To NoMapping Failed!");
 		goto READ_ERR;
@@ -2351,19 +2351,19 @@ static unsigned char SwitchToNoMapping(void)
 
 	if (1 == chPattern) { // 1: V3 Pattern
 		RegData = -1;
-		ReCode = read_reg(REG_MAPPING_SWITCH, &RegData);
+		ReCode = xiaomi_sdm439_ft5446_read_reg(REG_MAPPING_SWITCH, &RegData);
 		if (ReCode != ERROR_CODE_OK) {
 			FTS_TEST_SAVE_INFO("\nread REG_MAPPING_SWITCH Failed!");
 			goto READ_ERR;
 		}
 
 		if (1 != RegData) {
-			ReCode = write_reg(REG_MAPPING_SWITCH, 1);  //0-mapping 1-no mampping
+			ReCode = xiaomi_sdm439_ft5446_write_reg(REG_MAPPING_SWITCH, 1);  //0-mapping 1-no mampping
 			if (ReCode != ERROR_CODE_OK) {
 				FTS_TEST_SAVE_INFO("\nwrite REG_MAPPING_SWITCH Failed!");
 				goto READ_ERR;
 			}
-			sys_delay(20);
+			xiaomi_sdm439_ft5446_sys_delay(20);
 			ReCode = GetChannelNumNoMapping();
 
 			if (ReCode != ERROR_CODE_OK) {
@@ -2434,17 +2434,17 @@ static unsigned char WeakShort_GetAdcData(int AllAdcDataLen, int *pRevBuffer)
 		return -EIO;
 	}
 
-	ReCode = write_reg(0x07, 0x01);// Test weak short once,after host send an enable command
+	ReCode = xiaomi_sdm439_ft5446_write_reg(0x07, 0x01);// Test weak short once,after host send an enable command
 	if (ReCode != ERROR_CODE_OK) {
 		FTS_TEST_SAVE_INFO("\nWriteReg error. \n");
 		goto EndGetAdc;
 	}
 
-	sys_delay(100);
+	xiaomi_sdm439_ft5446_sys_delay(100);
 
 	for (i = 0; i < 100 * 5; i++) { // Data ready,and FW set reg 0x07 to 0.
-		sys_delay(10);
-		ReCode = read_reg(0x07, &Data);
+		xiaomi_sdm439_ft5446_sys_delay(10);
+		ReCode = xiaomi_sdm439_ft5446_read_reg(0x07, &Data);
 		if (ReCode == ERROR_CODE_OK) {
 			if (Data == 0) {
 				bAdcOK = true;
@@ -2458,7 +2458,7 @@ static unsigned char WeakShort_GetAdcData(int AllAdcDataLen, int *pRevBuffer)
 		ReCode = ERROR_CODE_COMM_ERROR;
 		goto EndGetAdc;
 	}
-	sys_delay(300);  //  frank add. 20160517
+	xiaomi_sdm439_ft5446_sys_delay(300);  //  frank add. 20160517
 	cmd = 0xF4;
 
 	packet_num = AllAdcDataLen / BYTES_PER_TIME;
@@ -2472,13 +2472,13 @@ static unsigned char WeakShort_GetAdcData(int AllAdcDataLen, int *pRevBuffer)
 	}
 	FTS_INFO("packet_num = %d, AllAdcDataLen = %d read_num = %d", packet_num, AllAdcDataLen, read_num);
 
-	ReCode = fts_i2c_read_write(&cmd, 1, pDataSend, read_num);
+	ReCode = xiaomi_sdm439_ft5446_fts_i2c_read_write(&cmd, 1, pDataSend, read_num);
 	for (i = 1; i < packet_num; i++) {
 		offset = read_num * i;
 		if ((i == (packet_num - 1)) && packet_remainder) {
 			read_num = packet_remainder;
 		}
-		ReCode = fts_i2c_read_write(NULL, 0, pDataSend + offset, read_num);
+		ReCode = xiaomi_sdm439_ft5446_fts_i2c_read_write(NULL, 0, pDataSend + offset, read_num);
 	}
 	if (ReCode == ERROR_CODE_OK) {
 		for (i = 0; i < AllAdcDataLen / 2; i++) {
@@ -2494,386 +2494,386 @@ EndGetAdc:
 	return ReCode;
 }
 
-void init_testitem_ft5x46(char *strIniFile)
+void xiaomi_sdm439_ft5446_init_testitem_ft5x46(char *strIniFile)
 {
 	char str[512];
 	FTS_TEST_FUNC_ENTER();
 
 	//////////////////////////////////////////////////////////// FW Version
-	GetPrivateProfileString("TestItem", "FW_VERSION_TEST", "0", str, strIniFile);
-	g_stCfg_FT5X46_TestItem.FW_VERSION_TEST = fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("TestItem", "FW_VERSION_TEST", "0", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_TestItem.FW_VERSION_TEST = xiaomi_sdm439_ft5446_fts_atoi(str);
 
 	//////////////////////////////////////////////////////////// Factory ID
-	GetPrivateProfileString("TestItem", "FACTORY_ID_TEST", "0", str, strIniFile);
-	g_stCfg_FT5X46_TestItem.FACTORY_ID_TEST = fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("TestItem", "FACTORY_ID_TEST", "0", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_TestItem.FACTORY_ID_TEST = xiaomi_sdm439_ft5446_fts_atoi(str);
 
 	//////////////////////////////////////////////////////////// Project Code Test
-	GetPrivateProfileString("TestItem", "PROJECT_CODE_TEST", "0", str, strIniFile);
-	g_stCfg_FT5X46_TestItem.PROJECT_CODE_TEST = fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("TestItem", "PROJECT_CODE_TEST", "0", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_TestItem.PROJECT_CODE_TEST = xiaomi_sdm439_ft5446_fts_atoi(str);
 
 	/////////////////////////////////// RawData Test
-	GetPrivateProfileString("TestItem", "RAWDATA_TEST", "1", str, strIniFile);
-	g_stCfg_FT5X46_TestItem.RAWDATA_TEST = fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("TestItem", "RAWDATA_TEST", "1", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_TestItem.RAWDATA_TEST = xiaomi_sdm439_ft5446_fts_atoi(str);
 
 	/////////////////////////////////// SCAP_CB_TEST
-	GetPrivateProfileString("TestItem", "SCAP_CB_TEST", "1", str, strIniFile);
-	g_stCfg_FT5X46_TestItem.SCAP_CB_TEST = fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("TestItem", "SCAP_CB_TEST", "1", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_TestItem.SCAP_CB_TEST = xiaomi_sdm439_ft5446_fts_atoi(str);
 
 	/////////////////////////////////// SCAP_RAWDATA_TEST
-	GetPrivateProfileString("TestItem", "SCAP_RAWDATA_TEST", "1", str, strIniFile);
-	g_stCfg_FT5X46_TestItem.SCAP_RAWDATA_TEST = fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("TestItem", "SCAP_RAWDATA_TEST", "1", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_TestItem.SCAP_RAWDATA_TEST = xiaomi_sdm439_ft5446_fts_atoi(str);
 
 	/////////////////////////////////// CHANNEL_NUM_TEST
-	GetPrivateProfileString("TestItem", "CHANNEL_NUM_TEST", "1", str, strIniFile);
-	g_stCfg_FT5X46_TestItem.CHANNEL_NUM_TEST = fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("TestItem", "CHANNEL_NUM_TEST", "1", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_TestItem.CHANNEL_NUM_TEST = xiaomi_sdm439_ft5446_fts_atoi(str);
 
 	/////////////////////////////////// NOISE_TEST
-	GetPrivateProfileString("TestItem", "NOISE_TEST", "0", str, strIniFile);
-	g_stCfg_FT5X46_TestItem.NOISE_TEST = fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("TestItem", "NOISE_TEST", "0", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_TestItem.NOISE_TEST = xiaomi_sdm439_ft5446_fts_atoi(str);
 
 	/////////////////////////////////// WEAK_SHORT_CIRCUIT_TEST
-	GetPrivateProfileString("TestItem", "WEAK_SHORT_CIRCUIT_TEST", "0", str, strIniFile);
-	g_stCfg_FT5X46_TestItem.WEAK_SHORT_CIRCUIT_TEST = fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("TestItem", "WEAK_SHORT_CIRCUIT_TEST", "0", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_TestItem.WEAK_SHORT_CIRCUIT_TEST = xiaomi_sdm439_ft5446_fts_atoi(str);
 
 	/////////////////////////////////// UNIFORMITY_TEST
-	GetPrivateProfileString("TestItem", "UNIFORMITY_TEST", "0", str, strIniFile);
-	g_stCfg_FT5X46_TestItem.UNIFORMITY_TEST = fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("TestItem", "UNIFORMITY_TEST", "0", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_TestItem.UNIFORMITY_TEST = xiaomi_sdm439_ft5446_fts_atoi(str);
 
 	/////////////////////////////////// panel differ_TEST
-	GetPrivateProfileString("TestItem", "PANEL_DIFFER_TEST", "0", str, strIniFile);
-	g_stCfg_FT5X46_TestItem.PANEL_DIFFER_TEST = fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("TestItem", "PANEL_DIFFER_TEST", "0", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_TestItem.PANEL_DIFFER_TEST = xiaomi_sdm439_ft5446_fts_atoi(str);
 
 	/////////////////////////////////// panel differ uniformity TEST
-	GetPrivateProfileString("TestItem", "PANEL_DIFFER_UNIFORMITY_TEST", "0", str, strIniFile);
-	g_stCfg_FT5X46_TestItem.PANEL_DIFFER_UNIFORMITY_TEST = fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("TestItem", "PANEL_DIFFER_UNIFORMITY_TEST", "0", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_TestItem.PANEL_DIFFER_UNIFORMITY_TEST = xiaomi_sdm439_ft5446_fts_atoi(str);
 
 	///////////////////////////////////SITO_RAWDATA_UNIFORMITY_TEST
-	GetPrivateProfileString("TestItem", "SITO_RAWDATA_UNIFORMITY_TEST", "0", str, strIniFile);
-	g_stCfg_FT5X46_TestItem.SITO_RAWDATA_UNIFORMITY_TEST = fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("TestItem", "SITO_RAWDATA_UNIFORMITY_TEST", "0", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_TestItem.SITO_RAWDATA_UNIFORMITY_TEST = xiaomi_sdm439_ft5446_fts_atoi(str);
 
 	///////////////////////////////////LCD_NOISE_TEST
-	GetPrivateProfileString("TestItem", "LCD_NOISE_TEST", "0", str, strIniFile);
-	g_stCfg_FT5X46_TestItem.LCD_NOISE_TEST = fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("TestItem", "LCD_NOISE_TEST", "0", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_TestItem.LCD_NOISE_TEST = xiaomi_sdm439_ft5446_fts_atoi(str);
 
 	FTS_TEST_FUNC_EXIT();
 }
-void init_basicthreshold_ft5x46(char *strIniFile)
+void xiaomi_sdm439_ft5446_init_basicthreshold_ft5x46(char *strIniFile)
 {
 	char str[512];
 
 	FTS_TEST_FUNC_ENTER();
 	//////////////////////////////////////////////////////////// FW Version
-	GetPrivateProfileString("Basic_Threshold", "FW_VER_VALUE", "0", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.FW_VER_VALUE = fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "FW_VER_VALUE", "0", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.FW_VER_VALUE = xiaomi_sdm439_ft5446_fts_atoi(str);
 
 	//////////////////////////////////////////////////////////// Factory ID
-	GetPrivateProfileString("Basic_Threshold", "Factory_ID_Number", "255", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.Factory_ID_Number = fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "Factory_ID_Number", "255", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.Factory_ID_Number = xiaomi_sdm439_ft5446_fts_atoi(str);
 
 	//////////////////////////////////////////////////////////// Project Code Test
-	GetPrivateProfileString("Basic_Threshold", "Project_Code", " ", str, strIniFile);
-	snprintf(g_stCfg_FT5X46_BasicThreshold.Project_Code, PAGE_SIZE, "%s", str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "Project_Code", " ", str, strIniFile);
+	snprintf(xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.Project_Code, PAGE_SIZE, "%s", str);
 
-	GetPrivateProfileString("Basic_Threshold", "RawDataTest_Low_Min", "3000", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.RawDataTest_low_Min = fts_atoi(str);
-	GetPrivateProfileString("Basic_Threshold", "RawDataTest_Low_Max", "15000", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.RawDataTest_Low_Max = fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "RawDataTest_Low_Min", "3000", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.RawDataTest_low_Min = xiaomi_sdm439_ft5446_fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "RawDataTest_Low_Max", "15000", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.RawDataTest_Low_Max = xiaomi_sdm439_ft5446_fts_atoi(str);
 
-	GetPrivateProfileString("Basic_Threshold", "RawDataTest_High_Min", "3000", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.RawDataTest_high_Min = fts_atoi(str);
-	GetPrivateProfileString("Basic_Threshold", "RawDataTest_High_Max", "15000", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.RawDataTest_high_Max = fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "RawDataTest_High_Min", "3000", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.RawDataTest_high_Min = xiaomi_sdm439_ft5446_fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "RawDataTest_High_Max", "15000", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.RawDataTest_high_Max = xiaomi_sdm439_ft5446_fts_atoi(str);
 
-	GetPrivateProfileString("Basic_Threshold", "RawDataTest_LowFreq", "0", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.RawDataTest_SetLowFreq  = fts_atoi(str);
-	GetPrivateProfileString("Basic_Threshold", "RawDataTest_HighFreq", "0", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.RawDataTest_SetHighFreq = fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "RawDataTest_LowFreq", "0", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.RawDataTest_SetLowFreq  = xiaomi_sdm439_ft5446_fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "RawDataTest_HighFreq", "0", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.RawDataTest_SetHighFreq = xiaomi_sdm439_ft5446_fts_atoi(str);
 
-	GetPrivateProfileString("Basic_Threshold", "SCapCbTest_OFF_Min", "0", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.SCapCbTest_OFF_Min = fts_atoi(str);
-	GetPrivateProfileString("Basic_Threshold", "SCapCbTest_OFF_Max", "240", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.SCapCbTest_OFF_Max = fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "SCapCbTest_OFF_Min", "0", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.SCapCbTest_OFF_Min = xiaomi_sdm439_ft5446_fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "SCapCbTest_OFF_Max", "240", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.SCapCbTest_OFF_Max = xiaomi_sdm439_ft5446_fts_atoi(str);
 
-	GetPrivateProfileString("Basic_Threshold", "SCapCbTest_ON_Min", "0", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.SCapCbTest_ON_Min = fts_atoi(str);
-	GetPrivateProfileString("Basic_Threshold", "SCapCbTest_ON_Max", "240", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.SCapCbTest_ON_Max = fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "SCapCbTest_ON_Min", "0", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.SCapCbTest_ON_Min = xiaomi_sdm439_ft5446_fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "SCapCbTest_ON_Max", "240", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.SCapCbTest_ON_Max = xiaomi_sdm439_ft5446_fts_atoi(str);
 
-	GetPrivateProfileString("Basic_Threshold", "ScapCBTest_SetWaterproof_OFF", "0", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.SCapCbTest_SetWaterproof_OFF = fts_atoi(str);
-	GetPrivateProfileString("Basic_Threshold", "ScapCBTest_SetWaterproof_ON", "240", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.SCapCbTest_SetWaterproof_ON = fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "ScapCBTest_SetWaterproof_OFF", "0", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.SCapCbTest_SetWaterproof_OFF = xiaomi_sdm439_ft5446_fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "ScapCBTest_SetWaterproof_ON", "240", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.SCapCbTest_SetWaterproof_ON = xiaomi_sdm439_ft5446_fts_atoi(str);
 
-	GetPrivateProfileString("Basic_Threshold", "SCapCBTest_LetTx_Disable", "0", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.SCapCbTest_LetTx_Disable = fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "SCapCBTest_LetTx_Disable", "0", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.SCapCbTest_LetTx_Disable = xiaomi_sdm439_ft5446_fts_atoi(str);
 
-	GetPrivateProfileString("Basic_Threshold", "SCapRawDataTest_OFF_Min", "5000", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.SCapRawDataTest_OFF_Min = fts_atoi(str);
-	GetPrivateProfileString("Basic_Threshold", "SCapRawDataTest_OFF_Max", "8500", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.SCapRawDataTest_OFF_Max = fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "SCapRawDataTest_OFF_Min", "5000", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.SCapRawDataTest_OFF_Min = xiaomi_sdm439_ft5446_fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "SCapRawDataTest_OFF_Max", "8500", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.SCapRawDataTest_OFF_Max = xiaomi_sdm439_ft5446_fts_atoi(str);
 
-	GetPrivateProfileString("Basic_Threshold", "SCapRawDataTest_ON_Min", "5000", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.SCapRawDataTest_ON_Min = fts_atoi(str);
-	GetPrivateProfileString("Basic_Threshold", "SCapRawDataTest_ON_Max", "8500", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.SCapRawDataTest_ON_Max = fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "SCapRawDataTest_ON_Min", "5000", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.SCapRawDataTest_ON_Min = xiaomi_sdm439_ft5446_fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "SCapRawDataTest_ON_Max", "8500", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.SCapRawDataTest_ON_Max = xiaomi_sdm439_ft5446_fts_atoi(str);
 
-	GetPrivateProfileString("Basic_Threshold", "SCapRawDataTest_SetWaterproof_OFF", "1", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.SCapRawDataTest_SetWaterproof_OFF = fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "SCapRawDataTest_SetWaterproof_OFF", "1", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.SCapRawDataTest_SetWaterproof_OFF = xiaomi_sdm439_ft5446_fts_atoi(str);
 
-	GetPrivateProfileString("Basic_Threshold", "SCapRawDataTest_SetWaterproof_ON", "0", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.SCapRawDataTest_SetWaterproof_ON = fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "SCapRawDataTest_SetWaterproof_ON", "0", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.SCapRawDataTest_SetWaterproof_ON = xiaomi_sdm439_ft5446_fts_atoi(str);
 
-	GetPrivateProfileString("Basic_Threshold", "SCapRawDataTest_LetTx_Disable", "0", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.SCapRawDataTest_LetTx_Disable = fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "SCapRawDataTest_LetTx_Disable", "0", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.SCapRawDataTest_LetTx_Disable = xiaomi_sdm439_ft5446_fts_atoi(str);
 
-	GetPrivateProfileString("Basic_Threshold", "ChannelNumTest_Mapping", "1", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.bChannelTestMapping = fts_atoi(str);
-	GetPrivateProfileString("Basic_Threshold", "ChannelNumTest_NoMapping", "0", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.bChannelTestNoMapping = fts_atoi(str);
-	GetPrivateProfileString("Basic_Threshold", "ChannelNumTest_TxNum", "13", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.ChannelNumTest_TxNum = fts_atoi(str);
-	GetPrivateProfileString("Basic_Threshold", "ChannelNumTest_RxNum", "24", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.ChannelNumTest_RxNum = fts_atoi(str);
-	GetPrivateProfileString("Basic_Threshold", "ChannelNumTest_Tx_NP_Num", "13", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.ChannelNumTest_TxNpNum = fts_atoi(str);
-	GetPrivateProfileString("Basic_Threshold", "ChannelNumTest_Rx_NP_Num", "24", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.ChannelNumTest_RxNpNum = fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "ChannelNumTest_Mapping", "1", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.bChannelTestMapping = xiaomi_sdm439_ft5446_fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "ChannelNumTest_NoMapping", "0", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.bChannelTestNoMapping = xiaomi_sdm439_ft5446_fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "ChannelNumTest_TxNum", "13", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.ChannelNumTest_TxNum = xiaomi_sdm439_ft5446_fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "ChannelNumTest_RxNum", "24", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.ChannelNumTest_RxNum = xiaomi_sdm439_ft5446_fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "ChannelNumTest_Tx_NP_Num", "13", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.ChannelNumTest_TxNpNum = xiaomi_sdm439_ft5446_fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "ChannelNumTest_Rx_NP_Num", "24", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.ChannelNumTest_RxNpNum = xiaomi_sdm439_ft5446_fts_atoi(str);
 
-	GetPrivateProfileString("Basic_Threshold", "NoiseTest_Max", "20", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.NoiseTest_Max = fts_atoi(str);
-	GetPrivateProfileString("Basic_Threshold", "NoiseTest_Frames", "32", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.NoiseTest_Frames = fts_atoi(str);
-	GetPrivateProfileString("Basic_Threshold", "NoiseTest_Time", "1", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.NoiseTest_Time = fts_atoi(str);
-	GetPrivateProfileString("Basic_Threshold", "NoiseTest_SampeMode", "0", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.NoiseTest_SampeMode = fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "NoiseTest_Max", "20", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.NoiseTest_Max = xiaomi_sdm439_ft5446_fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "NoiseTest_Frames", "32", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.NoiseTest_Frames = xiaomi_sdm439_ft5446_fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "NoiseTest_Time", "1", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.NoiseTest_Time = xiaomi_sdm439_ft5446_fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "NoiseTest_SampeMode", "0", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.NoiseTest_SampeMode = xiaomi_sdm439_ft5446_fts_atoi(str);
 
-	GetPrivateProfileString("Basic_Threshold", "NoiseTest_NoiseMode", "0", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.NoiseTest_NoiseMode = fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "NoiseTest_NoiseMode", "0", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.NoiseTest_NoiseMode = xiaomi_sdm439_ft5446_fts_atoi(str);
 
-	GetPrivateProfileString("Basic_Threshold", "NoiseTest_ShowTip", "0", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.NoiseTest_ShowTip = fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "NoiseTest_ShowTip", "0", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.NoiseTest_ShowTip = xiaomi_sdm439_ft5446_fts_atoi(str);
 
-	GetPrivateProfileString("Basic_Threshold", "NoiseTest_GloveMode", "0", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.bNoiseTest_GloveMode = fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "NoiseTest_GloveMode", "0", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.bNoiseTest_GloveMode = xiaomi_sdm439_ft5446_fts_atoi(str);
 
-	GetPrivateProfileString("Basic_Threshold", "NoiseTest_RawdataMin", "5000", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.NoiseTest_RawdataMin = fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "NoiseTest_RawdataMin", "5000", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.NoiseTest_RawdataMin = xiaomi_sdm439_ft5446_fts_atoi(str);
 
-	GetPrivateProfileString("Basic_Threshold", "GloveNoiseTest_Coefficient", "100", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.GloveNoiseTest_Coefficient = fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "GloveNoiseTest_Coefficient", "100", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.GloveNoiseTest_Coefficient = xiaomi_sdm439_ft5446_fts_atoi(str);
 
-	GetPrivateProfileString("Basic_Threshold", "Set_Frequency", "0", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.Set_Frequency = fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "Set_Frequency", "0", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.Set_Frequency = xiaomi_sdm439_ft5446_fts_atoi(str);
 
-	GetPrivateProfileString("Basic_Threshold", "NoiseThreshold_Choose", "0", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.bNoiseThreshold_Choose = fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "NoiseThreshold_Choose", "0", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.bNoiseThreshold_Choose = xiaomi_sdm439_ft5446_fts_atoi(str);
 
-	GetPrivateProfileString("Basic_Threshold", "NoiseTest_Threshold", "50", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.NoiseTest_Threshold = fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "NoiseTest_Threshold", "50", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.NoiseTest_Threshold = xiaomi_sdm439_ft5446_fts_atoi(str);
 
-	GetPrivateProfileString("Basic_Threshold", "NoiseTest_MinNGFrame", "0", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.NoiseTest_MinNgFrame = fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "NoiseTest_MinNGFrame", "0", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.NoiseTest_MinNgFrame = xiaomi_sdm439_ft5446_fts_atoi(str);
 
-	GetPrivateProfileString("Basic_Threshold", "WeakShortTest_CG", "2000", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.WeakShortTest_CG = fts_atoi(str);
-	GetPrivateProfileString("Basic_Threshold", "WeakShortTest_CC", "2000", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.WeakShortTest_CC = fts_atoi(str);
-	GetPrivateProfileString("Basic_Threshold", "UniformityTest_Check_Tx", "0", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.Uniformity_CheckTx = fts_atoi(str);
-	GetPrivateProfileString("Basic_Threshold", "UniformityTest_Check_Rx", "0", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.Uniformity_CheckRx = fts_atoi(str);
-	GetPrivateProfileString("Basic_Threshold", "UniformityTest_Check_MinMax", "0", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.Uniformity_CheckMinMax = fts_atoi(str);
-	GetPrivateProfileString("Basic_Threshold", "UniformityTest_Tx_Hole", "20", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.Uniformity_Tx_Hole = fts_atoi(str);
-	GetPrivateProfileString("Basic_Threshold", "UniformityTest_Rx_Hole", "20", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.Uniformity_Rx_Hole = fts_atoi(str);
-	GetPrivateProfileString("Basic_Threshold", "UniformityTest_MinMax_Hole", "70", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.Uniformity_MinMax_Hole = fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "WeakShortTest_CG", "2000", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.WeakShortTest_CG = xiaomi_sdm439_ft5446_fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "WeakShortTest_CC", "2000", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.WeakShortTest_CC = xiaomi_sdm439_ft5446_fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "UniformityTest_Check_Tx", "0", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.Uniformity_CheckTx = xiaomi_sdm439_ft5446_fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "UniformityTest_Check_Rx", "0", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.Uniformity_CheckRx = xiaomi_sdm439_ft5446_fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "UniformityTest_Check_MinMax", "0", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.Uniformity_CheckMinMax = xiaomi_sdm439_ft5446_fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "UniformityTest_Tx_Hole", "20", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.Uniformity_Tx_Hole = xiaomi_sdm439_ft5446_fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "UniformityTest_Rx_Hole", "20", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.Uniformity_Rx_Hole = xiaomi_sdm439_ft5446_fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "UniformityTest_MinMax_Hole", "70", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.Uniformity_MinMax_Hole = xiaomi_sdm439_ft5446_fts_atoi(str);
 
 	//panel differ
-	GetPrivateProfileString("Basic_Threshold", "PanelDifferTest_Min", "150", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.PanelDifferTest_Min = fts_atoi(str);
-	GetPrivateProfileString("Basic_Threshold", "PanelDifferTest_Max", "1000", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.PanelDifferTest_Max = fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "PanelDifferTest_Min", "150", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.PanelDifferTest_Min = xiaomi_sdm439_ft5446_fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "PanelDifferTest_Max", "1000", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.PanelDifferTest_Max = xiaomi_sdm439_ft5446_fts_atoi(str);
 
 	//panel differ uniformity
-	GetPrivateProfileString("Basic_Threshold", "PanelDiffer_UniformityTest_Check_Tx", "1", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.PanelDiffer_Uniformity_CheckTx = fts_atoi(str);
-	GetPrivateProfileString("Basic_Threshold", "PanelDiffer_UniformityTest_Tx_Hole", "20", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.PanelDiffer_Uniformity_Tx_Hole = fts_atoi(str);
-	GetPrivateProfileString("Basic_Threshold", "PanelDiffer_UniformityTest_Check_Rx", "1", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.PanelDiffer_Uniformity_CheckRx = fts_atoi(str);
-	GetPrivateProfileString("Basic_Threshold", "PanelDiffer_UniformityTest_Rx_Hole", "20", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.PanelDiffer_Uniformity_Rx_Hole = fts_atoi(str);
-	GetPrivateProfileString("Basic_Threshold", "PanelDiffer_UniformityTest_Check_MinMax", "1", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.PanelDiffer_Uniformity_CheckMinMax = fts_atoi(str);
-	GetPrivateProfileString("Basic_Threshold", "PanelDiffer_UniformityTest_MinMax_Hole", "70", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.PanelDiffer_Uniformity_MinMax_Hole = fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "PanelDiffer_UniformityTest_Check_Tx", "1", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.PanelDiffer_Uniformity_CheckTx = xiaomi_sdm439_ft5446_fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "PanelDiffer_UniformityTest_Tx_Hole", "20", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.PanelDiffer_Uniformity_Tx_Hole = xiaomi_sdm439_ft5446_fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "PanelDiffer_UniformityTest_Check_Rx", "1", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.PanelDiffer_Uniformity_CheckRx = xiaomi_sdm439_ft5446_fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "PanelDiffer_UniformityTest_Rx_Hole", "20", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.PanelDiffer_Uniformity_Rx_Hole = xiaomi_sdm439_ft5446_fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "PanelDiffer_UniformityTest_Check_MinMax", "1", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.PanelDiffer_Uniformity_CheckMinMax = xiaomi_sdm439_ft5446_fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "PanelDiffer_UniformityTest_MinMax_Hole", "70", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.PanelDiffer_Uniformity_MinMax_Hole = xiaomi_sdm439_ft5446_fts_atoi(str);
 
 	//RawdtaUniformityTest
-	GetPrivateProfileString("Basic_Threshold", "SITO_RawdataUniformityTest_Check_Tx", "0", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.SITO_RawdtaUniformityTest_Check_Tx = fts_atoi(str);
-	GetPrivateProfileString("Basic_Threshold", "SITO_RawdataUniformityTest_Check_Rx", "0", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.SITO_RawdtaUniformityTest_Check_Rx = fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "SITO_RawdataUniformityTest_Check_Tx", "0", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.SITO_RawdtaUniformityTest_Check_Tx = xiaomi_sdm439_ft5446_fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "SITO_RawdataUniformityTest_Check_Rx", "0", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.SITO_RawdtaUniformityTest_Check_Rx = xiaomi_sdm439_ft5446_fts_atoi(str);
 
-	GetPrivateProfileString("Basic_Threshold", "SITO_RawdataUniformityTest_Tx_Hole", "10", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.SITO_RawdtaUniformityTest_Tx_Hole = fts_atoi(str);
-	GetPrivateProfileString("Basic_Threshold", "SITO_RawdataUniformityTest_Rx_Hole", "10", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.SITO_RawdtaUniformityTest_Rx_Hole = fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "SITO_RawdataUniformityTest_Tx_Hole", "10", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.SITO_RawdtaUniformityTest_Tx_Hole = xiaomi_sdm439_ft5446_fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "SITO_RawdataUniformityTest_Rx_Hole", "10", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.SITO_RawdtaUniformityTest_Rx_Hole = xiaomi_sdm439_ft5446_fts_atoi(str);
 
-	GetPrivateProfileString("Basic_Threshold", "WeakShortTest_CC_Rsen", "57", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.WeakShortTest_CC_Rsen = fts_atoi(str);
-	GetPrivateProfileString("Basic_Threshold", "WeakShortTest_CapShortTest", "0", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.WeakShortTest_CapShortTest = fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "WeakShortTest_CC_Rsen", "57", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.WeakShortTest_CC_Rsen = xiaomi_sdm439_ft5446_fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "WeakShortTest_CapShortTest", "0", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.WeakShortTest_CapShortTest = xiaomi_sdm439_ft5446_fts_atoi(str);
 
 	//Lcd Noise Test
-	GetPrivateProfileString("Basic_Threshold", "Lcd_Noise_Max_Frame", "200", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.Lcd_Noise_MaxFrame = fts_atoi(str);
-	GetPrivateProfileString("Basic_Threshold", "Lcd_Noise_Conficient", "100", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.Lcd_Noise_Conficient = fts_atoi(str);
-	GetPrivateProfileString("Basic_Threshold", "Lcd_Noise_Mode", "1", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.Lcd_Noise_Noise_Mode = fts_atoi(str);
-	GetPrivateProfileString("Basic_Threshold", "Lcd_Noise_MaxNgPoint", "0", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.Lcd_Noise_MaxNgPoint = fts_atoi(str);
-	GetPrivateProfileString("Basic_Threshold", "Lcd_Noise_FrameNum", "63", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.Lcd_Noise_FrameNum = fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "Lcd_Noise_Max_Frame", "200", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.Lcd_Noise_MaxFrame = xiaomi_sdm439_ft5446_fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "Lcd_Noise_Conficient", "100", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.Lcd_Noise_Conficient = xiaomi_sdm439_ft5446_fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "Lcd_Noise_Mode", "1", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.Lcd_Noise_Noise_Mode = xiaomi_sdm439_ft5446_fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "Lcd_Noise_MaxNgPoint", "0", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.Lcd_Noise_MaxNgPoint = xiaomi_sdm439_ft5446_fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "Lcd_Noise_FrameNum", "63", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.Lcd_Noise_FrameNum = xiaomi_sdm439_ft5446_fts_atoi(str);
 
-	GetPrivateProfileString("Basic_Threshold", "Lcd_Noise_SetFrequency", "0", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.Lcd_Noise_SetFrequency = fts_atoi(str);
-	GetPrivateProfileString("Basic_Threshold", "Lcd_Noise_NoiseThresholdMode", "0", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.Lcd_Noise_NoiseThresholdMode = fts_atoi(str);
-	GetPrivateProfileString("Basic_Threshold", "Lcd_Noise_NoiseCoefficient", "200", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.Lcd_Noise_NoiseCoefficient = fts_atoi(str);
-	GetPrivateProfileString("Basic_Threshold", "Lcd_Noise_NoiseMax", "50", str, strIniFile);
-	g_stCfg_FT5X46_BasicThreshold.Lcd_Noise_NoiseMax = fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "Lcd_Noise_SetFrequency", "0", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.Lcd_Noise_SetFrequency = xiaomi_sdm439_ft5446_fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "Lcd_Noise_NoiseThresholdMode", "0", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.Lcd_Noise_NoiseThresholdMode = xiaomi_sdm439_ft5446_fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "Lcd_Noise_NoiseCoefficient", "200", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.Lcd_Noise_NoiseCoefficient = xiaomi_sdm439_ft5446_fts_atoi(str);
+	xiaomi_sdm439_ft5446_GetPrivateProfileString("Basic_Threshold", "Lcd_Noise_NoiseMax", "50", str, strIniFile);
+	xiaomi_sdm439_ft5446_g_stCfg_FT5X46_BasicThreshold.Lcd_Noise_NoiseMax = xiaomi_sdm439_ft5446_fts_atoi(str);
 	FTS_TEST_FUNC_EXIT();
 }
 
-void init_detailthreshold_ft5x46(char *ini)
+void xiaomi_sdm439_ft5446_init_detailthreshold_ft5x46(char *ini)
 {
 	FTS_TEST_FUNC_ENTER();
 
-	OnInit_InvalidNode(ini);
-	OnInit_DThreshold_RawDataTest(ini);
-	OnInit_DThreshold_SCapRawDataTest(ini);
-	OnInit_DThreshold_SCapCbTest(ini);
+	xiaomi_sdm439_ft5446_OnInit_InvalidNode(ini);
+	xiaomi_sdm439_ft5446_OnInit_DThreshold_RawDataTest(ini);
+	xiaomi_sdm439_ft5446_OnInit_DThreshold_SCapRawDataTest(ini);
+	xiaomi_sdm439_ft5446_OnInit_DThreshold_SCapCbTest(ini);
 
-	OnInit_DThreshold_ForceTouch_SCapRawDataTest(ini);
-	OnInit_DThreshold_ForceTouch_SCapCbTest(ini);
+	xiaomi_sdm439_ft5446_OnInit_DThreshold_ForceTouch_SCapRawDataTest(ini);
+	xiaomi_sdm439_ft5446_OnInit_DThreshold_ForceTouch_SCapCbTest(ini);
 
-	OnInit_DThreshold_RxLinearityTest(ini);
-	OnInit_DThreshold_TxLinearityTest(ini);
+	xiaomi_sdm439_ft5446_OnInit_DThreshold_RxLinearityTest(ini);
+	xiaomi_sdm439_ft5446_OnInit_DThreshold_TxLinearityTest(ini);
 
-	OnInit_DThreshold_PanelDifferTest(ini);
-	OnInit_DThreshold_PanelDiffer_Uniformity_Test(ini);
+	xiaomi_sdm439_ft5446_OnInit_DThreshold_PanelDifferTest(ini);
+	xiaomi_sdm439_ft5446_OnInit_DThreshold_PanelDiffer_Uniformity_Test(ini);
 
 	FTS_TEST_FUNC_EXIT();
 }
 
-void set_testitem_sequence_ft5x46(void)
+void xiaomi_sdm439_ft5446_set_testitem_sequence_ft5x46(void)
 {
 
-	test_data.test_num = 0;
+	xiaomi_sdm439_ft5446_test_data.test_num = 0;
 
 	FTS_TEST_FUNC_ENTER();
 
 	//////////////////////////////////////////////////FACTORY_ID_TEST
-	if (g_stCfg_FT5X46_TestItem.FACTORY_ID_TEST == 1) {
+	if (xiaomi_sdm439_ft5446_g_stCfg_FT5X46_TestItem.FACTORY_ID_TEST == 1) {
 
-		fts_set_testitem(Code_FT5X46_FACTORY_ID_TEST);
+		xiaomi_sdm439_ft5446_fts_set_testitem(Code_FT5X46_FACTORY_ID_TEST);
 	}
 
 	//////////////////////////////////////////////////Project Code Test
-	if (g_stCfg_FT5X46_TestItem.PROJECT_CODE_TEST == 1) {
+	if (xiaomi_sdm439_ft5446_g_stCfg_FT5X46_TestItem.PROJECT_CODE_TEST == 1) {
 
-		fts_set_testitem(Code_FT5X46_PROJECT_CODE_TEST);
+		xiaomi_sdm439_ft5446_fts_set_testitem(Code_FT5X46_PROJECT_CODE_TEST);
 	}
 
 	//////////////////////////////////////////////////FW Version Test
-	if (g_stCfg_FT5X46_TestItem.FW_VERSION_TEST == 1) {
+	if (xiaomi_sdm439_ft5446_g_stCfg_FT5X46_TestItem.FW_VERSION_TEST == 1) {
 
-		fts_set_testitem(Code_FT5X46_FW_VERSION_TEST);
+		xiaomi_sdm439_ft5446_fts_set_testitem(Code_FT5X46_FW_VERSION_TEST);
 	}
 
 	//////////////////////////////////////////////////Enter Factory Mode
-	fts_set_testitem(Code_FT5X46_ENTER_FACTORY_MODE);
+	xiaomi_sdm439_ft5446_fts_set_testitem(Code_FT5X46_ENTER_FACTORY_MODE);
 
 	//////////////////////////////////////////////////CHANNEL_NUM_TEST
-	if (g_stCfg_FT5X46_TestItem.CHANNEL_NUM_TEST == 1) {
+	if (xiaomi_sdm439_ft5446_g_stCfg_FT5X46_TestItem.CHANNEL_NUM_TEST == 1) {
 
-		fts_set_testitem(Code_FT5X46_CHANNEL_NUM_TEST);
+		xiaomi_sdm439_ft5446_fts_set_testitem(Code_FT5X46_CHANNEL_NUM_TEST);
 	}
 
 	//////////////////////////////////////////////////LCD_NOISE_TEST
-	if (g_stCfg_FT5X46_TestItem.LCD_NOISE_TEST == 1) {
+	if (xiaomi_sdm439_ft5446_g_stCfg_FT5X46_TestItem.LCD_NOISE_TEST == 1) {
 
-		fts_set_testitem(Code_FT5X46_LCD_NOISE_TEST);
+		xiaomi_sdm439_ft5446_fts_set_testitem(Code_FT5X46_LCD_NOISE_TEST);
 	}
 
 	//////////////////////////////////////////////////NOISE_TEST
-	if (g_stCfg_FT5X46_TestItem.NOISE_TEST == 1) {
+	if (xiaomi_sdm439_ft5446_g_stCfg_FT5X46_TestItem.NOISE_TEST == 1) {
 
-		fts_set_testitem(Code_FT5X46_NOISE_TEST);
+		xiaomi_sdm439_ft5446_fts_set_testitem(Code_FT5X46_NOISE_TEST);
 	}
 
 	//////////////////////////////////////////////////RawData Test
-	if (g_stCfg_FT5X46_TestItem.RAWDATA_TEST == 1) {
+	if (xiaomi_sdm439_ft5446_g_stCfg_FT5X46_TestItem.RAWDATA_TEST == 1) {
 
-		fts_set_testitem(Code_FT5X46_RAWDATA_TEST);
+		xiaomi_sdm439_ft5446_fts_set_testitem(Code_FT5X46_RAWDATA_TEST);
 	}
 
 	//////////////////////////////////////////////////Rawdata Uniformity Test
-	if (g_stCfg_FT5X46_TestItem.UNIFORMITY_TEST == 1) {
+	if (xiaomi_sdm439_ft5446_g_stCfg_FT5X46_TestItem.UNIFORMITY_TEST == 1) {
 
-		fts_set_testitem(Code_FT5X46_UNIFORMITY_TEST);
+		xiaomi_sdm439_ft5446_fts_set_testitem(Code_FT5X46_UNIFORMITY_TEST);
 	}
 
 	//////////////////////////////////////////////////SITO Rawdata Uniformity Test
-	if (g_stCfg_FT5X46_TestItem.SITO_RAWDATA_UNIFORMITY_TEST == 1) {
+	if (xiaomi_sdm439_ft5446_g_stCfg_FT5X46_TestItem.SITO_RAWDATA_UNIFORMITY_TEST == 1) {
 
-		fts_set_testitem(Code_FT5X46_SITO_RAWDATA_UNIFORMITY_TEST);
+		xiaomi_sdm439_ft5446_fts_set_testitem(Code_FT5X46_SITO_RAWDATA_UNIFORMITY_TEST);
 	}
 
 	//////////////////////////////////////////////////SCAP_CB_TEST
-	if (g_stCfg_FT5X46_TestItem.SCAP_CB_TEST == 1) {
+	if (xiaomi_sdm439_ft5446_g_stCfg_FT5X46_TestItem.SCAP_CB_TEST == 1) {
 
-		fts_set_testitem(Code_FT5X46_SCAP_CB_TEST);
+		xiaomi_sdm439_ft5446_fts_set_testitem(Code_FT5X46_SCAP_CB_TEST);
 	}
 
 	//////////////////////////////////////////////////SCAP_RAWDATA_TEST
-	if (g_stCfg_FT5X46_TestItem.SCAP_RAWDATA_TEST == 1) {
+	if (xiaomi_sdm439_ft5446_g_stCfg_FT5X46_TestItem.SCAP_RAWDATA_TEST == 1) {
 
-		fts_set_testitem(Code_FT5X46_SCAP_RAWDATA_TEST);
+		xiaomi_sdm439_ft5446_fts_set_testitem(Code_FT5X46_SCAP_RAWDATA_TEST);
 	}
 
 	//////////////////////////////////////////////////WEAK_SHORT_CIRCUIT_TEST
-	if (g_stCfg_FT5X46_TestItem.WEAK_SHORT_CIRCUIT_TEST == 1) {
+	if (xiaomi_sdm439_ft5446_g_stCfg_FT5X46_TestItem.WEAK_SHORT_CIRCUIT_TEST == 1) {
 
-		fts_set_testitem(Code_FT5X46_WEAK_SHORT_CIRCUIT_TEST);
+		xiaomi_sdm439_ft5446_fts_set_testitem(Code_FT5X46_WEAK_SHORT_CIRCUIT_TEST);
 	}
 
 	//////////////////////////////////////////////////panel differ_TEST
-	if (g_stCfg_FT5X46_TestItem.PANEL_DIFFER_TEST == 1) {
+	if (xiaomi_sdm439_ft5446_g_stCfg_FT5X46_TestItem.PANEL_DIFFER_TEST == 1) {
 
-		fts_set_testitem(Code_FT5X46_PANELDIFFER_TEST);
+		xiaomi_sdm439_ft5446_fts_set_testitem(Code_FT5X46_PANELDIFFER_TEST);
 	}
 
 	//////////////////////////////////////////////////panel PANEL_DIFFER_UNIFORMITY_TEST
-	if (g_stCfg_FT5X46_TestItem.PANEL_DIFFER_UNIFORMITY_TEST == 1) {
+	if (xiaomi_sdm439_ft5446_g_stCfg_FT5X46_TestItem.PANEL_DIFFER_UNIFORMITY_TEST == 1) {
 
-		fts_set_testitem(Code_FT5X46_PANELDIFFER_UNIFORMITY_TEST);
+		xiaomi_sdm439_ft5446_fts_set_testitem(Code_FT5X46_PANELDIFFER_UNIFORMITY_TEST);
 	}
 
 	FTS_TEST_FUNC_EXIT();
 }
 
-struct test_funcs test_func_ft5x46 = {
+struct test_funcs xiaomi_sdm439_ft5446_test_func_ft5x46 = {
 	.ic_series = TEST_ICSERIES(IC_FT5X46),
-	.init_testitem = init_testitem_ft5x46,
-	.init_basicthreshold = init_basicthreshold_ft5x46,
-	.init_detailthreshold = init_detailthreshold_ft5x46,
-	.set_testitem_sequence  = set_testitem_sequence_ft5x46,
-	.start_test = start_test_ft5x46,
+	.init_testitem = xiaomi_sdm439_ft5446_init_testitem_ft5x46,
+	.init_basicthreshold = xiaomi_sdm439_ft5446_init_basicthreshold_ft5x46,
+	.init_detailthreshold = xiaomi_sdm439_ft5446_init_detailthreshold_ft5x46,
+	.set_testitem_sequence  = xiaomi_sdm439_ft5446_set_testitem_sequence_ft5x46,
+	.start_test = xiaomi_sdm439_ft5446_start_test_ft5x46,
 };

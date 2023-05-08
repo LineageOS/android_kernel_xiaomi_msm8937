@@ -46,12 +46,12 @@ struct _ini_data {
 /*****************************************************************************
 * Global variable or extern global variabls/functions
 *****************************************************************************/
-int fts_atoi(char *nptr);
-char *ini_str_trim_r(char *buf);
-char *ini_str_trim_l(char *buf);
-int GetPrivateProfileString(char *section, char *ItemName, char *defaultvalue, char *returnValue, char *IniFile);
-int fts_test_get_testparam_from_ini(char *config_name);
-int fts_test_get_ini_size(char *config_name);
-int fts_test_read_ini_data(char *config_name, char *config_buf);
+int xiaomi_sdm439_ft5446_fts_atoi(char *nptr);
+char *xiaomi_sdm439_ft5446_ini_str_trim_r(char *buf);
+char *xiaomi_sdm439_ft5446_ini_str_trim_l(char *buf);
+int xiaomi_sdm439_ft5446_GetPrivateProfileString(char *section, char *ItemName, char *defaultvalue, char *returnValue, char *IniFile);
+int xiaomi_sdm439_ft5446_fts_test_get_testparam_from_ini(char *config_name);
+int xiaomi_sdm439_ft5446_fts_test_get_ini_size(char *config_name);
+int xiaomi_sdm439_ft5446_fts_test_read_ini_data(char *config_name, char *config_buf);
 
 #endif /* _INI_H */

@@ -93,20 +93,20 @@ struct detailthreshold_scap {
 	int K1DifferTest_Base[MAX_CHANNEL_NUM];
 };
 
-void OnInit_InvalidNode(char *strIniFile);
-void OnInit_DThreshold_RawDataTest(char *strIniFile);
-void OnInit_DThreshold_SCapRawDataTest(char *strIniFile);
-void OnInit_DThreshold_SCapCbTest(char *strIniFile);
-void OnInit_DThreshold_ForceTouch_SCapRawDataTest(char *strIniFile);
-void OnInit_DThreshold_ForceTouch_SCapCbTest(char *strIniFile);
-void OnInit_DThreshold_RxLinearityTest(char *strIniFile);
-void OnInit_DThreshold_TxLinearityTest(char *strIniFile);
-void OnInit_DThreshold_PanelDifferTest(char *strIniFile);
-void OnInit_DThreshold_PanelDiffer_Uniformity_Test(char *strIniFile);
-void OnInit_DThreshold_CBTest(char *strIniFile);
-void OnInit_DThreshold_AllButtonCBTest(char *strIniFile);
-void OnThreshold_VkAndVaRawDataSeparateTest(char *strIniFile);
+void xiaomi_sdm439_ft5446_OnInit_InvalidNode(char *strIniFile);
+void xiaomi_sdm439_ft5446_OnInit_DThreshold_RawDataTest(char *strIniFile);
+void xiaomi_sdm439_ft5446_OnInit_DThreshold_SCapRawDataTest(char *strIniFile);
+void xiaomi_sdm439_ft5446_OnInit_DThreshold_SCapCbTest(char *strIniFile);
+void xiaomi_sdm439_ft5446_OnInit_DThreshold_ForceTouch_SCapRawDataTest(char *strIniFile);
+void xiaomi_sdm439_ft5446_OnInit_DThreshold_ForceTouch_SCapCbTest(char *strIniFile);
+void xiaomi_sdm439_ft5446_OnInit_DThreshold_RxLinearityTest(char *strIniFile);
+void xiaomi_sdm439_ft5446_OnInit_DThreshold_TxLinearityTest(char *strIniFile);
+void xiaomi_sdm439_ft5446_OnInit_DThreshold_PanelDifferTest(char *strIniFile);
+void xiaomi_sdm439_ft5446_OnInit_DThreshold_PanelDiffer_Uniformity_Test(char *strIniFile);
+void xiaomi_sdm439_ft5446_OnInit_DThreshold_CBTest(char *strIniFile);
+void xiaomi_sdm439_ft5446_OnInit_DThreshold_AllButtonCBTest(char *strIniFile);
+void xiaomi_sdm439_ft5446_OnThreshold_VkAndVaRawDataSeparateTest(char *strIniFile);
 void OnGetTestItemParam(char *strItemName, char *strIniFile, int iDefautValue);
-int malloc_struct_DetailThreshold(void);
-void free_struct_DetailThreshold(void);
+int xiaomi_sdm439_ft5446_malloc_struct_DetailThreshold(void);
+void xiaomi_sdm439_ft5446_free_struct_DetailThreshold(void);
 #endif

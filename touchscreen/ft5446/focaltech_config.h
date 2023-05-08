@@ -219,20 +219,20 @@
 
 /*
  * FW.i file for auto upgrade, you must replace it with your own
- * define your own fw_file, the sample one to be replaced is invalid
+ * define your own xiaomi_sdm439_ft5446_fw_file, the sample one to be replaced is invalid
  * NOTE: if FTS_GET_VENDOR_ID_NUM > 1, it's the fw corresponding with FTS_VENDOR_ID
  */
 #define FTS_UPGRADE_FW_FILE                      "include/firmware/C3H_FT5446_Ofilm.i"
 
 /*
  * if FTS_GET_VENDOR_ID_NUM >= 2, fw corrsponding with FTS_VENDOR_ID2
- * define your own fw_file, the sample one is invalid
+ * define your own xiaomi_sdm439_ft5446_fw_file, the sample one is invalid
  */
 #define FTS_UPGRADE_FW2_FILE                     "include/firmware/C3H_FT5446_Ofilm.i"
 
 /*
  * if FTS_GET_VENDOR_ID_NUM >= 3, fw corrsponding with FTS_VENDOR_ID3
- * define your own fw_file, the sample one is invalid
+ * define your own xiaomi_sdm439_ft5446_fw_file, the sample one is invalid
  */
 #define FTS_UPGRADE_FW3_FILE                     "include/firmware/C3H_FT5446_Ofilm.i"
 

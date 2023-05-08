@@ -99,10 +99,10 @@ int idc_esdcheck_lcderror(struct fts_ts_data *ts_data)
 	if ((tp_need_recovery == 1) && (lcd_need_reset == 0)) {
 		tp_need_recovery = 0;
 		/* LCD reset, need recover TP state */
-		fts_tp_state_recovery(client);
+		xiaomi_sdm439_ft5446_fts_tp_state_recovery(client);
 	}
 
-	ret = fts_i2c_read_reg(client, FTS_REG_ESD_SATURATE, &val);
+	ret = xiaomi_sdm439_ft5446_fts_i2c_read_reg(client, FTS_REG_ESD_SATURATE, &val);
 	if (ret < 0) {
 		FTS_ERROR("[ESD]: Read ESD_SATURATE(0xED) failed ret=%d!", ret);
 		return -EIO;
@@ -137,8 +137,8 @@ static int fts_esdcheck_tp_reset(struct fts_ts_data *ts_data)
 	fts_esdcheck_data.flow_work_hold_cnt = 0;
 	fts_esdcheck_data.hardware_reset_cnt++;
 
-	fts_reset_proc(200);
-	fts_tp_state_recovery(ts_data->client);
+	xiaomi_sdm439_ft5446_fts_reset_proc(200);
+	xiaomi_sdm439_ft5446_fts_tp_state_recovery(ts_data->client);
 
 	FTS_FUNC_EXIT();
 	return 0;
@@ -163,7 +163,7 @@ static bool get_chip_id(struct fts_ts_data *ts_data)
 
 	for (i = 0; i < 3; i++) {
 		reg_addr = FTS_REG_CHIP_ID;
-		ret = fts_i2c_read(client, &reg_addr, 1, &reg_value, 1);
+		ret = xiaomi_sdm439_ft5446_fts_i2c_read(client, &reg_addr, 1, &reg_value, 1);
 		if (ret < 0) {
 			FTS_ERROR("[ESD]: Read Reg 0xA3 failed ret = %d!!", ret);
 			fts_esdcheck_data.i2c_nack_cnt++;
@@ -202,7 +202,7 @@ static bool get_flow_cnt(struct fts_ts_data *ts_data)
 	struct i2c_client *client = ts_data->client;
 
 	reg_addr = FTS_REG_FLOW_WORK_CNT;
-	ret = fts_i2c_read(client, &reg_addr, 1, &reg_value, 1);
+	ret = xiaomi_sdm439_ft5446_fts_i2c_read(client, &reg_addr, 1, &reg_value, 1);
 	if (ret < 0) {
 		FTS_ERROR("[ESD]: Read Reg 0x91 failed ret = %d!!", ret);
 		fts_esdcheck_data.i2c_nack_cnt++;
@@ -263,7 +263,7 @@ static int esdcheck_algorithm(struct fts_ts_data *ts_data)
 
 	/* 4. In factory mode, can't check esd */
 	reg_addr = FTS_REG_WORKMODE;
-	ret = fts_i2c_read(client, &reg_addr, 1, &reg_value, 1);
+	ret = xiaomi_sdm439_ft5446_fts_i2c_read(client, &reg_addr, 1, &reg_value, 1);
 	if (ret < 0) {
 		fts_esdcheck_data.i2c_nack_cnt++;
 	} else if ((reg_value & 0x70) !=  FTS_REG_WORKMODE_WORK_VALUE) {
@@ -309,7 +309,7 @@ static void esdcheck_func(struct work_struct *work)
 	FTS_FUNC_ENTER();
 	if (ENABLE == fts_esdcheck_data.mode) {
 		if (ts_data->ic_info.is_incell) {
-			fts_i2c_read_reg(ts_data->client, FTS_REG_ESDCHECK_DISABLE, &val);
+			xiaomi_sdm439_ft5446_fts_i2c_read_reg(ts_data->client, FTS_REG_ESDCHECK_DISABLE, &val);
 			if (0xA5 == val) {
 				fts_esdcheck_data.mode = DISABLE;
 				return;
@@ -323,13 +323,13 @@ static void esdcheck_func(struct work_struct *work)
 }
 
 /*****************************************************************************
-*  Name: fts_esdcheck_set_intr
+*  Name: xiaomi_sdm439_ft5446_fts_esdcheck_set_intr
 *  Brief: interrupt flag (main used in interrupt tp report)
 *  Input:
 *  Output:
 *  Return:
 *****************************************************************************/
-int fts_esdcheck_set_intr(bool intr)
+int xiaomi_sdm439_ft5446_fts_esdcheck_set_intr(bool intr)
 {
 	/* interrupt don't add debug message */
 	fts_esdcheck_data.intr = intr;
@@ -337,43 +337,43 @@ int fts_esdcheck_set_intr(bool intr)
 }
 
 /*****************************************************************************
-*  Name: fts_esdcheck_get_status(void)
+*  Name: xiaomi_sdm439_ft5446_fts_esdcheck_get_status(void)
 *  Brief: get current status
 *  Input:
 *  Output:
 *  Return:
 *****************************************************************************/
-int fts_esdcheck_get_status(void)
+int xiaomi_sdm439_ft5446_fts_esdcheck_get_status(void)
 {
 	/* interrupt don't add debug message */
 	return fts_esdcheck_data.mode;
 }
 
 /*****************************************************************************
-*  Name: fts_esdcheck_proc_busy
+*  Name: xiaomi_sdm439_ft5446_fts_esdcheck_proc_busy
 *  Brief: When APK or ADB command access TP via driver, then need set proc_debug,
 *         then will not check ESD.
 *  Input:
 *  Output:
 *  Return:
 *****************************************************************************/
-int fts_esdcheck_proc_busy(bool proc_debug)
+int xiaomi_sdm439_ft5446_fts_esdcheck_proc_busy(bool proc_debug)
 {
 	fts_esdcheck_data.proc_debug = proc_debug;
 	return 0;
 }
 
 /*****************************************************************************
-*  Name: fts_esdcheck_switch
+*  Name: xiaomi_sdm439_ft5446_fts_esdcheck_switch
 *  Brief: FTS esd check function switch.
 *  Input:   enable:  1 - Enable esd check
 *                    0 - Disable esd check
 *  Output:
 *  Return:
 *****************************************************************************/
-int fts_esdcheck_switch(bool enable)
+int xiaomi_sdm439_ft5446_fts_esdcheck_switch(bool enable)
 {
-	struct fts_ts_data *ts_data = fts_data;
+	struct fts_ts_data *ts_data = xiaomi_sdm439_ft5446_fts_data;
 	FTS_FUNC_ENTER();
 	if (fts_esdcheck_data.mode == ENABLE) {
 		if (enable) {
@@ -396,32 +396,32 @@ int fts_esdcheck_switch(bool enable)
 }
 
 /*****************************************************************************
-*  Name: fts_esdcheck_suspend
+*  Name: xiaomi_sdm439_ft5446_fts_esdcheck_suspend
 *  Brief: Run when tp enter into suspend
 *  Input:
 *  Output:
 *  Return:
 *****************************************************************************/
-int fts_esdcheck_suspend(void)
+int xiaomi_sdm439_ft5446_fts_esdcheck_suspend(void)
 {
 	FTS_FUNC_ENTER();
-	fts_esdcheck_switch(DISABLE);
+	xiaomi_sdm439_ft5446_fts_esdcheck_switch(DISABLE);
 	fts_esdcheck_data.suspend = 1;
 	FTS_FUNC_EXIT();
 	return 0;
 }
 
 /*****************************************************************************
-*  Name: fts_esdcheck_resume
+*  Name: xiaomi_sdm439_ft5446_fts_esdcheck_resume
 *  Brief: Run when tp resume
 *  Input:
 *  Output:
 *  Return:
 *****************************************************************************/
-int fts_esdcheck_resume(void)
+int xiaomi_sdm439_ft5446_fts_esdcheck_resume(void)
 {
 	FTS_FUNC_ENTER();
-	fts_esdcheck_switch(ENABLE);
+	xiaomi_sdm439_ft5446_fts_esdcheck_switch(ENABLE);
 	fts_esdcheck_data.suspend = 0;
 	FTS_FUNC_EXIT();
 	return 0;
@@ -436,17 +436,17 @@ int fts_esdcheck_resume(void)
 ***********************************************************************/
 static ssize_t fts_esdcheck_store(struct device *dev, struct device_attribute *attr, const char *buf, size_t count)
 {
-	struct input_dev *input_dev = fts_data->input_dev;
+	struct input_dev *input_dev = xiaomi_sdm439_ft5446_fts_data->input_dev;
 
 	mutex_lock(&input_dev->mutex);
 	if (FTS_SYSFS_ECHO_ON(buf)) {
 		FTS_DEBUG("enable esdcheck");
 		fts_esdcheck_data.mode = ENABLE;
-		fts_esdcheck_switch(ENABLE);
+		xiaomi_sdm439_ft5446_fts_esdcheck_switch(ENABLE);
 	} else if (FTS_SYSFS_ECHO_OFF(buf)) {
 		FTS_DEBUG("disable esdcheck");
 		fts_esdcheck_data.mode = DISABLE;
-		fts_esdcheck_switch(DISABLE);
+		xiaomi_sdm439_ft5446_fts_esdcheck_switch(DISABLE);
 	}
 	mutex_unlock(&input_dev->mutex);
 
@@ -463,10 +463,10 @@ static ssize_t fts_esdcheck_store(struct device *dev, struct device_attribute *a
 static ssize_t fts_esdcheck_show(struct device *dev, struct device_attribute *attr, char *buf)
 {
 	int count;
-	struct input_dev *input_dev = fts_data->input_dev;
+	struct input_dev *input_dev = xiaomi_sdm439_ft5446_fts_data->input_dev;
 
 	mutex_lock(&input_dev->mutex);
-	count = snprintf(buf, PAGE_SIZE, "Esd check: %s\n", fts_esdcheck_get_status() ? "On" : "Off");
+	count = snprintf(buf, PAGE_SIZE, "Esd check: %s\n", xiaomi_sdm439_ft5446_fts_esdcheck_get_status() ? "On" : "Off");
 	mutex_unlock(&input_dev->mutex);
 
 	return count;
@@ -489,19 +489,19 @@ static struct attribute_group fts_esd_group = {
 	.attrs = fts_esd_mode_attrs,
 };
 /*****************************************************************************
-*   Name: fts_create_gesture_sysfs
+*   Name: xiaomi_sdm439_ft5446_fts_create_gesture_sysfs
 *  Brief:
 *  Input:
 * Output:
 * Return: 0-success or others-error
 *****************************************************************************/
-int fts_create_esd_sysfs(struct i2c_client *client)
+int xiaomi_sdm439_ft5446_fts_create_esd_sysfs(struct i2c_client *client)
 {
 	int ret = 0;
 
 	ret = sysfs_create_group(&client->dev.kobj, &fts_esd_group);
 	if (ret != 0) {
-		FTS_ERROR("fts_create_esd_sysfs(sysfs) create failed!");
+		FTS_ERROR("xiaomi_sdm439_ft5446_fts_create_esd_sysfs(sysfs) create failed!");
 		sysfs_remove_group(&client->dev.kobj, &fts_esd_group);
 		return ret;
 	}
@@ -509,13 +509,13 @@ int fts_create_esd_sysfs(struct i2c_client *client)
 }
 
 /*****************************************************************************
-*  Name: fts_esdcheck_init
+*  Name: xiaomi_sdm439_ft5446_fts_esdcheck_init
 *  Brief: Init and create a queue work to check esd
 *  Input:
 *  Output:
 *  Return: < 0: Fail to create esd check queue
 *****************************************************************************/
-int fts_esdcheck_init(struct fts_ts_data *ts_data)
+int xiaomi_sdm439_ft5446_fts_esdcheck_init(struct fts_ts_data *ts_data)
 {
 	FTS_FUNC_ENTER();
 
@@ -529,20 +529,20 @@ int fts_esdcheck_init(struct fts_ts_data *ts_data)
 	memset((u8 *)&fts_esdcheck_data, 0, sizeof(struct fts_esdcheck_st));
 
 	fts_esdcheck_data.mode = ENABLE;
-	fts_esdcheck_switch(ENABLE);
-	fts_create_esd_sysfs(ts_data->client);
+	xiaomi_sdm439_ft5446_fts_esdcheck_switch(ENABLE);
+	xiaomi_sdm439_ft5446_fts_create_esd_sysfs(ts_data->client);
 	FTS_FUNC_EXIT();
 	return 0;
 }
 
 /*****************************************************************************
-*  Name: fts_esdcheck_exit
+*  Name: xiaomi_sdm439_ft5446_fts_esdcheck_exit
 *  Brief: When FTS TP driver is removed, then call this function to destory work queue
 *  Input:
 *  Output:
 *  Return:
 *****************************************************************************/
-int fts_esdcheck_exit(struct fts_ts_data *ts_data)
+int xiaomi_sdm439_ft5446_fts_esdcheck_exit(struct fts_ts_data *ts_data)
 {
 	FTS_FUNC_ENTER();
 

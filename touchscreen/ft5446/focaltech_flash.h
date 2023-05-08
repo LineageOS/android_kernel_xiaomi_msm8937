@@ -142,32 +142,32 @@ struct fts_upgrade {
 
 struct upgrade_fw {
 	u16 vendor_id;
-	u8 *fw_file;
+	u8 *xiaomi_sdm439_ft5446_fw_file;
 	u32 fw_len;
 };
 
 /*****************************************************************************
 * Global variable or extern global variabls/functions
 *****************************************************************************/
-extern struct fts_upgrade *fwupgrade;
-extern struct upgrade_func upgrade_func_ft5x46;
+extern struct fts_upgrade *xiaomi_sdm439_ft5446_fwupgrade;
+extern struct upgrade_func xiaomi_sdm439_ft5446_upgrade_func_ft5x46;
 
 /*****************************************************************************
 * Static function prototypes
 *****************************************************************************/
-bool fts_fwupg_check_fw_valid(struct i2c_client *client);
-int fts_fwupg_get_boot_state(struct i2c_client *client, enum FW_STATUS *fw_sts);
-bool fts_fwupg_check_state(struct i2c_client *client, enum FW_STATUS rstate);
-int fts_fwupg_reset_in_boot(struct i2c_client *client);
-int fts_fwupg_reset_to_boot(struct i2c_client *client);
-int fts_fwupg_reset_to_romboot(struct i2c_client *client);
-int fts_fwupg_enter_into_boot(struct i2c_client *client);
-int fts_fwupg_erase(struct i2c_client *client, u32 delay);
-int fts_fwupg_ecc_cal(struct i2c_client *client, u32 saddr, u32 len);
-int fts_flash_write_buf(struct i2c_client *client, u32 saddr, u8 *buf, u32 len, u32 delay);
-int fts_fwupg_upgrade(struct i2c_client *client, struct fts_upgrade *upg);
-int fts_get_firmware_name(char *fw_name, size_t size, u16 id);
+bool xiaomi_sdm439_ft5446_fts_fwupg_check_fw_valid(struct i2c_client *client);
+int xiaomi_sdm439_ft5446_fts_fwupg_get_boot_state(struct i2c_client *client, enum FW_STATUS *fw_sts);
+bool xiaomi_sdm439_ft5446_fts_fwupg_check_state(struct i2c_client *client, enum FW_STATUS rstate);
+int xiaomi_sdm439_ft5446_fts_fwupg_reset_in_boot(struct i2c_client *client);
+int xiaomi_sdm439_ft5446_fts_fwupg_reset_to_boot(struct i2c_client *client);
+int xiaomi_sdm439_ft5446_fts_fwupg_reset_to_romboot(struct i2c_client *client);
+int xiaomi_sdm439_ft5446_fts_fwupg_enter_into_boot(struct i2c_client *client);
+int xiaomi_sdm439_ft5446_fts_fwupg_erase(struct i2c_client *client, u32 delay);
+int xiaomi_sdm439_ft5446_fts_fwupg_ecc_cal(struct i2c_client *client, u32 saddr, u32 len);
+int xiaomi_sdm439_ft5446_fts_flash_write_buf(struct i2c_client *client, u32 saddr, u8 *buf, u32 len, u32 delay);
+int xiaomi_sdm439_ft5446_fts_fwupg_upgrade(struct i2c_client *client, struct fts_upgrade *upg);
+int xiaomi_sdm439_ft5446_fts_get_firmware_name(char *fw_name, size_t size, u16 id);
 
 /*Add by HQ-102007757 for sending tp hw info*/
-int fts_fwupg_get_ver_in_tp(struct i2c_client *client, u8 *ver);
+int xiaomi_sdm439_ft5446_fts_fwupg_get_ver_in_tp(struct i2c_client *client, u8 *ver);
 #endif

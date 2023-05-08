@@ -40,7 +40,7 @@
 *****************************************************************************/
 static int fts_ft5x46_init(void)
 {
-	struct fts_upgrade *upg = fwupgrade;
+	struct fts_upgrade *upg = xiaomi_sdm439_ft5446_fwupgrade;
 	 if (NULL == upg) {
 		FTS_ERROR("upg is null");
 		return -EINVAL;
@@ -51,7 +51,7 @@ static int fts_ft5x46_init(void)
 		return -EINVAL;
 	}
 
-	upgrade_func_ft5x46.fwveroff = upg->fw_length - 2;
+	xiaomi_sdm439_ft5446_upgrade_func_ft5x46.fwveroff = upg->fw_length - 2;
 	return 0;
 }
 
@@ -82,7 +82,7 @@ static int fts_ft5x46_upgrade(struct i2c_client *client, u8 *buf, u32 len)
 	}
 
 	/* enter into upgrade environment */
-	ret = fts_fwupg_enter_into_boot(client);
+	ret = xiaomi_sdm439_ft5446_fts_fwupg_enter_into_boot(client);
 	if (ret < 0) {
 		FTS_ERROR("enter into pramboot/bootloader fail,ret=%d", ret);
 		goto fw_reset;
@@ -90,7 +90,7 @@ static int fts_ft5x46_upgrade(struct i2c_client *client, u8 *buf, u32 len)
 
 	cmd[0] = FTS_CMD_FLASH_MODE;
 	cmd[1] = FLASH_MODE_UPGRADE_VALUE;
-	ret = fts_i2c_write(client, cmd, 2);
+	ret = xiaomi_sdm439_ft5446_fts_i2c_write(client, cmd, 2);
 	if (ret < 0) {
 		FTS_ERROR("upgrade mode(09) cmd write fail");
 		goto fw_reset;
@@ -100,28 +100,28 @@ static int fts_ft5x46_upgrade(struct i2c_client *client, u8 *buf, u32 len)
 	cmd[1] = BYTE_OFF_16(len);
 	cmd[2] = BYTE_OFF_8(len);
 	cmd[3] = BYTE_OFF_0(len);
-	ret = fts_i2c_write(client, cmd, FTS_CMD_DATA_LEN_LEN);
+	ret = xiaomi_sdm439_ft5446_fts_i2c_write(client, cmd, FTS_CMD_DATA_LEN_LEN);
 	if (ret < 0) {
 		FTS_ERROR("data len cmd write fail");
 		goto fw_reset;
 	}
 
-	ret = fts_fwupg_erase(client, FTS_REASE_APP_DELAY);
+	ret = xiaomi_sdm439_ft5446_fts_fwupg_erase(client, FTS_REASE_APP_DELAY);
 	if (ret < 0) {
 		FTS_ERROR("erase cmd write fail");
 		goto fw_reset;
 	}
 
 	/* write app */
-	start_addr = upgrade_func_ft5x46.appoff;
-	ecc_in_host = fts_flash_write_buf(client, start_addr, buf, len, 1);
+	start_addr = xiaomi_sdm439_ft5446_upgrade_func_ft5x46.appoff;
+	ecc_in_host = xiaomi_sdm439_ft5446_fts_flash_write_buf(client, start_addr, buf, len, 1);
 	if (ecc_in_host < 0) {
 		FTS_ERROR("lcd initial code write fail");
 		goto fw_reset;
 	}
 
 	/* ecc */
-	ecc_in_tp = fts_fwupg_ecc_cal(client, start_addr, len);
+	ecc_in_tp = xiaomi_sdm439_ft5446_fts_fwupg_ecc_cal(client, start_addr, len);
 	if (ecc_in_tp < 0) {
 		FTS_ERROR("ecc read fail");
 		goto fw_reset;
@@ -134,7 +134,7 @@ static int fts_ft5x46_upgrade(struct i2c_client *client, u8 *buf, u32 len)
 	}
 
 	FTS_INFO("upgrade success, reset to normal boot");
-	ret = fts_fwupg_reset_in_boot(client);
+	ret = xiaomi_sdm439_ft5446_fts_fwupg_reset_in_boot(client);
 	if (ret < 0) {
 		FTS_ERROR("reset to normal boot fail");
 	}
@@ -144,14 +144,14 @@ static int fts_ft5x46_upgrade(struct i2c_client *client, u8 *buf, u32 len)
 
 fw_reset:
 	FTS_INFO("upgrade fail, reset to normal boot");
-	ret = fts_fwupg_reset_in_boot(client);
+	ret = xiaomi_sdm439_ft5446_fts_fwupg_reset_in_boot(client);
 	if (ret < 0) {
 		FTS_ERROR("reset to normal boot fail");
 	}
 	return -EIO;
 }
 
-struct upgrade_func upgrade_func_ft5x46 = {
+struct upgrade_func xiaomi_sdm439_ft5446_upgrade_func_ft5x46 = {
 	.ctype = {0x02},
 	.fwveroff = 0x0000,
 	.fwcfgoff = 0xD780,

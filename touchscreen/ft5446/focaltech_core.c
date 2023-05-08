@@ -61,7 +61,7 @@
 /*****************************************************************************
 * Global variable or extern global variabls/functions
 *****************************************************************************/
-struct fts_ts_data *fts_data;
+struct fts_ts_data *xiaomi_sdm439_ft5446_fts_data;
 extern u8 goodix_flag;
 /*****************************************************************************
 * Static function prototypes
@@ -84,7 +84,7 @@ static struct workqueue_struct *fts_resume_workqueue;
 
 static void fts_resume_func(struct work_struct *work)
 {
-	struct fts_ts_data *data = fts_data;
+	struct fts_ts_data *data = xiaomi_sdm439_ft5446_fts_data;
 	FTS_DEBUG("Enter %s", __func__);
 
 	fts_ts_resume(&data->client->dev);
@@ -92,13 +92,13 @@ static void fts_resume_func(struct work_struct *work)
 	//mutex_unlock(&report_mutex);
 }
 
-void fts_resume_queue_work(void)
+void xiaomi_sdm439_ft5446_fts_resume_queue_work(void)
 {
 	cancel_delayed_work(&fts_resume_work);
 	queue_delayed_work(fts_resume_workqueue, &fts_resume_work, msecs_to_jiffies(FTS_RESUME_WAIT_TIME));
 }
 
-int fts_resume_init(void)
+int xiaomi_sdm439_ft5446_fts_resume_init(void)
 {
 	INIT_DELAYED_WORK(&fts_resume_work, fts_resume_func);
 	fts_resume_workqueue = create_workqueue("fts_resume_wq");
@@ -111,7 +111,7 @@ int fts_resume_init(void)
 	return 0;
 }
 
-int fts_resume_exit(void)
+int xiaomi_sdm439_ft5446_fts_resume_exit(void)
 {
 	destroy_workqueue(fts_resume_workqueue);
 
@@ -123,32 +123,32 @@ int fts_resume_exit(void)
 static int C3H_LCD_VENDOR;
 
 /************************************************************************
-* Name: get_lcd_vendor
+* Name: xiaomi_sdm439_ft5446_get_lcd_vendor
 * Brief: get lcd vendor from lockdown val[1]
 * Date: Add by HQ-102007757 [Date: 2018-12-26]
 ***********************************************************************/
-int *get_lcd_vendor(void)
+int *xiaomi_sdm439_ft5446_get_lcd_vendor(void)
 {
 	return &C3H_LCD_VENDOR;
 }
 
 /*****************************************************************************
-*  Name: fts_wait_tp_to_valid
+*  Name: xiaomi_sdm439_ft5446_fts_wait_tp_to_valid
 *  Brief: Read chip id until TP FW become valid(Timeout: TIMEOUT_READ_REG),
 *         need call when reset/power on/resume...
 *  Input:
 *  Output:
 *  Return: return 0 if tp valid, otherwise return error code
 *****************************************************************************/
-int fts_wait_tp_to_valid(struct i2c_client *client)
+int xiaomi_sdm439_ft5446_fts_wait_tp_to_valid(struct i2c_client *client)
 {
 	int ret = 0;
 	int cnt = 0;
 	u8 reg_value = 0;
-	u8 chip_id = fts_data->ic_info.ids.chip_idh;
+	u8 chip_id = xiaomi_sdm439_ft5446_fts_data->ic_info.ids.chip_idh;
 
 	do {
-		ret = fts_i2c_read_reg(client, FTS_REG_CHIP_ID, &reg_value);
+		ret = xiaomi_sdm439_ft5446_fts_i2c_read_reg(client, FTS_REG_CHIP_ID, &reg_value);
 		if ((ret < 0) || (reg_value != chip_id)) {
 			FTS_DEBUG("TP Not Ready, ReadData = 0x%x", reg_value);
 		} else if (reg_value == chip_id) {
@@ -204,13 +204,13 @@ static int fts_get_chip_types(
 }
 
 /*****************************************************************************
-*  Name: fts_get_ic_information
+*  Name: xiaomi_sdm439_ft5446_fts_get_ic_information
 *  Brief:
 *  Input:
 *  Output:
 *  Return: return 0 if success, otherwise return error code
 *****************************************************************************/
-int fts_get_ic_information(struct fts_ts_data *ts_data)
+int xiaomi_sdm439_ft5446_fts_get_ic_information(struct fts_ts_data *ts_data)
 {
 	int ret = 0;
 	int cnt = 0;
@@ -223,8 +223,8 @@ int fts_get_ic_information(struct fts_ts_data *ts_data)
 	ts_data->ic_info.is_incell = FTS_CHIP_IDC;
 	ts_data->ic_info.hid_supported = FTS_HID_SUPPORTTED;
 	do {
-		ret = fts_i2c_read_reg(client, FTS_REG_CHIP_ID, &chip_id[0]);
-		ret = fts_i2c_read_reg(client, FTS_REG_CHIP_ID2, &chip_id[1]);
+		ret = xiaomi_sdm439_ft5446_fts_i2c_read_reg(client, FTS_REG_CHIP_ID, &chip_id[0]);
+		ret = xiaomi_sdm439_ft5446_fts_i2c_read_reg(client, FTS_REG_CHIP_ID2, &chip_id[1]);
 		if ((ret < 0) || (0x0 == chip_id[0]) || (0x0 == chip_id[1])) {
 			FTS_DEBUG("i2c read invalid, read:0x%02x%02x", chip_id[0], chip_id[1]);
 		} else {
@@ -242,12 +242,12 @@ int fts_get_ic_information(struct fts_ts_data *ts_data)
 	if ((cnt * INTERVAL_READ_REG) >= TIMEOUT_READ_REG) {
 		FTS_INFO("fw is invalid, need read boot id");
 		if (ts_data->ic_info.hid_supported) {
-			fts_i2c_hid2std(client);
+			xiaomi_sdm439_ft5446_fts_i2c_hid2std(client);
 		}
 
 		id_cmd[0] = FTS_CMD_START1;
 		id_cmd[1] = FTS_CMD_START2;
-		ret = fts_i2c_write(client, id_cmd, 2);
+		ret = xiaomi_sdm439_ft5446_fts_i2c_write(client, id_cmd, 2);
 		if (ret < 0) {
 			FTS_ERROR("start cmd write fail");
 			return ret;
@@ -260,7 +260,7 @@ int fts_get_ic_information(struct fts_ts_data *ts_data)
 			id_cmd_len = FTS_CMD_READ_ID_LEN_INCELL;
 		else
 			id_cmd_len = FTS_CMD_READ_ID_LEN;
-		ret = fts_i2c_read(client, id_cmd, id_cmd_len, chip_id, 2);
+		ret = xiaomi_sdm439_ft5446_fts_i2c_read(client, id_cmd, id_cmd_len, chip_id, 2);
 		if ((ret < 0) || (0x0 == chip_id[0]) || (0x0 == chip_id[1])) {
 			FTS_ERROR("read boot id fail");
 			return -EIO;
@@ -279,41 +279,41 @@ int fts_get_ic_information(struct fts_ts_data *ts_data)
 }
 
 /*****************************************************************************
-*  Name: fts_tp_state_recovery
+*  Name: xiaomi_sdm439_ft5446_fts_tp_state_recovery
 *  Brief: Need execute this function when reset
 *  Input:
 *  Output:
 *  Return:
 *****************************************************************************/
-void fts_tp_state_recovery(struct i2c_client *client)
+void xiaomi_sdm439_ft5446_fts_tp_state_recovery(struct i2c_client *client)
 {
 	FTS_FUNC_ENTER();
 	/* wait tp stable */
-	fts_wait_tp_to_valid(client);
+	xiaomi_sdm439_ft5446_fts_wait_tp_to_valid(client);
 	/* recover TP charger state 0x8B */
 	/* recover TP glove state 0xC0 */
 	/* recover TP cover state 0xC1 */
-	fts_ex_mode_recovery(client);
+	xiaomi_sdm439_ft5446_fts_ex_mode_recovery(client);
 	/* recover TP gesture state 0xD0 */
 #if FTS_GESTURE_EN
-	fts_gesture_recovery(client);
+	xiaomi_sdm439_ft5446_fts_gesture_recovery(client);
 #endif
 	FTS_FUNC_EXIT();
 }
 
 /*****************************************************************************
-*  Name: fts_reset_proc
+*  Name: xiaomi_sdm439_ft5446_fts_reset_proc
 *  Brief: Execute reset operation
 *  Input: hdelayms - delay time unit:ms
 *  Output:
 *  Return:
 *****************************************************************************/
-int fts_reset_proc(int hdelayms)
+int xiaomi_sdm439_ft5446_fts_reset_proc(int hdelayms)
 {
 	FTS_FUNC_ENTER();
-	gpio_direction_output(fts_data->pdata->reset_gpio, 0);
+	gpio_direction_output(xiaomi_sdm439_ft5446_fts_data->pdata->reset_gpio, 0);
 	msleep(20);
-	gpio_direction_output(fts_data->pdata->reset_gpio, 1);
+	gpio_direction_output(xiaomi_sdm439_ft5446_fts_data->pdata->reset_gpio, 1);
 	if (hdelayms) {
 		msleep(hdelayms);
 	}
@@ -323,48 +323,48 @@ int fts_reset_proc(int hdelayms)
 }
 
 /*****************************************************************************
-*  Name: fts_irq_disable
+*  Name: xiaomi_sdm439_ft5446_fts_irq_disable
 *  Brief: disable irq
 *  Input:
 *  Output:
 *  Return:
 *****************************************************************************/
-void fts_irq_disable(void)
+void xiaomi_sdm439_ft5446_fts_irq_disable(void)
 {
 	unsigned long irqflags;
 
 	FTS_FUNC_ENTER();
-	spin_lock_irqsave(&fts_data->irq_lock, irqflags);
+	spin_lock_irqsave(&xiaomi_sdm439_ft5446_fts_data->irq_lock, irqflags);
 
-	if (!fts_data->irq_disabled) {
-		disable_irq_nosync(fts_data->irq);
-		fts_data->irq_disabled = true;
+	if (!xiaomi_sdm439_ft5446_fts_data->irq_disabled) {
+		disable_irq_nosync(xiaomi_sdm439_ft5446_fts_data->irq);
+		xiaomi_sdm439_ft5446_fts_data->irq_disabled = true;
 	}
 
-	spin_unlock_irqrestore(&fts_data->irq_lock, irqflags);
+	spin_unlock_irqrestore(&xiaomi_sdm439_ft5446_fts_data->irq_lock, irqflags);
 	FTS_FUNC_EXIT();
 }
 
 /*****************************************************************************
-*  Name: fts_irq_enable
+*  Name: xiaomi_sdm439_ft5446_fts_irq_enable
 *  Brief: enable irq
 *  Input:
 *  Output:
 *  Return:
 *****************************************************************************/
-void fts_irq_enable(void)
+void xiaomi_sdm439_ft5446_fts_irq_enable(void)
 {
 	unsigned long irqflags = 0;
 
 	FTS_FUNC_ENTER();
-	spin_lock_irqsave(&fts_data->irq_lock, irqflags);
+	spin_lock_irqsave(&xiaomi_sdm439_ft5446_fts_data->irq_lock, irqflags);
 
-	if (fts_data->irq_disabled) {
-		enable_irq(fts_data->irq);
-		fts_data->irq_disabled = false;
+	if (xiaomi_sdm439_ft5446_fts_data->irq_disabled) {
+		enable_irq(xiaomi_sdm439_ft5446_fts_data->irq);
+		xiaomi_sdm439_ft5446_fts_data->irq_disabled = false;
 	}
 
-	spin_unlock_irqrestore(&fts_data->irq_lock, irqflags);
+	spin_unlock_irqrestore(&xiaomi_sdm439_ft5446_fts_data->irq_lock, irqflags);
 	FTS_FUNC_EXIT();
 }
 
@@ -378,7 +378,7 @@ static int fts_power_source_init(struct fts_ts_data *data)
 
 	FTS_FUNC_ENTER();
 
-	gpio_direction_output(fts_data->pdata->reset_gpio, 0);
+	gpio_direction_output(xiaomi_sdm439_ft5446_fts_data->pdata->reset_gpio, 0);
 	msleep(8);
 
 	data->vdd = regulator_get(&data->client->dev, "vdd");
@@ -591,8 +591,8 @@ static void fts_show_touch_buffer(u8 *buf, int point_num)
 	int i;
 
 	memset(g_sz_debug, 0, 1024);
-	if (len > (fts_data->pnt_buf_size - 3)) {
-		len = fts_data->pnt_buf_size - 3;
+	if (len > (xiaomi_sdm439_ft5446_fts_data->pnt_buf_size - 3)) {
+		len = xiaomi_sdm439_ft5446_fts_data->pnt_buf_size - 3;
 	} else if (len == 0) {
 		len += FTS_ONE_TCH_LEN;
 	}
@@ -613,15 +613,15 @@ static void fts_show_touch_buffer(u8 *buf, int point_num)
  *****************************************************************************/
 static void fts_release_all_finger(void)
 {
-	struct input_dev *input_dev = fts_data->input_dev;
+	struct input_dev *input_dev = xiaomi_sdm439_ft5446_fts_data->input_dev;
 #if FTS_MT_PROTOCOL_B_EN
 	u32 finger_count = 0;
 #endif
 
 	FTS_FUNC_ENTER();
-	mutex_lock(&fts_data->report_mutex);
+	mutex_lock(&xiaomi_sdm439_ft5446_fts_data->report_mutex);
 #if FTS_MT_PROTOCOL_B_EN
-	for (finger_count = 0; finger_count < fts_data->pdata->max_touch_number; finger_count++) {
+	for (finger_count = 0; finger_count < xiaomi_sdm439_ft5446_fts_data->pdata->max_touch_number; finger_count++) {
 		input_mt_slot(input_dev, finger_count);
 		input_mt_report_slot_state(input_dev, MT_TOOL_FINGER, false);
 	}
@@ -631,7 +631,7 @@ static void fts_release_all_finger(void)
 	input_report_key(input_dev, BTN_TOUCH, 0);
 	input_sync(input_dev);
 
-	mutex_unlock(&fts_data->report_mutex);
+	mutex_unlock(&xiaomi_sdm439_ft5446_fts_data->report_mutex);
 	FTS_FUNC_EXIT();
 }
 
@@ -834,7 +834,7 @@ static int fts_read_touchdata(struct fts_ts_data *data)
 	struct i2c_client *client = data->client;
 
 #if FTS_GESTURE_EN
-	if (0 == fts_gesture_readdata(data)) {
+	if (0 == xiaomi_sdm439_ft5446_fts_gesture_readdata(data)) {
 		FTS_INFO("succuss to get gesture data in irq handler");
 		return 1;
 	}
@@ -850,7 +850,7 @@ static int fts_read_touchdata(struct fts_ts_data *data)
 	memset(buf, 0xFF, data->pnt_buf_size);
 	buf[0] = 0x00;
 
-	ret = fts_i2c_read(data->client, buf, 1, buf, data->pnt_buf_size);
+	ret = xiaomi_sdm439_ft5446_fts_i2c_read(data->client, buf, 1, buf, data->pnt_buf_size);
 	if (ret < 0) {
 		FTS_ERROR("read touchdata failed, ret:%d", ret);
 		return ret;
@@ -861,7 +861,7 @@ static int fts_read_touchdata(struct fts_ts_data *data)
 		if ((data->point_num == 0x0F) && (buf[1] == 0xFF) && (buf[2] == 0xFF)
 			&& (buf[3] == 0xFF) && (buf[4] == 0xFF) && (buf[5] == 0xFF) && (buf[6] == 0xFF)) {
 			FTS_INFO("touch buff is 0xff, need recovery state");
-			fts_tp_state_recovery(client);
+			xiaomi_sdm439_ft5446_fts_tp_state_recovery(client);
 			return -EIO;
 		}
 	}
@@ -944,7 +944,7 @@ static irqreturn_t fts_ts_interrupt(int irq, void *data)
 	}
 
 #if FTS_ESDCHECK_EN
-	fts_esdcheck_set_intr(1);
+	xiaomi_sdm439_ft5446_fts_esdcheck_set_intr(1);
 #endif
 
 	ret = fts_read_touchdata(ts_data);
@@ -955,7 +955,7 @@ static irqreturn_t fts_ts_interrupt(int irq, void *data)
 	}
 
 #if FTS_ESDCHECK_EN
-	fts_esdcheck_set_intr(0);
+	xiaomi_sdm439_ft5446_fts_esdcheck_set_intr(0);
 #endif
 
 	return IRQ_HANDLED;
@@ -1281,22 +1281,22 @@ static int fb_notifier_callback(struct notifier_block *self,
 {
 	struct fb_event *evdata = data;
 	int *blank;
-	struct fts_ts_data *fts_data =
+	struct fts_ts_data *xiaomi_sdm439_ft5446_fts_data =
 		container_of(self, struct fts_ts_data, fb_notif);
 
 	FTS_DEBUG("Enter %s", __func__);
 
 	if (evdata && evdata->data && event == FB_EVENT_BLANK &&
-		fts_data && fts_data->client) {
+		xiaomi_sdm439_ft5446_fts_data && xiaomi_sdm439_ft5446_fts_data->client) {
 		blank = evdata->data;
 		if (*blank == FB_BLANK_UNBLANK)
 #if FTS_RESUME_EN
-			fts_resume_queue_work();
+			xiaomi_sdm439_ft5446_fts_resume_queue_work();
 #else
-			fts_ts_resume(&fts_data->client->dev);
+			fts_ts_resume(&xiaomi_sdm439_ft5446_fts_data->client->dev);
 #endif
 		else if (*blank == FB_BLANK_POWERDOWN)
-			fts_ts_suspend(&fts_data->client->dev);
+			fts_ts_suspend(&xiaomi_sdm439_ft5446_fts_data->client->dev);
 	}
 
 	FTS_DEBUG("Exit %s", __func__);
@@ -1336,7 +1336,7 @@ static void fts_ts_late_resume(struct early_suspend *handler)
 	FTS_DEBUG("Enter %s", __func__);
 
 #if FTS_RESUME_EN
-	fts_resume_queue_work();
+	xiaomi_sdm439_ft5446_fts_resume_queue_work();
 #else
 	fts_ts_resume(&data->client->dev);
 #endif
@@ -1353,9 +1353,9 @@ static void fts_ts_late_resume(struct early_suspend *handler)
  * @Purpose: Send ctp hwinfo
  * ============================
  */
-extern u16 moudle_id;
+extern u16 xiaomi_sdm439_ft5446_moudle_id;
 static char tp_info_summary[80] = "";
-int ctp_hw_info(struct fts_ts_data *ts_data, struct i2c_client *client)
+int xiaomi_sdm439_ft5446_ctp_hw_info(struct fts_ts_data *ts_data, struct i2c_client *client)
 {
 	int ret = 0;
 	bool fwvalid = false;
@@ -1363,16 +1363,16 @@ int ctp_hw_info(struct fts_ts_data *ts_data, struct i2c_client *client)
 
 	FTS_FUNC_ENTER();
 
-	fwvalid = fts_fwupg_check_fw_valid(client);
+	fwvalid = xiaomi_sdm439_ft5446_fts_fwupg_check_fw_valid(client);
 	if (fwvalid) {
-		ret = fts_fwupg_get_ver_in_tp(client, &fw_ver_info);
+		ret = xiaomi_sdm439_ft5446_fts_fwupg_get_ver_in_tp(client, &fw_ver_info);
 		if (ret < 0) {
 			FTS_ERROR("get fw ver info fail");
 			return false;
 		 }
 	}
-	FTS_INFO("ctp_hw_info %x\n", moudle_id);
-	if (moudle_id == TRULY_ID) {
+	FTS_INFO("xiaomi_sdm439_ft5446_ctp_hw_info %x\n", xiaomi_sdm439_ft5446_moudle_id);
+	if (xiaomi_sdm439_ft5446_moudle_id == TRULY_ID) {
 		snprintf(tp_info_summary, sizeof (tp_info_summary), "%s:%d\n", FTS_TRULY_INFO, fw_ver_info);
 		FTS_INFO("%s", tp_info_summary);
 		xiaomi_sdm439_hq_regiser_hw_info(XIAOMI_SDM439_HWID_CTP, tp_info_summary);
@@ -1394,7 +1394,7 @@ int ctp_hw_info(struct fts_ts_data *ts_data, struct i2c_client *client)
 *  Output:
 *  Return:
 *****************************************************************************/
-struct i2c_client *hw_client;
+struct i2c_client *xiaomi_sdm439_ft5446_hw_client;
 static int fts_ts_probe(struct i2c_client *client, const struct i2c_device_id *id)
 {
 	int ret = 0;
@@ -1432,15 +1432,15 @@ static int fts_ts_probe(struct i2c_client *client, const struct i2c_device_id *i
 
 	ts_data = devm_kzalloc(&client->dev, sizeof(*ts_data), GFP_KERNEL);
 	if (!ts_data) {
-		FTS_ERROR("Failed to allocate memory for fts_data");
+		FTS_ERROR("Failed to allocate memory for xiaomi_sdm439_ft5446_fts_data");
 		return -ENOMEM;
 	}
 
-	fts_data = ts_data;
+	xiaomi_sdm439_ft5446_fts_data = ts_data;
 	ts_data->client = client;
 	ts_data->pdata = pdata;
 	i2c_set_clientdata(client, ts_data);
-	hw_client = client;
+	xiaomi_sdm439_ft5446_hw_client = client;
 
 	ts_data->ts_workqueue = create_singlethread_workqueue("fts_wq");
 	if (NULL == ts_data->ts_workqueue) {
@@ -1485,24 +1485,24 @@ static int fts_ts_probe(struct i2c_client *client, const struct i2c_device_id *i
 	}
 
 #if (!FTS_CHIP_IDC)
-	fts_reset_proc(200);
+	xiaomi_sdm439_ft5446_fts_reset_proc(200);
 #endif
 
-	ret = fts_get_ic_information(ts_data);
+	ret = xiaomi_sdm439_ft5446_fts_get_ic_information(ts_data);
 	if (ret) {
 		FTS_ERROR("not focal IC, unregister driver");
 		goto err_irq_req;
 	}
 
 #if FTS_APK_NODE_EN
-	ret = fts_create_apk_debug_channel(ts_data);
+	ret = xiaomi_sdm439_ft5446_fts_create_apk_debug_channel(ts_data);
 	if (ret) {
 		FTS_ERROR("create apk debug node fail");
 	}
 #endif
 
 #if FTS_SYSFS_NODE_EN
-	ret = fts_create_sysfs(client);
+	ret = xiaomi_sdm439_ft5446_fts_create_sysfs(client);
 	if (ret) {
 		FTS_ERROR("create sysfs node fail");
 	}
@@ -1515,34 +1515,34 @@ static int fts_ts_probe(struct i2c_client *client, const struct i2c_device_id *i
 	}
 #endif
 
-	ret = fts_ex_mode_init(client);
+	ret = xiaomi_sdm439_ft5446_fts_ex_mode_init(client);
 	if (ret) {
 		FTS_ERROR("init glove/cover/charger fail");
 	}
 
 #if FTS_GESTURE_EN
-	ret = fts_gesture_init(ts_data);
+	ret = xiaomi_sdm439_ft5446_fts_gesture_init(ts_data);
 	if (ret) {
 		FTS_ERROR("init gesture fail");
 	}
 #endif
 
 #if FTS_TEST_EN
-	ret = fts_test_init(client);
+	ret = xiaomi_sdm439_ft5446_fts_test_init(client);
 	if (ret) {
 		FTS_ERROR("init production test fail");
 	}
 #endif
 
 #if FTS_TP_SELFTEST
-	ret = fts_tp_selftest_proc();
+	ret = xiaomi_sdm439_ft5446_fts_tp_selftest_proc();
 	if (ret) {
 		FTS_ERROR("Unable to create tp_selftest_proc proc: %d", ret);
 	}
 #endif
 
 #if FTS_ESDCHECK_EN
-	ret = fts_esdcheck_init(ts_data);
+	ret = xiaomi_sdm439_ft5446_fts_esdcheck_init(ts_data);
 	if (ret) {
 		FTS_ERROR("init esd check fail");
 	}
@@ -1555,21 +1555,21 @@ static int fts_ts_probe(struct i2c_client *client, const struct i2c_device_id *i
 	}
 
 #if HQ_LOCK_DOWN_INFO
-	ret = fts_create_lockdown_proc(client);
+	ret = xiaomi_sdm439_ft5446_fts_create_lockdown_proc(client);
 	if (ret < 0) {
 		FTS_ERROR("Unable to create tp_lockdown_info proc !");
 	}
 #endif
 
 #if FTS_AUTO_UPGRADE_EN
-	ret = fts_fwupg_init(ts_data);
+	ret = xiaomi_sdm439_ft5446_fts_fwupg_init(ts_data);
 	if (ret) {
 		FTS_ERROR("init fw upgrade fail");
 	}
 #endif
 
 #if FTS_RESUME_EN
-	fts_resume_init();
+	xiaomi_sdm439_ft5446_fts_resume_init();
 #endif
 
 #if defined(CONFIG_FB)
@@ -1586,9 +1586,9 @@ static int fts_ts_probe(struct i2c_client *client, const struct i2c_device_id *i
 #endif
 
 	#if HQ_CTP_HWINFO_REGISTER
-	ret = ctp_hw_info(ts_data, client);
+	ret = xiaomi_sdm439_ft5446_ctp_hw_info(ts_data, client);
 	if (ret) {
-		FTS_ERROR("Unable to register ctp_hw_info: %d", ret);
+		FTS_ERROR("Unable to register xiaomi_sdm439_ft5446_ctp_hw_info: %d", ret);
 	}
 	#endif
 
@@ -1640,29 +1640,29 @@ static int fts_ts_remove(struct i2c_client *client)
 #endif
 
 #if FTS_APK_NODE_EN
-	fts_release_apk_debug_channel(ts_data);
+	xiaomi_sdm439_ft5446_fts_release_apk_debug_channel(ts_data);
 #endif
 
 #if FTS_SYSFS_NODE_EN
-	fts_remove_sysfs(client);
+	xiaomi_sdm439_ft5446_fts_remove_sysfs(client);
 #endif
 
-	fts_ex_mode_exit(client);
+	xiaomi_sdm439_ft5446_fts_ex_mode_exit(client);
 
 #if FTS_AUTO_UPGRADE_EN
-	fts_fwupg_exit(ts_data);
+	xiaomi_sdm439_ft5446_fts_fwupg_exit(ts_data);
 #endif
 
 #if FTS_TEST_EN
-	fts_test_exit(client);
+	xiaomi_sdm439_ft5446_fts_test_exit(client);
 #endif
 
 #if FTS_ESDCHECK_EN
-	fts_esdcheck_exit(ts_data);
+	xiaomi_sdm439_ft5446_fts_esdcheck_exit(ts_data);
 #endif
 
 #if FTS_GESTURE_EN
-	fts_gesture_exit(client);
+	xiaomi_sdm439_ft5446_fts_gesture_exit(client);
 #endif
 
 #if defined(CONFIG_FB)
@@ -1727,17 +1727,17 @@ static int fts_ts_suspend(struct device *dev)
 	}
 
 #if FTS_ESDCHECK_EN
-	fts_esdcheck_suspend();
+	xiaomi_sdm439_ft5446_fts_esdcheck_suspend();
 #endif
 
 #if FTS_GESTURE_EN
-	if (fts_gesture_suspend(ts_data->client) == 0) {
+	if (xiaomi_sdm439_ft5446_fts_gesture_suspend(ts_data->client) == 0) {
 		ts_data->suspended = true;
 		return 0;
 	}
 #endif
 
-	fts_irq_disable();
+	xiaomi_sdm439_ft5446_fts_irq_disable();
 
 #if FTS_POWER_SOURCE_CUST_EN
 	/*ret = fts_power_source_ctrl(ts_data, DISABLE);
@@ -1746,7 +1746,7 @@ static int fts_ts_suspend(struct device *dev)
 	}*/
 
 	/* TP enter sleep mode */
-	ret = fts_i2c_write_reg(ts_data->client, FTS_REG_POWER_MODE, FTS_REG_POWER_MODE_SLEEP_VALUE);
+	ret = xiaomi_sdm439_ft5446_fts_i2c_write_reg(ts_data->client, FTS_REG_POWER_MODE, FTS_REG_POWER_MODE_SLEEP_VALUE);
 	if (ret < 0)
 		FTS_ERROR("set TP to sleep mode fail, ret=%d", ret);
 
@@ -1755,7 +1755,7 @@ static int fts_ts_suspend(struct device *dev)
 #endif
 //#else
 	/* TP enter sleep mode */
-	//ret = fts_i2c_write_reg(ts_data->client, FTS_REG_POWER_MODE, FTS_REG_POWER_MODE_SLEEP_VALUE);
+	//ret = xiaomi_sdm439_ft5446_fts_i2c_write_reg(ts_data->client, FTS_REG_POWER_MODE, FTS_REG_POWER_MODE_SLEEP_VALUE);
 	//if (ret < 0)
 		//FTS_ERROR("set TP to sleep mode fail, ret=%d", ret);
 #endif
@@ -1792,24 +1792,24 @@ static int fts_ts_resume(struct device *dev)
 #endif
 
 	if (!ts_data->ic_info.is_incell) {
-		fts_reset_proc(200);
+		xiaomi_sdm439_ft5446_fts_reset_proc(200);
 	}
 
-	fts_tp_state_recovery(ts_data->client);
+	xiaomi_sdm439_ft5446_fts_tp_state_recovery(ts_data->client);
 
 #if FTS_ESDCHECK_EN
-	fts_esdcheck_resume();
+	xiaomi_sdm439_ft5446_fts_esdcheck_resume();
 #endif
 
 #if FTS_GESTURE_EN
-	if (fts_gesture_resume(ts_data->client) == 0) {
+	if (xiaomi_sdm439_ft5446_fts_gesture_resume(ts_data->client) == 0) {
 		ts_data->suspended = false;
 		return 0;
 	}
 #endif
 
 	ts_data->suspended = false;
-	fts_irq_enable();
+	xiaomi_sdm439_ft5446_fts_irq_enable();
 
 	FTS_FUNC_EXIT();
 	return 0;

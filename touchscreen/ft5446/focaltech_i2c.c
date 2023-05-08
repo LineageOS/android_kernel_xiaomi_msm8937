@@ -63,13 +63,13 @@ static DEFINE_MUTEX(i2c_rw_access);
 *****************************************************************************/
 
 /************************************************************************
-* Name: fts_i2c_read
+* Name: xiaomi_sdm439_ft5446_fts_i2c_read
 * Brief: i2c read
 * Input: i2c info, write buf, write len, read buf, read len
 * Output: get data in the 3rd buf
 * Return: fail <0
 ***********************************************************************/
-int fts_i2c_read(struct i2c_client *client, char *writebuf, int writelen, char *readbuf, int readlen)
+int xiaomi_sdm439_ft5446_fts_i2c_read(struct i2c_client *client, char *writebuf, int writelen, char *readbuf, int readlen)
 {
 	int ret = 0;
 	int i = 0;
@@ -123,13 +123,13 @@ int fts_i2c_read(struct i2c_client *client, char *writebuf, int writelen, char *
 }
 
 /************************************************************************
-* Name: fts_i2c_write
+* Name: xiaomi_sdm439_ft5446_fts_i2c_write
 * Brief: i2c write
 * Input: i2c info, write buf, write len
 * Output: no
 * Return: fail <0
 ***********************************************************************/
-int fts_i2c_write(struct i2c_client *client, char *writebuf, int writelen)
+int xiaomi_sdm439_ft5446_fts_i2c_write(struct i2c_client *client, char *writebuf, int writelen)
 {
 	int ret = 0;
 	int i = 0;
@@ -158,48 +158,48 @@ int fts_i2c_write(struct i2c_client *client, char *writebuf, int writelen)
 }
 
 /************************************************************************
-* Name: fts_i2c_write_reg
+* Name: xiaomi_sdm439_ft5446_fts_i2c_write_reg
 * Brief: write register
 * Input: i2c info, reg address, reg value
 * Output: no
 * Return: fail <0
 ***********************************************************************/
-int fts_i2c_write_reg(struct i2c_client *client, u8 regaddr, u8 regvalue)
+int xiaomi_sdm439_ft5446_fts_i2c_write_reg(struct i2c_client *client, u8 regaddr, u8 regvalue)
 {
 	u8 buf[2] = {0};
 
 	buf[0] = regaddr;
 	buf[1] = regvalue;
-	return fts_i2c_write(client, buf, sizeof(buf));
+	return xiaomi_sdm439_ft5446_fts_i2c_write(client, buf, sizeof(buf));
 }
 
 /************************************************************************
-* Name: fts_i2c_read_reg
+* Name: xiaomi_sdm439_ft5446_fts_i2c_read_reg
 * Brief: read register
 * Input: i2c info, reg address, reg value
 * Output: get reg value
 * Return: fail <0
 ***********************************************************************/
-int fts_i2c_read_reg(struct i2c_client *client, u8 regaddr, u8 *regvalue)
+int xiaomi_sdm439_ft5446_fts_i2c_read_reg(struct i2c_client *client, u8 regaddr, u8 *regvalue)
 {
-	return fts_i2c_read(client, &regaddr, 1, regvalue, 1);
+	return xiaomi_sdm439_ft5446_fts_i2c_read(client, &regaddr, 1, regvalue, 1);
 }
 
 /************************************************************************
 * HID to standard I2C
 ***********************************************************************/
-void fts_i2c_hid2std(struct i2c_client *client)
+void xiaomi_sdm439_ft5446_fts_i2c_hid2std(struct i2c_client *client)
 {
 	int ret = 0;
 	u8 buf[3] = {0xeb, 0xaa, 0x09};
 
-	ret = fts_i2c_write(client, buf, 3);
+	ret = xiaomi_sdm439_ft5446_fts_i2c_write(client, buf, 3);
 	if (ret < 0)
 		FTS_ERROR("hid2std cmd write fail");
 	else {
 		msleep(10);
 		buf[0] = buf[1] = buf[2] = 0;
-		ret = fts_i2c_read(client, NULL, 0, buf, 3);
+		ret = xiaomi_sdm439_ft5446_fts_i2c_read(client, NULL, 0, buf, 3);
 		if (ret < 0)
 			FTS_ERROR("hid2std cmd read fail");
 		else if ((0xeb == buf[0]) && (0xaa == buf[1]) && (0x08 == buf[2])) {
@@ -211,13 +211,13 @@ void fts_i2c_hid2std(struct i2c_client *client)
 }
 
 /************************************************************************
-* Name: fts_i2c_init
+* Name: xiaomi_sdm439_ft5446_fts_i2c_init
 * Brief: fts i2c init
 * Input:
 * Output:
 * Return:
 ***********************************************************************/
-int fts_i2c_init(void)
+int xiaomi_sdm439_ft5446_fts_i2c_init(void)
 {
 	FTS_FUNC_ENTER();
 
@@ -225,13 +225,13 @@ int fts_i2c_init(void)
 	return 0;
 }
 /************************************************************************
-* Name: fts_i2c_exit
+* Name: xiaomi_sdm439_ft5446_fts_i2c_exit
 * Brief: fts i2c exit
 * Input:
 * Output:
 * Return:
 ***********************************************************************/
-int fts_i2c_exit(void)
+int xiaomi_sdm439_ft5446_fts_i2c_exit(void)
 {
 	FTS_FUNC_ENTER();
 

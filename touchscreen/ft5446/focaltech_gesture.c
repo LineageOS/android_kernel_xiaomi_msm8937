@@ -142,11 +142,11 @@ static ssize_t fts_gesture_show(struct device *dev, struct device_attribute *att
 {
 	int count;
 	u8 val;
-	struct input_dev *input_dev = fts_data->input_dev;
+	struct input_dev *input_dev = xiaomi_sdm439_ft5446_fts_data->input_dev;
 	struct i2c_client *client = container_of(dev, struct i2c_client, dev);
 
 	mutex_lock(&input_dev->mutex);
-	fts_i2c_read_reg(client, FTS_REG_GESTURE_EN, &val);
+	xiaomi_sdm439_ft5446_fts_i2c_read_reg(client, FTS_REG_GESTURE_EN, &val);
 	count = snprintf(buf, PAGE_SIZE, "Gesture Mode: %s\n", fts_gesture_data.mode ? "On" : "Off");
 	count += snprintf(buf + count, PAGE_SIZE, "Reg(0xD0) = %d\n", val);
 	mutex_unlock(&input_dev->mutex);
@@ -163,7 +163,7 @@ static ssize_t fts_gesture_show(struct device *dev, struct device_attribute *att
 ***********************************************************************/
 static ssize_t fts_gesture_store(struct device *dev, struct device_attribute *attr, const char *buf, size_t count)
 {
-	struct input_dev *input_dev = fts_data->input_dev;
+	struct input_dev *input_dev = xiaomi_sdm439_ft5446_fts_data->input_dev;
 	mutex_lock(&input_dev->mutex);
 	if (FTS_SYSFS_ECHO_ON(buf)) {
 		FTS_INFO("[GESTURE]enable gesture");
@@ -187,7 +187,7 @@ static ssize_t fts_gesture_buf_show(struct device *dev, struct device_attribute 
 {
 	int count;
 	int i = 0;
-	struct input_dev *input_dev = fts_data->input_dev;
+	struct input_dev *input_dev = xiaomi_sdm439_ft5446_fts_data->input_dev;
 
 	mutex_lock(&input_dev->mutex);
 	count = snprintf(buf, PAGE_SIZE, "Gesture ID: 0x%x\n", fts_gesture_data.header[0]);
@@ -218,13 +218,13 @@ static ssize_t fts_gesture_buf_store(struct device *dev, struct device_attribute
 }
 
 /*****************************************************************************
-*   Name: fts_create_gesture_sysfs
+*   Name: xiaomi_sdm439_ft5446_fts_create_gesture_sysfs
 *  Brief:
 *  Input:
 * Output:
 * Return: 0-success or others-error
 *****************************************************************************/
-int fts_create_gesture_sysfs(struct i2c_client *client)
+int xiaomi_sdm439_ft5446_fts_create_gesture_sysfs(struct i2c_client *client)
 {
 	int ret = 0;
 
@@ -323,15 +323,15 @@ static int fts_gesture_read_buffer(struct i2c_client *client, u8 *buf, int read_
 	int i;
 
 	if (read_bytes <= I2C_BUFFER_LENGTH_MAXINUM) {
-		ret = fts_i2c_read(client, buf, 1, buf, read_bytes);
+		ret = xiaomi_sdm439_ft5446_fts_i2c_read(client, buf, 1, buf, read_bytes);
 	} else {
-		ret = fts_i2c_read(client, buf, 1, buf, I2C_BUFFER_LENGTH_MAXINUM);
+		ret = xiaomi_sdm439_ft5446_fts_i2c_read(client, buf, 1, buf, I2C_BUFFER_LENGTH_MAXINUM);
 		remain_bytes = read_bytes - I2C_BUFFER_LENGTH_MAXINUM;
 		for (i = 1; remain_bytes > 0; i++) {
 			if (remain_bytes <= I2C_BUFFER_LENGTH_MAXINUM)
-				ret = fts_i2c_read(client, buf, 0, buf + I2C_BUFFER_LENGTH_MAXINUM * i, remain_bytes);
+				ret = xiaomi_sdm439_ft5446_fts_i2c_read(client, buf, 0, buf + I2C_BUFFER_LENGTH_MAXINUM * i, remain_bytes);
 			else
-				ret = fts_i2c_read(client, buf, 0, buf + I2C_BUFFER_LENGTH_MAXINUM * i, I2C_BUFFER_LENGTH_MAXINUM);
+				ret = xiaomi_sdm439_ft5446_fts_i2c_read(client, buf, 0, buf + I2C_BUFFER_LENGTH_MAXINUM * i, I2C_BUFFER_LENGTH_MAXINUM);
 			remain_bytes -= I2C_BUFFER_LENGTH_MAXINUM;
 		}
 	}
@@ -340,13 +340,13 @@ static int fts_gesture_read_buffer(struct i2c_client *client, u8 *buf, int read_
 }
 
 /************************************************************************
-*   Name: fts_gesture_readdata
+*   Name: xiaomi_sdm439_ft5446_fts_gesture_readdata
 *  Brief: read data from TP register
 *  Input:
 * Output:
 * Return: return 0 if succuss, otherwise reture error code
 ***********************************************************************/
-int fts_gesture_readdata(struct fts_ts_data *ts_data)
+int xiaomi_sdm439_ft5446_fts_gesture_readdata(struct fts_ts_data *ts_data)
 {
 	u8 buf[FTS_GESTRUE_POINTS * 4] = { 0 };
 	int ret = 0;
@@ -362,7 +362,7 @@ int fts_gesture_readdata(struct fts_ts_data *ts_data)
 		return -EINVAL;
 	}
 
-	ret = fts_i2c_read_reg(client, FTS_REG_GESTURE_EN, &state);
+	ret = xiaomi_sdm439_ft5446_fts_i2c_read_reg(client, FTS_REG_GESTURE_EN, &state);
 	if ((ret < 0) || (state != ENABLE)) {
 		FTS_DEBUG("gesture not enable, don't process gesture");
 		return -EIO;
@@ -374,7 +374,7 @@ int fts_gesture_readdata(struct fts_ts_data *ts_data)
 	memset(fts_gesture_data.coordinate_y, 0, FTS_GESTRUE_POINTS * sizeof(u16));
 
 	buf[0] = FTS_REG_GESTURE_OUTPUT_ADDRESS;
-	ret = fts_i2c_read(client, buf, 1, buf, FTS_GESTRUE_POINTS_HEADER);
+	ret = xiaomi_sdm439_ft5446_fts_i2c_read(client, buf, 1, buf, FTS_GESTRUE_POINTS_HEADER);
 	if (ret < 0) {
 		FTS_ERROR("[GESTURE]Read gesture header data failed!!");
 		FTS_FUNC_EXIT();
@@ -406,34 +406,34 @@ int fts_gesture_readdata(struct fts_ts_data *ts_data)
 }
 
 /*****************************************************************************
-*   Name: fts_gesture_recovery
+*   Name: xiaomi_sdm439_ft5446_fts_gesture_recovery
 *  Brief: recovery gesture state when reset or power on
 *  Input:
 * Output:
 * Return:
 *****************************************************************************/
-void fts_gesture_recovery(struct i2c_client *client)
+void xiaomi_sdm439_ft5446_fts_gesture_recovery(struct i2c_client *client)
 {
 	if ((ENABLE == fts_gesture_data.mode) && (ENABLE == fts_gesture_data.active)) {
-		FTS_INFO("enter fts_gesture_recovery");
-		fts_i2c_write_reg(client, 0xD1, 0xff);
-		fts_i2c_write_reg(client, 0xD2, 0xff);
-		fts_i2c_write_reg(client, 0xD5, 0xff);
-		fts_i2c_write_reg(client, 0xD6, 0xff);
-		fts_i2c_write_reg(client, 0xD7, 0xff);
-		fts_i2c_write_reg(client, 0xD8, 0xff);
-		fts_i2c_write_reg(client, FTS_REG_GESTURE_EN, ENABLE);
+		FTS_INFO("enter xiaomi_sdm439_ft5446_fts_gesture_recovery");
+		xiaomi_sdm439_ft5446_fts_i2c_write_reg(client, 0xD1, 0xff);
+		xiaomi_sdm439_ft5446_fts_i2c_write_reg(client, 0xD2, 0xff);
+		xiaomi_sdm439_ft5446_fts_i2c_write_reg(client, 0xD5, 0xff);
+		xiaomi_sdm439_ft5446_fts_i2c_write_reg(client, 0xD6, 0xff);
+		xiaomi_sdm439_ft5446_fts_i2c_write_reg(client, 0xD7, 0xff);
+		xiaomi_sdm439_ft5446_fts_i2c_write_reg(client, 0xD8, 0xff);
+		xiaomi_sdm439_ft5446_fts_i2c_write_reg(client, FTS_REG_GESTURE_EN, ENABLE);
 	}
 }
 
 /*****************************************************************************
-*   Name: fts_gesture_suspend
+*   Name: xiaomi_sdm439_ft5446_fts_gesture_suspend
 *  Brief:
 *  Input:
 * Output:
 * Return: return 0 if succuss, otherwise return error code
 *****************************************************************************/
-int fts_gesture_suspend(struct i2c_client *client)
+int xiaomi_sdm439_ft5446_fts_gesture_suspend(struct i2c_client *client)
 {
 	int ret;
 	int i;
@@ -447,15 +447,15 @@ int fts_gesture_suspend(struct i2c_client *client)
 	}
 
 	for (i = 0; i < 5; i++) {
-		fts_i2c_write_reg(client, 0xd1, 0xff);
-		fts_i2c_write_reg(client, 0xd2, 0xff);
-		fts_i2c_write_reg(client, 0xd5, 0xff);
-		fts_i2c_write_reg(client, 0xd6, 0xff);
-		fts_i2c_write_reg(client, 0xd7, 0xff);
-		fts_i2c_write_reg(client, 0xd8, 0xff);
-		fts_i2c_write_reg(client, FTS_REG_GESTURE_EN, ENABLE);
+		xiaomi_sdm439_ft5446_fts_i2c_write_reg(client, 0xd1, 0xff);
+		xiaomi_sdm439_ft5446_fts_i2c_write_reg(client, 0xd2, 0xff);
+		xiaomi_sdm439_ft5446_fts_i2c_write_reg(client, 0xd5, 0xff);
+		xiaomi_sdm439_ft5446_fts_i2c_write_reg(client, 0xd6, 0xff);
+		xiaomi_sdm439_ft5446_fts_i2c_write_reg(client, 0xd7, 0xff);
+		xiaomi_sdm439_ft5446_fts_i2c_write_reg(client, 0xd8, 0xff);
+		xiaomi_sdm439_ft5446_fts_i2c_write_reg(client, FTS_REG_GESTURE_EN, ENABLE);
 		msleep(1);
-		fts_i2c_read_reg(client, FTS_REG_GESTURE_EN, &state);
+		xiaomi_sdm439_ft5446_fts_i2c_read_reg(client, FTS_REG_GESTURE_EN, &state);
 		if (state == ENABLE)
 			break;
 	}
@@ -466,9 +466,9 @@ int fts_gesture_suspend(struct i2c_client *client)
 		return -EIO;
 	}
 
-	ret = enable_irq_wake(fts_data->irq);
+	ret = enable_irq_wake(xiaomi_sdm439_ft5446_fts_data->irq);
 	if (ret) {
-		FTS_INFO("enable_irq_wake(irq:%d) failed", fts_data->irq);
+		FTS_INFO("enable_irq_wake(irq:%d) failed", xiaomi_sdm439_ft5446_fts_data->irq);
 	}
 
 	fts_gesture_data.active = ENABLE;
@@ -478,13 +478,13 @@ int fts_gesture_suspend(struct i2c_client *client)
 }
 
 /*****************************************************************************
-*   Name: fts_gesture_resume
+*   Name: xiaomi_sdm439_ft5446_fts_gesture_resume
 *  Brief:
 *  Input:
 * Output:
 * Return: return 0 if succuss, otherwise return error code
 *****************************************************************************/
-int fts_gesture_resume(struct i2c_client *client)
+int xiaomi_sdm439_ft5446_fts_gesture_resume(struct i2c_client *client)
 {
 	int ret;
 	int i;
@@ -498,15 +498,15 @@ int fts_gesture_resume(struct i2c_client *client)
 	}
 
 	if (fts_gesture_data.active == DISABLE) {
-		FTS_DEBUG("gesture in suspend is failed, no running fts_gesture_resume");
+		FTS_DEBUG("gesture in suspend is failed, no running xiaomi_sdm439_ft5446_fts_gesture_resume");
 		return -EINVAL;
 	}
 
 	fts_gesture_data.active = DISABLE;
 	for (i = 0; i < 5; i++) {
-		fts_i2c_write_reg(client, FTS_REG_GESTURE_EN, DISABLE);
+		xiaomi_sdm439_ft5446_fts_i2c_write_reg(client, FTS_REG_GESTURE_EN, DISABLE);
 		msleep(1);
-		fts_i2c_read_reg(client, FTS_REG_GESTURE_EN, &state);
+		xiaomi_sdm439_ft5446_fts_i2c_read_reg(client, FTS_REG_GESTURE_EN, &state);
 		if (state == DISABLE)
 			break;
 	}
@@ -516,9 +516,9 @@ int fts_gesture_resume(struct i2c_client *client)
 		return -EIO;
 	}
 
-	ret = disable_irq_wake(fts_data->irq);
+	ret = disable_irq_wake(xiaomi_sdm439_ft5446_fts_data->irq);
 	if (ret) {
-		FTS_INFO("disable_irq_wake(irq:%d) failed", fts_data->irq);
+		FTS_INFO("disable_irq_wake(irq:%d) failed", xiaomi_sdm439_ft5446_fts_data->irq);
 	}
 
 	FTS_INFO("[GESTURE]resume from gesture successfully!");
@@ -534,7 +534,7 @@ int fts_gesture_resume(struct i2c_client *client)
  * @Purpose: Double click to wake up
  * =============================
  */
-int fts_gesture_switch(struct input_dev *dev, unsigned int type, unsigned int code, int value)
+int xiaomi_sdm439_ft5446_fts_gesture_switch(struct input_dev *dev, unsigned int type, unsigned int code, int value)
 {
 	if (type == EV_SYN && code == SYN_CONFIG) {
 		if (value == WAKEUP_OFF) {
@@ -549,13 +549,13 @@ int fts_gesture_switch(struct input_dev *dev, unsigned int type, unsigned int co
 }
 
 /*****************************************************************************
-*   Name: fts_gesture_init
+*   Name: xiaomi_sdm439_ft5446_fts_gesture_init
 *  Brief:
 *  Input:
 * Output:
 * Return:
 *****************************************************************************/
-int fts_gesture_init(struct fts_ts_data *ts_data)
+int xiaomi_sdm439_ft5446_fts_gesture_init(struct fts_ts_data *ts_data)
 {
 	struct i2c_client *client = ts_data->client;
 	struct input_dev *input_dev = ts_data->input_dev;
@@ -592,9 +592,9 @@ int fts_gesture_init(struct fts_ts_data *ts_data)
 	__set_bit(KEY_GESTURE_C, input_dev->keybit);
 	__set_bit(KEY_GESTURE_Z, input_dev->keybit);
 
-	input_dev->event = fts_gesture_switch;
+	input_dev->event = xiaomi_sdm439_ft5446_fts_gesture_switch;
 
-	fts_create_gesture_sysfs(client);
+	xiaomi_sdm439_ft5446_fts_create_gesture_sysfs(client);
 	fts_gesture_data.mode = DISABLE;
 	fts_gesture_data.active = DISABLE;
 
@@ -603,13 +603,13 @@ int fts_gesture_init(struct fts_ts_data *ts_data)
 }
 
 /************************************************************************
-*   Name: fts_gesture_exit
+*   Name: xiaomi_sdm439_ft5446_fts_gesture_exit
 *  Brief: call when driver removed
 *  Input:
 * Output:
 * Return:
 ***********************************************************************/
-int fts_gesture_exit(struct i2c_client *client)
+int xiaomi_sdm439_ft5446_fts_gesture_exit(struct i2c_client *client)
 {
 	FTS_FUNC_ENTER();
 	sysfs_remove_group(&client->dev.kobj, &fts_gesture_group);
