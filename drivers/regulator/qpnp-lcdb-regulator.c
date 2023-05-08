@@ -17,6 +17,9 @@
 #include <linux/regulator/of_regulator.h>
 #include <linux/regulator/machine.h>
 #include <linux/qpnp/qpnp-revid.h>
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+#include <xiaomi-sdm439/mach.h>
+#endif
 
 #define QPNP_LCDB_REGULATOR_DRIVER_NAME		"qcom,qpnp-lcdb-regulator"
 
@@ -581,6 +584,10 @@ static int qpnp_lcdb_ttw_enter(struct qpnp_lcdb *lcdb)
 		return rc;
 
 	val = 0;
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_OLIVE)
+	if (xiaomi_sdm439_mach_get_family() == XIAOMI_SDM439_MACH_FAMILY_OLIVE)
+		val = 2;
+#endif
 	rc = qpnp_lcdb_write(lcdb, lcdb->base + LCDB_PWRUP_PWRDN_CTL_REG,
 			     &val, 1);
 	if (rc < 0)
