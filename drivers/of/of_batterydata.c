@@ -16,6 +16,9 @@
 #if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
 #include <xiaomi-msm8937/mach.h>
 #endif
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+#include <xiaomi-sdm439/mach.h>
+#endif
 
 static int of_batterydata_read_lut(const struct device_node *np,
 			int max_cols, int max_rows, int *ncols, int *nrows,
@@ -311,6 +314,10 @@ static int64_t of_batterydata_convert_battery_id_kohm(int batt_id_uv,
 	return resistor_value_kohm;
 }
 
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+#define XIAOMI_SDM439_SUNWODA_DEFAULT_ID 200
+#endif
+
 struct device_node *of_batterydata_get_best_profile(
 		const struct device_node *batterydata_container_node,
 		int batt_id_kohm, const char *batt_type)
@@ -323,6 +330,10 @@ struct device_node *of_batterydata_get_best_profile(
 	bool in_range = false;
 #if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
 	bool xiaomi_msm8937_no_battery_data = false;
+#endif
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+	struct device_node *xiaomi_sdm439_default_node = NULL;
+	int xiaomi_sdm439_checknum = 0, xiaomi_sdm439_match = 0;
 #endif
 
 	/* read battery id range percentage for best profile */
@@ -360,11 +371,26 @@ struct device_node *of_batterydata_get_best_profile(
 				delta = abs(batt_ids.kohm[i] - batt_id_kohm);
 				limit = (batt_ids.kohm[i] * id_range_pct) / 100;
 				in_range = (delta <= limit);
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+				if (xiaomi_sdm439_mach_get()) {
+					if (in_range != 0) {
+						xiaomi_sdm439_match = 1;
+					}
+				}
+#endif
 				/*
 				 * Check if the delta is the lowest one
 				 * and also if the limits are in range
 				 * before selecting the best node.
 				 */
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+				if (xiaomi_sdm439_mach_get()) {
+					pr_err("dhx batt_ids.kohm = %d\n", batt_ids.kohm[i]);
+					if (batt_ids.kohm[i] == XIAOMI_SDM439_SUNWODA_DEFAULT_ID) {
+						xiaomi_sdm439_default_node = node;
+					}
+				}
+#endif
 				if ((delta < best_delta || !best_node)
 					&& in_range) {
 					best_node = node;
@@ -393,6 +419,18 @@ struct device_node *of_batterydata_get_best_profile(
 	}
 #endif
 
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+	if (xiaomi_sdm439_mach_get()) {
+		xiaomi_sdm439_checknum = abs(best_id_kohm - batt_id_kohm);
+		pr_err("%s: xiaomi sdm439 checknum = %d,best_id_kohm = %d, batt_id_kohm = %d,match = %d,id_range_pct = %d\n",
+			xiaomi_sdm439_checknum, best_id_kohm, batt_id_kohm, xiaomi_sdm439_match, id_range_pct);
+		if (xiaomi_sdm439_match == 0) {
+			best_node = xiaomi_sdm439_default_node;
+			xiaomi_sdm439_checknum = 0;
+		}
+	}
+#endif
+
 	if (best_node == NULL) {
 		pr_err("No battery data found\n");
 		return best_node;
@@ -403,8 +441,12 @@ struct device_node *of_batterydata_get_best_profile(
 	if (xiaomi_msm8937_mach_get() && xiaomi_msm8937_no_battery_data)
 		goto skip_check_id;
 #endif
-	if (abs(best_id_kohm - batt_id_kohm) >
-			((best_id_kohm * id_range_pct) / 100)) {
+	if ((abs(best_id_kohm - batt_id_kohm) >
+			((best_id_kohm * id_range_pct) / 100))
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+			&& (!xiaomi_sdm439_mach_get() || (xiaomi_sdm439_checknum > ((best_id_kohm * id_range_pct) / 100)))
+#endif
+			) {
 		pr_err("out of range: profile id %d batt id %d pct %d\n",
 			best_id_kohm, batt_id_kohm, id_range_pct);
 		return NULL;
