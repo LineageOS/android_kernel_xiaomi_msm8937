@@ -46,6 +46,9 @@
 #if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
 #include <xiaomi-msm8937/mach.h>
 #endif
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+#include <xiaomi-sdm439/mach.h>
+#endif
 
 /**
  * Requested USB votes for BUS bandwidth
@@ -2302,6 +2305,16 @@ static void msm_otg_start_peripheral(struct usb_otg *otg, int on)
 		/* bump up usb core_clk to default */
 		clk_set_rate(motg->core_clk, motg->core_clk_rate);
 
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+		if (xiaomi_sdm439_mach_get()) {
+			if (get_psy_type(motg) == POWER_SUPPLY_TYPE_USB_CDP) {
+				pr_err("xbt %s usb_gadget_connect, chg_type=%d\n", __func__, get_psy_type(motg));
+
+				msm_chg_block_on(motg);
+				usb_gadget_connect(otg->gadget);
+			}
+		}
+#endif
 		usb_gadget_vbus_connect(otg->gadget);
 
 		/*
@@ -3227,6 +3240,12 @@ static void msm_otg_set_vbus_state(int online)
 		    (get_psy_type(motg) == POWER_SUPPLY_TYPE_USB_FLOAT &&
 		     chg_detection_for_float_charger))
 			motg->chg_detection = true;
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+			if (xiaomi_sdm439_mach_get()) {
+				if (get_psy_type(motg) == POWER_SUPPLY_TYPE_USB)
+					motg->chg_detection = true;
+			}
+#endif
 	}
 
 	if (motg->chg_detection)
@@ -3364,6 +3383,11 @@ static ssize_t msm_otg_mode_write(struct file *file, const char __user *ubuf,
 	struct usb_phy *phy = &motg->phy;
 	int status = count;
 	enum usb_mode_type req_mode;
+
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+	if (xiaomi_sdm439_mach_get())
+		return count;
+#endif
 
 	memset(buf, 0x00, sizeof(buf));
 
@@ -4148,6 +4172,14 @@ static int msm_otg_probe(struct platform_device *pdev)
 			break;
 		default:
 			break;
+	}
+#endif
+
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+	if (xiaomi_sdm439_mach_get()) {
+		idev_chg_max = 900;
+		dcp_max_current = 900;
+		floated_charger_enable = true;
 	}
 #endif
 
