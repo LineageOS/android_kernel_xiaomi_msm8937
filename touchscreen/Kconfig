@@ -1,0 +1,10 @@
+menu "Touchscreen"
+	depends on INPUT_TOUCHSCREEN
+
+source "techpack/xiaomi-sdm439/touchscreen/ft5446/Kconfig"
+source "techpack/xiaomi-sdm439/touchscreen/FT8006S/Kconfig"
+source "techpack/xiaomi-sdm439/touchscreen/gt1511q/Kconfig"
+source "techpack/xiaomi-sdm439/touchscreen/ITK9881H/Kconfig"
+source "techpack/xiaomi-sdm439/touchscreen/NT36525B/Kconfig"
+
+endmenu
