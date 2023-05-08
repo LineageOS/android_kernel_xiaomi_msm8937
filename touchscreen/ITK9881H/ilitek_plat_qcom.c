@@ -24,7 +24,6 @@
 #define DTS_INT_GPIO	"touch,irq-gpio"
 #define DTS_RESET_GPIO	"touch,reset-gpio"
 #define DTS_OF_NAME	"tchip,ilitek"
-bool is_ilitek_tp;
 void ilitek_plat_tp_reset(void)
 {
 	ipio_debug("edge delay = %d\n", idev->rst_edge_delay);
@@ -434,7 +433,6 @@ static int ilitek_plat_probe(void)
 
 	ilitek_plat_irq_register();
 	ilitek_plat_sleep_init();
-	is_ilitek_tp = true;
 	xiaomi_sdm439_touchscreen_type = XIAOMI_SDM439_TOUCHSCREEN_ITK9881H;
 	return 0;
 

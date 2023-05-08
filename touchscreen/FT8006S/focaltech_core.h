@@ -285,7 +285,6 @@ extern int xiaomi_sdm439_ft8006s_fts_fwupg_get_ver_in_tp(struct fts_ts_data *ts_
 extern bool xiaomi_sdm439_ft8006s_fts_fwupg_check_fw_valid(struct fts_ts_data *ts_data);
 
 extern int xiaomi_sdm439_ft8006s_fts_gesture_switch(struct input_dev *dev, unsigned int type, unsigned int code, int value);
-extern bool xiaomi_sdm439_ft8006s_is_focal_tp;
 extern void xiaomi_sdm439_ft8006s_lcd_call_tp_reset(int i);
 #endif /* __LINUX_FOCALTECH_CORE_H__ */
 

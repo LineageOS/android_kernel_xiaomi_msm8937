@@ -152,7 +152,6 @@
 
 extern bool ipio_debug_level;
 extern bool is_lcd_resume;
-extern bool is_ilitek_tp;
 #define ipio_debug(fmt, arg...)						\
 do {									\
 	if (ipio_debug_level)						\

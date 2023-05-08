@@ -72,7 +72,6 @@ struct fts_ts_data *xiaomi_sdm439_ft8006s_fts_data;
 *****************************************************************************/
 static int fts_ts_suspend(struct device *dev);
 static int fts_ts_resume(struct device *dev);
-bool xiaomi_sdm439_ft8006s_is_focal_tp;
 
 /*****************************************************************************
 *  Name: xiaomi_sdm439_ft8006s_fts_wait_tp_to_valid
@@ -1779,7 +1778,6 @@ static int fts_ts_probe(struct spi_device *spi)
 	}
 
 	FTS_INFO("Touch Screen(SPI BUS) driver prboe successfully");
-	xiaomi_sdm439_ft8006s_is_focal_tp = 1;
 	xiaomi_sdm439_touchscreen_type = XIAOMI_SDM439_TOUCHSCREEN_FT8006S;
 	return 0;
 }

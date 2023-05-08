@@ -26,7 +26,6 @@
 static struct input_dev *input_dev;
 static spinlock_t irq_lock;
 static int irq_disabled;
-u8 goodix_flag;
 #ifndef CONFIG_GTP_INT_SEL_SYNC_MI439
 #include <linux/pinctrl/consumer.h>
 static struct pinctrl *default_pctrl;
@@ -990,7 +989,6 @@ static int gt1x_ts_probe(struct i2c_client *client, const struct i2c_device_id *
 	gtp_create_cfgver_proc(client);
 	gt1x_register_powermanger();
 	gt1x_irq_enable();
-	goodix_flag = 1;
 	xiaomi_sdm439_touchscreen_type = XIAOMI_SDM439_TOUCHSCREEN_GT1511Q;
 	return 0;
 
