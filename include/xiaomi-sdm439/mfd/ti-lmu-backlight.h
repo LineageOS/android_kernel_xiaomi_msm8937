@@ -16,8 +16,8 @@
 
 #include <linux/backlight.h>
 #include <linux/device.h>
-#include <linux/mfd/ti-lmu.h>
-#include <linux/mfd/ti-lmu-register.h>
+#include <xiaomi-sdm439/mfd/ti-lmu.h>
+#include <xiaomi-sdm439/mfd/ti-lmu-register.h>
 #include <linux/notifier.h>
 
 /**

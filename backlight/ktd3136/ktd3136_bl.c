@@ -17,7 +17,7 @@
 #include <linux/of.h>
 #include <linux/of_device.h>
 #include <linux/bitops.h>
-#include <linux/mfd/ktd3136.h>
+#include <xiaomi-sdm439/mfd/ktd3136.h>
 #include <linux/device.h>
 #include <linux/platform_device.h>
 

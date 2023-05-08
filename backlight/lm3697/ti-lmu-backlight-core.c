@@ -16,9 +16,9 @@
 #include <linux/delay.h>
 #include <linux/err.h>
 #include <linux/kernel.h>
-#include <linux/mfd/ti-lmu.h>
-#include <linux/mfd/ti-lmu-backlight.h>
-#include <linux/mfd/ti-lmu-register.h>
+#include <xiaomi-sdm439/mfd/ti-lmu.h>
+#include <xiaomi-sdm439/mfd/ti-lmu-backlight.h>
+#include <xiaomi-sdm439/mfd/ti-lmu-register.h>
 #include <linux/module.h>
 #include <linux/of.h>
 #include <linux/of_device.h>

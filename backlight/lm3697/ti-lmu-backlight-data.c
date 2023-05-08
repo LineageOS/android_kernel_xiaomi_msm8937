@@ -12,9 +12,9 @@
  */
 
 #include <linux/kernel.h>
-#include <linux/mfd/ti-lmu.h>
-#include <linux/mfd/ti-lmu-backlight.h>
-#include <linux/mfd/ti-lmu-register.h>
+#include <xiaomi-sdm439/mfd/ti-lmu.h>
+#include <xiaomi-sdm439/mfd/ti-lmu-backlight.h>
+#include <xiaomi-sdm439/mfd/ti-lmu-register.h>
 #include <linux/module.h>
 
 /* LM3532 */
