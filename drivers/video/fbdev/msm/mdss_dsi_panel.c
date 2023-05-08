@@ -21,6 +21,7 @@
 #endif
 #if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
 #include <xiaomi-sdm439/mach.h>
+#include <xiaomi-sdm439/backlight.h>
 #endif
 
 #include "mdss_dsi.h"
@@ -1024,6 +1025,13 @@ static void mdss_dsi_panel_switch_mode(struct mdss_panel_data *pdata,
 		mdss_dsi_panel_dsc_pps_send(ctrl_pdata, &pdata->panel_info);
 }
 
+#if IS_ENABLED(CONFIG_MFD_TI_LMU_MI439)
+extern int xiaomi_sdm439_lm3697_set_brightness(int brightness);
+#endif
+#if IS_ENABLED(CONFIG_BACKLIGHT_KTD3136_MI439)
+extern int xiaomi_sdm439_ktd3137_brightness_set(int brightness);
+#endif
+
 static void mdss_dsi_panel_bl_ctrl(struct mdss_panel_data *pdata,
 							u32 bl_level)
 {
@@ -1100,6 +1108,16 @@ static void mdss_dsi_panel_bl_ctrl(struct mdss_panel_data *pdata,
 				mdss_dsi_panel_bklt_dcs(sctrl, bl_level);
 		}
 		break;
+#if IS_ENABLED(CONFIG_MFD_TI_LMU_MI439)
+	case BL_LM3697_MI439:
+		xiaomi_sdm439_lm3697_set_brightness(bl_level);
+		break;
+#endif
+#if IS_ENABLED(CONFIG_BACKLIGHT_KTD3136_MI439)
+	case BL_KTD3136_MI439:
+		xiaomi_sdm439_ktd3137_brightness_set(bl_level);
+		break;
+#endif
 	default:
 		pr_err("%s: Unknown bl_ctrl configuration\n",
 			__func__);
@@ -2686,6 +2704,23 @@ int mdss_panel_parse_bl_settings(struct device_node *np,
 
 			pr_debug("%s: Configured DCS_CMD bklt ctrl\n",
 								__func__);
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+		} else if (xiaomi_sdm439_mach_get() && !strcmp(data, "bl_mount")){
+			switch (xiaomi_sdm439_backlight_ic_type_get()) {
+#if IS_ENABLED(CONFIG_BACKLIGHT_KTD3136_MI439)
+				case XIAOMI_SDM439_BACKLIGHT_IC_KTD3136:
+					ctrl_pdata->bklt_ctrl = BL_KTD3136_MI439;
+					break;
+#endif // CONFIG_BACKLIGHT_KTD3136_MI439
+#if IS_ENABLED(CONFIG_MFD_TI_LMU_MI439)
+				case XIAOMI_SDM439_BACKLIGHT_IC_LM3697:
+					ctrl_pdata->bklt_ctrl = BL_LM3697_MI439;
+					break;
+#endif // CONFIG_MFD_TI_LMU_MI439
+				default:
+					break;
+			}
+#endif // CONFIG_MACH_XIAOMI_SDM439
 		}
 	}
 	return 0;
