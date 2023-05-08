@@ -22,11 +22,21 @@
 #if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
 #include <xiaomi-sdm439/mach.h>
 #include <xiaomi-sdm439/backlight.h>
+#include <xiaomi-sdm439/touchscreen.h>
 #endif
 
 #include "mdss_dsi.h"
 #include "mdss_dba_utils.h"
 #include "mdss_debug.h"
+
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_OLIVE)
+#if IS_ENABLED(CONFIG_TOUCHSCREEN_FT8006S_MI439)
+extern void xiaomi_sdm439_ft8006s_lcd_call_tp_reset(int i);
+#endif
+#if IS_ENABLED(CONFIG_TOUCHSCREEN_ITK9881H_MI439)
+extern void xiaomi_sdm439_ilitek_call_resume_work(void);
+#endif
+#endif
 
 #define DT_CMD_HDR 6
 #define DEFAULT_MDP_TRANSFER_TIME 14000
@@ -576,6 +586,24 @@ int mdss_dsi_panel_reset(struct mdss_panel_data *pdata, int enable)
 				}
 			}
 
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_OLIVE) && IS_ENABLED(CONFIG_TOUCHSCREEN_FT8006S_MI439)
+			if (xiaomi_sdm439_mach_get_family() == XIAOMI_SDM439_MACH_FAMILY_OLIVE &&
+				xiaomi_sdm439_touchscreen_type == XIAOMI_SDM439_TOUCHSCREEN_FT8006S) {
+				xiaomi_sdm439_ft8006s_lcd_call_tp_reset(0);
+				gpio_set_value((ctrl_pdata->rst_gpio), pdata->panel_info.rst_seq[0]);
+				if (pdata->panel_info.rst_seq[1])
+					usleep_range((pinfo->rst_seq[1] * 1000), (pinfo->rst_seq[1] * 1000) + 10);
+				gpio_set_value((ctrl_pdata->rst_gpio), pdata->panel_info.rst_seq[2]);
+				if (pdata->panel_info.rst_seq[3])
+					usleep_range((pinfo->rst_seq[3] * 1000 - 5000), (pinfo->rst_seq[3] * 1000) + 10 - 5000);
+				xiaomi_sdm439_ft8006s_lcd_call_tp_reset(1);
+				usleep_range(5000, 5010);
+				gpio_set_value((ctrl_pdata->rst_gpio), pdata->panel_info.rst_seq[4]);
+				if (pdata->panel_info.rst_seq[5])
+					usleep_range((pinfo->rst_seq[5] * 1000), (pinfo->rst_seq[5] * 1000) + 10);
+			} else
+#endif
+
 			for (i = 0; i < pdata->panel_info.rst_seq_len; ++i) {
 				gpio_set_value((ctrl_pdata->rst_gpio),
 					pdata->panel_info.rst_seq[i]);
@@ -583,6 +611,30 @@ int mdss_dsi_panel_reset(struct mdss_panel_data *pdata, int enable)
 					usleep_range(pinfo->rst_seq[i] * 1000,
 						pinfo->rst_seq[i] * 1000);
 			}
+
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_OLIVE)
+			if (xiaomi_sdm439_mach_get_family() == XIAOMI_SDM439_MACH_FAMILY_OLIVE) {
+				if (!strcmp(pdata->panel_info.panel_name, "nvt36525b hdplus c3i video mode dsi panel")) {
+					pr_info("%s: This is novatek LCM!!!\n", __func__);
+					msleep(10);
+					for (i = 0; i < pdata->panel_info.rst_seq_len; ++i) {
+						gpio_set_value((ctrl_pdata->rst_gpio),
+							pdata->panel_info.rst_seq[i]);
+						if (pdata->panel_info.rst_seq[++i])
+							usleep_range((pinfo->rst_seq[i] * 1000),
+							(pinfo->rst_seq[i] * 1000) + 10);
+					}
+				}
+#if IS_ENABLED(CONFIG_TOUCHSCREEN_ITK9881H_MI439)
+				if (xiaomi_sdm439_touchscreen_type == XIAOMI_SDM439_TOUCHSCREEN_ITK9881H) {
+					pr_info("%s: ILITEK LCD Call TP Reset start! \n", __func__);
+					xiaomi_sdm439_ilitek_call_resume_work();
+					pr_info("%s: ILITEK LCD Call TP Reset end! \n", __func__);
+					mdelay(35);
+				}
+#endif
+			}
+#endif
 
 			if (gpio_is_valid(ctrl_pdata->avdd_en_gpio)) {
 				if (ctrl_pdata->avdd_en_gpio_invert) {
