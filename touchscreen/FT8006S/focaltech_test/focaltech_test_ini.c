@@ -16,7 +16,7 @@
 /*****************************************************************************
 * Private constant and macro definitions using #define
 *****************************************************************************/
-struct ini_ic_type ic_types[] = {
+struct ini_ic_type xiaomi_sdm439_ft8006s_ic_types[] = {
 	{"FT5X46", 0x54000002},
 	{"FT5X46i", 0x54010002},
 	{"FT5526", 0x54020002},
@@ -299,7 +299,7 @@ static int fts_test_get_ini_via_request_firmware(struct ini_data *ini,
 {
 	int ret = 0;
 	const struct firmware *fw = NULL;
-	struct device *dev = &fts_data->input_dev->dev;
+	struct device *dev = &xiaomi_sdm439_ft8006s_fts_data->input_dev->dev;
 
 	ret = request_firmware(&fw, fwname, dev);
 	if (0 == ret) {
@@ -347,7 +347,7 @@ static void print_ini_data(struct ini_data *ini)
 	int j = 0;
 	struct ini_section *section = NULL;
 	struct ini_keyword *keyword = NULL;
-	struct fts_test *tdata = fts_ftest;
+	struct fts_test *tdata = xiaomi_sdm439_ft8006s_fts_ftest;
 
 	if (tdata && tdata->ts_data && (tdata->ts_data->log_level < 10))
 		return;
@@ -530,11 +530,11 @@ static int ini_get_key(char *section_name, char *key_name, char *value)
 {
 	int i = 0;
 	int j = 0;
-	struct ini_data *ini = &fts_ftest->ini;
+	struct ini_data *ini = &xiaomi_sdm439_ft8006s_fts_ftest->ini;
 	struct ini_section *section;
 	struct ini_keyword *keyword;
 	int key_len = 0;
-	int log_level = fts_ftest->ts_data->log_level;
+	int log_level = xiaomi_sdm439_ft8006s_fts_ftest->ts_data->log_level;
 
 	if (log_level >= 10) {
 		FTS_TEST_DBG("section name:%s, key name:%s", section_name,
@@ -589,7 +589,7 @@ static int ini_get_string_value(char *section_name, char *key_name, char *rval)
 	return ini_get_key(section_name, key_name, rval);
 }
 
-int get_keyword_value(char *section, char *name, int *value)
+int xiaomi_sdm439_ft8006s_get_keyword_value(char *section, char *name, int *value)
 {
 	int ret = 0;
 	char str[MAX_KEYWORD_VALUE_LEN] = { 0 };
@@ -666,12 +666,12 @@ static int get_basic_threshold(char name[][MAX_KEYWORD_NAME_LEN], int length,
 {
 	int i = 0;
 	int ret = 0;
-	struct fts_test *tdata = fts_ftest;
+	struct fts_test *tdata = xiaomi_sdm439_ft8006s_fts_ftest;
 	int log_level = tdata->ts_data->log_level;
 
 	FTS_TEST_INFO("basic_thr string length(%d), count(%d)\n", length,
 		      tdata->basic_thr_count);
-	if (length > fts_ftest->basic_thr_count) {
+	if (length > xiaomi_sdm439_ft8006s_fts_ftest->basic_thr_count) {
 		FTS_TEST_SAVE_ERR("basic_thr string length > count\n");
 		return -EINVAL;
 	}
@@ -696,7 +696,7 @@ static void get_detail_threshold(char *key_name, bool is_prex, int *thr, int nod
 	char str[MAX_KEYWORD_VALUE_LEN] = { 0 };
 	char str_temp[MAX_KEYWORD_NAME_LEN] = { 0 };
 	char str_tmp[MAX_KEYWORD_VALUE_ONE_LEN] = { 0 };
-	struct fts_test *tdata = fts_ftest;
+	struct fts_test *tdata = xiaomi_sdm439_ft8006s_fts_ftest;
 	int divider_pos = 0;
 	int index = 0;
 	int i = 0;
@@ -759,7 +759,7 @@ static int init_node_valid(void)
 	int chy = 0;
 	int node_num = 0;
 	int cnt = 0;
-	struct fts_test *tdata = fts_ftest;
+	struct fts_test *tdata = xiaomi_sdm439_ft8006s_fts_ftest;
 
 	if (!tdata || !tdata->node_valid || !tdata->node_valid_sc) {
 		FTS_TEST_ERROR("tdata/node_valid/node_valid_sc is null");
@@ -776,7 +776,7 @@ static int init_node_valid(void)
 			j = cnt % chy + 1;
 			snprintf(str, MAX_KEYWORD_NAME_LEN,
 				 "InvalidNode[%d][%d]", i, j);
-			get_keyword_value("INVALID_NODE", str,
+			xiaomi_sdm439_ft8006s_get_keyword_value("INVALID_NODE", str,
 					  &tdata->node_valid[cnt]);
 		}
 	}
@@ -791,14 +791,14 @@ static int init_node_valid(void)
 			j = (cnt >= chy) ? (cnt - chy + 1) : (cnt + 1);
 			snprintf(str, MAX_KEYWORD_NAME_LEN,
 				 "InvalidNodeS[%d][%d]", i, j);
-			get_keyword_value("INVALID_NODES", str,
+			xiaomi_sdm439_ft8006s_get_keyword_value("INVALID_NODES", str,
 					  &tdata->node_valid_sc[cnt]);
 		}
 	}
 
-	print_buffer(tdata->node_valid, tdata->node.node_num,
+	xiaomi_sdm439_ft8006s_print_buffer(tdata->node_valid, tdata->node.node_num,
 		     tdata->node.rx_num);
-	print_buffer(tdata->node_valid_sc, tdata->sc_node.node_num,
+	xiaomi_sdm439_ft8006s_print_buffer(tdata->node_valid_sc, tdata->sc_node.node_num,
 		     tdata->sc_node.rx_num);
 	return 0;
 }
@@ -817,7 +817,7 @@ static int get_test_item_incell(void)
 		return ret;
 	}
 
-	fts_ftest->ic.incell.u.tmp = item_val;
+	xiaomi_sdm439_ft8006s_fts_ftest->ic.incell.u.tmp = item_val;
 	return 0;
 }
 
@@ -826,7 +826,7 @@ static int get_test_threshold_incell(void)
 {
 	int ret = 0;
 	int length = sizeof(bthr_name_incell) / MAX_KEYWORD_NAME_LEN;
-	struct fts_test *tdata = fts_ftest;
+	struct fts_test *tdata = xiaomi_sdm439_ft8006s_fts_ftest;
 	struct incell_threshold *thr = &tdata->ic.incell.thr;
 	int node_num = tdata->node.node_num;
 	int key_num = tdata->node.key_num;
@@ -878,7 +878,7 @@ static int get_test_threshold_incell(void)
 
 static void print_thr_incell(void)
 {
-	struct fts_test *tdata = fts_ftest;
+	struct fts_test *tdata = xiaomi_sdm439_ft8006s_fts_ftest;
 	struct incell_threshold *thr = &tdata->ic.incell.thr;
 
 	if (tdata->ts_data->log_level < 3)
@@ -913,15 +913,15 @@ static void print_thr_incell(void)
 	FTS_TEST_DBG("rawdata2_min:%d", thr->basic.rawdata2_min);
 	FTS_TEST_DBG("rawdata2_max:%d", thr->basic.rawdata2_max);
 
-	print_buffer(thr->rawdata_min, tdata->node.node_num,
+	xiaomi_sdm439_ft8006s_print_buffer(thr->rawdata_min, tdata->node.node_num,
 		     tdata->node.rx_num);
-	print_buffer(thr->rawdata_max, tdata->node.node_num,
+	xiaomi_sdm439_ft8006s_print_buffer(thr->rawdata_max, tdata->node.node_num,
 		     tdata->node.rx_num);
-	print_buffer(thr->cb_min, tdata->node.node_num, tdata->node.rx_num);
-	print_buffer(thr->cb_max, tdata->node.node_num, tdata->node.rx_num);
-	print_buffer(thr->rawdata2_min, tdata->node.node_num,
+	xiaomi_sdm439_ft8006s_print_buffer(thr->cb_min, tdata->node.node_num, tdata->node.rx_num);
+	xiaomi_sdm439_ft8006s_print_buffer(thr->cb_max, tdata->node.node_num, tdata->node.rx_num);
+	xiaomi_sdm439_ft8006s_print_buffer(thr->rawdata2_min, tdata->node.node_num,
 		     tdata->node.rx_num);
-	print_buffer(thr->rawdata2_max, tdata->node.node_num,
+	xiaomi_sdm439_ft8006s_print_buffer(thr->rawdata2_max, tdata->node.node_num,
 		     tdata->node.rx_num);
 }
 
@@ -959,8 +959,8 @@ static int get_test_item_mc_sc(void)
 		return ret;
 	}
 
-	fts_ftest->ic.mc_sc.u.tmp = item_val;
-	FTS_TEST_INFO("test item:0x%x in ini", fts_ftest->ic.mc_sc.u.tmp);
+	xiaomi_sdm439_ft8006s_fts_ftest->ic.mc_sc.u.tmp = item_val;
+	FTS_TEST_INFO("test item:0x%x in ini", xiaomi_sdm439_ft8006s_fts_ftest->ic.mc_sc.u.tmp);
 	return 0;
 }
 
@@ -969,7 +969,7 @@ static int get_test_threshold_mc_sc(void)
 {
 	int ret = 0;
 	int length = sizeof(bthr_name_mc_sc) / MAX_KEYWORD_NAME_LEN;
-	struct fts_test *tdata = fts_ftest;
+	struct fts_test *tdata = xiaomi_sdm439_ft8006s_fts_ftest;
 	struct mc_sc_threshold *thr = &tdata->ic.mc_sc.thr;
 	int node_num = tdata->node.node_num;
 	int sc_num = tdata->sc_node.node_num;
@@ -1064,7 +1064,7 @@ static int get_test_threshold_mc_sc(void)
 
 static void print_thr_mc_sc(void)
 {
-	struct fts_test *tdata = fts_ftest;
+	struct fts_test *tdata = xiaomi_sdm439_ft8006s_fts_ftest;
 	struct mc_sc_threshold *thr = &tdata->ic.mc_sc.thr;
 
 	if (tdata->ts_data->log_level < 3)
@@ -1106,33 +1106,33 @@ static void print_thr_mc_sc(void)
 	FTS_TEST_DBG("panel_differ_min:%d", thr->basic.panel_differ_min);
 	FTS_TEST_DBG("panel_differ_max:%d", thr->basic.panel_differ_max);
 
-	print_buffer(thr->rawdata_h_min, tdata->node.node_num,
+	xiaomi_sdm439_ft8006s_print_buffer(thr->rawdata_h_min, tdata->node.node_num,
 		     tdata->node.rx_num);
-	print_buffer(thr->rawdata_h_max, tdata->node.node_num,
+	xiaomi_sdm439_ft8006s_print_buffer(thr->rawdata_h_max, tdata->node.node_num,
 		     tdata->node.rx_num);
-	print_buffer(thr->rawdata_l_min, tdata->node.node_num,
+	xiaomi_sdm439_ft8006s_print_buffer(thr->rawdata_l_min, tdata->node.node_num,
 		     tdata->node.rx_num);
-	print_buffer(thr->rawdata_l_max, tdata->node.node_num,
+	xiaomi_sdm439_ft8006s_print_buffer(thr->rawdata_l_max, tdata->node.node_num,
 		     tdata->node.rx_num);
-	print_buffer(thr->scap_cb_off_min, tdata->sc_node.node_num,
+	xiaomi_sdm439_ft8006s_print_buffer(thr->scap_cb_off_min, tdata->sc_node.node_num,
 		     tdata->sc_node.rx_num);
-	print_buffer(thr->scap_cb_off_max, tdata->sc_node.node_num,
+	xiaomi_sdm439_ft8006s_print_buffer(thr->scap_cb_off_max, tdata->sc_node.node_num,
 		     tdata->sc_node.rx_num);
-	print_buffer(thr->scap_cb_on_min, tdata->sc_node.node_num,
+	xiaomi_sdm439_ft8006s_print_buffer(thr->scap_cb_on_min, tdata->sc_node.node_num,
 		     tdata->sc_node.rx_num);
-	print_buffer(thr->scap_cb_on_max, tdata->sc_node.node_num,
+	xiaomi_sdm439_ft8006s_print_buffer(thr->scap_cb_on_max, tdata->sc_node.node_num,
 		     tdata->sc_node.rx_num);
-	print_buffer(thr->scap_rawdata_off_min, tdata->sc_node.node_num,
+	xiaomi_sdm439_ft8006s_print_buffer(thr->scap_rawdata_off_min, tdata->sc_node.node_num,
 		     tdata->sc_node.rx_num);
-	print_buffer(thr->scap_rawdata_off_max, tdata->sc_node.node_num,
+	xiaomi_sdm439_ft8006s_print_buffer(thr->scap_rawdata_off_max, tdata->sc_node.node_num,
 		     tdata->sc_node.rx_num);
-	print_buffer(thr->scap_rawdata_on_min, tdata->sc_node.node_num,
+	xiaomi_sdm439_ft8006s_print_buffer(thr->scap_rawdata_on_min, tdata->sc_node.node_num,
 		     tdata->sc_node.rx_num);
-	print_buffer(thr->scap_rawdata_on_max, tdata->sc_node.node_num,
+	xiaomi_sdm439_ft8006s_print_buffer(thr->scap_rawdata_on_max, tdata->sc_node.node_num,
 		     tdata->sc_node.rx_num);
-	print_buffer(thr->panel_differ_min, tdata->node.node_num,
+	xiaomi_sdm439_ft8006s_print_buffer(thr->panel_differ_min, tdata->node.node_num,
 		     tdata->node.rx_num);
-	print_buffer(thr->panel_differ_max, tdata->node.node_num,
+	xiaomi_sdm439_ft8006s_print_buffer(thr->panel_differ_max, tdata->node.node_num,
 		     tdata->node.rx_num);
 }
 
@@ -1170,7 +1170,7 @@ static int get_test_item_sc(void)
 		return ret;
 	}
 
-	fts_ftest->ic.sc.u.tmp = item_val;
+	xiaomi_sdm439_ft8006s_fts_ftest->ic.sc.u.tmp = item_val;
 	return 0;
 }
 
@@ -1179,7 +1179,7 @@ static int get_test_threshold_sc(void)
 {
 	int ret = 0;
 	int length = sizeof(bthr_name_sc) / MAX_KEYWORD_NAME_LEN;
-	struct fts_test *tdata = fts_ftest;
+	struct fts_test *tdata = xiaomi_sdm439_ft8006s_fts_ftest;
 	struct sc_threshold *thr = &tdata->ic.sc.thr;
 	int node_num = tdata->node.node_num;
 
@@ -1230,7 +1230,7 @@ static int get_test_threshold_sc(void)
 
 static void print_thr_sc(void)
 {
-	struct fts_test *tdata = fts_ftest;
+	struct fts_test *tdata = xiaomi_sdm439_ft8006s_fts_ftest;
 	struct sc_threshold *thr = &tdata->ic.sc.thr;
 
 	if (tdata->ts_data->log_level < 3)
@@ -1257,14 +1257,14 @@ static void print_thr_sc(void)
 	FTS_TEST_DBG("dcb_cs5:%d", thr->basic.dcb_cs5);
 	FTS_TEST_DBG("dcb_cs6:%d", thr->basic.dcb_cs6);
 
-	print_buffer(thr->rawdata_min, tdata->node.node_num,
+	xiaomi_sdm439_ft8006s_print_buffer(thr->rawdata_min, tdata->node.node_num,
 		     tdata->node.rx_num);
-	print_buffer(thr->rawdata_max, tdata->node.node_num,
+	xiaomi_sdm439_ft8006s_print_buffer(thr->rawdata_max, tdata->node.node_num,
 		     tdata->node.rx_num);
-	print_buffer(thr->cb_min, tdata->node.node_num, tdata->node.rx_num);
-	print_buffer(thr->cb_max, tdata->node.node_num, tdata->node.rx_num);
-	print_buffer(thr->dcb_sort, tdata->node.node_num, tdata->node.rx_num);
-	print_buffer(thr->dcb_base, tdata->node.node_num, tdata->node.rx_num);
+	xiaomi_sdm439_ft8006s_print_buffer(thr->cb_min, tdata->node.node_num, tdata->node.rx_num);
+	xiaomi_sdm439_ft8006s_print_buffer(thr->cb_max, tdata->node.node_num, tdata->node.rx_num);
+	xiaomi_sdm439_ft8006s_print_buffer(thr->dcb_sort, tdata->node.node_num, tdata->node.rx_num);
+	xiaomi_sdm439_ft8006s_print_buffer(thr->dcb_base, tdata->node.node_num, tdata->node.rx_num);
 }
 
 static int ini_init_test_sc(void)
@@ -1295,13 +1295,13 @@ static u32 ini_get_ic_code(char *ic_name)
 	int ic_types_len = 0;
 
 	ini_icname_len = strlen(ic_name);
-	type_size = sizeof(ic_types) / sizeof(ic_types[0]);
+	type_size = sizeof(xiaomi_sdm439_ft8006s_ic_types) / sizeof(xiaomi_sdm439_ft8006s_ic_types[0]);
 	for (i = 0; i < type_size; i++) {
 		ic_types_len = strlen(ic_name);
 		if (ini_icname_len == ic_types_len) {
 			if (0 ==
-			    strncmp(ic_name, ic_types[i].ic_name, ic_types_len))
-				return ic_types[i].ic_type;
+			    strncmp(ic_name, xiaomi_sdm439_ft8006s_ic_types[i].ic_name, ic_types_len))
+				return xiaomi_sdm439_ft8006s_ic_types[i].ic_type;
 		}
 	}
 
@@ -1313,7 +1313,7 @@ static void ini_init_interface(struct ini_data *ini)
 {
 	char str[MAX_KEYWORD_VALUE_LEN] = { 0 };
 	u32 value = 0;
-	struct fts_test *tdata = fts_ftest;
+	struct fts_test *tdata = xiaomi_sdm439_ft8006s_fts_ftest;
 
 	/* IC type */
 	ini_get_string_value("Interface", "IC_Type", str);
@@ -1333,7 +1333,7 @@ static void ini_init_interface(struct ini_data *ini)
 static int ini_init_test(struct ini_data *ini)
 {
 	int ret = 0;
-	struct fts_test *tdata = fts_ftest;
+	struct fts_test *tdata = xiaomi_sdm439_ft8006s_fts_ftest;
 
 	/* interface init */
 	ini_init_interface(ini);
@@ -1366,16 +1366,16 @@ static int ini_init_test(struct ini_data *ini)
 }
 
 /*
- * fts_test_get_testparam_from_ini - get test parameters from ini
+ * xiaomi_sdm439_ft8006s_fts_test_get_testparam_from_ini - get test parameters from ini
  *
  * read, parse the configuration file, initialize the test variable
  *
  * return 0 if succuss, else errro code
  */
-int fts_test_get_testparam_from_ini(char *config_name)
+int xiaomi_sdm439_ft8006s_fts_test_get_testparam_from_ini(char *config_name)
 {
 	int ret = 0;
-	struct ini_data *ini = &fts_ftest->ini;
+	struct ini_data *ini = &xiaomi_sdm439_ft8006s_fts_ftest->ini;
 
 	ret = fts_test_get_ini_via_request_firmware(ini, config_name);
 	if (ret != 0) {

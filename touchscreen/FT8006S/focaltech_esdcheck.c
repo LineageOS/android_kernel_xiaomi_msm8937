@@ -96,11 +96,11 @@ int idc_esdcheck_lcderror(struct fts_ts_data *ts_data)
 	if ((tp_need_recovery == 1) && (lcd_need_reset == 0)) {
 		tp_need_recovery = 0;
 		/* LCD reset, need recover TP state */
-		fts_release_all_finger();
-		fts_tp_state_recovery(ts_data);
+		xiaomi_sdm439_ft8006s_fts_release_all_finger();
+		xiaomi_sdm439_ft8006s_fts_tp_state_recovery(ts_data);
 	}
 
-	ret = fts_read_reg(FTS_REG_ESD_SATURATE, &val);
+	ret = xiaomi_sdm439_ft8006s_fts_read_reg(FTS_REG_ESD_SATURATE, &val);
 	if (ret < 0) {
 		FTS_ERROR("read reg0xED fail,ret:%d", ret);
 		return -EIO;
@@ -129,9 +129,9 @@ static int fts_esdcheck_tp_reset(struct fts_ts_data *ts_data)
 	fts_esdcheck_data.flow_work_hold_cnt = 0;
 	fts_esdcheck_data.hardware_reset_cnt++;
 
-	fts_reset_proc(200);
-	fts_release_all_finger();
-	fts_tp_state_recovery(ts_data);
+	xiaomi_sdm439_ft8006s_fts_reset_proc(200);
+	xiaomi_sdm439_ft8006s_fts_release_all_finger();
+	xiaomi_sdm439_ft8006s_fts_tp_state_recovery(ts_data);
 
 	FTS_FUNC_EXIT();
 	return 0;
@@ -147,7 +147,7 @@ static bool get_chip_id(struct fts_ts_data *ts_data)
 
 	for (i = 0; i < 3; i++) {
 		reg_addr = FTS_REG_CHIP_ID;
-		ret = fts_read(&reg_addr, 1, &reg_value, 1);
+		ret = xiaomi_sdm439_ft8006s_fts_read(&reg_addr, 1, &reg_value, 1);
 		if (ret < 0) {
 			FTS_ERROR("read chip id fail,ret:%d", ret);
 			fts_esdcheck_data.nack_cnt++;
@@ -187,7 +187,7 @@ static bool get_flow_cnt(struct fts_ts_data *ts_data)
 	u8 reg_addr = 0;
 
 	reg_addr = FTS_REG_FLOW_WORK_CNT;
-	ret = fts_read(&reg_addr, 1, &reg_value, 1);
+	ret = xiaomi_sdm439_ft8006s_fts_read(&reg_addr, 1, &reg_value, 1);
 	if (ret < 0) {
 		FTS_ERROR("read reg0x91 fail,ret:%d", ret);
 		fts_esdcheck_data.nack_cnt++;
@@ -247,7 +247,7 @@ static int esdcheck_algorithm(struct fts_ts_data *ts_data)
 
 	/* 4. In factory mode, can't check esd */
 	reg_addr = FTS_REG_WORKMODE;
-	ret = fts_read_reg(reg_addr, &reg_value);
+	ret = xiaomi_sdm439_ft8006s_fts_read_reg(reg_addr, &reg_value);
 	if (ret < 0) {
 		fts_esdcheck_data.nack_cnt++;
 	} else if ((reg_value & 0x70) != FTS_REG_WORKMODE_WORK_VALUE) {
@@ -334,7 +334,7 @@ int fts_esdcheck_proc_busy(bool proc_debug)
 *****************************************************************************/
 int fts_esdcheck_switch(bool enable)
 {
-	struct fts_ts_data *ts_data = fts_data;
+	struct fts_ts_data *ts_data = xiaomi_sdm439_ft8006s_fts_data;
 	FTS_FUNC_ENTER();
 	if (fts_esdcheck_data.mode == ENABLE) {
 		if (enable) {
@@ -383,7 +383,7 @@ static ssize_t fts_esdcheck_store(struct device *dev,
 				  struct device_attribute *attr,
 				  const char *buf, size_t count)
 {
-	struct input_dev *input_dev = fts_data->input_dev;
+	struct input_dev *input_dev = xiaomi_sdm439_ft8006s_fts_data->input_dev;
 
 	mutex_lock(&input_dev->mutex);
 	if (FTS_SYSFS_ECHO_ON(buf)) {
@@ -404,7 +404,7 @@ static ssize_t fts_esdcheck_show(struct device *dev,
 				 struct device_attribute *attr, char *buf)
 {
 	int count;
-	struct input_dev *input_dev = fts_data->input_dev;
+	struct input_dev *input_dev = xiaomi_sdm439_ft8006s_fts_data->input_dev;
 
 	mutex_lock(&input_dev->mutex);
 	count = snprintf(buf, PAGE_SIZE, "Esd check: %s\n",

@@ -61,7 +61,7 @@ static void fts_prc_func(struct work_struct *work)
 	struct input_dev *input_dev = ts_data->input_dev;
 #if FTS_MT_PROTOCOL_B_EN
 	u32 finger_count = 0;
-	u32 max_touches = fts_data->pdata->max_touch_number;
+	u32 max_touches = xiaomi_sdm439_ft8006s_fts_data->pdata->max_touch_number;
 #endif
 
 	FTS_FUNC_ENTER();

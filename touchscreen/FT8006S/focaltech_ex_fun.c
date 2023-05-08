@@ -93,7 +93,7 @@ static ssize_t fts_debug_write(struct file *filp, const char __user *buff,
 	int writelen = 0;
 	int ret = 0;
 	char tmp[PROC_BUF_SIZE];
-	struct fts_ts_data *ts_data = fts_data;
+	struct fts_ts_data *ts_data = xiaomi_sdm439_ft8006s_fts_data;
 	struct ftxxxx_proc *proc = &ts_data->proc;
 
 	if ((buflen <= 1) || (buflen > PAGE_SIZE)) {
@@ -138,7 +138,7 @@ static ssize_t fts_debug_write(struct file *filp, const char __user *buff,
 		break;
 
 	case PROC_WRITE_REGISTER:
-		ret = fts_write_reg(writebuf[1], writebuf[2]);
+		ret = xiaomi_sdm439_ft8006s_fts_write_reg(writebuf[1], writebuf[2]);
 		if (ret < 0) {
 			FTS_ERROR("PROC_WRITE_REGISTER write error");
 			goto proc_write_err;
@@ -157,7 +157,7 @@ static ssize_t fts_debug_write(struct file *filp, const char __user *buff,
 
 	case PROC_WRITE_DATA:
 		writelen = buflen - 1;
-		ret = fts_write(writebuf + 1, writelen);
+		ret = xiaomi_sdm439_ft8006s_fts_write(writebuf + 1, writelen);
 		if (ret < 0) {
 			FTS_ERROR("PROC_WRITE_DATA write error");
 			goto proc_write_err;
@@ -172,7 +172,7 @@ static ssize_t fts_debug_write(struct file *filp, const char __user *buff,
 		tmp[buflen - 1] = '\0';
 		if (strncmp(tmp, "focal_driver", 12) == 0) {
 			FTS_INFO("APK execute HW Reset");
-			fts_reset_proc(0);
+			xiaomi_sdm439_ft8006s_fts_reset_proc(0);
 		}
 		break;
 
@@ -187,9 +187,9 @@ static ssize_t fts_debug_write(struct file *filp, const char __user *buff,
 		FTS_DEBUG("[APK]: PROC_ENTER_TEST_ENVIRONMENT = %x",
 			  writebuf[1]);
 		if (0 == writebuf[1])
-			fts_enter_test_environment(0);
+			xiaomi_sdm439_ft8006s_fts_enter_test_environment(0);
 		else
-			fts_enter_test_environment(1);
+			xiaomi_sdm439_ft8006s_fts_enter_test_environment(1);
 		break;
 
 	default:
@@ -213,7 +213,7 @@ static ssize_t fts_debug_read(struct file *filp, char __user *buff,
 	int buflen = count;
 	u8 *readbuf = NULL;
 	u8 tmpbuf[PROC_BUF_SIZE] = { 0 };
-	struct fts_ts_data *ts_data = fts_data;
+	struct fts_ts_data *ts_data = xiaomi_sdm439_ft8006s_fts_data;
 	struct ftxxxx_proc *proc = &ts_data->proc;
 
 	if ((buflen <= 0) || (buflen > PAGE_SIZE)) {
@@ -239,7 +239,7 @@ static ssize_t fts_debug_read(struct file *filp, char __user *buff,
 	switch (proc->opmode) {
 	case PROC_READ_REGISTER:
 		num_read_chars = 1;
-		ret = fts_read_reg(proc->cmd[0], &readbuf[0]);
+		ret = xiaomi_sdm439_ft8006s_fts_read_reg(proc->cmd[0], &readbuf[0]);
 		if (ret < 0) {
 			FTS_ERROR("PROC_READ_REGISTER read error");
 			goto proc_read_err;
@@ -250,7 +250,7 @@ static ssize_t fts_debug_read(struct file *filp, char __user *buff,
 
 	case PROC_READ_DATA:
 		num_read_chars = buflen;
-		ret = fts_read(proc->cmd, proc->cmd_len, readbuf, num_read_chars);
+		ret = xiaomi_sdm439_ft8006s_fts_read(proc->cmd, proc->cmd_len, readbuf, num_read_chars);
 		if (ret < 0) {
 			FTS_ERROR("PROC_READ_DATA read error");
 			goto proc_read_err;
@@ -298,7 +298,7 @@ static int fts_debug_write(struct file *filp, const char __user *buff,
 	int writelen = 0;
 	int ret = 0;
 	char tmp[PROC_BUF_SIZE];
-	struct fts_ts_data *ts_data = fts_data;
+	struct fts_ts_data *ts_data = xiaomi_sdm439_ft8006s_fts_data;
 	struct ftxxxx_proc *proc = &ts_data->proc;
 
 	if ((buflen <= 1) || (buflen > PAGE_SIZE)) {
@@ -343,7 +343,7 @@ static int fts_debug_write(struct file *filp, const char __user *buff,
 		break;
 
 	case PROC_WRITE_REGISTER:
-		ret = fts_write_reg(writebuf[1], writebuf[2]);
+		ret = xiaomi_sdm439_ft8006s_fts_write_reg(writebuf[1], writebuf[2]);
 		if (ret < 0) {
 			FTS_ERROR("PROC_WRITE_REGISTER write error");
 			goto proc_write_err;
@@ -362,7 +362,7 @@ static int fts_debug_write(struct file *filp, const char __user *buff,
 
 	case PROC_WRITE_DATA:
 		writelen = buflen - 1;
-		ret = fts_write(writebuf + 1, writelen);
+		ret = xiaomi_sdm439_ft8006s_fts_write(writebuf + 1, writelen);
 		if (ret < 0) {
 			FTS_ERROR("PROC_WRITE_DATA write error");
 			goto proc_write_err;
@@ -377,7 +377,7 @@ static int fts_debug_write(struct file *filp, const char __user *buff,
 		tmp[buflen - 1] = '\0';
 		if (strncmp(tmp, "focal_driver", 12) == 0) {
 			FTS_INFO("APK execute HW Reset");
-			fts_reset_proc(0);
+			xiaomi_sdm439_ft8006s_fts_reset_proc(0);
 		}
 		break;
 
@@ -392,9 +392,9 @@ static int fts_debug_write(struct file *filp, const char __user *buff,
 		FTS_DEBUG("[APK]: PROC_ENTER_TEST_ENVIRONMENT = %x",
 			  writebuf[1]);
 		if (0 == writebuf[1])
-			fts_enter_test_environment(0);
+			xiaomi_sdm439_ft8006s_fts_enter_test_environment(0);
 		else
-			fts_enter_test_environment(1);
+			xiaomi_sdm439_ft8006s_fts_enter_test_environment(1);
 		break;
 
 	default:
@@ -418,7 +418,7 @@ static int fts_debug_read(char *page, char **start, off_t off, int count,
 	int buflen = count;
 	u8 *readbuf = NULL;
 	u8 tmpbuf[PROC_BUF_SIZE] = { 0 };
-	struct fts_ts_data *ts_data = fts_data;
+	struct fts_ts_data *ts_data = xiaomi_sdm439_ft8006s_fts_data;
 	struct ftxxxx_proc *proc = &ts_data->proc;
 
 	if ((buflen <= 0) || (buflen > PAGE_SIZE)) {
@@ -444,7 +444,7 @@ static int fts_debug_read(char *page, char **start, off_t off, int count,
 	switch (proc->opmode) {
 	case PROC_READ_REGISTER:
 		num_read_chars = 1;
-		ret = fts_read_reg(proc->cmd[0], &readbuf[0]);
+		ret = xiaomi_sdm439_ft8006s_fts_read_reg(proc->cmd[0], &readbuf[0]);
 		if (ret < 0) {
 			FTS_ERROR("PROC_READ_REGISTER read error");
 			goto proc_read_err;
@@ -455,7 +455,7 @@ static int fts_debug_read(char *page, char **start, off_t off, int count,
 
 	case PROC_READ_DATA:
 		num_read_chars = buflen;
-		ret = fts_read(proc->cmd, proc->cmd_len, readbuf, num_read_chars);
+		ret = xiaomi_sdm439_ft8006s_fts_read(proc->cmd, proc->cmd_len, readbuf, num_read_chars);
 		if (ret < 0) {
 			FTS_ERROR("PROC_READ_DATA read error");
 			goto proc_read_err;
@@ -489,7 +489,7 @@ proc_read_err:
 }
 #endif
 
-int fts_create_apk_debug_channel(struct fts_ts_data *ts_data)
+int xiaomi_sdm439_ft8006s_fts_create_apk_debug_channel(struct fts_ts_data *ts_data)
 {
 	struct ftxxxx_proc *proc = &ts_data->proc;
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 10, 0))
@@ -512,7 +512,7 @@ int fts_create_apk_debug_channel(struct fts_ts_data *ts_data)
 	return 0;
 }
 
-void fts_release_apk_debug_channel(struct fts_ts_data *ts_data)
+void xiaomi_sdm439_ft8006s_fts_release_apk_debug_channel(struct fts_ts_data *ts_data)
 {
 	struct ftxxxx_proc *proc = &ts_data->proc;
 
@@ -532,11 +532,11 @@ void fts_release_apk_debug_channel(struct fts_ts_data *ts_data)
 static ssize_t fts_hw_reset_show(struct device *dev,
 				 struct device_attribute *attr, char *buf)
 {
-	struct input_dev *input_dev = fts_data->input_dev;
+	struct input_dev *input_dev = xiaomi_sdm439_ft8006s_fts_data->input_dev;
 	ssize_t count = 0;
 
 	mutex_lock(&input_dev->mutex);
-	fts_reset_proc(0);
+	xiaomi_sdm439_ft8006s_fts_reset_proc(0);
 	count = snprintf(buf, PAGE_SIZE, "hw reset executed\n");
 	mutex_unlock(&input_dev->mutex);
 
@@ -555,7 +555,7 @@ static ssize_t fts_irq_show(struct device *dev, struct device_attribute *attr,
 			    char *buf)
 {
 	ssize_t count = 0;
-	struct irq_desc *desc = irq_to_desc(fts_data->irq);
+	struct irq_desc *desc = irq_to_desc(xiaomi_sdm439_ft8006s_fts_data->irq);
 
 	count = snprintf(buf, PAGE_SIZE, "irq_depth:%d\n", desc->depth);
 
@@ -566,15 +566,15 @@ static ssize_t fts_irq_store(struct device *dev,
 			     struct device_attribute *attr, const char *buf,
 			     size_t count)
 {
-	struct input_dev *input_dev = fts_data->input_dev;
+	struct input_dev *input_dev = xiaomi_sdm439_ft8006s_fts_data->input_dev;
 
 	mutex_lock(&input_dev->mutex);
 	if (FTS_SYSFS_ECHO_ON(buf)) {
 		FTS_INFO("enable irq");
-		fts_irq_enable();
+		xiaomi_sdm439_ft8006s_fts_irq_enable();
 	} else if (FTS_SYSFS_ECHO_OFF(buf)) {
 		FTS_INFO("disable irq");
-		fts_irq_disable();
+		xiaomi_sdm439_ft8006s_fts_irq_disable();
 	}
 	mutex_unlock(&input_dev->mutex);
 	return count;
@@ -585,16 +585,16 @@ static ssize_t fts_bootmode_store(struct device *dev,
 				  struct device_attribute *attr,
 				  const char *buf, size_t count)
 {
-	struct input_dev *input_dev = fts_data->input_dev;
+	struct input_dev *input_dev = xiaomi_sdm439_ft8006s_fts_data->input_dev;
 
 	FTS_FUNC_ENTER();
 	mutex_lock(&input_dev->mutex);
 	if (FTS_SYSFS_ECHO_ON(buf)) {
 		FTS_INFO("[EX-FUN]set to boot mode");
-		fts_data->fw_is_running = false;
+		xiaomi_sdm439_ft8006s_fts_data->fw_is_running = false;
 	} else if (FTS_SYSFS_ECHO_OFF(buf)) {
 		FTS_INFO("[EX-FUN]set to fw mode");
-		fts_data->fw_is_running = true;
+		xiaomi_sdm439_ft8006s_fts_data->fw_is_running = true;
 	}
 	mutex_unlock(&input_dev->mutex);
 	FTS_FUNC_EXIT();
@@ -606,11 +606,11 @@ static ssize_t fts_bootmode_show(struct device *dev,
 				 struct device_attribute *attr, char *buf)
 {
 	ssize_t count = 0;
-	struct input_dev *input_dev = fts_data->input_dev;
+	struct input_dev *input_dev = xiaomi_sdm439_ft8006s_fts_data->input_dev;
 
 	FTS_FUNC_ENTER();
 	mutex_lock(&input_dev->mutex);
-	if (true == fts_data->fw_is_running)
+	if (true == xiaomi_sdm439_ft8006s_fts_data->fw_is_running)
 		count = snprintf(buf, PAGE_SIZE, "tp is in fw mode\n");
 	else
 		count = snprintf(buf, PAGE_SIZE, "tp is in boot mode\n");
@@ -624,7 +624,7 @@ static ssize_t fts_bootmode_show(struct device *dev,
 static ssize_t fts_tpfwver_show(struct device *dev,
 				struct device_attribute *attr, char *buf)
 {
-	struct fts_ts_data *ts_data = fts_data;
+	struct fts_ts_data *ts_data = xiaomi_sdm439_ft8006s_fts_data;
 	struct input_dev *input_dev = ts_data->input_dev;
 	ssize_t num_read_chars = 0;
 	u8 fwver = 0;
@@ -634,7 +634,7 @@ static ssize_t fts_tpfwver_show(struct device *dev,
 #if FTS_ESDCHECK_EN
 	fts_esdcheck_proc_busy(1);
 #endif
-	fts_read_reg(FTS_REG_FW_VER, &fwver);
+	xiaomi_sdm439_ft8006s_fts_read_reg(FTS_REG_FW_VER, &fwver);
 #if FTS_ESDCHECK_EN
 	fts_esdcheck_proc_busy(0);
 #endif
@@ -661,7 +661,7 @@ static ssize_t fts_tprwreg_show(struct device *dev,
 {
 	int count;
 	int i;
-	struct input_dev *input_dev = fts_data->input_dev;
+	struct input_dev *input_dev = xiaomi_sdm439_ft8006s_fts_data->input_dev;
 
 	mutex_lock(&input_dev->mutex);
 
@@ -841,7 +841,7 @@ static ssize_t fts_tprwreg_store(struct device *dev,
 				 struct device_attribute *attr, const char *buf,
 				 size_t count)
 {
-	struct input_dev *input_dev = fts_data->input_dev;
+	struct input_dev *input_dev = xiaomi_sdm439_ft8006s_fts_data->input_dev;
 	ssize_t cmd_length = 0;
 
 	mutex_lock(&input_dev->mutex);
@@ -879,14 +879,14 @@ static ssize_t fts_tprwreg_store(struct device *dev,
 			if (rw_op.len == 1) {
 				u8 reg, val;
 				reg = rw_op.reg & 0xFF;
-				rw_op.res = fts_read_reg(reg, &val);
+				rw_op.res = xiaomi_sdm439_ft8006s_fts_read_reg(reg, &val);
 				rw_op.val = val;
 			} else {
 				char reg;
 				reg = rw_op.reg & 0xFF;
 
 				rw_op.res =
-				    fts_read(&reg, 1, rw_op.opbuf, rw_op.len);
+				    xiaomi_sdm439_ft8006s_fts_read(&reg, 1, rw_op.opbuf, rw_op.len);
 			}
 
 			if (rw_op.res < 0) {
@@ -902,9 +902,9 @@ static ssize_t fts_tprwreg_store(struct device *dev,
 				u8 reg, val;
 				reg = rw_op.reg & 0xFF;
 				val = rw_op.val & 0xFF;
-				rw_op.res = fts_write_reg(reg, val);
+				rw_op.res = xiaomi_sdm439_ft8006s_fts_write_reg(reg, val);
 			} else {
-				rw_op.res = fts_write(rw_op.opbuf, rw_op.len);
+				rw_op.res = xiaomi_sdm439_ft8006s_fts_write(rw_op.opbuf, rw_op.len);
 			}
 			if (rw_op.res < 0) {
 				FTS_ERROR("Could not write 0x%02x", rw_op.reg);
@@ -925,7 +925,7 @@ static ssize_t fts_tprwreg_store(struct device *dev,
 	return count;
 }
 
-/* fts_upgrade_bin interface */
+/* xiaomi_sdm439_ft8006s_fts_upgrade_bin interface */
 static ssize_t fts_fwupgradebin_show(struct device *dev,
 				     struct device_attribute *attr, char *buf)
 {
@@ -937,7 +937,7 @@ static ssize_t fts_fwupgradebin_store(struct device *dev,
 				      const char *buf, size_t count)
 {
 	char fwname[FILE_NAME_LENGTH] = { 0 };
-	struct input_dev *input_dev = fts_data->input_dev;
+	struct input_dev *input_dev = xiaomi_sdm439_ft8006s_fts_data->input_dev;
 
 	if ((count <= 1) || (count >= FILE_NAME_LENGTH - 32)) {
 		FTS_ERROR("fw bin name's length(%d) fail", (int)count);
@@ -949,7 +949,7 @@ static ssize_t fts_fwupgradebin_store(struct device *dev,
 
 	FTS_INFO("upgrade with bin file through sysfs node");
 	mutex_lock(&input_dev->mutex);
-	fts_upgrade_bin(fwname, 0);
+	xiaomi_sdm439_ft8006s_fts_upgrade_bin(fwname, 0);
 	mutex_unlock(&input_dev->mutex);
 
 	return count;
@@ -967,7 +967,7 @@ static ssize_t fts_fwforceupg_store(struct device *dev,
 				    const char *buf, size_t count)
 {
 	char fwname[FILE_NAME_LENGTH];
-	struct input_dev *input_dev = fts_data->input_dev;
+	struct input_dev *input_dev = xiaomi_sdm439_ft8006s_fts_data->input_dev;
 
 	if ((count <= 1) || (count >= FILE_NAME_LENGTH - 32)) {
 		FTS_ERROR("fw bin name's length(%d) fail", (int)count);
@@ -979,7 +979,7 @@ static ssize_t fts_fwforceupg_store(struct device *dev,
 
 	FTS_INFO("force upgrade through sysfs node");
 	mutex_lock(&input_dev->mutex);
-	fts_upgrade_bin(fwname, 1);
+	xiaomi_sdm439_ft8006s_fts_upgrade_bin(fwname, 1);
 	mutex_unlock(&input_dev->mutex);
 
 	return count;
@@ -990,7 +990,7 @@ static ssize_t fts_driverinfo_show(struct device *dev,
 				   struct device_attribute *attr, char *buf)
 {
 	int count = 0;
-	struct fts_ts_data *ts_data = fts_data;
+	struct fts_ts_data *ts_data = xiaomi_sdm439_ft8006s_fts_data;
 	struct fts_ts_platform_data *pdata = ts_data->pdata;
 	struct input_dev *input_dev = ts_data->input_dev;
 
@@ -1033,45 +1033,45 @@ static ssize_t fts_dumpreg_show(struct device *dev,
 {
 	int count = 0;
 	u8 val = 0;
-	struct input_dev *input_dev = fts_data->input_dev;
+	struct input_dev *input_dev = xiaomi_sdm439_ft8006s_fts_data->input_dev;
 
 	mutex_lock(&input_dev->mutex);
 #if FTS_ESDCHECK_EN
 	fts_esdcheck_proc_busy(1);
 #endif
-	fts_read_reg(FTS_REG_POWER_MODE, &val);
+	xiaomi_sdm439_ft8006s_fts_read_reg(FTS_REG_POWER_MODE, &val);
 	count += snprintf(buf + count, PAGE_SIZE, "Power Mode:0x%02x\n", val);
 
-	fts_read_reg(FTS_REG_FW_VER, &val);
+	xiaomi_sdm439_ft8006s_fts_read_reg(FTS_REG_FW_VER, &val);
 	count += snprintf(buf + count, PAGE_SIZE, "FW Ver:0x%02x\n", val);
 
-	fts_read_reg(FTS_REG_LIC_VER, &val);
+	xiaomi_sdm439_ft8006s_fts_read_reg(FTS_REG_LIC_VER, &val);
 	count +=
 	    snprintf(buf + count, PAGE_SIZE, "LCD Initcode Ver:0x%02x\n", val);
 
-	fts_read_reg(FTS_REG_IDE_PARA_VER_ID, &val);
+	xiaomi_sdm439_ft8006s_fts_read_reg(FTS_REG_IDE_PARA_VER_ID, &val);
 	count += snprintf(buf + count, PAGE_SIZE, "Param Ver:0x%02x\n", val);
 
-	fts_read_reg(FTS_REG_IDE_PARA_STATUS, &val);
+	xiaomi_sdm439_ft8006s_fts_read_reg(FTS_REG_IDE_PARA_STATUS, &val);
 	count += snprintf(buf + count, PAGE_SIZE, "Param status:0x%02x\n", val);
 
-	fts_read_reg(FTS_REG_VENDOR_ID, &val);
+	xiaomi_sdm439_ft8006s_fts_read_reg(FTS_REG_VENDOR_ID, &val);
 	count += snprintf(buf + count, PAGE_SIZE, "Vendor ID:0x%02x\n", val);
 
-	fts_read_reg(FTS_REG_LCD_BUSY_NUM, &val);
+	xiaomi_sdm439_ft8006s_fts_read_reg(FTS_REG_LCD_BUSY_NUM, &val);
 	count +=
 	    snprintf(buf + count, PAGE_SIZE, "LCD Busy Number:0x%02x\n", val);
 
-	fts_read_reg(FTS_REG_GESTURE_EN, &val);
+	xiaomi_sdm439_ft8006s_fts_read_reg(FTS_REG_GESTURE_EN, &val);
 	count += snprintf(buf + count, PAGE_SIZE, "Gesture Mode:0x%02x\n", val);
 
-	fts_read_reg(FTS_REG_CHARGER_MODE_EN, &val);
+	xiaomi_sdm439_ft8006s_fts_read_reg(FTS_REG_CHARGER_MODE_EN, &val);
 	count += snprintf(buf + count, PAGE_SIZE, "charge stat:0x%02x\n", val);
 
-	fts_read_reg(FTS_REG_INT_CNT, &val);
+	xiaomi_sdm439_ft8006s_fts_read_reg(FTS_REG_INT_CNT, &val);
 	count += snprintf(buf + count, PAGE_SIZE, "INT count:0x%02x\n", val);
 
-	fts_read_reg(FTS_REG_FLOW_WORK_CNT, &val);
+	xiaomi_sdm439_ft8006s_fts_read_reg(FTS_REG_FLOW_WORK_CNT, &val);
 	count += snprintf(buf + count, PAGE_SIZE, "ESD count:0x%02x\n", val);
 #if FTS_ESDCHECK_EN
 	fts_esdcheck_proc_busy(0);
@@ -1095,14 +1095,14 @@ static ssize_t fts_tpbuf_show(struct device *dev, struct device_attribute *attr,
 {
 	int count = 0;
 	int i = 0;
-	struct input_dev *input_dev = fts_data->input_dev;
+	struct input_dev *input_dev = xiaomi_sdm439_ft8006s_fts_data->input_dev;
 
 	mutex_lock(&input_dev->mutex);
 	count += snprintf(buf + count, PAGE_SIZE, "touch point buffer:\n");
-	for (i = 0; i < fts_data->pnt_buf_size; i++) {
+	for (i = 0; i < xiaomi_sdm439_ft8006s_fts_data->pnt_buf_size; i++) {
 		count +=
 		    snprintf(buf + count, PAGE_SIZE, "%02x ",
-			     fts_data->point_buf[i]);
+			     xiaomi_sdm439_ft8006s_fts_data->point_buf[i]);
 	}
 	count += snprintf(buf + count, PAGE_SIZE, "\n");
 	mutex_unlock(&input_dev->mutex);
@@ -1122,11 +1122,11 @@ static ssize_t fts_log_level_show(struct device *dev,
 				  struct device_attribute *attr, char *buf)
 {
 	int count = 0;
-	struct input_dev *input_dev = fts_data->input_dev;
+	struct input_dev *input_dev = xiaomi_sdm439_ft8006s_fts_data->input_dev;
 
 	mutex_lock(&input_dev->mutex);
 	count += snprintf(buf + count, PAGE_SIZE, "log level:%d\n",
-			  fts_data->log_level);
+			  xiaomi_sdm439_ft8006s_fts_data->log_level);
 	mutex_unlock(&input_dev->mutex);
 
 	return count;
@@ -1137,13 +1137,13 @@ static ssize_t fts_log_level_store(struct device *dev,
 				   const char *buf, size_t count)
 {
 	int value = 0;
-	struct input_dev *input_dev = fts_data->input_dev;
+	struct input_dev *input_dev = xiaomi_sdm439_ft8006s_fts_data->input_dev;
 
 	FTS_FUNC_ENTER();
 	mutex_lock(&input_dev->mutex);
 	sscanf(buf, "%d", &value);
-	FTS_DEBUG("log level:%d->%d", fts_data->log_level, value);
-	fts_data->log_level = value;
+	FTS_DEBUG("log level:%d->%d", xiaomi_sdm439_ft8006s_fts_data->log_level, value);
+	xiaomi_sdm439_ft8006s_fts_data->log_level = value;
 	mutex_unlock(&input_dev->mutex);
 	FTS_FUNC_EXIT();
 
@@ -1171,7 +1171,7 @@ static DEVICE_ATTR(fts_fw_version, S_IRUGO | S_IWUSR, fts_tpfwver_show,
 */
 static DEVICE_ATTR(fts_rw_reg, S_IRUGO | S_IWUSR, fts_tprwreg_show,
 		   fts_tprwreg_store);
-/*  upgrade from fw bin file   example:echo "*.bin" > fts_upgrade_bin */
+/*  upgrade from fw bin file   example:echo "*.bin" > xiaomi_sdm439_ft8006s_fts_upgrade_bin */
 static DEVICE_ATTR(fts_upgrade_bin, S_IRUGO | S_IWUSR, fts_fwupgradebin_show,
 		   fts_fwupgradebin_store);
 static DEVICE_ATTR(fts_force_upgrade, S_IRUGO | S_IWUSR, fts_fwforceupg_show,
@@ -1210,7 +1210,7 @@ static struct attribute_group fts_attribute_group = {
 	.attrs = fts_attributes
 };
 
-int fts_create_sysfs(struct fts_ts_data *ts_data)
+int xiaomi_sdm439_ft8006s_fts_create_sysfs(struct fts_ts_data *ts_data)
 {
 	int ret = 0;
 
@@ -1226,7 +1226,7 @@ int fts_create_sysfs(struct fts_ts_data *ts_data)
 	return ret;
 }
 
-int fts_remove_sysfs(struct fts_ts_data *ts_data)
+int xiaomi_sdm439_ft8006s_fts_remove_sysfs(struct fts_ts_data *ts_data)
 {
 	sysfs_remove_group(&ts_data->dev->kobj, &fts_attribute_group);
 	return 0;
@@ -1263,7 +1263,7 @@ static const struct file_operations proc_tp_lock_down_info_fops = {
 	.read = seq_read,
 };
 
-int focal_proc_tp_lockdown_info(void)
+int xiaomi_sdm439_ft8006s_focal_proc_tp_lockdown_info(void)
 {
 	focal_proc_create_tp_lock_down = proc_create("tp_lockdown_info", 0644, NULL, &proc_tp_lock_down_info_fops);
 	if (!focal_proc_create_tp_lock_down) {
@@ -1276,7 +1276,7 @@ int focal_proc_tp_lockdown_info(void)
 	return 0;
 }
 
-void focal_lockdown_proc_deinit(void)
+void xiaomi_sdm439_ft8006s_focal_lockdown_proc_deinit(void)
 {
 	if (focal_proc_create_tp_lock_down != NULL) {
 		remove_proc_entry("tp_lockdown_info", NULL);

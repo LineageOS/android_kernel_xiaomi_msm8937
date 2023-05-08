@@ -53,28 +53,28 @@
 /*****************************************************************************
 * Global variable or extern global variabls/functions
 *****************************************************************************/
-u8 fw_file[] = {
+u8 xiaomi_sdm439_ft8006s_fw_file[] = {
 #include FTS_UPGRADE_FW_FILE
 };
 
-u8 fw_file2[] = {
+u8 xiaomi_sdm439_ft8006s_fw_file2[] = {
 #include FTS_UPGRADE_FW2_FILE
 };
 
-u8 fw_file3[] = {
+u8 xiaomi_sdm439_ft8006s_fw_file3[] = {
 #include FTS_UPGRADE_FW3_FILE
 };
 
-struct upgrade_module module_list[] = {
-	{FTS_MODULE_ID, FTS_MODULE_NAME, fw_file, sizeof(fw_file)}
+struct upgrade_module xiaomi_sdm439_ft8006s_module_list[] = {
+	{FTS_MODULE_ID, FTS_MODULE_NAME, xiaomi_sdm439_ft8006s_fw_file, sizeof(xiaomi_sdm439_ft8006s_fw_file)}
 	,
-	{FTS_MODULE2_ID, FTS_MODULE2_NAME, fw_file2, sizeof(fw_file2)}
+	{FTS_MODULE2_ID, FTS_MODULE2_NAME, xiaomi_sdm439_ft8006s_fw_file2, sizeof(xiaomi_sdm439_ft8006s_fw_file2)}
 	,
-	{FTS_MODULE3_ID, FTS_MODULE3_NAME, fw_file3, sizeof(fw_file3)}
+	{FTS_MODULE3_ID, FTS_MODULE3_NAME, xiaomi_sdm439_ft8006s_fw_file3, sizeof(xiaomi_sdm439_ft8006s_fw_file3)}
 	,
 };
 
-struct upgrade_setting_nf upgrade_setting_list[] = {
+struct upgrade_setting_nf xiaomi_sdm439_ft8006s_upgrade_setting_list[] = {
 	{0x87, 0x19, 0, (64 * 1024), (128 * 1024), 0x00, 0x02, 8,  1, 0, 1, 0},
 	{0x86, 0x22, 0, (64 * 1024), (128 * 1024), 0x00, 0x02, 8,  1, 0, 0, 0},
 	{0x87, 0x56, 0, (88 * 1024), 32766,		0xA5, 0x01, 8,  0, 1, 0, 1},
@@ -82,14 +82,14 @@ struct upgrade_setting_nf upgrade_setting_list[] = {
 	{0x86, 0x32, 0, (64 * 1024), (128 * 1024), 0xA5, 0x01, 12, 0, 0, 0, 0},
 };
 
-struct fts_upgrade *fwupgrade;
+struct fts_upgrade *xiaomi_sdm439_ft8006s_fwupgrade;
 
 static int fts_check_bootid(void)
 {
 	int ret = 0;
 	u8 cmd = 0;
 	u8 id[2] = { 0 };
-	struct fts_upgrade *upg = fwupgrade;
+	struct fts_upgrade *upg = xiaomi_sdm439_ft8006s_fwupgrade;
 	struct ft_chip_t *chip_id;
 
 	if (!upg || !upg->ts_data || !upg->setting_nf) {
@@ -100,7 +100,7 @@ static int fts_check_bootid(void)
 	chip_id = &upg->ts_data->ic_info.ids;
 
 	cmd = FTS_CMD_READ_ID;
-	ret = fts_read(&cmd, 1, id, 2);
+	ret = xiaomi_sdm439_ft8006s_fts_read(&cmd, 1, id, 2);
 	if (ret < 0) {
 		FTS_ERROR("read boot id(0x%02x 0x%02x) fail",
 					id[0], id[1]);
@@ -116,7 +116,7 @@ static int fts_check_bootid(void)
 
 static int fts_fwupg_hardware_reset_to_boot(void)
 {
-	fts_reset_proc(0);
+	xiaomi_sdm439_ft8006s_fts_reset_proc(0);
 	return 0;
 }
 
@@ -126,7 +126,7 @@ static int fts_enter_into_boot(void)
 	int i = 0;
 	int j = 0;
 	u8 cmd[2] = { 0 };
-	struct fts_upgrade *upg = fwupgrade;
+	struct fts_upgrade *upg = xiaomi_sdm439_ft8006s_fwupgrade;
 
 	if (!upg || !upg->ts_data || !upg->setting_nf) {
 		FTS_ERROR("upgrade/ts_data/setting_nf is null");
@@ -142,7 +142,7 @@ static int fts_enter_into_boot(void)
 		/* enter into boot & check boot id*/
 		for (j = 0; j < FTS_READ_BOOT_ID_TIMEOUT; j++) {
 			cmd[0] = FTS_CMD_START1;
-			ret = fts_write(cmd, 1);
+			ret = xiaomi_sdm439_ft8006s_fts_write(cmd, 1);
 			if (ret >= 0) {
 				mdelay(upg->setting_nf->delay_init);
 				ret = fts_check_bootid();
@@ -164,13 +164,13 @@ static bool fts_check_fast_download(void)
 	u8 value = 0;
 	u8 value2[2] = { 0 };
 
-	ret = fts_read_reg(0xdb, &value);
+	ret = xiaomi_sdm439_ft8006s_fts_read_reg(0xdb, &value);
 	if (ret < 0) {
 		FTS_ERROR("read 0xdb fail");
 		goto read_err;
 	}
 
-	ret = fts_read(cmd, 6, value2, 2);
+	ret = xiaomi_sdm439_ft8006s_fts_read(cmd, 6, value2, 2);
 	if (ret < 0) {
 		FTS_ERROR("read f2 fail");
 		goto read_err;
@@ -201,7 +201,7 @@ static int fts_dpram_write_pe(u32 saddr,
 	u32 packet_len = 0;
 	u32 packet_size = FTS_FLASH_PACKET_LENGTH_SPI;
 	bool fd_support = true;
-	struct fts_upgrade *upg = fwupgrade;
+	struct fts_upgrade *upg = xiaomi_sdm439_ft8006s_fwupgrade;
 
 	FTS_INFO("dpram write");
 	if (!upg || !upg->ts_data || !upg->setting_nf) {
@@ -257,7 +257,7 @@ static int fts_dpram_write_pe(u32 saddr,
 		for (j = 0; j < packet_len; j++)
 			cmd[FTS_CMD_WRITE_LEN + j] = buf[offset + j];
 
-		ret = fts_write(&cmd[0], FTS_CMD_WRITE_LEN + packet_len);
+		ret = xiaomi_sdm439_ft8006s_fts_write(&cmd[0], FTS_CMD_WRITE_LEN + packet_len);
 		if (ret < 0) {
 			FTS_ERROR("write fw to pram(%d) fail", i);
 			goto write_pram_err;
@@ -289,7 +289,7 @@ static int fts_dpram_write(u32 saddr,
 	u32 packet_number = 0;
 	u32 packet_len = 0;
 	u32 packet_size = FTS_FLASH_PACKET_LENGTH_SPI;
-	struct fts_upgrade *upg = fwupgrade;
+	struct fts_upgrade *upg = xiaomi_sdm439_ft8006s_fwupgrade;
 
 	FTS_INFO("dpram write");
 	if (!upg || !upg->ts_data || !upg->setting_nf) {
@@ -334,7 +334,7 @@ static int fts_dpram_write(u32 saddr,
 		cmd[1] = BYTE_OFF_16(addr);
 		cmd[2] = BYTE_OFF_8(addr);
 		cmd[3] = BYTE_OFF_0(addr);
-		ret = fts_write(&cmd[0], FTS_ROMBOOT_CMD_SET_PRAM_ADDR_LEN);
+		ret = xiaomi_sdm439_ft8006s_fts_write(&cmd[0], FTS_ROMBOOT_CMD_SET_PRAM_ADDR_LEN);
 		if (ret < 0) {
 			FTS_ERROR("set pram(%d) addr(%d) fail", i, addr);
 			goto write_pram_err;
@@ -345,7 +345,7 @@ static int fts_dpram_write(u32 saddr,
 		for (j = 0; j < packet_len; j++)
 			cmd[1 + j] = buf[offset + j];
 
-		ret = fts_write(&cmd[0], 1 + packet_len);
+		ret = xiaomi_sdm439_ft8006s_fts_write(&cmd[0], 1 + packet_len);
 		if (ret < 0) {
 			FTS_ERROR("write fw to pram(%d) fail", i);
 			goto write_pram_err;
@@ -366,7 +366,7 @@ static int fts_ecc_cal_tp(u32 ecc_saddr, u32 ecc_len, u16 *ecc_value)
 	int i = 0;
 	u8 cmd[FTS_ROMBOOT_CMD_ECC_NEW_LEN] = { 0 };
 	u8 value[2] = { 0 };
-	struct fts_upgrade *upg = fwupgrade;
+	struct fts_upgrade *upg = xiaomi_sdm439_ft8006s_fwupgrade;
 
 	FTS_INFO("ecc calc in tp");
 	if (!upg || !upg->ts_data || !upg->setting_nf) {
@@ -383,7 +383,7 @@ static int fts_ecc_cal_tp(u32 ecc_saddr, u32 ecc_len, u16 *ecc_value)
 	cmd[6] = BYTE_OFF_0(ecc_len);
 
 	/* make boot to calculate ecc in pram */
-	ret = fts_write(cmd, FTS_ROMBOOT_CMD_ECC_NEW_LEN);
+	ret = xiaomi_sdm439_ft8006s_fts_write(cmd, FTS_ROMBOOT_CMD_ECC_NEW_LEN);
 	if (ret < 0) {
 		FTS_ERROR("ecc calc cmd fail");
 		return ret;
@@ -393,7 +393,7 @@ static int fts_ecc_cal_tp(u32 ecc_saddr, u32 ecc_len, u16 *ecc_value)
 	/* wait boot calculate ecc finish */
 	cmd[0] = FTS_ROMBOOT_CMD_ECC_FINISH;
 	for (i = 0; i < FTS_ECC_FINISH_TIMEOUT; i++) {
-		ret = fts_read(cmd, 1, value, 1);
+		ret = xiaomi_sdm439_ft8006s_fts_read(cmd, 1, value, 1);
 		if (ret < 0) {
 			FTS_ERROR("ecc finish cmd fail");
 			return ret;
@@ -409,7 +409,7 @@ static int fts_ecc_cal_tp(u32 ecc_saddr, u32 ecc_len, u16 *ecc_value)
 
 	/* get ecc value calculate in boot */
 	cmd[0] = FTS_ROMBOOT_CMD_ECC_READ;
-	ret = fts_read(cmd, 1, value, 2);
+	ret = xiaomi_sdm439_ft8006s_fts_read(cmd, 1, value, 2);
 	if (ret < 0) {
 		FTS_ERROR("ecc read cmd fail");
 		return ret;
@@ -451,7 +451,7 @@ static int fts_ecc_check(const u8 *buf, u32 len, u32 ecc_saddr)
 	int packet_remainder = 0;
 	int offset = 0;
 	u32 packet_size = FTS_MAX_LEN_FILE;
-	struct fts_upgrade *upg = fwupgrade;
+	struct fts_upgrade *upg = xiaomi_sdm439_ft8006s_fwupgrade;
 
 	FTS_INFO("ecc check");
 	if (!upg || !upg->ts_data || !upg->setting_nf) {
@@ -505,7 +505,7 @@ static int fts_pram_write_ecc(const u8 *buf, u32 len)
 	u16 code_len = 0;
 	u16 code_len_n = 0;
 	u32 pram_start_addr = 0;
-	struct fts_upgrade *upg = fwupgrade;
+	struct fts_upgrade *upg = xiaomi_sdm439_ft8006s_fwupgrade;
 
 	FTS_INFO("begin to write pram app(bin len:%d)", len);
 	if (!upg || !upg->setting_nf) {
@@ -559,7 +559,7 @@ static int fts_dram_write_ecc(const u8 *buf, u32 len)
 	u16 const_len = 0;
 	u16 const_len_n = 0;
 	const u8 *dram_buf = NULL;
-	struct fts_upgrade *upg = fwupgrade;
+	struct fts_upgrade *upg = xiaomi_sdm439_ft8006s_fwupgrade;
 
 	FTS_INFO("begin to write dram data(bin len:%d)", len);
 	if (!upg || !upg->setting_nf) {
@@ -612,7 +612,7 @@ static int fts_pram_start(void)
 	u8 cmd = FTS_ROMBOOT_CMD_START_APP;
 
 	FTS_INFO("remap to start pram");
-	ret = fts_write(&cmd, 1);
+	ret = xiaomi_sdm439_ft8006s_fts_write(&cmd, 1);
 	if (ret < 0) {
 		FTS_ERROR("write start pram cmd fail");
 		return ret;
@@ -632,7 +632,7 @@ static int fts_pram_start(void)
 static int fts_fw_write_start(const u8 *buf, u32 len, bool need_reset)
 {
 	int ret = 0;
-	struct fts_upgrade *upg = fwupgrade;
+	struct fts_upgrade *upg = xiaomi_sdm439_ft8006s_fwupgrade;
 
 	FTS_INFO("begin to write and start fw(bin len:%d)", len);
 	if (!upg || !upg->ts_data || !upg->setting_nf) {
@@ -678,9 +678,9 @@ static int fts_fw_write_start(const u8 *buf, u32 len, bool need_reset)
 	FTS_INFO("fw download successfully");
 
 #if HQ_CTP_HWINFO_REGISTER
-	ret = ctp_hw_info(fts_data);
+	ret = xiaomi_sdm439_ft8006s_ctp_hw_info(xiaomi_sdm439_ft8006s_fts_data);
 	if (ret) {
-		FTS_ERROR("Unable to register ctp_hw_info: %d", ret);
+		FTS_ERROR("Unable to register xiaomi_sdm439_ft8006s_ctp_hw_info: %d", ret);
 	}
 #endif
 
@@ -691,7 +691,7 @@ static int fts_fw_download(const u8 *buf, u32 len, bool need_reset)
 {
 	int ret = 0;
 	int i = 0;
-	struct fts_upgrade *upg = fwupgrade;
+	struct fts_upgrade *upg = xiaomi_sdm439_ft8006s_fwupgrade;
 
 	FTS_INFO("fw upgrade download function");
 	if (!upg || !upg->ts_data || !upg->setting_nf) {
@@ -705,7 +705,7 @@ static int fts_fw_download(const u8 *buf, u32 len, bool need_reset)
 	}
 
 	upg->ts_data->fw_loading = 1;
-	fts_irq_disable();
+	xiaomi_sdm439_ft8006s_fts_irq_disable();
 #if FTS_ESDCHECK_EN
 	fts_esdcheck_switch(DISABLE);
 #endif
@@ -728,7 +728,7 @@ static int fts_fw_download(const u8 *buf, u32 len, bool need_reset)
 
 	ret = 0;
 err_fw_download:
-	fts_irq_enable();
+	xiaomi_sdm439_ft8006s_fts_irq_enable();
 	upg->ts_data->fw_loading = 0;
 
 	return ret;
@@ -782,12 +782,12 @@ static int fts_read_file(char *file_name, u8 **file_buf)
 	return ret;
 }
 
-int fts_upgrade_bin(char *fw_name, bool force)
+int xiaomi_sdm439_ft8006s_fts_upgrade_bin(char *fw_name, bool force)
 {
 	int ret = 0;
 	u32 fw_file_len = 0;
 	u8 *fw_file_buf = NULL;
-	struct fts_upgrade *upg = fwupgrade;
+	struct fts_upgrade *upg = xiaomi_sdm439_ft8006s_fwupgrade;
 
 	FTS_INFO("start upgrade with fw bin");
 	if (!upg || !upg->ts_data || !upg->setting_nf) {
@@ -825,13 +825,13 @@ err_bin:
 }
 
 
-int fts_enter_test_environment(bool test_state)
+int xiaomi_sdm439_ft8006s_fts_enter_test_environment(bool test_state)
 {
 	int ret = 0;
 	int i = 0;
 	u8 detach_flag = 0;
 	u32 app_offset = 0;
-	struct fts_upgrade *upg = fwupgrade;
+	struct fts_upgrade *upg = xiaomi_sdm439_ft8006s_fwupgrade;
 
 	FTS_INFO("fw test download function");
 	if (!upg || !upg->ts_data || !upg->setting_nf) {
@@ -868,17 +868,17 @@ int fts_enter_test_environment(bool test_state)
 	}
 
 	msleep(50);
-	ret = fts_read_reg(FTS_REG_FACTORY_MODE_DETACH_FLAG,
+	ret = xiaomi_sdm439_ft8006s_fts_read_reg(FTS_REG_FACTORY_MODE_DETACH_FLAG,
 		&detach_flag);
 	FTS_INFO("regb4:0x%02x", detach_flag);
 
 	return 0;
 }
 
-int fts_fw_resume(void)
+int xiaomi_sdm439_ft8006s_fts_fw_resume(void)
 {
 	int ret = 0;
-	struct fts_upgrade *upg = fwupgrade;
+	struct fts_upgrade *upg = xiaomi_sdm439_ft8006s_fwupgrade;
 	const struct firmware *fw = NULL;
 	char fwname[FILE_NAME_LENGTH] = { 0 };
 
@@ -921,12 +921,12 @@ int fts_fw_resume(void)
 	return 0;
 }
 
-int fts_fw_recovery(void)
+int xiaomi_sdm439_ft8006s_fts_fw_recovery(void)
 {
 	int ret = 0;
 	u8 boot_state = 0;
 	u8 chip_id = 0;
-	struct fts_upgrade *upg = fwupgrade;
+	struct fts_upgrade *upg = xiaomi_sdm439_ft8006s_fwupgrade;
 
 	FTS_INFO("check if boot recovery");
 	if (!upg || !upg->ts_data || !upg->setting_nf) {
@@ -947,7 +947,7 @@ int fts_fw_recovery(void)
 		return ret;
 	}
 
-	ret = fts_read_reg(0xD0, &boot_state);
+	ret = xiaomi_sdm439_ft8006s_fts_read_reg(0xD0, &boot_state);
 	if (ret < 0) {
 		FTS_ERROR("read boot state failed, ret=%d", ret);
 		upg->ts_data->fw_is_running = true;
@@ -961,16 +961,16 @@ int fts_fw_recovery(void)
 	}
 
 	FTS_INFO("abnormal situation,need download fw");
-	ret = fts_fw_resume();
+	ret = xiaomi_sdm439_ft8006s_fts_fw_resume();
 	if (ret < 0) {
-		FTS_ERROR("fts_fw_resume fail");
+		FTS_ERROR("xiaomi_sdm439_ft8006s_fts_fw_resume fail");
 		return ret;
 	}
 	msleep(10);
-	ret = fts_read_reg(FTS_REG_CHIP_ID, &chip_id);
+	ret = xiaomi_sdm439_ft8006s_fts_read_reg(FTS_REG_CHIP_ID, &chip_id);
 	FTS_INFO("read chip id:0x%02x", chip_id);
 
-	fts_tp_state_recovery(upg->ts_data);
+	xiaomi_sdm439_ft8006s_fts_tp_state_recovery(upg->ts_data);
 
 	FTS_INFO("boot recovery pass");
 	return ret;
@@ -979,7 +979,7 @@ int fts_fw_recovery(void)
 static int fts_fwupg_get_module_info(struct fts_upgrade *upg)
 {
 	int i = 0;
-	struct upgrade_module *info = &module_list[0];
+	struct upgrade_module *info = &xiaomi_sdm439_ft8006s_module_list[0];
 
 	if (!upg || !upg->ts_data) {
 		FTS_ERROR("upg/ts_data is null");
@@ -989,7 +989,7 @@ static int fts_fwupg_get_module_info(struct fts_upgrade *upg)
 	if (FTS_GET_MODULE_NUM > 1) {
 		FTS_INFO("module id:%04x", upg->module_id);
 		for (i = 0; i < FTS_GET_MODULE_NUM; i++) {
-			info = &module_list[i];
+			info = &xiaomi_sdm439_ft8006s_module_list[i];
 			if (upg->module_id == info->id) {
 				FTS_INFO("module id match, get fw file successfully");
 				break;
@@ -1042,7 +1042,7 @@ static int fts_get_fw_file_via_request_firmware(struct fts_upgrade *upg)
 
 static int fts_get_fw_file_via_i(struct fts_upgrade *upg)
 {
-	upg->fw = upg->module_info->fw_file;
+	upg->fw = upg->module_info->xiaomi_sdm439_ft8006s_fw_file;
 	upg->fw_length = upg->module_info->fw_len;
 	upg->fw_from_request = 0;
 
@@ -1107,7 +1107,7 @@ static void fts_fwupg_work(struct work_struct *work)
 {
 	int ret = 0;
 	u8 chip_id = 0;
-	struct fts_upgrade *upg = fwupgrade;
+	struct fts_upgrade *upg = xiaomi_sdm439_ft8006s_fwupgrade;
 
 #if !FTS_AUTO_UPGRADE_EN
 	FTS_INFO("FTS_AUTO_UPGRADE_EN is disabled, not upgrade when power on");
@@ -1137,17 +1137,17 @@ static void fts_fwupg_work(struct work_struct *work)
 		FTS_ERROR("fw auto download failed");
 	else {
 		msleep(50);
-		ret = fts_read_reg(FTS_REG_CHIP_ID, &chip_id);
+		ret = xiaomi_sdm439_ft8006s_fts_read_reg(FTS_REG_CHIP_ID, &chip_id);
 		FTS_INFO("read chip id:0x%02x", chip_id);
 	}
 }
 
-int fts_fwupg_init(struct fts_ts_data *ts_data)
+int xiaomi_sdm439_ft8006s_fts_fwupg_init(struct fts_ts_data *ts_data)
 {
 	int i = 0;
-	struct upgrade_setting_nf *setting = &upgrade_setting_list[0];
+	struct upgrade_setting_nf *setting = &xiaomi_sdm439_ft8006s_upgrade_setting_list[0];
 	int setting_count =
-		sizeof(upgrade_setting_list) / sizeof(upgrade_setting_list[0]);
+		sizeof(xiaomi_sdm439_ft8006s_upgrade_setting_list) / sizeof(xiaomi_sdm439_ft8006s_upgrade_setting_list[0]);
 
 	FTS_INFO("fw upgrade init function");
 	if (!ts_data || !ts_data->ts_workqueue) {
@@ -1160,30 +1160,30 @@ int fts_fwupg_init(struct fts_ts_data *ts_data)
 		return -ENODATA;
 	}
 
-	fwupgrade = (struct fts_upgrade *)kzalloc(sizeof(*fwupgrade), GFP_KERNEL);
-	if (NULL == fwupgrade) {
+	xiaomi_sdm439_ft8006s_fwupgrade = (struct fts_upgrade *)kzalloc(sizeof(*xiaomi_sdm439_ft8006s_fwupgrade), GFP_KERNEL);
+	if (NULL == xiaomi_sdm439_ft8006s_fwupgrade) {
 		FTS_ERROR("malloc memory for upgrade fail");
 		return -ENOMEM;
 	}
 
 	if (1 == setting_count)
-		fwupgrade->setting_nf = setting;
+		xiaomi_sdm439_ft8006s_fwupgrade->setting_nf = setting;
 	else {
 		for (i = 0; i < setting_count; i++) {
-			setting = &upgrade_setting_list[i];
+			setting = &xiaomi_sdm439_ft8006s_upgrade_setting_list[i];
 			if ((setting->rom_idh == ts_data->ic_info.ids.rom_idh)
 				&& (setting->rom_idl == ts_data->ic_info.ids.rom_idl)) {
 				FTS_INFO("match upgrade setting,type(ID):0x%02x%02x",
 						 setting->rom_idh, setting->rom_idl);
-				fwupgrade->setting_nf = setting;
+				xiaomi_sdm439_ft8006s_fwupgrade->setting_nf = setting;
 			}
 		}
 	}
 
-	if (NULL == fwupgrade->setting_nf) {
+	if (NULL == xiaomi_sdm439_ft8006s_fwupgrade->setting_nf) {
 		FTS_ERROR("no upgrade settings match, can't upgrade");
-		kfree(fwupgrade);
-		fwupgrade = NULL;
+		kfree(xiaomi_sdm439_ft8006s_fwupgrade);
+		xiaomi_sdm439_ft8006s_fwupgrade = NULL;
 		return -ENODATA;
 	}
 
@@ -1191,22 +1191,22 @@ int fts_fwupg_init(struct fts_ts_data *ts_data)
 	fts_esdcheck_switch(DISABLE);
 #endif
 
-	fwupgrade->ts_data = ts_data;
+	xiaomi_sdm439_ft8006s_fwupgrade->ts_data = ts_data;
 	INIT_WORK(&ts_data->fwupg_work, fts_fwupg_work);
 	queue_work(ts_data->ts_workqueue, &ts_data->fwupg_work);
 
 	return 0;
 }
 
-bool fts_fwupg_check_fw_valid(struct fts_ts_data *ts_data)
+bool xiaomi_sdm439_ft8006s_fts_fwupg_check_fw_valid(struct fts_ts_data *ts_data)
 {
 	FTS_FUNC_ENTER();
-	fts_wait_tp_to_valid();
+	xiaomi_sdm439_ft8006s_fts_wait_tp_to_valid();
 	FTS_FUNC_EXIT();
 	return true;
 }
 
-int fts_fwupg_get_ver_in_tp(struct fts_ts_data *ts_data, u8 *ver)
+int xiaomi_sdm439_ft8006s_fts_fwupg_get_ver_in_tp(struct fts_ts_data *ts_data, u8 *ver)
 {
 	int ret = 0;
 
@@ -1215,7 +1215,7 @@ int fts_fwupg_get_ver_in_tp(struct fts_ts_data *ts_data, u8 *ver)
 		return -EINVAL;
 	}
 
-	ret = fts_read_reg(FTS_REG_FW_VER, ver);
+	ret = xiaomi_sdm439_ft8006s_fts_read_reg(FTS_REG_FW_VER, ver);
 	if (ret < 0) {
 		FTS_ERROR("read fw ver from tp fail");
 		return ret;
@@ -1224,17 +1224,17 @@ int fts_fwupg_get_ver_in_tp(struct fts_ts_data *ts_data, u8 *ver)
 	return 0;
 }
 
-int fts_fwupg_exit(struct fts_ts_data *ts_data)
+int xiaomi_sdm439_ft8006s_fts_fwupg_exit(struct fts_ts_data *ts_data)
 {
 	FTS_FUNC_ENTER();
-	if (fwupgrade) {
-		if (fwupgrade->fw_from_request) {
-			vfree(fwupgrade->fw);
-			fwupgrade->fw = NULL;
+	if (xiaomi_sdm439_ft8006s_fwupgrade) {
+		if (xiaomi_sdm439_ft8006s_fwupgrade->fw_from_request) {
+			vfree(xiaomi_sdm439_ft8006s_fwupgrade->fw);
+			xiaomi_sdm439_ft8006s_fwupgrade->fw = NULL;
 		}
 
-		kfree(fwupgrade);
-		fwupgrade = NULL;
+		kfree(xiaomi_sdm439_ft8006s_fwupgrade);
+		xiaomi_sdm439_ft8006s_fwupgrade = NULL;
 	}
 	FTS_FUNC_EXIT();
 	return 0;

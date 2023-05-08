@@ -141,15 +141,15 @@ struct ini_data {
 /*****************************************************************************
 * Global variable or extern global variabls/functions
 *****************************************************************************/
-int fts_test_get_testparam_from_ini(char *config_name);
-int get_keyword_value(char *section, char *name, int *value);
+int xiaomi_sdm439_ft8006s_fts_test_get_testparam_from_ini(char *config_name);
+int xiaomi_sdm439_ft8006s_get_keyword_value(char *section, char *name, int *value);
 
 #define get_value_interface(name, value) \
-	get_keyword_value("Interface", name, value)
+	xiaomi_sdm439_ft8006s_get_keyword_value("Interface", name, value)
 #define get_value_basic(name, value) \
-	get_keyword_value("Basic_Threshold", name, value)
+	xiaomi_sdm439_ft8006s_get_keyword_value("Basic_Threshold", name, value)
 #define get_value_detail(name, value) \
-	get_keyword_value("SpecialSet", name, value)
+	xiaomi_sdm439_ft8006s_get_keyword_value("SpecialSet", name, value)
 #define get_value_testitem(name, value) \
-	get_keyword_value("TestItem", name, value)
+	xiaomi_sdm439_ft8006s_get_keyword_value("TestItem", name, value)
 #endif /* _INI_H */

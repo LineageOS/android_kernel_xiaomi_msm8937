@@ -203,32 +203,32 @@ struct fts_ts_data {
 /*****************************************************************************
 * Global variable or extern global variabls/functions
 *****************************************************************************/
-extern struct fts_ts_data *fts_data;
+extern struct fts_ts_data *xiaomi_sdm439_ft8006s_fts_data;
 
 /* communication interface */
-int fts_read(u8 *cmd, u32 cmdlen, u8 *data, u32 datalen);
-int fts_read_reg(u8 addr, u8 *value);
-int fts_write(u8 *writebuf, u32 writelen);
-int fts_write_reg(u8 addr, u8 value);
-void fts_hid2std(void);
-int fts_bus_init(struct fts_ts_data *ts_data);
-int fts_bus_exit(struct fts_ts_data *ts_data);
+int xiaomi_sdm439_ft8006s_fts_read(u8 *cmd, u32 cmdlen, u8 *data, u32 datalen);
+int xiaomi_sdm439_ft8006s_fts_read_reg(u8 addr, u8 *value);
+int xiaomi_sdm439_ft8006s_fts_write(u8 *writebuf, u32 writelen);
+int xiaomi_sdm439_ft8006s_fts_write_reg(u8 addr, u8 value);
+void xiaomi_sdm439_ft8006s_fts_hid2std(void);
+int xiaomi_sdm439_ft8006s_fts_bus_init(struct fts_ts_data *ts_data);
+int xiaomi_sdm439_ft8006s_fts_bus_exit(struct fts_ts_data *ts_data);
 
 /* Gesture functions */
-int fts_gesture_init(struct fts_ts_data *ts_data);
-int fts_gesture_exit(struct fts_ts_data *ts_data);
-void fts_gesture_recovery(struct fts_ts_data *ts_data);
-int fts_gesture_readdata(struct fts_ts_data *ts_data, u8 *data);
-int fts_gesture_suspend(struct fts_ts_data *ts_data);
-int fts_gesture_resume(struct fts_ts_data *ts_data);
+int xiaomi_sdm439_ft8006s_fts_gesture_init(struct fts_ts_data *ts_data);
+int xiaomi_sdm439_ft8006s_fts_gesture_exit(struct fts_ts_data *ts_data);
+void xiaomi_sdm439_ft8006s_fts_gesture_recovery(struct fts_ts_data *ts_data);
+int xiaomi_sdm439_ft8006s_fts_gesture_readdata(struct fts_ts_data *ts_data, u8 *data);
+int xiaomi_sdm439_ft8006s_fts_gesture_suspend(struct fts_ts_data *ts_data);
+int xiaomi_sdm439_ft8006s_fts_gesture_resume(struct fts_ts_data *ts_data);
 
 /* Apk and functions */
-int fts_create_apk_debug_channel(struct fts_ts_data *);
-void fts_release_apk_debug_channel(struct fts_ts_data *);
+int xiaomi_sdm439_ft8006s_fts_create_apk_debug_channel(struct fts_ts_data *);
+void xiaomi_sdm439_ft8006s_fts_release_apk_debug_channel(struct fts_ts_data *);
 
 /* ADB functions */
-int fts_create_sysfs(struct fts_ts_data *ts_data);
-int fts_remove_sysfs(struct fts_ts_data *ts_data);
+int xiaomi_sdm439_ft8006s_fts_create_sysfs(struct fts_ts_data *ts_data);
+int xiaomi_sdm439_ft8006s_fts_remove_sysfs(struct fts_ts_data *ts_data);
 
 /* ESD */
 #if FTS_ESDCHECK_EN
@@ -243,10 +243,10 @@ int fts_esdcheck_resume(void);
 
 /* Production test */
 #if FTS_TEST_EN
-int fts_test_init(struct fts_ts_data *ts_data);
-int fts_test_exit(struct fts_ts_data *ts_data);
-int fts_tp_selftest_proc(void);
-int fts_get_ic_information(struct fts_ts_data *ts_data);
+int xiaomi_sdm439_ft8006s_fts_test_init(struct fts_ts_data *ts_data);
+int xiaomi_sdm439_ft8006s_fts_test_exit(struct fts_ts_data *ts_data);
+int xiaomi_sdm439_ft8006s_fts_tp_selftest_proc(void);
+int xiaomi_sdm439_ft8006s_fts_get_ic_information(struct fts_ts_data *ts_data);
 #endif
 
 /* Point Report Check*/
@@ -257,40 +257,40 @@ void fts_prc_queue_work(struct fts_ts_data *ts_data);
 #endif
 
 /* FW upgrade */
-int fts_fwupg_init(struct fts_ts_data *ts_data);
-int fts_fwupg_exit(struct fts_ts_data *ts_data);
-int fts_fw_resume(void);
-int fts_fw_recovery(void);
-int fts_upgrade_bin(char *fw_name, bool force);
-int fts_enter_test_environment(bool test_state);
+int xiaomi_sdm439_ft8006s_fts_fwupg_init(struct fts_ts_data *ts_data);
+int xiaomi_sdm439_ft8006s_fts_fwupg_exit(struct fts_ts_data *ts_data);
+int xiaomi_sdm439_ft8006s_fts_fw_resume(void);
+int xiaomi_sdm439_ft8006s_fts_fw_recovery(void);
+int xiaomi_sdm439_ft8006s_fts_upgrade_bin(char *fw_name, bool force);
+int xiaomi_sdm439_ft8006s_fts_enter_test_environment(bool test_state);
 
 /* Other */
-int fts_reset_proc(int hdelayms);
-int fts_wait_tp_to_valid(void);
-void fts_release_all_finger(void);
-void fts_tp_state_recovery(struct fts_ts_data *ts_data);
-int fts_ex_mode_init(struct fts_ts_data *ts_data);
-int fts_ex_mode_exit(struct fts_ts_data *ts_data);
-int fts_ex_mode_recovery(struct fts_ts_data *ts_data);
+int xiaomi_sdm439_ft8006s_fts_reset_proc(int hdelayms);
+int xiaomi_sdm439_ft8006s_fts_wait_tp_to_valid(void);
+void xiaomi_sdm439_ft8006s_fts_release_all_finger(void);
+void xiaomi_sdm439_ft8006s_fts_tp_state_recovery(struct fts_ts_data *ts_data);
+int xiaomi_sdm439_ft8006s_fts_ex_mode_init(struct fts_ts_data *ts_data);
+int xiaomi_sdm439_ft8006s_fts_ex_mode_exit(struct fts_ts_data *ts_data);
+int xiaomi_sdm439_ft8006s_fts_ex_mode_recovery(struct fts_ts_data *ts_data);
 
 extern char *saved_command_line;
 
-void fts_irq_disable(void);
-void fts_irq_enable(void);
+void xiaomi_sdm439_ft8006s_fts_irq_disable(void);
+void xiaomi_sdm439_ft8006s_fts_irq_enable(void);
 
 #define FTS_VENDOR_INFO                     "[Vendor]Ebbg(TP) + Ebbg(LCD), [TP-IC]FT8006S, [FW]Ver"
 #define HQ_CTP_HWINFO_REGISTER              1
-int ctp_hw_info(struct fts_ts_data *ts_data);
-extern int fts_fwupg_get_ver_in_tp(struct fts_ts_data *ts_data, u8 *ver);
-extern bool fts_fwupg_check_fw_valid(struct fts_ts_data *ts_data);
+int xiaomi_sdm439_ft8006s_ctp_hw_info(struct fts_ts_data *ts_data);
+extern int xiaomi_sdm439_ft8006s_fts_fwupg_get_ver_in_tp(struct fts_ts_data *ts_data, u8 *ver);
+extern bool xiaomi_sdm439_ft8006s_fts_fwupg_check_fw_valid(struct fts_ts_data *ts_data);
 
-extern int fts_gesture_switch(struct input_dev *dev, unsigned int type, unsigned int code, int value);
-extern bool is_focal_tp;
-extern void lcd_call_tp_reset(int i);
+extern int xiaomi_sdm439_ft8006s_fts_gesture_switch(struct input_dev *dev, unsigned int type, unsigned int code, int value);
+extern bool xiaomi_sdm439_ft8006s_is_focal_tp;
+extern void xiaomi_sdm439_ft8006s_lcd_call_tp_reset(int i);
 #endif /* __LINUX_FOCALTECH_CORE_H__ */
 
 #define FOCAL_LOCKDOWN 1
 #if FOCAL_LOCKDOWN
-extern int focal_proc_tp_lockdown_info(void);
-extern void focal_lockdown_proc_deinit(void);
+extern int xiaomi_sdm439_ft8006s_focal_proc_tp_lockdown_info(void);
+extern void xiaomi_sdm439_ft8006s_focal_lockdown_proc_deinit(void);
 #endif

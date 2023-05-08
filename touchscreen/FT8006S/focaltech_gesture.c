@@ -108,10 +108,10 @@ static ssize_t fts_gesture_show(struct device *dev,
 {
 	int count = 0;
 	u8 val = 0;
-	struct fts_ts_data *ts_data = fts_data;
+	struct fts_ts_data *ts_data = xiaomi_sdm439_ft8006s_fts_data;
 
 	mutex_lock(&ts_data->input_dev->mutex);
-	fts_read_reg(FTS_REG_GESTURE_EN, &val);
+	xiaomi_sdm439_ft8006s_fts_read_reg(FTS_REG_GESTURE_EN, &val);
 	count = snprintf(buf, PAGE_SIZE, "Gesture Mode:%s\n",
 					 ts_data->gesture_mode ? "On" : "Off");
 	count += snprintf(buf + count, PAGE_SIZE, "Reg(0xD0)=%d\n", val);
@@ -124,7 +124,7 @@ static ssize_t fts_gesture_store(struct device *dev,
 				 struct device_attribute *attr, const char *buf,
 				 size_t count)
 {
-	struct fts_ts_data *ts_data = fts_data;
+	struct fts_ts_data *ts_data = xiaomi_sdm439_ft8006s_fts_data;
 
 	mutex_lock(&ts_data->input_dev->mutex);
 	if (FTS_SYSFS_ECHO_ON(buf)) {
@@ -144,7 +144,7 @@ static ssize_t fts_gesture_buf_show(struct device *dev,
 {
 	int count = 0;
 	int i = 0;
-	struct input_dev *input_dev = fts_data->input_dev;
+	struct input_dev *input_dev = xiaomi_sdm439_ft8006s_fts_data->input_dev;
 	struct fts_gesture_st *gesture = &fts_gesture_data;
 
 	mutex_lock(&input_dev->mutex);
@@ -276,7 +276,7 @@ static void fts_gesture_report(struct input_dev *input_dev, int gesture_id)
 }
 
 /*****************************************************************************
-* Name: fts_gesture_readdata
+* Name: xiaomi_sdm439_ft8006s_fts_gesture_readdata
 * Brief: Read information about gesture: enable flag/gesture points..., if ges-
 *        ture enable, save gesture points' information, and report to OS.
 *        It will be called this function every intrrupt when FTS_GESTURE_EN = 1
@@ -289,7 +289,7 @@ static void fts_gesture_report(struct input_dev *input_dev, int gesture_id)
 *         1 - tp not in suspend/gesture not enable in TP FW
 *         -Exx - error
 *****************************************************************************/
-int fts_gesture_readdata(struct fts_ts_data *ts_data, u8 *data)
+int xiaomi_sdm439_ft8006s_fts_gesture_readdata(struct fts_ts_data *ts_data, u8 *data)
 {
 	int ret = 0;
 	int i = 0;
@@ -336,21 +336,21 @@ int fts_gesture_readdata(struct fts_ts_data *ts_data, u8 *data)
 	return 0;
 }
 
-void fts_gesture_recovery(struct fts_ts_data *ts_data)
+void xiaomi_sdm439_ft8006s_fts_gesture_recovery(struct fts_ts_data *ts_data)
 {
 	if (ts_data->gesture_mode && ts_data->suspended) {
 		FTS_DEBUG("gesture recovery...");
-		fts_write_reg(0xD1, 0xFF);
-		fts_write_reg(0xD2, 0xFF);
-		fts_write_reg(0xD5, 0xFF);
-		fts_write_reg(0xD6, 0xFF);
-		fts_write_reg(0xD7, 0xFF);
-		fts_write_reg(0xD8, 0xFF);
-		fts_write_reg(FTS_REG_GESTURE_EN, ENABLE);
+		xiaomi_sdm439_ft8006s_fts_write_reg(0xD1, 0xFF);
+		xiaomi_sdm439_ft8006s_fts_write_reg(0xD2, 0xFF);
+		xiaomi_sdm439_ft8006s_fts_write_reg(0xD5, 0xFF);
+		xiaomi_sdm439_ft8006s_fts_write_reg(0xD6, 0xFF);
+		xiaomi_sdm439_ft8006s_fts_write_reg(0xD7, 0xFF);
+		xiaomi_sdm439_ft8006s_fts_write_reg(0xD8, 0xFF);
+		xiaomi_sdm439_ft8006s_fts_write_reg(FTS_REG_GESTURE_EN, ENABLE);
 	}
 }
 
-int fts_gesture_suspend(struct fts_ts_data *ts_data)
+int xiaomi_sdm439_ft8006s_fts_gesture_suspend(struct fts_ts_data *ts_data)
 {
 	int i = 0;
 	u8 state = 0xFF;
@@ -361,15 +361,15 @@ int fts_gesture_suspend(struct fts_ts_data *ts_data)
 	}
 
 	for (i = 0; i < 5; i++) {
-		fts_write_reg(0xD1, 0xFF);
-		fts_write_reg(0xD2, 0xFF);
-		fts_write_reg(0xD5, 0xFF);
-		fts_write_reg(0xD6, 0xFF);
-		fts_write_reg(0xD7, 0xFF);
-		fts_write_reg(0xD8, 0xFF);
-		fts_write_reg(FTS_REG_GESTURE_EN, ENABLE);
+		xiaomi_sdm439_ft8006s_fts_write_reg(0xD1, 0xFF);
+		xiaomi_sdm439_ft8006s_fts_write_reg(0xD2, 0xFF);
+		xiaomi_sdm439_ft8006s_fts_write_reg(0xD5, 0xFF);
+		xiaomi_sdm439_ft8006s_fts_write_reg(0xD6, 0xFF);
+		xiaomi_sdm439_ft8006s_fts_write_reg(0xD7, 0xFF);
+		xiaomi_sdm439_ft8006s_fts_write_reg(0xD8, 0xFF);
+		xiaomi_sdm439_ft8006s_fts_write_reg(FTS_REG_GESTURE_EN, ENABLE);
 		msleep(1);
-		fts_read_reg(FTS_REG_GESTURE_EN, &state);
+		xiaomi_sdm439_ft8006s_fts_read_reg(FTS_REG_GESTURE_EN, &state);
 		if (state == ENABLE)
 			break;
 	}
@@ -383,7 +383,7 @@ int fts_gesture_suspend(struct fts_ts_data *ts_data)
 	return 0;
 }
 
-int fts_gesture_resume(struct fts_ts_data *ts_data)
+int xiaomi_sdm439_ft8006s_fts_gesture_resume(struct fts_ts_data *ts_data)
 {
 	int i = 0;
 	u8 state = 0xFF;
@@ -393,9 +393,9 @@ int fts_gesture_resume(struct fts_ts_data *ts_data)
 		FTS_DEBUG("disable_irq_wake(irq:%d) fail", ts_data->irq);
 
 	for (i = 0; i < 5; i++) {
-		fts_write_reg(FTS_REG_GESTURE_EN, DISABLE);
+		xiaomi_sdm439_ft8006s_fts_write_reg(FTS_REG_GESTURE_EN, DISABLE);
 		msleep(1);
-		fts_read_reg(FTS_REG_GESTURE_EN, &state);
+		xiaomi_sdm439_ft8006s_fts_read_reg(FTS_REG_GESTURE_EN, &state);
 		if (state == DISABLE)
 			break;
 	}
@@ -409,28 +409,28 @@ int fts_gesture_resume(struct fts_ts_data *ts_data)
 	return 0;
 }
 
-bool fts_gesture_flag;
+bool xiaomi_sdm439_ft8006s_fts_gesture_flag;
 
-int fts_gesture_switch(struct input_dev *dev, unsigned int type, unsigned int code, int value)
+int xiaomi_sdm439_ft8006s_fts_gesture_switch(struct input_dev *dev, unsigned int type, unsigned int code, int value)
 {
-	struct fts_ts_data *ts_data = fts_data;
+	struct fts_ts_data *ts_data = xiaomi_sdm439_ft8006s_fts_data;
 	FTS_FUNC_ENTER();
 	if (type == EV_SYN && code == SYN_CONFIG) {
 		if (value == WAKEUP_OFF) {
 			ts_data->gesture_mode = DISABLE;
-			fts_gesture_flag = false;
-			FTS_INFO("gesture disabled:%d", fts_gesture_flag);
+			xiaomi_sdm439_ft8006s_fts_gesture_flag = false;
+			FTS_INFO("gesture disabled:%d", xiaomi_sdm439_ft8006s_fts_gesture_flag);
 		} else if (value == WAKEUP_ON) {
 			ts_data->gesture_mode = ENABLE;
-			fts_gesture_flag = true;
-			FTS_INFO("fts_gesture_flag:%d", fts_gesture_flag);
+			xiaomi_sdm439_ft8006s_fts_gesture_flag = true;
+			FTS_INFO("xiaomi_sdm439_ft8006s_fts_gesture_flag:%d", xiaomi_sdm439_ft8006s_fts_gesture_flag);
 		}
 	}
 	FTS_FUNC_EXIT();
 	return 0;
 }
 
-int fts_gesture_init(struct fts_ts_data *ts_data)
+int xiaomi_sdm439_ft8006s_fts_gesture_init(struct fts_ts_data *ts_data)
 {
 	struct input_dev *input_dev = ts_data->input_dev;
 
@@ -466,7 +466,7 @@ int fts_gesture_init(struct fts_ts_data *ts_data)
 	__set_bit(KEY_GESTURE_C, input_dev->keybit);
 	__set_bit(KEY_GESTURE_Z, input_dev->keybit);
 
-	input_dev->event = fts_gesture_switch;
+	input_dev->event = xiaomi_sdm439_ft8006s_fts_gesture_switch;
 	fts_create_gesture_sysfs(ts_data->dev);
 
 	memset(&fts_gesture_data, 0, sizeof(struct fts_gesture_st));
@@ -476,7 +476,7 @@ int fts_gesture_init(struct fts_ts_data *ts_data)
 	return 0;
 }
 
-int fts_gesture_exit(struct fts_ts_data *ts_data)
+int xiaomi_sdm439_ft8006s_fts_gesture_exit(struct fts_ts_data *ts_data)
 {
 	FTS_FUNC_ENTER();
 	sysfs_remove_group(&ts_data->dev->kobj, &fts_gesture_group);

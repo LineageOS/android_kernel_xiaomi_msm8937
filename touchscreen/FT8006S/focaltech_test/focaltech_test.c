@@ -42,10 +42,10 @@
 /*****************************************************************************
 * Global variable or extern global variabls/functions
 *****************************************************************************/
-struct fts_test *fts_ftest;
+struct fts_test *xiaomi_sdm439_ft8006s_fts_ftest;
 
-struct test_funcs *test_func_list[] = {
-	&test_func_ft8006sp,
+struct test_funcs *xiaomi_sdm439_ft8006s_test_func_list[] = {
+	&xiaomi_sdm439_ft8006s_test_func_ft8006sp,
 };
 
 #ifdef ITO_TEST_NORMALIZED_NODE
@@ -63,12 +63,12 @@ static u8 ito_test_status;
 /*****************************************************************************
 * functions body
 *****************************************************************************/
-void sys_delay(int ms)
+void xiaomi_sdm439_ft8006s_sys_delay(int ms)
 {
 	msleep(ms);
 }
 
-int focal_abs(int value)
+int xiaomi_sdm439_ft8006s_focal_abs(int value)
 {
 	if (value < 0)
 		value = 0 - value;
@@ -76,17 +76,17 @@ int focal_abs(int value)
 	return value;
 }
 
-void *fts_malloc(size_t size)
+void *xiaomi_sdm439_ft8006s_fts_malloc(size_t size)
 {
 	return kzalloc(size, GFP_KERNEL);
 }
 
-void fts_free_proc(void *p)
+void xiaomi_sdm439_ft8006s_fts_free_proc(void *p)
 {
 	return kfree(p);
 }
 
-void print_buffer(int *buffer, int length, int line_num)
+void xiaomi_sdm439_ft8006s_print_buffer(int *buffer, int length, int line_num)
 {
 	int i = 0;
 	int j = 0;
@@ -94,7 +94,7 @@ void print_buffer(int *buffer, int length, int line_num)
 	char *tmpbuf = NULL;
 	int tmplen = 0;
 	int cnt = 0;
-	struct fts_test *tdata = fts_ftest;
+	struct fts_test *tdata = xiaomi_sdm439_ft8006s_fts_ftest;
 
 	if (tdata && tdata->ts_data && (tdata->ts_data->log_level < 3))
 		return;
@@ -130,7 +130,7 @@ static int fts_test_bus_read(u8 *cmd, int cmdlen, u8 *data, int datalen)
 {
 	int ret = 0;
 
-	ret = fts_read(cmd, cmdlen, data, datalen);
+	ret = xiaomi_sdm439_ft8006s_fts_read(cmd, cmdlen, data, datalen);
 	if (ret < 0)
 		return ret;
 	else
@@ -141,19 +141,19 @@ static int fts_test_bus_write(u8 *writebuf, int writelen)
 {
 	int ret = 0;
 
-	ret = fts_write(writebuf, writelen);
+	ret = xiaomi_sdm439_ft8006s_fts_write(writebuf, writelen);
 	if (ret < 0)
 		return ret;
 	else
 		return 0;
 }
 
-int fts_test_read_reg(u8 addr, u8 *val)
+int xiaomi_sdm439_ft8006s_fts_test_read_reg(u8 addr, u8 *val)
 {
 	return fts_test_bus_read(&addr, 1, val, 1);
 }
 
-int fts_test_write_reg(u8 addr, u8 val)
+int xiaomi_sdm439_ft8006s_fts_test_write_reg(u8 addr, u8 val)
 {
 	int ret;
 	u8 cmd[2] = {0};
@@ -165,7 +165,7 @@ int fts_test_write_reg(u8 addr, u8 val)
 	return ret;
 }
 
-int fts_test_read(u8 addr, u8 *readbuf, int readlen)
+int xiaomi_sdm439_ft8006s_fts_test_read(u8 addr, u8 *readbuf, int readlen)
 {
 	int ret = 0;
 	int i = 0;
@@ -209,7 +209,7 @@ int fts_test_read(u8 addr, u8 *readbuf, int readlen)
 	return 0;
 }
 
-int fts_test_write(u8 addr, u8 *writebuf, int writelen)
+int xiaomi_sdm439_ft8006s_fts_test_write(u8 addr, u8 *writebuf, int writelen)
 {
 	int ret = 0;
 	int i = 0;
@@ -220,7 +220,7 @@ int fts_test_write(u8 addr, u8 *writebuf, int writelen)
 	int offset = 0;
 	int byte_num = writelen;
 
-	data = fts_malloc(BYTES_PER_TIME + 1);
+	data = xiaomi_sdm439_ft8006s_fts_malloc(BYTES_PER_TIME + 1);
 	if (!data) {
 		FTS_TEST_ERROR("malloc memory for bus write data fail");
 		return -ENOMEM;
@@ -263,7 +263,7 @@ int fts_test_write(u8 addr, u8 *writebuf, int writelen)
 /********************************************************************
  * test global function enter work/factory mode
  *******************************************************************/
-int enter_work_mode(void)
+int xiaomi_sdm439_ft8006s_enter_work_mode(void)
 {
 	int ret = 0;
 	u8 mode = 0;
@@ -272,27 +272,27 @@ int enter_work_mode(void)
 
 	FTS_TEST_FUNC_ENTER();
 
-	ret = fts_test_read_reg(DEVIDE_MODE_ADDR, &mode);
+	ret = xiaomi_sdm439_ft8006s_fts_test_read_reg(DEVIDE_MODE_ADDR, &mode);
 	if ((ret >= 0) && (0x00 == mode))
 		return 0;
 
 	for (i = 0; i < ENTER_WORK_FACTORY_RETRIES; i++) {
-		ret = fts_test_write_reg(DEVIDE_MODE_ADDR, 0x00);
+		ret = xiaomi_sdm439_ft8006s_fts_test_write_reg(DEVIDE_MODE_ADDR, 0x00);
 		if (ret >= 0) {
-			sys_delay(FACTORY_TEST_DELAY);
+			xiaomi_sdm439_ft8006s_sys_delay(FACTORY_TEST_DELAY);
 			for (j = 0; j < 20; j++) {
 				ret =
-				    fts_test_read_reg(DEVIDE_MODE_ADDR, &mode);
+				    xiaomi_sdm439_ft8006s_fts_test_read_reg(DEVIDE_MODE_ADDR, &mode);
 				if ((ret >= 0) && (0x00 == mode)) {
 					FTS_TEST_INFO
 					    ("enter work mode success");
 					return 0;
 				} else
-					sys_delay(FACTORY_TEST_DELAY);
+					xiaomi_sdm439_ft8006s_sys_delay(FACTORY_TEST_DELAY);
 			}
 		}
 
-		sys_delay(50);
+		xiaomi_sdm439_ft8006s_sys_delay(50);
 	}
 
 	if (i >= ENTER_WORK_FACTORY_RETRIES) {
@@ -304,35 +304,35 @@ int enter_work_mode(void)
 	return 0;
 }
 
-int enter_factory_mode(void)
+int xiaomi_sdm439_ft8006s_enter_factory_mode(void)
 {
 	int ret = 0;
 	u8 mode = 0;
 	int i = 0;
 	int j = 0;
 
-	ret = fts_test_read_reg(DEVIDE_MODE_ADDR, &mode);
+	ret = xiaomi_sdm439_ft8006s_fts_test_read_reg(DEVIDE_MODE_ADDR, &mode);
 	if ((ret >= 0) && (0x40 == mode))
 		return 0;
 
 	for (i = 0; i < ENTER_WORK_FACTORY_RETRIES; i++) {
-		ret = fts_test_write_reg(DEVIDE_MODE_ADDR, 0x40);
+		ret = xiaomi_sdm439_ft8006s_fts_test_write_reg(DEVIDE_MODE_ADDR, 0x40);
 		if (ret >= 0) {
-			sys_delay(FACTORY_TEST_DELAY);
+			xiaomi_sdm439_ft8006s_sys_delay(FACTORY_TEST_DELAY);
 			for (j = 0; j < 20; j++) {
 				ret =
-				    fts_test_read_reg(DEVIDE_MODE_ADDR, &mode);
+				    xiaomi_sdm439_ft8006s_fts_test_read_reg(DEVIDE_MODE_ADDR, &mode);
 				if ((ret >= 0) && (0x40 == mode)) {
 					FTS_TEST_INFO
 					    ("enter factory mode success");
-					sys_delay(200);
+					xiaomi_sdm439_ft8006s_sys_delay(200);
 					return 0;
 				} else
-					sys_delay(FACTORY_TEST_DELAY);
+					xiaomi_sdm439_ft8006s_sys_delay(FACTORY_TEST_DELAY);
 			}
 		}
 
-		sys_delay(50);
+		xiaomi_sdm439_ft8006s_sys_delay(50);
 	}
 
 	if (i >= ENTER_WORK_FACTORY_RETRIES) {
@@ -344,20 +344,20 @@ int enter_factory_mode(void)
 }
 
 /*
- * read_mass_data - read rawdata/short test data
+ * xiaomi_sdm439_ft8006s_read_mass_data - read rawdata/short test data
  * addr - register addr which read data from
  * byte_num - read data length, unit:byte
  * buf - save data
  *
  * return 0 if read data succuss, otherwise return error code
  */
-int read_mass_data(u8 addr, int byte_num, int *buf)
+int xiaomi_sdm439_ft8006s_read_mass_data(u8 addr, int byte_num, int *buf)
 {
 	int ret = 0;
 	int i = 0;
 	u8 *data = NULL;
 
-	data = (u8 *) fts_malloc(byte_num * sizeof(u8));
+	data = (u8 *) xiaomi_sdm439_ft8006s_fts_malloc(byte_num * sizeof(u8));
 	if (NULL == data) {
 		FTS_TEST_SAVE_ERR("mass data buffer malloc fail\n");
 		return -ENOMEM;
@@ -365,7 +365,7 @@ int read_mass_data(u8 addr, int byte_num, int *buf)
 
 	/* read rawdata buffer */
 	FTS_TEST_INFO("mass data len:%d", byte_num);
-	ret = fts_test_read(addr, data, byte_num);
+	ret = xiaomi_sdm439_ft8006s_fts_test_read(addr, data, byte_num);
 	if (ret < 0) {
 		FTS_TEST_SAVE_ERR("read mass data fail\n");
 		goto read_massdata_err;
@@ -380,7 +380,7 @@ read_massdata_err:
 	return ret;
 }
 
-int short_get_adcdata_incell(u8 retval, u8 ch_num, int byte_num, int *adc_buf)
+int xiaomi_sdm439_ft8006s_short_get_adcdata_incell(u8 retval, u8 ch_num, int byte_num, int *adc_buf)
 {
 	int ret = 0;
 	int times = 0;
@@ -389,16 +389,16 @@ int short_get_adcdata_incell(u8 retval, u8 ch_num, int byte_num, int *adc_buf)
 	FTS_TEST_FUNC_ENTER();
 
 	/* Start ADC sample */
-	ret = fts_test_write_reg(FACTORY_REG_SHORT_TEST_EN, 0x01);
+	ret = xiaomi_sdm439_ft8006s_fts_test_write_reg(FACTORY_REG_SHORT_TEST_EN, 0x01);
 	if (ret) {
 		FTS_TEST_SAVE_ERR("start short test fail\n");
 		goto adc_err;
 	}
 
-	sys_delay(ch_num * FACTORY_TEST_DELAY);
+	xiaomi_sdm439_ft8006s_sys_delay(ch_num * FACTORY_TEST_DELAY);
 	for (times = 0; times < FACTORY_TEST_RETRY; times++) {
 		ret =
-		    fts_test_read_reg(FACTORY_REG_SHORT_TEST_STATE,
+		    xiaomi_sdm439_ft8006s_fts_test_read_reg(FACTORY_REG_SHORT_TEST_STATE,
 				      &short_state);
 		if ((ret >= 0) && (retval == short_state))
 			break;
@@ -407,7 +407,7 @@ int short_get_adcdata_incell(u8 retval, u8 ch_num, int byte_num, int *adc_buf)
 				     FACTORY_REG_SHORT_TEST_STATE, short_state,
 				     times);
 
-		sys_delay(FACTORY_TEST_RETRY_DELAY);
+		xiaomi_sdm439_ft8006s_sys_delay(FACTORY_TEST_RETRY_DELAY);
 	}
 	if (times >= FACTORY_TEST_RETRY) {
 		FTS_TEST_SAVE_ERR("short test timeout, ADC data not OK\n");
@@ -415,7 +415,7 @@ int short_get_adcdata_incell(u8 retval, u8 ch_num, int byte_num, int *adc_buf)
 		goto adc_err;
 	}
 
-	ret = read_mass_data(FACTORY_REG_SHORT_ADDR, byte_num, adc_buf);
+	ret = xiaomi_sdm439_ft8006s_read_mass_data(FACTORY_REG_SHORT_ADDR, byte_num, adc_buf);
 	if (ret)
 		FTS_TEST_SAVE_ERR("get short(adc) data fail\n");
 
@@ -425,19 +425,19 @@ adc_err:
 }
 
 /*
- * wait_state_update - wait fw status update
+ * xiaomi_sdm439_ft8006s_wait_state_update - wait fw status update
  */
-int wait_state_update(u8 retval)
+int xiaomi_sdm439_ft8006s_wait_state_update(u8 retval)
 {
 	int ret = 0;
 	int times = 0;
 	u8 state = 0xFF;
 
 	while (times++ < FACTORY_TEST_RETRY) {
-		sys_delay(FACTORY_TEST_DELAY);
+		xiaomi_sdm439_ft8006s_sys_delay(FACTORY_TEST_DELAY);
 		/* Wait register status update */
 		state = 0xFF;
-		ret = fts_test_read_reg(FACTORY_REG_PARAM_UPDATE_STATE, &state);
+		ret = xiaomi_sdm439_ft8006s_fts_test_read_reg(FACTORY_REG_PARAM_UPDATE_STATE, &state);
 		if ((ret >= 0) && (retval == state))
 			break;
 		else
@@ -455,16 +455,16 @@ int wait_state_update(u8 retval)
 }
 
 /*
- * start_scan - start to scan a frame
+ * xiaomi_sdm439_ft8006s_start_scan - start to scan a frame
  */
-int start_scan(void)
+int xiaomi_sdm439_ft8006s_start_scan(void)
 {
 	int ret = 0;
 	u8 addr = 0;
 	u8 val = 0;
 	u8 finish_val = 0;
 	int times = 0;
-	struct fts_test *tdata = fts_ftest;
+	struct fts_test *tdata = xiaomi_sdm439_ft8006s_fts_ftest;
 
 	if ((NULL == tdata) || (NULL == tdata->func)) {
 		FTS_TEST_SAVE_ERR("test/func is null\n");
@@ -483,7 +483,7 @@ int start_scan(void)
 	}
 
 	/* write register to start scan */
-	ret = fts_test_write_reg(addr, val);
+	ret = xiaomi_sdm439_ft8006s_fts_test_write_reg(addr, val);
 	if (ret < 0) {
 		FTS_TEST_SAVE_ERR("write start scan mode fail\n");
 		return ret;
@@ -491,9 +491,9 @@ int start_scan(void)
 
 	/* Wait for the scan to complete */
 	while (times++ < FACTORY_TEST_RETRY) {
-		sys_delay(FACTORY_TEST_DELAY);
+		xiaomi_sdm439_ft8006s_sys_delay(FACTORY_TEST_DELAY);
 
-		ret = fts_test_read_reg(addr, &val);
+		ret = xiaomi_sdm439_ft8006s_fts_test_read_reg(addr, &val);
 		if ((ret >= 0) && (val == finish_val))
 			break;
 		else
@@ -514,13 +514,13 @@ static int read_rawdata(u8 off_addr,
 	int ret = 0;
 
 	/* set line addr or rawdata start addr */
-	ret = fts_test_write_reg(off_addr, off_val);
+	ret = xiaomi_sdm439_ft8006s_fts_test_write_reg(off_addr, off_val);
 	if (ret < 0) {
 		FTS_TEST_SAVE_ERR("wirte line/start addr fail\n");
 		return ret;
 	}
 
-	ret = read_mass_data(rawdata_addr, byte_num, data);
+	ret = xiaomi_sdm439_ft8006s_read_mass_data(rawdata_addr, byte_num, data);
 	if (ret < 0) {
 		FTS_TEST_SAVE_ERR("read rawdata fail\n");
 		return ret;
@@ -529,14 +529,14 @@ static int read_rawdata(u8 off_addr,
 	return 0;
 }
 
-int get_rawdata(int *data)
+int xiaomi_sdm439_ft8006s_get_rawdata(int *data)
 {
 	int ret = 0;
 	u8 val = 0;
 	u8 addr = 0;
 	u8 rawdata_addr = 0;
 	int byte_num = 0;
-	struct fts_test *tdata = fts_ftest;
+	struct fts_test *tdata = xiaomi_sdm439_ft8006s_fts_ftest;
 
 	if ((NULL == tdata) || (NULL == tdata->func)) {
 		FTS_TEST_SAVE_ERR("test/func is null\n");
@@ -544,14 +544,14 @@ int get_rawdata(int *data)
 	}
 
 	/* enter factory mode */
-	ret = enter_factory_mode();
+	ret = xiaomi_sdm439_ft8006s_enter_factory_mode();
 	if (ret < 0) {
 		FTS_TEST_SAVE_ERR("failed to enter factory mode,ret=%d\n", ret);
 		return ret;
 	}
 
 	/* start scanning */
-	ret = start_scan();
+	ret = xiaomi_sdm439_ft8006s_start_scan();
 	if (ret < 0) {
 		FTS_TEST_SAVE_ERR("scan fail\n");
 		return ret;
@@ -583,24 +583,24 @@ int get_rawdata(int *data)
 }
 
 /*
- * chip_clb - auto clb
+ * xiaomi_sdm439_ft8006s_chip_clb - auto clb
  */
-int chip_clb(void)
+int xiaomi_sdm439_ft8006s_chip_clb(void)
 {
 	int ret = 0;
 	u8 val = 0;
 	int times = 0;
 
 	/* start clb */
-	ret = fts_test_write_reg(FACTORY_REG_CLB, 0x04);
+	ret = xiaomi_sdm439_ft8006s_fts_test_write_reg(FACTORY_REG_CLB, 0x04);
 	if (ret) {
 		FTS_TEST_SAVE_ERR("write start clb fail\n");
 		return ret;
 	}
 
 	while (times++ < FACTORY_TEST_RETRY) {
-		sys_delay(FACTORY_TEST_RETRY_DELAY);
-		ret = fts_test_read_reg(FACTORY_REG_CLB, &val);
+		xiaomi_sdm439_ft8006s_sys_delay(FACTORY_TEST_RETRY_DELAY);
+		ret = xiaomi_sdm439_ft8006s_fts_test_read_reg(FACTORY_REG_CLB, &val);
 		if ((0 == ret) && (0x02 == val)) {
 			/* clb ok */
 			break;
@@ -618,9 +618,9 @@ int chip_clb(void)
 }
 
 /*
- * get_cb_incell - get cb data for incell IC
+ * xiaomi_sdm439_ft8006s_get_cb_incell - get cb data for incell IC
  */
-int get_cb_incell(u16 saddr, int byte_num, int *cb_buf)
+int xiaomi_sdm439_ft8006s_get_cb_incell(u16 saddr, int byte_num, int *cb_buf)
 {
 	int ret = 0;
 	int i = 0;
@@ -634,7 +634,7 @@ int get_cb_incell(u16 saddr, int byte_num, int *cb_buf)
 	int addr = 0;
 	u8 *data = NULL;
 
-	data = (u8 *) fts_malloc(byte_num * sizeof(u8));
+	data = (u8 *) xiaomi_sdm439_ft8006s_fts_malloc(byte_num * sizeof(u8));
 	if (NULL == data) {
 		FTS_TEST_SAVE_ERR("cb buffer malloc fail\n");
 		return -ENOMEM;
@@ -657,18 +657,18 @@ int get_cb_incell(u16 saddr, int byte_num, int *cb_buf)
 		if ((i == (packet_num - 1)) && packet_remainder)
 			read_num = packet_remainder;
 
-		ret = fts_test_write_reg(FACTORY_REG_CB_ADDR_H, addr_h);
+		ret = xiaomi_sdm439_ft8006s_fts_test_write_reg(FACTORY_REG_CB_ADDR_H, addr_h);
 		if (ret) {
 			FTS_TEST_SAVE_ERR("write cb addr high fail\n");
 			goto TEST_CB_ERR;
 		}
-		ret = fts_test_write_reg(FACTORY_REG_CB_ADDR_L, addr_l);
+		ret = xiaomi_sdm439_ft8006s_fts_test_write_reg(FACTORY_REG_CB_ADDR_L, addr_l);
 		if (ret) {
 			FTS_TEST_SAVE_ERR("write cb addr low fail\n");
 			goto TEST_CB_ERR;
 		}
 
-		ret = fts_test_read(cb_addr, data + offset, read_num);
+		ret = xiaomi_sdm439_ft8006s_fts_test_read(cb_addr, data + offset, read_num);
 		if (ret) {
 			FTS_TEST_SAVE_ERR("read cb fail\n");
 			goto TEST_CB_ERR;
@@ -683,7 +683,7 @@ TEST_CB_ERR:
 	return ret;
 }
 
-int get_cb_sc(int byte_num, int *cb_buf, enum byte_mode mode)
+int xiaomi_sdm439_ft8006s_get_cb_sc(int byte_num, int *cb_buf, enum byte_mode mode)
 {
 	int ret = 0;
 	int i = 0;
@@ -693,7 +693,7 @@ int get_cb_sc(int byte_num, int *cb_buf, enum byte_mode mode)
 	int offset = 0;
 	u8 cb_addr = 0;
 	u8 off_addr = 0;
-	struct fts_test *tdata = fts_ftest;
+	struct fts_test *tdata = xiaomi_sdm439_ft8006s_fts_ftest;
 	u8 *cb = NULL;
 
 	if ((NULL == tdata) || (NULL == tdata->func)) {
@@ -701,7 +701,7 @@ int get_cb_sc(int byte_num, int *cb_buf, enum byte_mode mode)
 		return -EINVAL;
 	}
 
-	cb = (u8 *) fts_malloc(byte_num * sizeof(u8));
+	cb = (u8 *) xiaomi_sdm439_ft8006s_fts_malloc(byte_num * sizeof(u8));
 	if (NULL == cb) {
 		FTS_TEST_SAVE_ERR("malloc memory for cb buffer fail\n");
 		return -ENOMEM;
@@ -728,13 +728,13 @@ int get_cb_sc(int byte_num, int *cb_buf, enum byte_mode mode)
 		if ((i == (packet_num - 1)) && packet_remainder)
 			read_num = packet_remainder;
 
-		ret = fts_test_write_reg(off_addr, offset);
+		ret = xiaomi_sdm439_ft8006s_fts_test_write_reg(off_addr, offset);
 		if (ret < 0) {
 			FTS_TEST_SAVE_ERR("write cb addr offset fail\n");
 			goto cb_err;
 		}
 
-		ret = fts_test_read(cb_addr, cb + offset, read_num);
+		ret = xiaomi_sdm439_ft8006s_fts_test_read(cb_addr, cb + offset, read_num);
 		if (ret < 0) {
 			FTS_TEST_SAVE_ERR("read cb fail\n");
 			goto cb_err;
@@ -757,11 +757,11 @@ cb_err:
 	return ret;
 }
 
-bool compare_data(int *data, int min, int max, int min_vk, int max_vk, bool key)
+bool xiaomi_sdm439_ft8006s_compare_data(int *data, int min, int max, int min_vk, int max_vk, bool key)
 {
 	int i = 0;
 	bool result = true;
-	struct fts_test *tdata = fts_ftest;
+	struct fts_test *tdata = xiaomi_sdm439_ft8006s_fts_ftest;
 	int rx = tdata->node.rx_num;
 	int node_va = tdata->node.node_num - tdata->node.key_num;
 
@@ -800,11 +800,11 @@ bool compare_data(int *data, int min, int max, int min_vk, int max_vk, bool key)
 	return result;
 }
 
-bool compare_array(int *data, int *min, int *max, bool key)
+bool xiaomi_sdm439_ft8006s_compare_array(int *data, int *min, int *max, bool key)
 {
 	int i = 0;
 	bool result = true;
-	struct fts_test *tdata = fts_ftest;
+	struct fts_test *tdata = xiaomi_sdm439_ft8006s_fts_ftest;
 	int rx = tdata->node.rx_num;
 	int node_num = tdata->node.node_num;
 
@@ -831,14 +831,14 @@ bool compare_array(int *data, int *min, int *max, bool key)
 }
 
 /*
- * show_data - show and save test data to testresult.txt
+ * xiaomi_sdm439_ft8006s_show_data - show and save test data to testresult.txt
  */
-void show_data(int *data, bool key)
+void xiaomi_sdm439_ft8006s_show_data(int *data, bool key)
 {
 #if TXT_SUPPORT
 	int i = 0;
 	int j = 0;
-	struct fts_test *tdata = fts_ftest;
+	struct fts_test *tdata = xiaomi_sdm439_ft8006s_fts_ftest;
 	int node_num = tdata->node.node_num;
 	int tx_num = tdata->node.tx_num;
 	int rx_num = tdata->node.rx_num;
@@ -863,14 +863,14 @@ void show_data(int *data, bool key)
 
 /* mc_sc only */
 /* Only V3 Pattern has mapping & no-mapping */
-int mapping_switch(u8 mapping)
+int xiaomi_sdm439_ft8006s_mapping_switch(u8 mapping)
 {
 	int ret = 0;
 	u8 val = 0xFF;
-	struct fts_test *tdata = fts_ftest;
+	struct fts_test *tdata = xiaomi_sdm439_ft8006s_fts_ftest;
 
 	if (tdata->v3_pattern) {
-		ret = fts_test_read_reg(FACTORY_REG_NOMAPPING, &val);
+		ret = xiaomi_sdm439_ft8006s_fts_test_read_reg(FACTORY_REG_NOMAPPING, &val);
 		if (ret < 0) {
 			FTS_TEST_ERROR("read 0x54 register fail");
 			return ret;
@@ -878,19 +878,19 @@ int mapping_switch(u8 mapping)
 
 		if (val != mapping) {
 			ret =
-			    fts_test_write_reg(FACTORY_REG_NOMAPPING, mapping);
+			    xiaomi_sdm439_ft8006s_fts_test_write_reg(FACTORY_REG_NOMAPPING, mapping);
 			if (ret < 0) {
 				FTS_TEST_ERROR("write 0x54 register fail");
 				return ret;
 			}
-			sys_delay(FACTORY_TEST_DELAY);
+			xiaomi_sdm439_ft8006s_sys_delay(FACTORY_TEST_DELAY);
 		}
 	}
 
 	return 0;
 }
 
-bool get_fw_wp(u8 wp_ch_sel, enum wp_type water_proof_type)
+bool xiaomi_sdm439_ft8006s_get_fw_wp(u8 wp_ch_sel, enum wp_type water_proof_type)
 {
 	bool fw_wp_state = false;
 
@@ -931,19 +931,19 @@ bool get_fw_wp(u8 wp_ch_sel, enum wp_type water_proof_type)
 	return fw_wp_state;
 }
 
-int get_cb_mc_sc(u8 wp, int byte_num, int *cb_buf, enum byte_mode mode)
+int xiaomi_sdm439_ft8006s_get_cb_mc_sc(u8 wp, int byte_num, int *cb_buf, enum byte_mode mode)
 {
 	int ret = 0;
 
 	/* 1:waterproof 0:non-waterproof */
-	ret = fts_test_write_reg(FACTORY_REG_MC_SC_MODE, wp);
+	ret = xiaomi_sdm439_ft8006s_fts_test_write_reg(FACTORY_REG_MC_SC_MODE, wp);
 	if (ret < 0) {
 		FTS_TEST_SAVE_ERR("get mc_sc mode fail\n");
 		return ret;
 	}
 
 	/* read cb */
-	ret = get_cb_sc(byte_num, cb_buf, mode);
+	ret = xiaomi_sdm439_ft8006s_get_cb_sc(byte_num, cb_buf, mode);
 	if (ret < 0) {
 		FTS_TEST_SAVE_ERR("get sc cb fail\n");
 		return ret;
@@ -952,14 +952,14 @@ int get_cb_mc_sc(u8 wp, int byte_num, int *cb_buf, enum byte_mode mode)
 	return 0;
 }
 
-int get_rawdata_mc_sc(enum wp_type wp, int *data)
+int xiaomi_sdm439_ft8006s_get_rawdata_mc_sc(enum wp_type wp, int *data)
 {
 	int ret = 0;
 	u8 val = 0;
 	u8 addr = 0;
 	u8 rawdata_addr = 0;
 	int byte_num = 0;
-	struct fts_test *tdata = fts_ftest;
+	struct fts_test *tdata = xiaomi_sdm439_ft8006s_fts_ftest;
 
 	if ((NULL == tdata) || (NULL == tdata->func)) {
 		FTS_TEST_SAVE_ERR("test/func is null\n");
@@ -983,7 +983,7 @@ int get_rawdata_mc_sc(enum wp_type wp, int *data)
 	return 0;
 }
 
-int get_rawdata_mc(u8 fre, u8 fir, int *rawdata)
+int xiaomi_sdm439_ft8006s_get_rawdata_mc(u8 fre, u8 fir, int *rawdata)
 {
 	int ret = 0;
 	int i = 0;
@@ -994,14 +994,14 @@ int get_rawdata_mc(u8 fre, u8 fir, int *rawdata)
 	}
 
 	/* set frequecy high/low */
-	ret = fts_test_write_reg(FACTORY_REG_FRE_LIST, fre);
+	ret = xiaomi_sdm439_ft8006s_fts_test_write_reg(FACTORY_REG_FRE_LIST, fre);
 	if (ret < 0) {
 		FTS_TEST_SAVE_ERR("set frequecy fail,ret=%d\n", ret);
 		return ret;
 	}
 
 	/* fir enable/disable */
-	ret = fts_test_write_reg(FACTORY_REG_FIR, fir);
+	ret = xiaomi_sdm439_ft8006s_fts_test_write_reg(FACTORY_REG_FIR, fir);
 	if (ret < 0) {
 		FTS_TEST_SAVE_ERR("set fir fail,ret=%d\n", ret);
 		return ret;
@@ -1010,7 +1010,7 @@ int get_rawdata_mc(u8 fre, u8 fir, int *rawdata)
 	/* get rawdata */
 	for (i = 0; i < 3; i++) {
 		/* lost 3 frames, in order to obtain stable data */
-		ret = get_rawdata(rawdata);
+		ret = xiaomi_sdm439_ft8006s_get_rawdata(rawdata);
 	}
 	if (ret < 0) {
 		FTS_TEST_SAVE_ERR("get rawdata fail,ret=%d\n", ret);
@@ -1020,7 +1020,7 @@ int get_rawdata_mc(u8 fre, u8 fir, int *rawdata)
 	return 0;
 }
 
-int short_get_adc_data_mc(u8 retval, int byte_num, int *adc_buf, u8 mode)
+int xiaomi_sdm439_ft8006s_short_get_adc_data_mc(u8 retval, int byte_num, int *adc_buf, u8 mode)
 {
 	int ret = 0;
 	int i = 0;
@@ -1028,17 +1028,17 @@ int short_get_adc_data_mc(u8 retval, int byte_num, int *adc_buf, u8 mode)
 
 	FTS_TEST_FUNC_ENTER();
 	/* select short test mode & start test */
-	ret = fts_test_write_reg(FACTROY_REG_SHORT_TEST_EN, mode);
+	ret = xiaomi_sdm439_ft8006s_fts_test_write_reg(FACTROY_REG_SHORT_TEST_EN, mode);
 	if (ret < 0) {
 		FTS_TEST_SAVE_ERR("write short test mode fail\n");
 		goto test_err;
 	}
 
 	for (i = 0; i < FACTORY_TEST_RETRY; i++) {
-		sys_delay(FACTORY_TEST_RETRY_DELAY);
+		xiaomi_sdm439_ft8006s_sys_delay(FACTORY_TEST_RETRY_DELAY);
 
 		ret =
-		    fts_test_read_reg(FACTROY_REG_SHORT_TEST_EN, &short_state);
+		    xiaomi_sdm439_ft8006s_fts_test_read_reg(FACTROY_REG_SHORT_TEST_EN, &short_state);
 		if ((ret >= 0) && (retval == short_state))
 			break;
 		else
@@ -1051,22 +1051,22 @@ int short_get_adc_data_mc(u8 retval, int byte_num, int *adc_buf, u8 mode)
 		goto test_err;
 	}
 
-	ret = read_mass_data(FACTORY_REG_SHORT_ADDR_MC, byte_num, adc_buf);
+	ret = xiaomi_sdm439_ft8006s_read_mass_data(FACTORY_REG_SHORT_ADDR_MC, byte_num, adc_buf);
 	if (ret < 0)
 		FTS_TEST_SAVE_ERR("get short(adc) data fail\n");
 
 	FTS_TEST_DBG("adc data:\n");
-	print_buffer(adc_buf, byte_num / 2, 0);
+	xiaomi_sdm439_ft8006s_print_buffer(adc_buf, byte_num / 2, 0);
 test_err:
 	FTS_TEST_FUNC_EXIT();
 	return ret;
 }
 
-bool compare_mc_sc(bool tx_check, bool rx_check, int *data, int *min, int *max)
+bool xiaomi_sdm439_ft8006s_compare_mc_sc(bool tx_check, bool rx_check, int *data, int *min, int *max)
 {
 	int i = 0;
 	bool result = true;
-	struct fts_test *tdata = fts_ftest;
+	struct fts_test *tdata = xiaomi_sdm439_ft8006s_fts_ftest;
 
 	if (rx_check) {
 		for (i = 0; i < tdata->sc_node.rx_num; i++) {
@@ -1101,10 +1101,10 @@ bool compare_mc_sc(bool tx_check, bool rx_check, int *data, int *min, int *max)
 	return result;
 }
 
-void show_data_mc_sc(int *data)
+void xiaomi_sdm439_ft8006s_show_data_mc_sc(int *data)
 {
 	int i = 0;
-	struct fts_test *tdata = fts_ftest;
+	struct fts_test *tdata = xiaomi_sdm439_ft8006s_fts_ftest;
 
 	FTS_TEST_SAVE_INFO("SCap Rx: ");
 	for (i = 0; i < tdata->sc_node.rx_num; i++)
@@ -1355,7 +1355,7 @@ static int fts_test_save_result_txt(struct fts_test *tdata)
 }
 
 /*****************************************************************************
-* Name: fts_test_save_data
+* Name: xiaomi_sdm439_ft8006s_fts_test_save_data
 * Brief: Save test data.
 *		If multi-data of MC, length of data package must be tx*rx,(tx+1)*rx
 *		If multi-data of MC-SC, length of data package should be (tx+rx)*2
@@ -1364,11 +1364,11 @@ static int fts_test_save_result_txt(struct fts_test *tdata)
 * Output:
 * Return:
 *****************************************************************************/
-void fts_test_save_data(char *name, int code, int *data, int datacnt,
+void xiaomi_sdm439_ft8006s_fts_test_save_data(char *name, int code, int *data, int datacnt,
 						bool mc_sc, bool key, bool result)
 {
 	int datalen = datacnt;
-	struct fts_test *tdata = fts_ftest;
+	struct fts_test *tdata = xiaomi_sdm439_ft8006s_fts_ftest;
 	struct fts_test_data *td = &tdata->testdata;
 	struct item_info *info = &td->info[td->item_count];
 
@@ -1398,7 +1398,7 @@ void fts_test_save_data(char *name, int code, int *data, int datacnt,
 	}
 
 	FTS_TEST_DBG("name:%s,len:%d", name, datalen);
-	info->data = fts_malloc(datalen * sizeof(int));
+	info->data = xiaomi_sdm439_ft8006s_fts_malloc(datalen * sizeof(int));
 	if (!info->data) {
 		FTS_TEST_ERROR("malloc memory for item(%d) data fail",
 			       td->item_count);
@@ -1595,9 +1595,9 @@ static int get_tx_rx_num(u8 tx_rx_reg, u8 *ch_num, u8 ch_num_max)
 	int i = 0;
 
 	for (i = 0; i < 3; i++) {
-		ret = fts_test_read_reg(tx_rx_reg, ch_num);
+		ret = xiaomi_sdm439_ft8006s_fts_test_read_reg(tx_rx_reg, ch_num);
 		if ((ret < 0) || (*ch_num > ch_num_max))
-			sys_delay(50);
+			xiaomi_sdm439_ft8006s_sys_delay(50);
 		else
 			break;
 	}
@@ -1620,7 +1620,7 @@ static int get_key_num(int *key_num_en, int max_key_num)
 		return 0;
 	}
 
-	ret = fts_test_read_reg(FACTORY_REG_LEFT_KEY, &key_en);
+	ret = xiaomi_sdm439_ft8006s_fts_test_read_reg(FACTORY_REG_LEFT_KEY, &key_en);
 	if (ret >= 0) {
 		if (key_en & 0x01)
 			(*key_num_en)++;
@@ -1632,7 +1632,7 @@ static int get_key_num(int *key_num_en, int max_key_num)
 			(*key_num_en)++;
 	}
 
-	ret = fts_test_read_reg(FACTORY_REG_RIGHT_KEY, &key_en);
+	ret = xiaomi_sdm439_ft8006s_fts_test_read_reg(FACTORY_REG_RIGHT_KEY, &key_en);
 	if (ret >= 0) {
 		if (key_en & 0x01)
 			(*key_num_en)++;
@@ -1768,27 +1768,27 @@ static int fts_test_init_basicinfo(struct fts_test *tdata)
 		return -EINVAL;
 	}
 
-	fts_test_read_reg(REG_FW_VERSION, &val);
+	xiaomi_sdm439_ft8006s_fts_test_read_reg(REG_FW_VERSION, &val);
 	tdata->fw_ver = val;
 
 	if (IC_HW_INCELL == tdata->func->hwtype) {
-		fts_test_read_reg(REG_VA_TOUCH_THR, &val);
+		xiaomi_sdm439_ft8006s_fts_test_read_reg(REG_VA_TOUCH_THR, &val);
 		tdata->va_touch_thr = val;
-		fts_test_read_reg(REG_VKEY_TOUCH_THR, &val);
+		xiaomi_sdm439_ft8006s_fts_test_read_reg(REG_VKEY_TOUCH_THR, &val);
 		tdata->vk_touch_thr = val;
 	}
 
 	/* enter factory mode */
-	ret = enter_factory_mode();
+	ret = xiaomi_sdm439_ft8006s_enter_factory_mode();
 	if (ret < 0) {
 		FTS_TEST_SAVE_ERR("enter factory mode fail\n");
 		return ret;
 	}
 
 	if (IC_HW_MC_SC == tdata->func->hwtype) {
-		fts_test_read_reg(FACTORY_REG_PATTERN, &val);
+		xiaomi_sdm439_ft8006s_fts_test_read_reg(FACTORY_REG_PATTERN, &val);
 		tdata->v3_pattern = (1 == val) ? true : false;
-		fts_test_read_reg(FACTORY_REG_NOMAPPING, &val);
+		xiaomi_sdm439_ft8006s_fts_test_read_reg(FACTORY_REG_NOMAPPING, &val);
 		tdata->mapping = val;
 	}
 
@@ -1805,7 +1805,7 @@ static int fts_test_init_basicinfo(struct fts_test *tdata)
 static int fts_test_main_init(void)
 {
 	int ret = 0;
-	struct fts_test *tdata = fts_ftest;
+	struct fts_test *tdata = xiaomi_sdm439_ft8006s_fts_ftest;
 
 	FTS_TEST_FUNC_ENTER();
 	/* Init fts_test_data to 0 before test,  */
@@ -1838,7 +1838,7 @@ static int fts_test_main_init(void)
 	tdata->buffer_length = (tdata->node.tx_num + 1) * tdata->node.rx_num;
 	tdata->buffer_length *= sizeof(int) * 2;
 	FTS_TEST_INFO("test buffer length:%d", tdata->buffer_length);
-	tdata->buffer = (int *)fts_malloc(tdata->buffer_length);
+	tdata->buffer = (int *)xiaomi_sdm439_ft8006s_fts_malloc(tdata->buffer_length);
 	if (NULL == tdata->buffer) {
 		FTS_TEST_ERROR("test buffer(%d) malloc fail",
 			       tdata->buffer_length);
@@ -1852,7 +1852,7 @@ static int fts_test_main_init(void)
 
 static int fts_test_main_exit(void)
 {
-	struct fts_test *tdata = fts_ftest;
+	struct fts_test *tdata = xiaomi_sdm439_ft8006s_fts_ftest;
 	int ret = 0;//ITO_TEST_NORMALIZED_NODE
 
 	FTS_TEST_FUNC_ENTER();
@@ -1883,7 +1883,7 @@ static int fts_test_get_testparams(char *config_name)
 {
 	int ret = 0;
 
-	ret = fts_test_get_testparam_from_ini(config_name);
+	ret = xiaomi_sdm439_ft8006s_fts_test_get_testparam_from_ini(config_name);
 
 	return ret;
 }
@@ -1891,7 +1891,7 @@ static int fts_test_get_testparams(char *config_name)
 static int fts_test_start(void)
 {
 	int testresult = 0;
-	struct fts_test *tdata = fts_ftest;
+	struct fts_test *tdata = xiaomi_sdm439_ft8006s_fts_ftest;
 
 	tdata->testdata.item_count = 0;
 	if (tdata && tdata->func && tdata->func->start_test)
@@ -1942,12 +1942,12 @@ static int fts_test_entry(char *ini_file_name)
 	ret = 0;
 test_err:
 	fts_test_main_exit();
-	enter_work_mode();
+	xiaomi_sdm439_ft8006s_enter_work_mode();
 	return ret;
 }
 
 #ifdef ITO_TEST_NORMALIZED_NODE
-u8 FTS_IS_TESTING_FLAG;
+u8 xiaomi_sdm439_ft8006s_FTS_IS_TESTING_FLAG;
 
 static ssize_t fts_ito_test_write(struct file *file, const char __user *buffer,
 	size_t count, loff_t *pos)
@@ -1966,35 +1966,35 @@ static int fts_ito_test_show(struct seq_file *file, void *data)
 	char test_result_bmp[5];
 	int i = 0;
 	int ret = 0;
-	struct input_dev *input_dev = fts_data->input_dev;
+	struct input_dev *input_dev = xiaomi_sdm439_ft8006s_fts_data->input_dev;
 
 	memset(fwname, 0, sizeof(fwname));
 	snprintf(fwname, FILE_NAME_LENGTH, "%s", buf);
 	FTS_TEST_DBG("fwname:%s.", fwname);
 
 	for (i = FTS_ENTER_FACTORY_MODE ; i <= FTS_SHORT_CIRCUIT_TEST;  i++)
-		fts_ftest->test_item[i].testresult = 0 ;
+		xiaomi_sdm439_ft8006s_fts_ftest->test_item[i].testresult = 0 ;
 
 mutex_lock(&input_dev->mutex);
-	fts_irq_disable();
+	xiaomi_sdm439_ft8006s_fts_irq_disable();
 
 #if defined(FTS_ESDCHECK_EN) && (FTS_ESDCHECK_EN)
 	fts_esdcheck_switch(DISABLE);
 #endif
 
-	ret = fts_enter_test_environment(1);
+	ret = xiaomi_sdm439_ft8006s_fts_enter_test_environment(1);
 	if (ret < 0)
 		FTS_ERROR("enter test environment fail");
 	else
 		fts_test_entry(fwname);
-	ret = fts_enter_test_environment(0);
+	ret = xiaomi_sdm439_ft8006s_fts_enter_test_environment(0);
 	if (ret < 0)
 		FTS_ERROR("enter normal environment fail");
 #if defined(FTS_ESDCHECK_EN) && (FTS_ESDCHECK_EN)
 	fts_esdcheck_switch(ENABLE);
 #endif
 
-	fts_irq_enable();
+	xiaomi_sdm439_ft8006s_fts_irq_enable();
 	mutex_unlock(&input_dev->mutex);
 	//fts_test_entry(fwname);
 
@@ -2049,7 +2049,7 @@ mutex_lock(&input_dev->mutex);
 	}
 
 	//I2C_Communication result
-	if ((fts_ftest->test_item[FTS_ENTER_FACTORY_MODE].testresult))
+	if ((xiaomi_sdm439_ft8006s_fts_ftest->test_item[FTS_ENTER_FACTORY_MODE].testresult))
 		test_result_bmp[I2C_COMMUNICATION] = 'P';
 	else {
 		seq_printf(file, "0F-1F-2F-3F-4F\n");
@@ -2057,20 +2057,20 @@ mutex_lock(&input_dev->mutex);
 	}
 
 	//Rawdata result
-	if ((fts_ftest->test_item[FTS_RAWDATA_TEST].testresult)
-		&& (fts_ftest->test_item[FTS_CB_TEST].testresult))
+	if ((xiaomi_sdm439_ft8006s_fts_ftest->test_item[FTS_RAWDATA_TEST].testresult)
+		&& (xiaomi_sdm439_ft8006s_fts_ftest->test_item[FTS_CB_TEST].testresult))
 		test_result_bmp[RAWDATA] = 'P';
 	else
 		test_result_bmp[RAWDATA] = 'F';
 
 	//open test result
-	if (fts_ftest->test_item[FTS_OPEN_TEST].testresult)
+	if (xiaomi_sdm439_ft8006s_fts_ftest->test_item[FTS_OPEN_TEST].testresult)
 		test_result_bmp[OPEN_DATA] = 'P';
     else
 		test_result_bmp[OPEN_DATA] = 'F';
 
 	//short test result
-	if (fts_ftest->test_item[FTS_SHORT_CIRCUIT_TEST].testresult)
+	if (xiaomi_sdm439_ft8006s_fts_ftest->test_item[FTS_SHORT_CIRCUIT_TEST].testresult)
 		test_result_bmp[SHORT_DATA] = 'P';
 	else
 		test_result_bmp[SHORT_DATA] = 'F';
@@ -2116,7 +2116,7 @@ static ssize_t fts_test_store(struct device *dev,
 {
 	int ret = 0;
 	char fwname[FILE_NAME_LENGTH] = { 0 };
-	struct fts_ts_data *ts_data = fts_data;
+	struct fts_ts_data *ts_data = xiaomi_sdm439_ft8006s_fts_data;
 	struct input_dev *input_dev;
 
 	if (ts_data->suspended) {
@@ -2131,25 +2131,25 @@ static ssize_t fts_test_store(struct device *dev,
 	FTS_TEST_DBG("fwname:%s.", fwname);
 
 	mutex_lock(&input_dev->mutex);
-	fts_irq_disable();
+	xiaomi_sdm439_ft8006s_fts_irq_disable();
 
 #if defined(FTS_ESDCHECK_EN) && (FTS_ESDCHECK_EN)
 	fts_esdcheck_switch(DISABLE);
 #endif
 
-	ret = fts_enter_test_environment(1);
+	ret = xiaomi_sdm439_ft8006s_fts_enter_test_environment(1);
 	if (ret < 0)
 		FTS_ERROR("enter test environment fail");
 	else
 		fts_test_entry(fwname);
-	ret = fts_enter_test_environment(0);
+	ret = xiaomi_sdm439_ft8006s_fts_enter_test_environment(0);
 	if (ret < 0)
 		FTS_ERROR("enter normal environment fail");
 #if defined(FTS_ESDCHECK_EN) && (FTS_ESDCHECK_EN)
 	fts_esdcheck_switch(ENABLE);
 #endif
 
-	fts_irq_enable();
+	xiaomi_sdm439_ft8006s_fts_irq_enable();
 	mutex_unlock(&input_dev->mutex);
 
 	return count;
@@ -2174,8 +2174,8 @@ static int fts_test_func_init(struct fts_ts_data *ts_data)
 	int i = 0;
 	int j = 0;
 	int ic_stype = ts_data->ic_info.ids.type;
-	struct test_funcs *func = test_func_list[0];
-	int func_count = sizeof(test_func_list) / sizeof(test_func_list[0]);
+	struct test_funcs *func = xiaomi_sdm439_ft8006s_test_func_list[0];
+	int func_count = sizeof(xiaomi_sdm439_ft8006s_test_func_list) / sizeof(xiaomi_sdm439_ft8006s_test_func_list[0]);
 
 	FTS_TEST_INFO("init test function");
 	if (0 == func_count) {
@@ -2183,41 +2183,41 @@ static int fts_test_func_init(struct fts_ts_data *ts_data)
 		return -ENODATA;
 	}
 
-	fts_ftest = (struct fts_test *)kzalloc(sizeof(*fts_ftest), GFP_KERNEL);
-	if (NULL == fts_ftest) {
+	xiaomi_sdm439_ft8006s_fts_ftest = (struct fts_test *)kzalloc(sizeof(*xiaomi_sdm439_ft8006s_fts_ftest), GFP_KERNEL);
+	if (NULL == xiaomi_sdm439_ft8006s_fts_ftest) {
 		FTS_TEST_ERROR("malloc memory for test fail");
 		return -ENOMEM;
 	}
 
 	for (i = 0; i < func_count; i++) {
-		func = test_func_list[i];
+		func = xiaomi_sdm439_ft8006s_test_func_list[i];
 		for (j = 0; j < FTX_MAX_COMPATIBLE_TYPE; j++) {
 			if (0 == func->ctype[j])
 				break;
 			else if (func->ctype[j] == ic_stype) {
 				FTS_TEST_INFO("match test function,type:%x",
 					      (int)func->ctype[j]);
-				fts_ftest->func = func;
+				xiaomi_sdm439_ft8006s_fts_ftest->func = func;
 			}
 		}
 	}
-	if (NULL == fts_ftest->func) {
+	if (NULL == xiaomi_sdm439_ft8006s_fts_ftest->func) {
 		FTS_TEST_ERROR("no test function match, can't test");
 		return -ENODATA;
 	}
 
-	fts_ftest->ts_data = fts_data;
+	xiaomi_sdm439_ft8006s_fts_ftest->ts_data = xiaomi_sdm439_ft8006s_fts_data;
 	return 0;
 }
 
-int fts_test_init(struct fts_ts_data *ts_data)
+int xiaomi_sdm439_ft8006s_fts_test_init(struct fts_ts_data *ts_data)
 {
 	int ret = 0;
 
 	FTS_TEST_FUNC_ENTER();
 
 #ifdef FTS_GET_TP_DIFFER
-	ret = fts_tp_differ_proc();
+	ret = xiaomi_sdm439_ft8006s_fts_tp_differ_proc();
 	if (ret) {
 		FTS_TEST_ERROR("[focal] %s() - ERROR: create fts_tp_differ proc()  failed.",  __func__);
 	}
@@ -2252,12 +2252,12 @@ int fts_test_init(struct fts_ts_data *ts_data)
 	return ret;
 }
 
-int fts_test_exit(struct fts_ts_data *ts_data)
+int xiaomi_sdm439_ft8006s_fts_test_exit(struct fts_ts_data *ts_data)
 {
 	FTS_TEST_FUNC_ENTER();
 
 	sysfs_remove_group(&ts_data->dev->kobj, &fts_test_attribute_group);
-	fts_free(fts_ftest);
+	fts_free(xiaomi_sdm439_ft8006s_fts_ftest);
 	FTS_TEST_FUNC_EXIT();
 	return 0;
 }
@@ -2269,15 +2269,15 @@ int fts_test_exit(struct fts_ts_data *ts_data)
 static int my_test_result;
 static int my_test_type;
 
-bool fts_selftest_start(int temp)
+bool xiaomi_sdm439_ft8006s_fts_selftest_start(int temp)
 {
 	bool testresult = false;
 
 	FTS_TEST_FUNC_ENTER();
 
-	testresult = start_selftest(temp);
+	testresult = xiaomi_sdm439_ft8006s_start_selftest(temp);
 
-	enter_work_mode();
+	xiaomi_sdm439_ft8006s_enter_work_mode();
 
 	FTS_TEST_FUNC_EXIT();
 
@@ -2307,7 +2307,7 @@ static int fts_selftest_enry(char *ini_file_name, int temp)
 
 	ito_test_status = 1;//ITO_TEST_NORMALIZED_NODE
 	/* Start testing according to the test configuration */
-	if (true == fts_selftest_start(temp)) {
+	if (true == xiaomi_sdm439_ft8006s_fts_selftest_start(temp)) {
 		FTS_TEST_SAVE_INFO("\n\n=======Tp test pass.\n");
 		my_test_result = 2;//ITO_TEST_NORMALIZED_NODE
 	} else {
@@ -2319,7 +2319,7 @@ static int fts_selftest_enry(char *ini_file_name, int temp)
 	ret = 0;
 test_err:
 	fts_test_main_exit();
-	enter_work_mode();
+	xiaomi_sdm439_ft8006s_enter_work_mode();
 	return ret;
 
 	FTS_TEST_FUNC_EXIT();
@@ -2332,7 +2332,7 @@ static ssize_t fts_tp_selftest_write(struct file *file, const char __user *buffe
 	int ret = 0;
 	char tmp[6] = {0};
 	char fwname[FILE_NAME_LENGTH] = "Conf_MultipleTest.ini";
-	struct fts_ts_data *ts_data = fts_data;
+	struct fts_ts_data *ts_data = xiaomi_sdm439_ft8006s_fts_data;
 	struct input_dev *input_dev;
 	my_test_result = 0;
 
@@ -2352,7 +2352,7 @@ static ssize_t fts_tp_selftest_write(struct file *file, const char __user *buffe
 	fwname[strlen(fwname) + 1] = '\0';
 	FTS_TEST_DBG("fwname:%s.", fwname);
 	if (memcmp(tmp, "i2c", 3) == 0) {
-		ret = fts_get_ic_information(ts_data);
+		ret = xiaomi_sdm439_ft8006s_fts_get_ic_information(ts_data);
 		if (ret)
 			my_test_result = 1;
 		else
@@ -2365,25 +2365,25 @@ static ssize_t fts_tp_selftest_write(struct file *file, const char __user *buffe
 			my_test_type = TEST_OPEN;
 
 	mutex_lock(&input_dev->mutex);
-	fts_irq_disable();
+	xiaomi_sdm439_ft8006s_fts_irq_disable();
 
 #if defined(FTS_ESDCHECK_EN) && (FTS_ESDCHECK_EN)
 	fts_esdcheck_switch(DISABLE);
 #endif
 
-	ret = fts_enter_test_environment(1);
+	ret = xiaomi_sdm439_ft8006s_fts_enter_test_environment(1);
 	if (ret < 0)
 		FTS_ERROR("enter test environment fail");
 	else
 		fts_selftest_enry(fwname, my_test_type);
-	ret = fts_enter_test_environment(0);
+	ret = xiaomi_sdm439_ft8006s_fts_enter_test_environment(0);
 	if (ret < 0)
 		FTS_ERROR("enter normal environment fail");
 #if defined(FTS_ESDCHECK_EN) && (FTS_ESDCHECK_EN)
 	fts_esdcheck_switch(ENABLE);
 #endif
 
-	fts_irq_enable();
+	xiaomi_sdm439_ft8006s_fts_irq_enable();
 	mutex_unlock(&input_dev->mutex);
 	}
 	return count;
@@ -2423,7 +2423,7 @@ static const struct file_operations tp_selftest_ops = {
 #define FTS_PROC_TP_SELFTEST "tp_selftest"
 static struct proc_dir_entry *tp_selftest;
 
-int fts_tp_selftest_proc(void)
+int xiaomi_sdm439_ft8006s_fts_tp_selftest_proc(void)
 {
 	int ret = 0;
 

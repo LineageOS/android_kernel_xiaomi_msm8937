@@ -172,7 +172,7 @@ struct upgrade_setting_nf {
 struct upgrade_module {
 	int id;
 	char vendor_name[MAX_MODULE_VENDOR_NAME_LEN];
-	u8 *fw_file;
+	u8 *xiaomi_sdm439_ft8006s_fw_file;
 	u32 fw_len;
 };
 
@@ -189,8 +189,8 @@ struct fts_upgrade {
 	u32 lic_length;
 };
 
-int fts_fwupg_get_ver_in_tp(struct fts_ts_data *ts_data, u8 *ver);
-bool fts_fwupg_check_fw_valid(struct fts_ts_data *ts_data);
+int xiaomi_sdm439_ft8006s_fts_fwupg_get_ver_in_tp(struct fts_ts_data *ts_data, u8 *ver);
+bool xiaomi_sdm439_ft8006s_fts_fwupg_check_fw_valid(struct fts_ts_data *ts_data);
 /*****************************************************************************
 * Global variable or extern global variabls/functions
 *****************************************************************************/

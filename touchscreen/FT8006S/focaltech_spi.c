@@ -73,7 +73,7 @@
 static int fts_spi_transfer(u8 *tx_buf, u8 *rx_buf, u32 len)
 {
 	int ret = 0;
-	struct spi_device *spi = fts_data->spi;
+	struct spi_device *spi = xiaomi_sdm439_ft8006s_fts_data->spi;
 	struct spi_message msg;
 	struct spi_transfer xfer = {
 		.tx_buf = tx_buf,
@@ -125,11 +125,11 @@ static int rdata_check(u8 *rdata, u32 rlen)
 	return 0;
 }
 
-int fts_write(u8 *writebuf, u32 writelen)
+int xiaomi_sdm439_ft8006s_fts_write(u8 *writebuf, u32 writelen)
 {
 	int ret = 0;
 	int i = 0;
-	struct fts_ts_data *ts_data = fts_data;
+	struct fts_ts_data *ts_data = xiaomi_sdm439_ft8006s_fts_data;
 	u8 *txbuf = NULL;
 	u8 *rxbuf = NULL;
 	u32 txlen = 0;
@@ -203,20 +203,20 @@ err_write:
 	return ret;
 }
 
-int fts_write_reg(u8 addr, u8 value)
+int xiaomi_sdm439_ft8006s_fts_write_reg(u8 addr, u8 value)
 {
 	u8 writebuf[2] = { 0 };
 
 	writebuf[0] = addr;
 	writebuf[1] = value;
-	return fts_write(writebuf, 2);
+	return xiaomi_sdm439_ft8006s_fts_write(writebuf, 2);
 }
 
-int fts_read(u8 *cmd, u32 cmdlen, u8 *data, u32 datalen)
+int xiaomi_sdm439_ft8006s_fts_read(u8 *cmd, u32 cmdlen, u8 *data, u32 datalen)
 {
 	int ret = 0;
 	int i = 0;
-	struct fts_ts_data *ts_data = fts_data;
+	struct fts_ts_data *ts_data = xiaomi_sdm439_ft8006s_fts_data;
 	u8 *txbuf = NULL;
 	u8 *rxbuf = NULL;
 	u32 txlen = 0;
@@ -301,12 +301,12 @@ err_read:
 	return ret;
 }
 
-int fts_read_reg(u8 addr, u8 *value)
+int xiaomi_sdm439_ft8006s_fts_read_reg(u8 addr, u8 *value)
 {
-	return fts_read(&addr, 1, value, 1);
+	return xiaomi_sdm439_ft8006s_fts_read(&addr, 1, value, 1);
 }
 
-int fts_bus_init(struct fts_ts_data *ts_data)
+int xiaomi_sdm439_ft8006s_fts_bus_init(struct fts_ts_data *ts_data)
 {
 	FTS_FUNC_ENTER();
 	ts_data->bus_tx_buf = kzalloc(SPI_BUF_LENGTH, GFP_KERNEL);
@@ -326,7 +326,7 @@ int fts_bus_init(struct fts_ts_data *ts_data)
 	return 0;
 }
 
-int fts_bus_exit(struct fts_ts_data *ts_data)
+int xiaomi_sdm439_ft8006s_fts_bus_exit(struct fts_ts_data *ts_data)
 {
 	FTS_FUNC_ENTER();
 	if (ts_data && ts_data->bus_tx_buf) {
