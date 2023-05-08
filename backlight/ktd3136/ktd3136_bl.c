@@ -1021,14 +1021,8 @@ static int ktd3137_probe(struct i2c_client *client,
 	struct ktd3137_bl_pdata *pdata = dev_get_drvdata(&client->dev);
 	struct ktd3137_chip *chip;
 	//struct device_node *np = client->dev.of_node;
-	extern char *saved_command_line;
-	int bkl_id = 0;
-	char *bkl_ptr = (char *)strnstr(saved_command_line, ":bklic=", strlen(saved_command_line));
-	bkl_ptr += strlen(":bklic=");
-	bkl_id = simple_strtol(bkl_ptr, NULL, 10);
-	if (bkl_id != 24) {
+	if (xiaomi_sdm439_backlight_ic_type_get() != XIAOMI_SDM439_BACKLIGHT_IC_KTD3136)
 		return -ENODEV;
-	}
 	client->addr = 0x36;
 	LOG_DBG("probe start!\n");
 	if (!pdata) {

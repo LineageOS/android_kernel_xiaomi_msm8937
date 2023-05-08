@@ -9,4 +9,19 @@ enum xiaomi_sdm439_backlight_hbm_mode {
 	XIAOMI_SDM439_HBM_MODE_LEVEL_MAX
 };
 
+enum xiaomi_sdm439_backlight_ic_types {
+	XIAOMI_SDM439_BACKLIGHT_IC_UNKNOWN,
+	XIAOMI_SDM439_BACKLIGHT_IC_LM3697,
+	XIAOMI_SDM439_BACKLIGHT_IC_KTD3136,
+};
+
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+extern enum xiaomi_sdm439_backlight_ic_types xiaomi_sdm439_backlight_ic_type_get(void);
+#else
+static inline enum xiaomi_sdm439_backlight_ic_types xiaomi_sdm439_backlight_ic_type_get(void)
+{
+	return XIAOMI_SDM439_BACKLIGHT_IC_UNKNOWN;
+}
+#endif
+
 #endif

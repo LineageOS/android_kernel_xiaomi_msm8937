@@ -24,6 +24,7 @@
 #include <linux/of_device.h>
 #include <linux/of_gpio.h>
 #include <linux/slab.h>
+#include <xiaomi-sdm439/backlight.h>
 
 struct ti_lmu_data {
 	struct mfd_cell *cells;
@@ -207,14 +208,8 @@ static int ti_lmu_probe(struct i2c_client *cl, const struct i2c_device_id *id)
 	struct regmap_config regmap_cfg;
 	struct ti_lmu *lmu;
 	int ret;
-	extern char *saved_command_line;
-	int bkl_id = 0;
-	char *bkl_ptr = (char *)strnstr(saved_command_line, ":bklic=", strlen(saved_command_line));
-	bkl_ptr += strlen(":bklic=");
-	bkl_id = simple_strtol(bkl_ptr, NULL, 10);
-	if (bkl_id != 1) {
+	if (xiaomi_sdm439_backlight_ic_type_get() != XIAOMI_SDM439_BACKLIGHT_IC_LM3697)
 		return -ENODEV;
-	}
 	pr_err("[bkl] %s enter\n", __func__);
 	match = of_match_device(ti_lmu_of_match, dev);
 	if (!match)
