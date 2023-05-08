@@ -21,6 +21,9 @@
 #include <linux/slab.h>
 #include <linux/pmic-voter.h>
 #include <linux/workqueue.h>
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+#include <xiaomi-sdm439/mach.h>
+#endif
 #include "battery.h"
 
 #define DRV_MAJOR_VERSION	1
@@ -1243,6 +1246,11 @@ static int pl_fv_vote_callback(struct votable *votable, void *data,
 	 * check for termination at reduced float voltage and re-trigger
 	 * charging if new float voltage is above last FV.
 	 */
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+	if (xiaomi_sdm439_mach_get())
+		pr_debug("%s: Skip some codes for Xiaomi SDM439");
+	else
+#endif
 	if ((chip->float_voltage_uv < fv_uv) && is_batt_available(chip)) {
 		rc = power_supply_get_property(chip->batt_psy,
 				POWER_SUPPLY_PROP_STATUS, &pval);
@@ -1262,6 +1270,11 @@ static int pl_fv_vote_callback(struct votable *votable, void *data,
 		}
 	}
 
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+	if (xiaomi_sdm439_mach_get())
+		pr_debug("%s: Skip setting chip->float_voltage_uv for Xiaomi SDM439");
+	else
+#endif
 	chip->float_voltage_uv = fv_uv;
 
 	return 0;

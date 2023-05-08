@@ -20,6 +20,9 @@
 #include <linux/iio/consumer.h>
 #include <linux/pmic-voter.h>
 #include <linux/usb/typec.h>
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+#include <xiaomi-sdm439/mach.h>
+#endif
 #include "smb5-reg.h"
 #include "smb5-lib.h"
 #include "schgm-flash.h"
@@ -298,7 +301,8 @@ static const struct clamp_config clamp_levels[] = {
 	{ {0x11C6, 0x11F9, 0x13F1}, {0x60, 0x2B, 0x9C} },
 };
 
-#define PMI632_MAX_ICL_UA	3000000
+static int pmi632_max_icl_ua = 3000000;
+#define PMI632_MAX_ICL_UA	pmi632_max_icl_ua
 #define PM6150_MAX_FCC_UA	3000000
 static int smb5_chg_config_init(struct smb5 *chip)
 {
@@ -372,6 +376,10 @@ static int smb5_chg_config_init(struct smb5 *chip)
 	}
 
 	chg->chg_freq.freq_5V			= 600;
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+	if (xiaomi_sdm439_mach_get())
+		chg->chg_freq.freq_5V = 1050;
+#endif
 	chg->chg_freq.freq_6V_8V		= 800;
 	chg->chg_freq.freq_9V			= 1050;
 	chg->chg_freq.freq_12V                  = 1200;
@@ -471,6 +479,17 @@ static int smb5_parse_dt_misc(struct smb5 *chip, struct device_node *node)
 
 	chg->lpd_disabled = chg->lpd_disabled ||
 			of_property_read_bool(node, "qcom,lpd-disable");
+
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+	if (xiaomi_sdm439_mach_get()) {
+		if (!chg->sw_jeita_enabled) {
+		chg->xiaomi_sdm439_hw_jeita_enabled = of_property_read_bool(node,
+					"qcom,hw-jeita-enable");
+		}
+		pr_info("sw_jeita_enable = %d, hw_jeita_enable = %d",
+				chg->sw_jeita_enabled, chg->xiaomi_sdm439_hw_jeita_enabled);
+	}
+#endif
 
 	rc = of_property_read_u32(node, "qcom,wd-bark-time-secs",
 					&chip->dt.wd_bark_time);
@@ -891,6 +910,7 @@ static enum power_supply_property smb5_usb_props[] = {
 	POWER_SUPPLY_PROP_APSD_TIMEOUT,
 	POWER_SUPPLY_PROP_CHARGER_STATUS,
 	POWER_SUPPLY_PROP_INPUT_VOLTAGE_SETTLED,
+	POWER_SUPPLY_PROP_HVDCP_TYPE3,
 };
 
 static int smb5_usb_get_prop(struct power_supply *psy,
@@ -933,6 +953,10 @@ static int smb5_usb_get_prop(struct power_supply *psy,
 		break;
 	case POWER_SUPPLY_PROP_TYPE:
 		val->intval = POWER_SUPPLY_TYPE_USB_PD;
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+		if (xiaomi_sdm439_mach_get_family() == CONFIG_MACH_FAMILY_XIAOMI_OLIVE)
+			val->intval = chg->real_charger_type;
+#endif
 		break;
 	case POWER_SUPPLY_PROP_REAL_TYPE:
 		val->intval = chg->real_charger_type;
@@ -1059,6 +1083,18 @@ static int smb5_usb_get_prop(struct power_supply *psy,
 				val->intval = (buff[1] << 8 | buff[0]) * 1038;
 		}
 		break;
+	case POWER_SUPPLY_PROP_HVDCP_TYPE3:
+		val->intval = 0;
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+		if (xiaomi_sdm439_mach_get()) {
+			if (chg->real_charger_type == POWER_SUPPLY_TYPE_USB_HVDCP
+				|| chg->real_charger_type == POWER_SUPPLY_TYPE_USB_HVDCP_3)
+				val->intval = 1;
+			else
+				val->intval = 0;
+		}
+#endif
+		break;
 	default:
 		pr_err("get prop %d is not supported in usb\n", psp);
 		rc = -EINVAL;
@@ -1153,6 +1189,12 @@ static int smb5_usb_set_prop(struct power_supply *psy,
 		chg->apsd_ext_timeout = false;
 		smblib_rerun_apsd(chg);
 		break;
+	case POWER_SUPPLY_PROP_REAL_TYPE:
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+		if (xiaomi_sdm439_mach_get())
+			chg->real_charger_type = val->intval;
+		break;
+#endif
 	default:
 		pr_err("set prop %d is not supported\n", psp);
 		rc = -EINVAL;
@@ -1738,6 +1780,7 @@ static enum power_supply_property smb5_batt_props[] = {
 	POWER_SUPPLY_PROP_CHARGE_FULL_DESIGN,
 	POWER_SUPPLY_PROP_TIME_TO_FULL_NOW,
 	POWER_SUPPLY_PROP_FCC_STEPPER_ENABLE,
+	POWER_SUPPLY_PROP_FVCOMP,
 };
 
 #define DEBUG_ACCESSORY_TEMP_DECIDEGC	250
@@ -1829,6 +1872,10 @@ static int smb5_batt_get_prop(struct power_supply *psy,
 		break;
 	case POWER_SUPPLY_PROP_TECHNOLOGY:
 		val->intval = POWER_SUPPLY_TECHNOLOGY_LION;
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+		if (xiaomi_sdm439_mach_get())
+			val->intval = POWER_SUPPLY_TECHNOLOGY_LIPO;
+#endif
 		break;
 	case POWER_SUPPLY_PROP_CHARGE_DONE:
 		rc = smblib_get_prop_batt_charge_done(chg, val);
@@ -1880,6 +1927,18 @@ static int smb5_batt_get_prop(struct power_supply *psy,
 		val->intval = 0;
 		break;
 	case POWER_SUPPLY_PROP_CHARGE_FULL_DESIGN:
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+		switch (xiaomi_sdm439_mach_get_family()) {
+			case XIAOMI_SDM439_MACH_FAMILY_PINE:
+				val->intval = 4000000;
+				return 0;
+			case XIAOMI_SDM439_MACH_FAMILY_OLIVE:
+				val->intval = 5000000;
+				return 0;
+			default:
+				break;
+		}
+#endif
 		rc = smblib_get_prop_from_bms(chg,
 				POWER_SUPPLY_PROP_CHARGE_FULL_DESIGN, val);
 		break;
@@ -1889,6 +1948,9 @@ static int smb5_batt_get_prop(struct power_supply *psy,
 		break;
 	case POWER_SUPPLY_PROP_FCC_STEPPER_ENABLE:
 		val->intval = chg->fcc_stepper_enable;
+		break;
+	case POWER_SUPPLY_PROP_FVCOMP:
+		val->intval = 0;
 		break;
 	default:
 		pr_err("batt power supply prop %d not supported\n", psp);
@@ -1997,6 +2059,12 @@ static int smb5_batt_set_prop(struct power_supply *psy,
 	case POWER_SUPPLY_PROP_FCC_STEPPER_ENABLE:
 		chg->fcc_stepper_enable = val->intval;
 		break;
+	case POWER_SUPPLY_PROP_FVCOMP:
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+		if (xiaomi_sdm439_mach_get())
+			rc = smblib_write(chg, XIAOMI_SDM439_JEITA_FVCOMP_CFG_HOT_REG, val->intval);
+#endif
+		break;
 	default:
 		rc = -EINVAL;
 	}
@@ -2018,6 +2086,7 @@ static int smb5_batt_prop_is_writeable(struct power_supply *psy,
 	case POWER_SUPPLY_PROP_INPUT_CURRENT_LIMITED:
 	case POWER_SUPPLY_PROP_STEP_CHARGING_ENABLED:
 	case POWER_SUPPLY_PROP_DIE_HEALTH:
+	case POWER_SUPPLY_PROP_CONSTANT_CHARGE_CURRENT_MAX:
 		return 1;
 	default:
 		break;
@@ -2461,6 +2530,13 @@ static int smb5_configure_mitigation(struct smb_charger *chg)
 		}
 	}
 
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+	if (xiaomi_sdm439_mach_get())
+	rc = smblib_masked_write(chg, MISC_THERMREG_SRC_CFG_REG,
+			THERMREG_DIE_ADC_SRC_EN_BIT
+			| THERMREG_DIE_CMP_SRC_EN_BIT, src_cfg);
+	else
+#endif
 	rc = smblib_masked_write(chg, MISC_THERMREG_SRC_CFG_REG,
 		THERMREG_SW_ICL_ADJUST_BIT | THERMREG_DIE_ADC_SRC_EN_BIT |
 		THERMREG_DIE_CMP_SRC_EN_BIT | THERMREG_SKIN_ADC_SRC_EN_BIT |
@@ -2671,6 +2747,52 @@ static int smb5_init_connector_type(struct smb_charger *chg)
 
 }
 
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+static int xiaomi_sdm439_smb5_init_hw_jeita(struct smb_charger *chg)
+{
+	int rc = 0;
+
+	rc = smblib_write(chg, XIAOMI_SDM439_JEITA_FVCOMP_CFG_COLD_REG, XIAOMI_SDM439_COOL_FV_4400MV);
+	if (rc < 0) {
+		dev_err(chg->dev, "%s:Couldn't configure XIAOMI_SDM439_JEITA_FVCOMP_CFG_COLD_REG rc=%d\n",
+			__func__, rc);
+	}
+
+	rc = smblib_write(chg, XIAOMI_SDM439_JEITA_FVCOMP_CFG_HOT_REG, XIAOMI_SDM439_HOT_FV_4100MV);
+	if (rc < 0) {
+		dev_err(chg->dev, "%s:Couldn't configure XIAOMI_SDM439_JEITA_FVCOMP_CFG_HOT_REG rc=%d\n",
+			__func__, rc);
+	}
+
+	if (xiaomi_sdm439_mach_get_family() == XIAOMI_SDM439_MACH_FAMILY_PINE) {
+		rc = smblib_write(chg, JEITA_CCCOMP_CFG_HOT_REG, XIAOMI_SDM439_HOT_ICL_1000MA);
+		if (rc < 0) {
+			dev_err(chg->dev, "%s:Couldn't configure XIAOMI_SDM439_JEITA_FVCOMP_CFG_COLD_REG rc=%d\n",
+				__func__, rc);
+		}
+
+		rc = smblib_write(chg, JEITA_CCCOMP_CFG_COLD_REG, XIAOMI_SDM439_COOL_ICL_1950MA);
+		if (rc < 0) {
+			dev_err(chg->dev, "%s:Couldn't configure XIAOMI_SDM439_JEITA_FVCOMP_CFG_HOT_REG rc=%d\n",
+				__func__, rc);
+		}
+	} else {
+		rc = smblib_write(chg, JEITA_CCCOMP_CFG_HOT_REG, XIAOMI_SDM439_HOT_ICL_OLIVE_2450MA);
+		if (rc < 0) {
+			dev_err(chg->dev, "%s:Couldn't configure XIAOMI_SDM439_JEITA_FVCOMP_CFG_COLD_REG rc=%d\n",
+				__func__, rc);
+		}
+
+		rc = smblib_write(chg, JEITA_CCCOMP_CFG_COLD_REG, XIAOMI_SDM439_COOL_ICL_OLIVE_2950MA);
+		if (rc < 0) {
+			dev_err(chg->dev, "%s:Couldn't configure XIAOMI_SDM439_JEITA_FVCOMP_CFG_HOT_REG rc=%d\n",
+				__func__, rc);
+		}
+	}
+	return rc;
+}
+#endif
+
 static int smb5_init_hw(struct smb5 *chip)
 {
 	struct smb_charger *chg = &chip->chg;
@@ -2828,6 +2950,19 @@ static int smb5_init_hw(struct smb5 *chip)
 		return rc;
 	}
 
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+	if (xiaomi_sdm439_mach_get()) {
+		rc = smblib_masked_write(chg, USBIN_AICL_OPTIONS_CFG_REG,
+				USBIN_AICL_ADC_EN_BIT |
+				XIAOMI_SDM439_USBIN_AICL_START_AT_MAX_BIT |
+				XIAOMI_SDM439_SUSPEND_ON_COLLAPSE_USBIN_BIT, 0);
+		if (rc < 0) {
+			dev_err(chg->dev, "Couldn't config AICL rc=%d\n", rc);
+			return rc;
+		}
+	}
+#endif
+
 	/* enable the charging path */
 	rc = vote(chg->chg_disable_votable, DEFAULT_VOTER, false, 0);
 	if (rc < 0) {
@@ -2963,6 +3098,33 @@ static int smb5_init_hw(struct smb5 *chip)
 			return rc;
 		}
 	}
+
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+	if (xiaomi_sdm439_mach_get()) {
+		if (chg->xiaomi_sdm439_hw_jeita_enabled) {
+			rc = xiaomi_sdm439_smb5_init_hw_jeita(chg);
+			if (rc < 0) {
+				dev_err(chg->dev, "smb5 init hw jeita fail rc=%d\n",
+						rc);
+			}
+		}
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_OLIVE)
+		if (xiaomi_sdm439_mach_get_family() == XIAOMI_SDM439_MACH_FAMILY_OLIVE) {
+			rc = smblib_write(chg, XIAOMI_SDM439_USBIN_9V_AICL_THRESHOLD_REG, 0x5);
+			if (rc < 0) {
+				dev_err(chg->dev, "Couldn't configure XIAOMI_SDM439_USBIN_9V_AICL_THRESHOLD_REG rc=%d\n",
+					rc);
+				return rc;
+			}
+		}
+#endif
+
+		rc = smblib_write(chg, 0x1342, 0x1);
+		if (rc < 0) {
+			dev_err(chg->dev, "Couldn't config 0x1342 to 0x1 rc=%d\n", rc);
+		}
+	}
+#endif
 
 	return rc;
 }
@@ -3556,6 +3718,14 @@ static int smb5_probe(struct platform_device *pdev)
 	struct smb_charger *chg;
 	int rc = 0;
 
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+	if (xiaomi_sdm439_mach_get()) {
+		pmi632_max_icl_ua = 2000000;
+		override_smb5_lib_h_values_for_xiaomi_sdm439();
+		override_smb5_reg_h_values_for_xiaomi_sdm439();
+	}
+#endif
+
 	chip = devm_kzalloc(&pdev->dev, sizeof(*chip), GFP_KERNEL);
 	if (!chip)
 		return -ENOMEM;
@@ -3572,6 +3742,10 @@ static int smb5_probe(struct platform_device *pdev)
 	chg->otg_present = false;
 	chg->main_fcc_max = -EINVAL;
 	mutex_init(&chg->adc_lock);
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+	if (xiaomi_sdm439_mach_get())
+		mutex_init(&chg->xiaomi_sdm439_cool_current);
+#endif
 
 	chg->regmap = dev_get_regmap(chg->dev->parent, NULL);
 	if (!chg->regmap) {

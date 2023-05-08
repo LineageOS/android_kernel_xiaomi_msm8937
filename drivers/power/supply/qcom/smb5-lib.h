@@ -15,6 +15,14 @@
 #include <linux/regulator/consumer.h>
 #include <linux/extcon-provider.h>
 #include <linux/usb/typec.h>
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+#include <xiaomi-sdm439/mach.h>
+#endif
+#include <linux/extcon.h>
+#include <linux/alarmtimer.h>
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+#include <xiaomi-sdm439/mach.h>
+#endif
 #include "storm-watch.h"
 #include "battery.h"
 
@@ -94,16 +102,53 @@ enum print_reason {
 
 #define SDP_100_MA			100000
 #define SDP_CURRENT_UA			500000
-#define CDP_CURRENT_UA			1500000
-#define DCP_CURRENT_UA			1500000
-#define HVDCP_CURRENT_UA		3000000
+
+static int cdp_current_ua = 1500000;
+#define CDP_CURRENT_UA			cdp_current_ua
+
+static int dcp_current_ua = 1500000;
+#define DCP_CURRENT_UA			dcp_current_ua
+
+static int hvdcp_current_ua = 3000000;
+#define HVDCP_CURRENT_UA		hvdcp_current_ua
+
 #define TYPEC_DEFAULT_CURRENT_UA	900000
 #define TYPEC_MEDIUM_CURRENT_UA		1500000
-#define TYPEC_HIGH_CURRENT_UA		3000000
+static int typec_high_current_ua = 3000000;
+#define TYPEC_HIGH_CURRENT_UA		typec_high_current_ua
 #define DCIN_ICL_MIN_UA			100000
 #define DCIN_ICL_MAX_UA			1500000
 #define DCIN_ICL_STEP_UA		100000
 #define ROLE_REVERSAL_DELAY_MS		500
+
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+#define XIAOMI_SDM439_SMBCHG_UPDATE_MS		1000
+#define XIAOMI_SDM439_DCP_CURRENT_UA_PINE_IDN		1000000
+#define XIAOMI_SDM439_DCP_CURRENT_UA_PINE_LIMIT		1300000
+#endif
+
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+static void override_smb5_lib_h_values_for_xiaomi_sdm439(void) {
+	if (!xiaomi_sdm439_mach_get())
+		return;
+
+	CDP_CURRENT_UA = 1000000;
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_PINE)
+	if (xiaomi_sdm439_mach_get_family() == XIAOMI_SDM439_MACH_FAMILY_PINE) {
+		DCP_CURRENT_UA = 2000000;
+		HVDCP_CURRENT_UA = 2000000;
+		TYPEC_HIGH_CURRENT_UA = 2000000;
+	}
+#endif
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_OLIVE)
+	if (xiaomi_sdm439_mach_get_family() == XIAOMI_SDM439_MACH_FAMILY_OLIVE) {
+		DCP_CURRENT_UA = 3000000;
+		HVDCP_CURRENT_UA = 3000000;
+		TYPEC_HIGH_CURRENT_UA = 3000000;
+	}
+#endif
+}
+#endif
 
 enum smb_mode {
 	PARALLEL_MASTER = 0,
@@ -398,6 +443,9 @@ struct smb_charger {
 	struct mutex		adc_lock;
 	struct mutex		dpdm_lock;
 	struct mutex		typec_lock;
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+	struct mutex		xiaomi_sdm439_cool_current;
+#endif
 
 	/* power supplies */
 	struct power_supply		*batt_psy;
@@ -471,6 +519,13 @@ struct smb_charger {
 	struct delayed_work	pr_swap_detach_work;
 	struct delayed_work	pr_lock_clear_work;
 	struct delayed_work	role_reversal_check;
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+	struct delayed_work	xiaomi_sdm439_cool_limit_work;
+	struct delayed_work	xiaomi_sdm439_arb_monitor_work;
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_PINE)
+	struct delayed_work	xiaomi_pine_adapter_limit_work;
+#endif
+#endif
 
 	struct alarm		lpd_recheck_timer;
 	struct alarm		moisture_protection_alarm;
@@ -513,6 +568,9 @@ struct smb_charger {
 	bool			sw_jeita_enabled;
 	bool			jeita_arb_enable;
 	bool			typec_legacy_use_rp_icl;
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+	bool			xiaomi_sdm439_hw_jeita_enabled;
+#endif
 	bool			is_hdc;
 	bool			chg_done;
 	int			connector_type;
@@ -617,6 +675,18 @@ struct smb_charger {
 	int			dcin_uv_count;
 	ktime_t			dcin_uv_last_time;
 	int			last_wls_vout;
+
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_PINE)
+	bool			xiaomi_pine_is_adapter_idn;
+#endif
+
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_OLIVE)
+	unsigned long xiaomi_olive_recent_collapse_time;
+	bool		  xiaomi_olive_hvdcp_disabled;
+	bool		  xiaomi_olive_collapsed;
+	struct delayed_work xiaomi_olive_hw_suchg_detect_work;
+	int 		  xiaomi_olive_count;
+#endif
 };
 
 int smblib_read(struct smb_charger *chg, u16 addr, u8 *val);

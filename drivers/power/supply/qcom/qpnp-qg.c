@@ -28,6 +28,9 @@
 #include <linux/qpnp/qpnp-revid.h>
 #include <uapi/linux/qg.h>
 #include <uapi/linux/qg-profile.h>
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+#include <xiaomi-sdm439/mach.h>
+#endif
 #include "fg-alg.h"
 #include "qg-sdam.h"
 #include "qg-core.h"
@@ -36,6 +39,27 @@
 #include "qg-soc.h"
 #include "qg-battery-profile.h"
 #include "qg-defs.h"
+
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_PINE)
+#define XIAOMI_PINE_SUNWODA_ID_MAX 82000
+#define XIAOMI_PINE_SUNWODA_ID_MIN 73500
+#define XIAOMI_PINE_NVT_ID_MAX 44000
+#define XIAOMI_PINE_NVT_ID_MIN 39000
+#define XIAOMI_PINE_COSLIGHT_ID_MAX 54000
+#define XIAOMI_PINE_COSLIGHT_ID_MIN 48000
+#endif
+
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_OLIVE)
+#define XIAOMI_OLIVE_SUNWODA_ID_MAX 350000
+#define XIAOMI_OLIVE_SUNWODA_ID_MIN 315000
+#define XIAOMI_OLIVE_COSLIGHT_ID_MAX 107000
+#define XIAOMI_OLIVE_COSLIGHT_ID_MIN 96000
+#endif
+
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+#define XIAOMI_SDM439_HOT_FVCOMP_4100MV 0x1D		/*JEITA_FVCOMP_HOT=(4390-4100)/10*/
+#define XIAOMI_SDM439_HOT_FVCOMP_4000MV 0x27		/*JEITA_FVCOMP_HOT=(4390-4000)/10*/
+#endif
 
 static int qg_debug_mask;
 
@@ -2225,6 +2249,18 @@ static int qg_psy_get_property(struct power_supply *psy,
 			pval->intval = (int)temp;
 		break;
 	case POWER_SUPPLY_PROP_CHARGE_FULL_DESIGN:
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+		switch (xiaomi_sdm439_mach_get_family()) {
+			case XIAOMI_SDM439_MACH_FAMILY_PINE:
+				pval->intval = 4000000;
+				return 0;
+			case XIAOMI_SDM439_MACH_FAMILY_OLIVE:
+				pval->intval = 5000000;
+				return 0;
+			default:
+				break;
+		}
+#endif
 		rc = qg_get_nominal_capacity((int *)&temp, 250, true);
 		if (!rc)
 			pval->intval = (int)temp;
@@ -2283,6 +2319,13 @@ static int qg_psy_get_property(struct power_supply *psy,
 		break;
 	case POWER_SUPPLY_PROP_FG_TYPE:
 		pval->intval = chip->qg_mode;
+		break;
+	case POWER_SUPPLY_PROP_BATTERY_ID:
+		pval->intval = 0;
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+		if (xiaomi_sdm439_mach_get())
+			pval->intval = chip->xiaomi_sdm439_batt_id;
+#endif
 		break;
 	default:
 		pr_debug("Unsupported property %d\n", psp);
@@ -2351,6 +2394,7 @@ static enum power_supply_property qg_psy_props[] = {
 	POWER_SUPPLY_PROP_SCALE_MODE_EN,
 	POWER_SUPPLY_PROP_BATT_AGE_LEVEL,
 	POWER_SUPPLY_PROP_FG_TYPE,
+	POWER_SUPPLY_PROP_BATTERY_ID,
 };
 
 static const struct power_supply_desc qg_psy_desc = {
@@ -2409,13 +2453,30 @@ static int qg_charge_full_update(struct qpnp_qg *chip)
 			chip->charge_full = true;
 			qg_dbg(chip, QG_DEBUG_STATUS, "Setting charge_full (0->1) @ msoc=%d\n",
 					chip->msoc);
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+		} else if (xiaomi_sdm439_mach_get() && health == POWER_SUPPLY_HEALTH_WARM) {
+			/* terminated in JEITA */
+			prop.intval = XIAOMI_SDM439_HOT_FVCOMP_4000MV;
+			pr_info("%s: set status 4000mv\n");
+			rc = power_supply_set_property(chip->batt_psy,
+					POWER_SUPPLY_PROP_FVCOMP, &prop);
+			if (rc < 0) {
+				pr_err("%s: Failed to set POWER_SUPPLY_PROP_FVCOMP, rc=%d\n", __func__, rc);
+				goto out;
+			}
+			pr_info("%s:Terminated charging @ msoc=%d\n",
+					__func__, chip->msoc);
+#endif
 		} else if (health != POWER_SUPPLY_HEALTH_GOOD) {
 			/* terminated in JEITA */
 			qg_dbg(chip, QG_DEBUG_STATUS, "Terminated charging @ msoc=%d\n",
 					chip->msoc);
 		}
-	} else if ((!chip->charge_done || chip->msoc <= recharge_soc)
-				&& chip->charge_full) {
+	} else if ((!chip->charge_done || chip->msoc <= recharge_soc
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+				|| (xiaomi_sdm439_mach_get() && chip->msoc < recharge_soc)
+#endif
+				) && chip->charge_full) {
 
 		bool input_present = is_input_present(chip);
 
@@ -2654,6 +2715,9 @@ static void qg_status_change_work(struct work_struct *work)
 	union power_supply_propval prop = {0, };
 	int rc = 0, batt_temp = 0;
 	bool input_present = false;
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+	int xiaomi_sdm439_health = 0, xiaomi_sdm439_vol = 0;
+#endif
 
 	if (!is_batt_available(chip)) {
 		pr_debug("batt-psy not available\n");
@@ -2714,6 +2778,37 @@ static void qg_status_change_work(struct work_struct *work)
 				input_present, false);
 		}
 	}
+
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+	if (xiaomi_sdm439_mach_get()) {
+		rc = power_supply_get_property(chip->batt_psy,
+				POWER_SUPPLY_PROP_HEALTH, &prop);
+		if (rc < 0) {
+			pr_err("%s: Failed to get battery health, rc=%d\n", __func__, rc);
+		}
+		xiaomi_sdm439_health = prop.intval;
+
+		rc = power_supply_get_property(chip->batt_psy,
+				POWER_SUPPLY_PROP_VOLTAGE_NOW, &prop);
+		if (rc < 0) {
+			pr_err("%s: Failed to get battery voltage, rc=%d\n", __func__, rc);
+		}
+		xiaomi_sdm439_vol = prop.intval;
+
+		if (chip->charge_status == 1 &&
+			xiaomi_sdm439_vol < 4000000 && xiaomi_sdm439_health == POWER_SUPPLY_HEALTH_WARM) {
+			prop.intval = XIAOMI_SDM439_HOT_FVCOMP_4100MV;
+			pr_err("set status 4100mv\n");
+			rc = power_supply_set_property(chip->batt_psy,
+					POWER_SUPPLY_PROP_FVCOMP, &prop);
+			if (rc < 0) {
+				pr_err("%s: Failed to set battery POWER_SUPPLY_PROP_FVCOMP, rc=%d\n", __func__, rc);
+				goto out;
+			}
+		}
+	}
+#endif
+
 	rc = qg_charge_full_update(chip);
 	if (rc < 0)
 		pr_err("Failed in charge_full_update, rc=%d\n", rc);
@@ -3002,6 +3097,51 @@ static int qg_load_battery_profile(struct qpnp_qg *chip)
 	struct device_node *node = chip->dev->of_node;
 	struct device_node *profile_node;
 	int rc, tuple_len, len, i, avail_age_level = 0;
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+	bool xiaomi_sdm439_match = false;
+
+	if (xiaomi_sdm439_mach_get()) {
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_PINE)
+		if (xiaomi_sdm439_mach_get_family() == XIAOMI_SDM439_MACH_FAMILY_PINE) {
+			if (chip->batt_id_ohm >= XIAOMI_PINE_SUNWODA_ID_MIN && chip->batt_id_ohm <= XIAOMI_PINE_SUNWODA_ID_MAX) {
+				xiaomi_sdm439_match = true;
+				chip->xiaomi_sdm439_batt_id = 1;
+				printk("SUNWODA match succ.\n");
+			} else if (chip->batt_id_ohm >= XIAOMI_PINE_NVT_ID_MIN && chip->batt_id_ohm <= XIAOMI_PINE_NVT_ID_MAX) {
+				xiaomi_sdm439_match = true;
+				chip->xiaomi_sdm439_batt_id = 2;
+				printk("NVT match succ.\n");
+			} else if (chip->batt_id_ohm >= XIAOMI_PINE_COSLIGHT_ID_MIN && chip->batt_id_ohm <= XIAOMI_PINE_COSLIGHT_ID_MAX) {
+				xiaomi_sdm439_match = true;
+				chip->xiaomi_sdm439_batt_id = 3;
+				printk("COSLIGHT match succ.\n");
+			}
+		}
+#endif
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_OLIVE)
+		if (xiaomi_sdm439_mach_get_family() == XIAOMI_SDM439_MACH_FAMILY_OLIVE) {
+			if (chip->batt_id_ohm >= XIAOMI_OLIVE_SUNWODA_ID_MIN && chip->batt_id_ohm <= XIAOMI_OLIVE_SUNWODA_ID_MAX) {
+				xiaomi_sdm439_match = true;
+				chip->xiaomi_sdm439_batt_id = 1;
+				printk("SUNWODA match succ.\n");
+			} else if (chip->batt_id_ohm >= XIAOMI_OLIVE_COSLIGHT_ID_MIN && chip->batt_id_ohm <= XIAOMI_OLIVE_COSLIGHT_ID_MAX) {
+				xiaomi_sdm439_match = true;
+				chip->xiaomi_sdm439_batt_id = 2;
+				printk("COSLIGHT match succ.\n");
+			}
+		}
+#endif
+		if (!xiaomi_sdm439_match) {
+			rc = get_batt_id_ohm(chip, &chip->batt_id_ohm);
+			if (rc < 0) {
+				pr_err("%s: Failed to detect batt_id for xiaomi sdm439 rc=%d\n", __func__, rc);
+				chip->profile_loaded = false;
+			}
+			chip->xiaomi_sdm439_batt_id = 0;
+		}
+		pr_err("%s: xiaomi sdm439 batt_id=%d\n", __func__, chip->batt_id_ohm);
+	}
+#endif
 
 	chip->batt_node = of_find_node_by_name(node, "qcom,battery-data");
 	if (!chip->batt_node) {
@@ -3160,6 +3300,10 @@ static int qg_setup_battery(struct qpnp_qg *chip)
 		if (rc < 0) {
 			pr_err("Failed to detect batt_id rc=%d\n", rc);
 			chip->profile_loaded = false;
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+			if (xiaomi_sdm439_mach_get())
+				chip->xiaomi_sdm439_batt_id = 0;
+#endif
 		} else {
 			rc = qg_load_battery_profile(chip);
 			if (rc < 0) {

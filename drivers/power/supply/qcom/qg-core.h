@@ -207,6 +207,10 @@ struct qpnp_qg {
 	struct cycle_counter	*counter;
 	/* ttf */
 	struct ttf		*ttf;
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+	/* batt_id*/
+	int			xiaomi_sdm439_batt_id;
+#endif
 };
 
 struct ocv_all {

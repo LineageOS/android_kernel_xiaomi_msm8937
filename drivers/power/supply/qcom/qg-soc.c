@@ -11,6 +11,9 @@
 #include <linux/power_supply.h>
 #include <uapi/linux/qg.h>
 #include <uapi/linux/qg-profile.h>
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+#include <xiaomi-sdm439/mach.h>
+#endif
 #include "fg-alg.h"
 #include "qg-sdam.h"
 #include "qg-core.h"
@@ -685,6 +688,11 @@ done:
 
 int qg_soc_init(struct qpnp_qg *chip)
 {
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+	if (xiaomi_sdm439_mach_get())
+		qg_delta_soc_cold_interval_ms = 70000;
+#endif
+
 	if (alarmtimer_get_rtcdev()) {
 		alarm_init(&chip->alarm_timer, ALARM_BOOTTIME,
 			qpnp_msoc_timer);
