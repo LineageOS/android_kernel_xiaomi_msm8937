@@ -20,6 +20,9 @@
 #include <linux/pmic-voter.h>
 #include <linux/of_batterydata.h>
 #include <linux/alarmtimer.h>
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_OLIVE)
+#include <linux/jiffies.h>
+#endif
 #include "smb5-lib.h"
 #include "smb5-reg.h"
 #include "battery.h"
@@ -46,6 +49,92 @@
 	((typec_mode == POWER_SUPPLY_TYPEC_SOURCE_MEDIUM	\
 	|| typec_mode == POWER_SUPPLY_TYPEC_SOURCE_HIGH)	\
 	&& !chg->typec_legacy)
+
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_PINE)
+int xiaomi_pine_quiet_ther_ibus[] = {2500000, 2000000, 2000000, 1000000,
+					1000000, 500000};
+
+int xiaomi_pine_quiet_ther_ibus_idn[] = {2500000, 1000000, 1000000, 1000000,
+					1000000, 500000};
+#endif
+
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_OLIVE)
+int xiaomi_olive_quiet_ther_ibus[] = {2500000, 2000000, 2000000, 2000000,
+					1000000, 1000000};
+
+int xiaomi_olive_hvdcp_ther_ibus[] = {2500000, 2000000, 1500000, 1300000,
+					700000, 500000};
+#endif
+
+#define XIAOMI_SDM439_ARB_VBUS_UV_THRESHOLD 4300000
+#define XIAOMI_SDM439_ARB_IBUS_UA_THRESHOLD 100000
+#define XIAOMI_SDM439_ARB_DELAY_MS 10000
+
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_OLIVE)
+#define XIAOMI_OLIVE_COLLAPSE_DETACH_MAX_INTERVAL ((unsigned long)5)
+#define XIAOMI_OLIVE_ATTACH_DETACH_MAX_INTERVAL ((unsigned long)310)
+#define XIAOMI_OLIVE_DETACH_ATTACH_MAX_INTERVAL ((unsigned long)330)
+#define XIAOMI_OLIVE_HW_SUCHG_DETECT_INTERVAL_MS 300
+#define XIAOMI_OLIVE_HW_SUCHG_DETECT_COUNT		3
+#endif
+
+static void xiaomi_sdm439_smblib_arb_monitor_work(struct work_struct *work)
+{
+	struct smb_charger *chg = container_of(work, struct smb_charger,
+	xiaomi_sdm439_arb_monitor_work.work);
+	int rc = 0;
+	int ibus_current = 0, vbus_voltage = 0;
+	union power_supply_propval pval = {0, };
+
+	smblib_dbg(chg, PR_MISC, "it's arb monitor work\n");
+
+	rc = power_supply_get_property(chg->usb_psy,
+	POWER_SUPPLY_PROP_INPUT_CURRENT_NOW,
+	&pval);
+	if (rc < 0) {
+		smblib_err(chg, "Couldn't get ibus current rc=%d\n", rc);
+		goto out;
+	} else {
+		ibus_current = pval.intval;
+	}
+
+	rc = power_supply_get_property(chg->usb_psy,
+	POWER_SUPPLY_PROP_VOLTAGE_NOW,
+	&pval);
+	if (rc < 0) {
+		smblib_err(chg, "Couldn't get vbus voltage rc=%d\n", rc);
+		goto out;
+	} else {
+		vbus_voltage = pval.intval;
+	}
+
+	smblib_dbg(chg, PR_MISC, "it's arb monitor work, ibus_current:%d, vbus_voltage:%d\n",
+	ibus_current, vbus_voltage);
+	if (vbus_voltage < XIAOMI_SDM439_ARB_VBUS_UV_THRESHOLD
+	&& ibus_current < XIAOMI_SDM439_ARB_IBUS_UA_THRESHOLD) {
+		rc = vote(chg->usb_icl_votable, USER_VOTER, true, 0);
+		if (rc < 0) {
+			smblib_err(chg, "Couldn't vote to suspend USB rc=%d\n", rc);
+			goto out;
+		}
+
+		mdelay(100);
+
+		rc = vote(chg->usb_icl_votable, USER_VOTER, false, 0);
+		if (rc < 0) {
+			smblib_err(chg, "Couldn't vote to resume USB rc=%d\n", rc);
+			goto out;
+		}
+	}
+
+	schedule_delayed_work(&chg->xiaomi_sdm439_arb_monitor_work, msecs_to_jiffies(XIAOMI_SDM439_ARB_DELAY_MS));
+
+	return;
+	out:
+	smblib_err(chg, "stop monitor arb.\n");
+}
+#endif
 
 int smblib_read(struct smb_charger *chg, u16 addr, u8 *val)
 {
@@ -684,8 +773,17 @@ static const struct apsd_result *smblib_update_usb_type(struct smb_charger *chg)
 		 * detected as as SDP
 		 */
 		if (!(apsd_result->pst == POWER_SUPPLY_TYPE_USB_FLOAT &&
-			chg->real_charger_type == POWER_SUPPLY_TYPE_USB))
+			chg->real_charger_type == POWER_SUPPLY_TYPE_USB)) {
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+			if (xiaomi_sdm439_mach_get() && (
+				chg->real_charger_type == POWER_SUPPLY_TYPE_USB_FLOAT &&
+				apsd_result->pst == POWER_SUPPLY_TYPE_USB)) {
+				chg->real_charger_type = POWER_SUPPLY_TYPE_USB_FLOAT;
+				smblib_err(chg, "float charger detected\n");
+			} else
+#endif
 			chg->real_charger_type = apsd_result->pst;
+			}
 	}
 
 	smblib_dbg(chg, PR_MISC, "APSD=%s PD=%d\n",
@@ -1403,6 +1501,9 @@ int smblib_get_prop_batt_status(struct smb_charger *chg,
 	bool usb_online, dc_online;
 	u8 stat;
 	int rc, suspend = 0;
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+	int xiaomi_sdm439_health = 0;
+#endif
 
 	if (chg->dbc_usbov) {
 		rc = smblib_get_prop_usb_present(chg, &pval);
@@ -1445,6 +1546,18 @@ int smblib_get_prop_batt_status(struct smb_charger *chg,
 	}
 	dc_online = (bool)pval.intval;
 
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+	if (xiaomi_sdm439_mach_get()) {
+		rc = smblib_get_prop_batt_health(chg, &pval);
+		if (rc < 0) {
+			smblib_err(chg, "Couldn't get dc online property rc=%d\n",
+				rc);
+			return rc;
+		}
+		xiaomi_sdm439_health = pval.intval;
+	}
+#endif
+
 	rc = smblib_read(chg, BATTERY_CHARGER_STATUS_1_REG, &stat);
 	if (rc < 0) {
 		smblib_err(chg, "Couldn't read BATTERY_CHARGER_STATUS_1 rc=%d\n",
@@ -1458,6 +1571,14 @@ int smblib_get_prop_batt_status(struct smb_charger *chg,
 		case TERMINATE_CHARGE:
 		case INHIBIT_CHARGE:
 			val->intval = POWER_SUPPLY_STATUS_FULL;
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+			if (xiaomi_sdm439_mach_get()) {
+				if (xiaomi_sdm439_health != POWER_SUPPLY_HEALTH_WARM)
+					val->intval = POWER_SUPPLY_STATUS_FULL;
+				else
+					val->intval = POWER_SUPPLY_STATUS_CHARGING;
+			}
+#endif
 			break;
 		default:
 			val->intval = POWER_SUPPLY_STATUS_DISCHARGING;
@@ -1476,6 +1597,16 @@ int smblib_get_prop_batt_status(struct smb_charger *chg,
 	case TERMINATE_CHARGE:
 	case INHIBIT_CHARGE:
 		val->intval = POWER_SUPPLY_STATUS_FULL;
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+		if (xiaomi_sdm439_mach_get()) {
+			if (xiaomi_sdm439_health != POWER_SUPPLY_HEALTH_WARM)
+				val->intval = POWER_SUPPLY_STATUS_FULL;
+			else {
+				val->intval = POWER_SUPPLY_STATUS_CHARGING;
+				return 0;
+			}
+		}
+#endif
 		break;
 	case DISABLE_CHARGE:
 	case PAUSE_CHARGE:
@@ -1490,6 +1621,18 @@ int smblib_get_prop_batt_status(struct smb_charger *chg,
 	 * If charge termination WA is active and has suspended charging, then
 	 * continue reporting charging status as FULL.
 	 */
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+	if (xiaomi_sdm439_mach_get()) {
+		if (is_client_vote_enabled(chg->usb_icl_votable,
+							CHG_TERMINATION_VOTER)) {
+			if (xiaomi_sdm439_health != POWER_SUPPLY_HEALTH_WARM)
+				val->intval = POWER_SUPPLY_STATUS_FULL;
+			else
+				val->intval = POWER_SUPPLY_STATUS_CHARGING;
+			return 0;
+		}
+	} else
+#endif
 	if (is_client_vote_enabled_locked(chg->usb_icl_votable,
 						CHG_TERMINATION_VOTER)) {
 		val->intval = POWER_SUPPLY_STATUS_FULL;
@@ -1502,6 +1645,14 @@ int smblib_get_prop_batt_status(struct smb_charger *chg,
 	if (!usb_online && dc_online
 		&& chg->fake_batt_status == POWER_SUPPLY_STATUS_FULL) {
 		val->intval = POWER_SUPPLY_STATUS_FULL;
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+		if (xiaomi_sdm439_mach_get()) {
+			if (xiaomi_sdm439_health != POWER_SUPPLY_HEALTH_WARM)
+				val->intval = POWER_SUPPLY_STATUS_FULL;
+			else
+				val->intval = POWER_SUPPLY_STATUS_CHARGING;
+		}
+#endif
 		return 0;
 	}
 
@@ -1734,6 +1885,49 @@ int smblib_set_prop_system_temp_level(struct smb_charger *chg,
 	if (chg->system_temp_level == 0)
 		return vote(chg->fcc_votable, THERMAL_DAEMON_VOTER, false, 0);
 
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+	if (xiaomi_sdm439_mach_get()) {
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_PINE)
+		if (xiaomi_sdm439_mach_get_family() == XIAOMI_SDM439_MACH_FAMILY_PINE) {
+			if (chg->xiaomi_pine_is_adapter_idn) {
+				vote(chg->usb_icl_votable, THERMAL_DAEMON_VOTER, true,
+						xiaomi_pine_quiet_ther_ibus_idn[chg->system_temp_level]);
+
+				smblib_err(chg, "system_temp_level = %d, ibus =%d\n",
+					chg->system_temp_level,
+					xiaomi_pine_quiet_ther_ibus_idn[chg->system_temp_level]);
+			} else {
+				vote(chg->usb_icl_votable, THERMAL_DAEMON_VOTER, true,
+						xiaomi_pine_quiet_ther_ibus[chg->system_temp_level]);
+
+				smblib_err(chg, "system_temp_level = %d, ibus =%d\n",
+					chg->system_temp_level,
+					xiaomi_pine_quiet_ther_ibus[chg->system_temp_level]);
+			}
+		}
+#endif
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_OLIVE)
+		if (xiaomi_sdm439_mach_get_family() == XIAOMI_SDM439_MACH_FAMILY_OLIVE) {
+			if (chg->real_charger_type == POWER_SUPPLY_TYPE_USB_HVDCP
+				|| chg->real_charger_type == POWER_SUPPLY_TYPE_USB_HVDCP_3) {
+				vote(chg->usb_icl_votable, THERMAL_DAEMON_VOTER, true,
+						xiaomi_olive_hvdcp_ther_ibus[chg->system_temp_level]);
+
+				smblib_err(chg, "system_temp_level = %d, ibus =%d\n",
+					chg->system_temp_level,
+					xiaomi_olive_hvdcp_ther_ibus[chg->system_temp_level]);
+			} else {
+				vote(chg->usb_icl_votable, THERMAL_DAEMON_VOTER, true,
+						xiaomi_olive_quiet_ther_ibus[chg->system_temp_level]);
+
+				smblib_err(chg, "system_temp_level = %d, ibus =%d\n",
+					chg->system_temp_level,
+					xiaomi_olive_quiet_ther_ibus[chg->system_temp_level]);
+			}
+		}
+#endif
+	} else
+#endif
 	vote(chg->fcc_votable, THERMAL_DAEMON_VOTER, true,
 			chg->thermal_mitigation[chg->system_temp_level]);
 	return 0;
@@ -2132,7 +2326,29 @@ static int smblib_get_prop_ufp_mode(struct smb_charger *chg)
 	}
 	smblib_dbg(chg, PR_REGISTER, "TYPE_C_STATUS_1 = 0x%02x\n", stat);
 
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_OLIVE)
+	if (xiaomi_sdm439_mach_get_family() == XIAOMI_SDM439_MACH_FAMILY_OLIVE) {
+		if (stat &
+		(XIAOMI_SDM439_SNK_RP_STD_DAM_BIT | XIAOMI_SDM439_SNK_RP_1P5_DAM_BIT | XIAOMI_SDM439_SNK_RP_3P0_DAM_BIT)) {
+			smblib_masked_write(chg, XIAOMI_SDM439_TYPE_C_DEBUG_ACCESS_SINK_REG,
+			XIAOMI_SDM439_DAM_DIS_AICL, 0);
+			smblib_masked_write(chg, XIAOMI_SDM439_TYPE_C_DEBUG_ACCESS_SINK_REG,
+			XIAOMI_SDM439_DAM_DIS_AICL|XIAOMI_SDM439_EN_CHG_ON_DEBUG_ACCESS_SNK, XIAOMI_SDM439_EN_CHG_ON_DEBUG_ACCESS_SNK);
+			smblib_masked_write(chg, XIAOMI_SDM439_SCHG_USB_TYPE_C_CFG,
+			XIAOMI_SDM439_BC1P2_START_ON_CC, 0);
+		}
+	}
+#endif
+
 	switch (stat & DETECTED_SRC_TYPE_MASK) {
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_OLIVE)
+	case XIAOMI_SDM439_SNK_RP_STD_DAM_BIT:
+	case XIAOMI_SDM439_SNK_RP_1P5_DAM_BIT:
+	case XIAOMI_SDM439_SNK_RP_3P0_DAM_BIT:
+		if (xiaomi_sdm439_mach_get_family() == XIAOMI_SDM439_MACH_FAMILY_OLIVE)
+			return POWER_SUPPLY_TYPEC_SOURCE_MEDIUM;
+		break;
+#endif
 	case SNK_RP_STD_BIT:
 		return POWER_SUPPLY_TYPEC_SOURCE_DEFAULT;
 	case SNK_RP_1P5_BIT:
@@ -2401,6 +2617,10 @@ static int smblib_handle_usb_current(struct smb_charger *chg,
 			 * real_charger_type
 			 */
 			chg->real_charger_type = POWER_SUPPLY_TYPE_USB;
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+			if (xiaomi_sdm439_mach_get())
+				chg->real_charger_type = POWER_SUPPLY_TYPE_USB_FLOAT;
+#endif
 			rc = vote(chg->usb_icl_votable, USB_PSY_VOTER,
 						true, usb_current);
 			if (rc < 0)
@@ -2795,6 +3015,23 @@ irqreturn_t default_irq_handler(int irq, void *data)
 	struct smb_irq_data *irq_data = data;
 	struct smb_charger *chg = irq_data->parent_data;
 
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_OLIVE)
+	const struct apsd_result *xiaomi_olive_apsd_result;
+
+	if (xiaomi_sdm439_mach_get_family() == XIAOMI_SDM439_MACH_FAMILY_OLIVE) {
+		if (!strcmp(irq_data->name, "usbin-collapse")) {
+			xiaomi_olive_apsd_result = smblib_get_apsd_result(chg);
+			smblib_err(chg, "IRQ: usbin-collapse, APSD = %s\n", xiaomi_olive_apsd_result->name);
+			if (!strncmp(xiaomi_olive_apsd_result->name, "HVDCP", 5)) {
+				chg->xiaomi_olive_collapsed = true;
+				chg->xiaomi_olive_recent_collapse_time = jiffies;
+				schedule_delayed_work(&chg->xiaomi_olive_hw_suchg_detect_work, msecs_to_jiffies(XIAOMI_OLIVE_HW_SUCHG_DETECT_INTERVAL_MS));
+				smblib_err(chg, "HVDCP-usbin-collapse, time = %lu\n", chg->xiaomi_olive_recent_collapse_time);
+			}
+		}
+	}
+#endif
+
 	smblib_dbg(chg, PR_INTERRUPT, "IRQ: %s\n", irq_data->name);
 	return IRQ_HANDLED;
 }
@@ -3136,6 +3373,11 @@ void smblib_usb_plugin_locked(struct smb_charger *chg)
 	bool vbus_rising;
 	struct smb_irq_data *data;
 	struct storm_watch *wdata;
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_OLIVE)
+	static unsigned long xiaomi_olive_detach_time;
+	static unsigned long xiaomi_olive_attach_time;
+	static bool xiaomi_olive_need_confirm;
+#endif
 
 	rc = smblib_read(chg, USBIN_BASE + INT_RT_STS_OFFSET, &stat);
 	if (rc < 0) {
@@ -3148,6 +3390,20 @@ void smblib_usb_plugin_locked(struct smb_charger *chg)
 						chg->chg_freq.freq_removal);
 
 	if (vbus_rising) {
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_OLIVE)
+		if (xiaomi_sdm439_mach_get_family() == XIAOMI_SDM439_MACH_FAMILY_OLIVE) {
+			xiaomi_olive_attach_time = jiffies;
+			smblib_err(chg, "attach_time = %lu\n", xiaomi_olive_attach_time);
+			if (xiaomi_olive_attach_time - xiaomi_olive_detach_time < XIAOMI_OLIVE_DETACH_ATTACH_MAX_INTERVAL) {
+				rc = smblib_masked_write(chg, USBIN_OPTIONS_1_CFG_REG, HVDCP_EN_BIT, 0);
+				if (rc < 0)
+					smblib_err(chg, "XIAOMI can't disable HVDCP for workaround\n");
+				else
+					chg->xiaomi_olive_hvdcp_disabled = true;
+			}
+			xiaomi_olive_need_confirm = false;
+		}
+#endif
 		rc = smblib_request_dpdm(chg, true);
 		if (rc < 0)
 			smblib_err(chg, "Couldn't to enable DPDM rc=%d\n", rc);
@@ -3160,7 +3416,32 @@ void smblib_usb_plugin_locked(struct smb_charger *chg)
 		vote(chg->awake_votable, PL_DELAY_VOTER, true, 0);
 		schedule_delayed_work(&chg->pl_enable_work,
 					msecs_to_jiffies(PL_DELAY_MS));
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+		if (xiaomi_sdm439_mach_get())
+			schedule_delayed_work(&chg->xiaomi_sdm439_arb_monitor_work, msecs_to_jiffies(XIAOMI_SDM439_ARB_DELAY_MS));
+#endif
 	} else {
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_OLIVE)
+		if (xiaomi_sdm439_mach_get_family() == XIAOMI_SDM439_MACH_FAMILY_OLIVE) {
+			if (chg->xiaomi_olive_hvdcp_disabled) {
+				rc = smblib_masked_write(chg, USBIN_OPTIONS_1_CFG_REG, HVDCP_EN_BIT, HVDCP_EN_BIT);
+				if (rc < 0) {
+					smblib_err(chg, "can't restore HVDCP_EN_BIT\n");
+				} else {
+					chg->xiaomi_olive_hvdcp_disabled = false;
+				}
+			}
+			if (chg->xiaomi_olive_collapsed) {
+				xiaomi_olive_detach_time = jiffies;
+				smblib_err(chg, "detached after collapse --> time = %lu, collapse-time = %lu, last_atta"
+						"ch_time = %lu\n", xiaomi_olive_detach_time, chg->xiaomi_olive_recent_collapse_time, xiaomi_olive_attach_time);
+				if (xiaomi_olive_detach_time - chg->xiaomi_olive_recent_collapse_time < XIAOMI_OLIVE_COLLAPSE_DETACH_MAX_INTERVAL &&
+					xiaomi_olive_detach_time - xiaomi_olive_attach_time < XIAOMI_OLIVE_ATTACH_DETACH_MAX_INTERVAL)
+					xiaomi_olive_need_confirm = true;
+				chg->xiaomi_olive_collapsed = false;
+			}
+		}
+#endif
 		if (chg->wa_flags & BOOST_BACK_WA) {
 			data = chg->irq_info[SWITCHER_POWER_OK_IRQ].irq_data;
 			if (data) {
@@ -3211,6 +3492,14 @@ void smblib_usb_plugin_locked(struct smb_charger *chg)
 			smblib_err(chg, "Couldn't disable DPDM rc=%d\n", rc);
 
 		smblib_update_usb_type(chg);
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+		if (xiaomi_sdm439_mach_get()) {
+			if (chg->use_extcon)
+				smblib_notify_device_mode(chg, false);
+			vote(chg->usb_icl_votable, USB_PSY_VOTER, false, 0); //remove USB_PSY voting when plugin detach
+			cancel_delayed_work_sync(&chg->xiaomi_sdm439_arb_monitor_work);
+		}
+#endif
 	}
 
 	if (chg->connector_type == POWER_SUPPLY_CONNECTOR_MICRO_USB)
@@ -3230,6 +3519,11 @@ irqreturn_t usb_plugin_irq_handler(int irq, void *data)
 		smblib_usb_plugin_hard_reset_locked(chg);
 	else
 		smblib_usb_plugin_locked(chg);
+
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_PINE)
+	if (xiaomi_sdm439_mach_get_family() == XIAOMI_SDM439_MACH_FAMILY_PINE)
+		schedule_delayed_work(&chg->xiaomi_pine_adapter_limit_work, msecs_to_jiffies(XIAOMI_SDM439_SMBCHG_UPDATE_MS*10));
+#endif
 
 	return IRQ_HANDLED;
 }
@@ -3458,6 +3752,9 @@ irqreturn_t usb_source_change_irq_handler(int irq, void *data)
 	struct smb_charger *chg = irq_data->parent_data;
 	int rc = 0;
 	u8 stat;
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+	u8 xiaomi_sdm439_apsd_result;
+#endif
 
 	/*
 	 * Prepared to run PD or PD is active. At this moment, APSD is disabled,
@@ -3472,10 +3769,22 @@ irqreturn_t usb_source_change_irq_handler(int irq, void *data)
 		smblib_err(chg, "Couldn't read APSD_STATUS rc=%d\n", rc);
 		return IRQ_HANDLED;
 	}
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+	if (xiaomi_sdm439_mach_get()) {
+		rc = smblib_read(chg, APSD_RESULT_STATUS_REG, &xiaomi_sdm439_apsd_result);
+		if (rc < 0) {
+			smblib_err(chg, "Couldn't read APSD_RESULT rc=%d\n", rc);
+			return IRQ_HANDLED;
+		}
+	}
+#endif
 	smblib_dbg(chg, PR_REGISTER, "APSD_STATUS = 0x%02x\n", stat);
 
 	if ((chg->connector_type == POWER_SUPPLY_CONNECTOR_MICRO_USB)
 		&& (stat & APSD_DTC_STATUS_DONE_BIT)
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+		&& (!xiaomi_sdm439_mach_get() || (xiaomi_sdm439_apsd_result & FLOAT_CHARGER_BIT))
+#endif
 		&& !chg->uusb_apsd_rerun_done) {
 		/*
 		 * Force re-run APSD to handle slow insertion related
@@ -3515,6 +3824,22 @@ irqreturn_t usb_source_change_irq_handler(int irq, void *data)
 		return IRQ_HANDLED;
 	}
 	smblib_dbg(chg, PR_REGISTER, "APSD_STATUS = 0x%02x\n", stat);
+
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_OLIVE)
+	if (xiaomi_sdm439_mach_get_family() == XIAOMI_SDM439_MACH_FAMILY_OLIVE) {
+		if (chg->system_temp_level > 0) {
+			if (chg->real_charger_type == POWER_SUPPLY_TYPE_USB_HVDCP
+				|| chg->real_charger_type == POWER_SUPPLY_TYPE_USB_HVDCP_3) {
+				smblib_err(chg, "%s:system_temp_level = %d, ibus =%d\n",
+							__func__, chg->system_temp_level,
+							xiaomi_olive_hvdcp_ther_ibus[chg->system_temp_level]);
+
+				vote(chg->usb_icl_votable, THERMAL_DAEMON_VOTER, true,
+						xiaomi_olive_hvdcp_ther_ibus[chg->system_temp_level]);
+			}
+		}
+	}
+#endif
 
 	return IRQ_HANDLED;
 }
@@ -4223,6 +4548,39 @@ out:
 	pm_relax(chg->dev);
 }
 
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_OLIVE)
+static void xiaomi_olive_smblib_hw_suchg_detect_work(struct work_struct *work)
+{
+	int rc;
+	union power_supply_propval online = {-1, };
+	union power_supply_propval crt = {-1, };
+	struct smb_charger *chg = container_of(work, struct smb_charger, xiaomi_olive_hw_suchg_detect_work.work);
+
+	if (chg->xiaomi_olive_hvdcp_disabled) {
+		smblib_err(chg, "HVDCP already disabled, do nothing\n");
+		return;
+	}
+	smblib_get_prop_usb_online(chg, &online);
+	smblib_get_prop_input_current_settled(chg, &crt);
+	if (1 == online.intval && 0 == crt.intval) {
+		++chg->xiaomi_olive_count;
+		if (chg->xiaomi_olive_count == XIAOMI_OLIVE_HW_SUCHG_DETECT_COUNT) {
+			smblib_err(chg, "Huawei SuperCharger detected, disable HVDCP for workaround\n");
+			rc = smblib_masked_write(chg, USBIN_OPTIONS_1_CFG_REG, HVDCP_EN_BIT, 0);
+			if (rc < 0)
+				smblib_err(chg, "can't disable HVDCP for workaround\n");
+			else {
+				chg->xiaomi_olive_hvdcp_disabled = true;
+				smblib_rerun_apsd(chg);
+			}
+			chg->xiaomi_olive_count = 0;
+		} else
+			schedule_delayed_work(&chg->xiaomi_olive_hw_suchg_detect_work, msecs_to_jiffies(XIAOMI_OLIVE_HW_SUCHG_DETECT_INTERVAL_MS));
+	} else
+		chg->xiaomi_olive_count = 0;
+}
+#endif
+
 static enum alarmtimer_restart moisture_protection_alarm_cb(struct alarm *alarm,
 							ktime_t now)
 {
@@ -4441,6 +4799,138 @@ out:
 	chg->jeita_configured = true;
 }
 
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+static void xiaomi_sdm439_smbchg_cool_limit_work(struct work_struct *work)
+{
+	struct smb_charger *chg = container_of(work, struct smb_charger,
+			xiaomi_sdm439_cool_limit_work.work);
+
+	int rc;
+	static int icl;
+	union power_supply_propval temp = {0,};
+
+	smblib_get_prop_from_bms(chg, POWER_SUPPLY_PROP_TEMP, &temp);
+
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_PINE)
+	if (xiaomi_sdm439_mach_get_family() == XIAOMI_SDM439_MACH_FAMILY_PINE) {
+		if (temp.intval > XIAOMI_SDM439_COOL_0_TEMPERATURE
+			&& temp.intval <= XIAOMI_SDM439_COOL_5_TEMPERATURE && icl != XIAOMI_SDM439_COOL_ICL_400MA) {
+			mutex_lock(&chg->xiaomi_sdm439_cool_current);
+			rc = smblib_write(chg, JEITA_CCCOMP_CFG_COLD_REG, XIAOMI_SDM439_COOL_ICL_400MA);
+			if (rc < 0) {
+				smblib_err(chg,
+					"Couldn't configure XIAOMI_SDM439_JEITA_FVCOMP_CFG_HOT_REG rc=%d\n",
+					rc);
+			} else {
+				icl = XIAOMI_SDM439_COOL_ICL_400MA;
+				smblib_err(chg,
+					"bat temp between 0-5,set ibus 400ma\n");
+			}
+			mutex_unlock(&chg->xiaomi_sdm439_cool_current);
+		} else if (temp.intval  > XIAOMI_SDM439_COOL_5_TEMPERATURE
+			&& temp.intval  <= XIAOMI_SDM439_COOL_10_TEMPERATURE && icl != XIAOMI_SDM439_COOL_ICL_1300MA) {
+			mutex_lock(&chg->xiaomi_sdm439_cool_current);
+			rc = smblib_write(chg, JEITA_CCCOMP_CFG_COLD_REG, XIAOMI_SDM439_COOL_ICL_1300MA);
+			if (rc < 0) {
+				smblib_err(chg, "Couldn't configure XIAOMI_SDM439_JEITA_FVCOMP_CFG_HOT_REG rc=%d\n",
+					rc);
+			} else {
+				icl = XIAOMI_SDM439_COOL_ICL_1300MA;
+				smblib_err(chg,
+					"bat temp between 5-10,set ibus 1200ma\n");
+			}
+			mutex_unlock(&chg->xiaomi_sdm439_cool_current);
+		} else if (temp.intval  > XIAOMI_SDM439_COOL_10_TEMPERATURE
+			&& temp.intval  < XIAOMI_SDM439_COOL_15_TEMPERATURE && icl != XIAOMI_SDM439_COOL_ICL_1950MA) {
+			mutex_lock(&chg->xiaomi_sdm439_cool_current);
+			rc = smblib_write(chg, JEITA_CCCOMP_CFG_COLD_REG, XIAOMI_SDM439_COOL_ICL_1950MA);
+			if (rc < 0) {
+				smblib_err(chg, "Couldn't configure XIAOMI_SDM439_JEITA_FVCOMP_CFG_HOT_REG rc=%d\n",
+					rc);
+			} else {
+				icl = XIAOMI_SDM439_COOL_ICL_1950MA;
+				smblib_err(chg,
+					"bat temp between 10-15,set ibus 1950ma\n");
+			}
+			mutex_unlock(&chg->xiaomi_sdm439_cool_current);
+		}
+	}
+#endif
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_OLIVE)
+	if (xiaomi_sdm439_mach_get_family() == XIAOMI_SDM439_MACH_FAMILY_OLIVE) {
+		if (temp.intval > XIAOMI_SDM439_COOL_0_TEMPERATURE
+			&& temp.intval <= XIAOMI_SDM439_COOL_5_TEMPERATURE && icl != XIAOMI_SDM439_COOL_ICL_OLIVE_1000MA) {
+			mutex_lock(&chg->xiaomi_sdm439_cool_current);
+			rc = smblib_write(chg, JEITA_CCCOMP_CFG_COLD_REG, XIAOMI_SDM439_COOL_ICL_OLIVE_1000MA);
+			if (rc < 0) {
+				smblib_err(chg,
+					"Couldn't configure XIAOMI_SDM439_JEITA_FVCOMP_CFG_HOT_REG rc=%d\n",
+					rc);
+			} else {
+				icl = XIAOMI_SDM439_COOL_ICL_OLIVE_1000MA;
+				smblib_err(chg,
+					"bat temp between 0-5,set ibus 1000ma\n");
+			}
+			mutex_unlock(&chg->xiaomi_sdm439_cool_current);
+		} else if (temp.intval  > XIAOMI_SDM439_COOL_5_TEMPERATURE
+			&& temp.intval  <= XIAOMI_SDM439_COOL_10_TEMPERATURE && icl != XIAOMI_SDM439_COOL_ICL_OLIVE_1950MA) {
+			mutex_lock(&chg->xiaomi_sdm439_cool_current);
+			rc = smblib_write(chg, JEITA_CCCOMP_CFG_COLD_REG, XIAOMI_SDM439_COOL_ICL_OLIVE_1950MA);
+			if (rc < 0) {
+				smblib_err(chg, "Couldn't configure XIAOMI_SDM439_JEITA_FVCOMP_CFG_HOT_REG rc=%d\n",
+					rc);
+			} else {
+				icl = XIAOMI_SDM439_COOL_ICL_OLIVE_1950MA;
+				smblib_err(chg,
+					"bat temp between 5-10,set ibus 1950ma\n");
+			}
+			mutex_unlock(&chg->xiaomi_sdm439_cool_current);
+		} else if (temp.intval  > XIAOMI_SDM439_COOL_10_TEMPERATURE
+			&& temp.intval  < XIAOMI_SDM439_COOL_15_TEMPERATURE && icl != XIAOMI_SDM439_COOL_ICL_OLIVE_2950MA) {
+			mutex_lock(&chg->xiaomi_sdm439_cool_current);
+			rc = smblib_write(chg, JEITA_CCCOMP_CFG_COLD_REG, XIAOMI_SDM439_COOL_ICL_OLIVE_2950MA);
+			if (rc < 0) {
+				smblib_err(chg, "Couldn't configure XIAOMI_SDM439_JEITA_FVCOMP_CFG_HOT_REG rc=%d\n",
+					rc);
+			} else {
+				icl = XIAOMI_SDM439_COOL_ICL_OLIVE_2950MA;
+				smblib_err(chg,
+					"bat temp between 10-15,set ibus 2950ma\n");
+			}
+			mutex_unlock(&chg->xiaomi_sdm439_cool_current);
+		}
+	}
+#endif
+	schedule_delayed_work(&chg->xiaomi_sdm439_cool_limit_work, msecs_to_jiffies(XIAOMI_SDM439_SMBCHG_UPDATE_MS));
+}
+
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_PINE)
+static void xiaomi_pine_smblib_adapter_limit_work(struct work_struct *work)
+{
+	int settled_ua = 0;
+	union power_supply_propval val;
+	struct smb_charger *chg = container_of(work, struct smb_charger,
+			xiaomi_pine_adapter_limit_work.work);
+
+	smblib_get_prop_input_current_settled(chg, &val);
+	settled_ua = val.intval;
+	smblib_err(chg, "settled_ua = %d\n", settled_ua);
+	if ((chg->real_charger_type == POWER_SUPPLY_TYPE_USB_DCP) &&
+		(settled_ua >= XIAOMI_SDM439_DCP_CURRENT_UA_PINE_LIMIT)) {
+		chg->xiaomi_pine_is_adapter_idn = false;
+		smblib_err(chg, "DCP set ibus 2A\n");
+		vote(chg->usb_icl_votable, SW_ICL_MAX_VOTER, true, DCP_CURRENT_UA);
+	} else if (settled_ua <= XIAOMI_SDM439_DCP_CURRENT_UA_PINE_IDN) {
+		return;
+	} else {
+		chg->xiaomi_pine_is_adapter_idn = true;
+		smblib_err(chg, "NOT DCP set ibus 1A\n");
+		vote(chg->usb_icl_votable, SW_ICL_MAX_VOTER, true, XIAOMI_SDM439_DCP_CURRENT_UA_PINE_IDN);
+	}
+}
+#endif
+#endif
+
 static int smblib_create_votables(struct smb_charger *chg)
 {
 	int rc = 0;
@@ -4540,6 +5030,13 @@ int smblib_init(struct smb_charger *chg)
 {
 	int rc = 0;
 
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+	if (xiaomi_sdm439_mach_get()) {
+		override_smb5_lib_h_values_for_xiaomi_sdm439();
+		override_smb5_reg_h_values_for_xiaomi_sdm439();
+	}
+#endif
+
 	mutex_init(&chg->lock);
 	INIT_WORK(&chg->bms_update_work, bms_update_work);
 	INIT_WORK(&chg->pl_update_work, pl_update_work);
@@ -4550,6 +5047,24 @@ int smblib_init(struct smb_charger *chg)
 	INIT_DELAYED_WORK(&chg->uusb_otg_work, smblib_uusb_otg_work);
 	INIT_DELAYED_WORK(&chg->bb_removal_work, smblib_bb_removal_work);
 	INIT_DELAYED_WORK(&chg->usbov_dbc_work, smblib_usbov_dbc_work);
+
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+	if (xiaomi_sdm439_mach_get()) {
+		INIT_DELAYED_WORK(&chg->xiaomi_sdm439_arb_monitor_work, xiaomi_sdm439_smblib_arb_monitor_work);
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_PINE)
+		if (xiaomi_sdm439_mach_get_family() == XIAOMI_SDM439_MACH_FAMILY_PINE)
+			INIT_DELAYED_WORK(&chg->xiaomi_pine_adapter_limit_work, xiaomi_pine_smblib_adapter_limit_work);
+#endif
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_OLIVE)
+		if (xiaomi_sdm439_mach_get_family() == XIAOMI_SDM439_MACH_FAMILY_OLIVE)
+			INIT_DELAYED_WORK(&chg->xiaomi_olive_hw_suchg_detect_work, xiaomi_olive_smblib_hw_suchg_detect_work);
+#endif
+		if (chg->xiaomi_sdm439_hw_jeita_enabled) {
+			INIT_DELAYED_WORK(&chg->xiaomi_sdm439_cool_limit_work, xiaomi_sdm439_smbchg_cool_limit_work);
+			schedule_delayed_work(&chg->xiaomi_sdm439_cool_limit_work, msecs_to_jiffies(XIAOMI_SDM439_SMBCHG_UPDATE_MS));
+		}
+	}
+#endif
 
 	if (chg->wa_flags & CHG_TERMINATION_WA) {
 		INIT_WORK(&chg->chg_termination_work,
@@ -4657,6 +5172,20 @@ int smblib_deinit(struct smb_charger *chg)
 		cancel_delayed_work_sync(&chg->uusb_otg_work);
 		cancel_delayed_work_sync(&chg->bb_removal_work);
 		cancel_delayed_work_sync(&chg->usbov_dbc_work);
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+		if (xiaomi_sdm439_mach_get()) {
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_PINE)
+			if (xiaomi_sdm439_mach_get_family() == XIAOMI_SDM439_MACH_FAMILY_PINE)
+				cancel_delayed_work_sync(&chg->xiaomi_pine_adapter_limit_work);
+#endif
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_OLIVE)
+			if (xiaomi_sdm439_mach_get_family() == XIAOMI_SDM439_MACH_FAMILY_OLIVE)
+				cancel_delayed_work_sync(&chg->xiaomi_olive_hw_suchg_detect_work);
+#endif
+			if (chg->xiaomi_sdm439_hw_jeita_enabled)
+				cancel_delayed_work_sync(&chg->xiaomi_sdm439_cool_limit_work);
+		}
+#endif
 		power_supply_unreg_notifier(&chg->nb);
 		smblib_destroy_votables(chg);
 		qcom_step_chg_deinit();
