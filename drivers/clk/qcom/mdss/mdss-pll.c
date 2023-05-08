@@ -13,6 +13,14 @@
 #include "mdss-dsi-pll.h"
 #include "mdss-dp-pll.h"
 #include "mdss-hdmi-pll.h"
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+#include <xiaomi-sdm439/mach.h>
+#endif
+
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+#define MDSS_MAX_PANEL_LEN 256
+extern char mdss_mdp_panel[MDSS_MAX_PANEL_LEN];
+#endif
 
 int mdss_pll_resource_enable(struct mdss_pll_resources *pll_res, bool enable)
 {
@@ -220,6 +228,15 @@ static int mdss_pll_probe(struct platform_device *pdev)
 
 	pll_res->ssc_en = of_property_read_bool(pdev->dev.of_node,
 						"qcom,dsi-pll-ssc-en");
+
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+	if (xiaomi_sdm439_mach_get()) {
+		if (strstr(mdss_mdp_panel, "mdss_dsi_ili9881d_hdplus_video_c3e")) {
+			pr_info("%s: Disable ssc_en for mdss_dsi_ili9881d_hdplus_video_c3e panel\n", __func__);
+			pll_res->ssc_en = false;
+		}
+	}
+#endif
 
 	if (pll_res->ssc_en) {
 		pr_info("%s: label=%s PLL SSC enabled\n", __func__, label);
