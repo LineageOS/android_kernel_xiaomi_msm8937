@@ -1,4 +1,4 @@
-//* drivers/input/touchscreen/gt1x_generic.h
+// drivers/input/touchscreen/gt1x_generic.h
 //
 // 2010 - 2016 Goodix Technology.
 //

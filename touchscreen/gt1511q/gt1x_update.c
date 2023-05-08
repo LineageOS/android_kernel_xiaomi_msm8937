@@ -1,19 +1,19 @@
-//* drivers/input/touchscreen/gt1x_update.c
-//*
-//* 2010 - 2016 Goodix Technology.
-//*
-//* This program is free software; you can redistribute it and/or modify
-//* it under the terms of the GNU General Public License as published by
-//* the Free Software Foundation; either version 2 of the License, or
-//* (at your option) any later version.
-//*
-//* This program is distributed in the hope that it will be a reference
-//* to you, when you are integrating the GOODiX's CTP IC into your system,
-//* but WITHOUT ANY WARRANTY; without even the implied warranty of
-//* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//* General Public License for more details.
-//*
-//* Version: 1.6
+// drivers/input/touchscreen/gt1x_update.c
+//
+// 2010 - 2016 Goodix Technology.
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be a reference
+// to you, when you are integrating the GOODiX's CTP IC into your system,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// General Public License for more details.
+//
+// Version: 1.6
 
 #include <linux/interrupt.h>
 #include <linux/i2c.h>
@@ -56,7 +56,7 @@
 #define _bRW_MISCTL__DSP_MCU_PWR_		0x4010
 #define _bRW_MISCTL__PATCH_AREA_EN_		0x404D
 
-//*
+//
 //	1.  firmware structure
 //		header: 128b
 //
@@ -159,9 +159,9 @@ int gt1x_auto_update_proc(void *data);
 int gt1x_hold_ss51_dsp(void);
 void gt1x_leave_update_mode(void);
 
-//**
-//* @return: return 0 if success, otherwise return a negative number
-//*          which contains the error code.
+//
+// @return: return 0 if success, otherwise return a negative number
+//          which contains the error code.
 
 s32 gt1x_check_fs_mounted(char *path_name)
 {
@@ -260,7 +260,7 @@ int gt1x_auto_update_proc(void *data)
 				return 0;
 			}
 
-			//* extends config */
+			// extends config */
 		if (config[0x805A - GTP_REG_CONFIG_DATA] & 0x40) {
 			ret = gt1x_i2c_write(GTP_REG_EXT_CONFIG,
 				&config[GTP_CONFIG_ORG_LENGTH], GTP_CONFIG_EXT_LENGTH);
@@ -671,9 +671,9 @@ int gt1x_check_firmware(void)
 	return 0;
 }
 
-///**
-//* @return: return a pointer pointed at the content of firmware
-//*          if success, otherwise return NULL.
+///
+// @return: return a pointer pointed at the content of firmware
+//          if success, otherwise return NULL.
 
 u8 *gt1x_get_fw_data(u32 offset, int length)
 {
@@ -708,10 +708,10 @@ int gt1x_update_judge(void)
 	memcpy(fw_ver_info.product_id, update_info.firmware_info->pid, 4);
 	fw_ver_info.product_id[4] = 0;
 
-	//* check fw status reg */
+	// check fw status reg */
 	do {
 		ret = gt1x_i2c_read_dbl_check(GTP_REG_FW_CHK_MAINSYS, reg_val, 1);
-		if (ret < 0) {	//* read reg failed */
+		if (ret < 0) {	// read reg failed */
 			goto _reset;
 		} else if (ret > 0) {
 			continue;

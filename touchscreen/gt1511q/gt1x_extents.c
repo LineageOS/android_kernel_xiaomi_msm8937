@@ -1,12 +1,12 @@
-//* drivers/input/touchscreen/gt1x_extents.c
-//*
-//* 2010 - 2016 Goodix Technology.
-//*
-//* This program is free software; you can redistribute it and/or modify
-//* it under the terms of the GNU General Public License as published by
-//* the Free Software Foundation; either version 2 of the License, or
-//* (at your option) any later version.
-//*
+// drivers/input/touchscreen/gt1x_extents.c
+//
+// 2010 - 2016 Goodix Technology.
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
 // This program is distributed in the hope that it will be a reference
 // to you, when you are integrating the GOODiX's CTP IC into your system,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -42,9 +42,9 @@
 
 #pragma pack(1)
 typedef struct {
-	u8 ic_msg[6];		//*from the first byte */
+	u8 ic_msg[6];		//from the first byte */
 	u8 gestures[4];
-	u8 data[3 + GESTURE_MAX_POINT_COUNT * 4 + 80];	//*80 bytes for extra data */
+	u8 data[3 + GESTURE_MAX_POINT_COUNT * 4 + 80];	//80 bytes for extra data */
 } st_gesture_data;
 #pragma pack()
 
@@ -56,13 +56,13 @@ typedef struct {
 #define CHKBITS_16			16
 #define CHKBITS_8			8
 
-int gesture_enabled;	//* module switch */
-DOZE_T gesture_doze_status = DOZE_DISABLED; //* doze status */
+int gesture_enabled;	// module switch */
+DOZE_T gesture_doze_status = DOZE_DISABLED; // doze status */
 
 //static u8 egde_config;
-static u8 gestures_flag[32];	//* gesture flag, every bit stands for a gesture */
-static st_gesture_data gesture_data;	//* gesture data buffer */
-static struct mutex gesture_data_mutex;	//* lock for gesture data */
+static u8 gestures_flag[32];	// gesture flag, every bit stands for a gesture */
+static st_gesture_data gesture_data;	// gesture data buffer */
+static struct mutex gesture_data_mutex;	// lock for gesture data */
 
 int gt1x_gesture_switch(struct input_dev *dev, unsigned int type, unsigned int code, int value)
 {
@@ -114,12 +114,12 @@ static ssize_t gt1x_gesture_data_write(struct file *filp, const char __user *buf
 	return len;
 }
 
-//**
-//* calc_checksum - Calc checksum.
-//* @buf: data to be calc
-//* @len: length of buf.
-//* @bits: checkbits
-//* Return true-pass, false:not pass.
+//
+// calc_checksum - Calc checksum.
+// @buf: data to be calc
+// @len: length of buf.
+// @bits: checkbits
+// Return true-pass, false:not pass.
 
 static bool calc_checksum(u8 *buf, int len, int bits)
 {
@@ -182,7 +182,7 @@ s32 gesture_event_handler(struct input_dev *dev)
 		return INVALID;
 	}
 
-		//** package: -head 4B + track points + extra info-
+		// package: -head 4B + track points + extra info-
 			// - head -
 			//  doze_buf[0]: gesture type,
 			//  doze_buf[1]: number of gesture points ,
@@ -238,7 +238,7 @@ s32 gesture_event_handler(struct input_dev *dev)
 						ret = 0;
 						goto clear_reg;
 					} else {
-						///* just return 0 without clear reg,
+						/// just return 0 without clear reg,
 										//this will receive another int, we
 										//check the data in the next frame */
 						err_flag1 = 1;
@@ -766,7 +766,7 @@ static long gt1x_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 	}
 
 	//GTP_DEBUG("IOCTL CMD:%x", cmd);
-	//* GTP_DEBUG("command:%d, length:%d, rw:%s",
+	// GTP_DEBUG("command:%d, length:%d, rw:%s",
 			//_IOC_NR(cmd),
 			//_IOC_SIZE(cmd),
 			//(_IOC_DIR(cmd) & _IOC_READ) ? "read" : (_IOC_DIR(cmd) & _IOC_WRITE) ? "write" : "-");

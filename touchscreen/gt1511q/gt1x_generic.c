@@ -453,12 +453,12 @@ s32 _do_i2c_write(struct i2c_msg *msg, u16 addr, u8 *buffer, s32 len)
 	return 0;
 }
 
-//**
-//* gt1x_i2c_read_dbl_check - read twice and double check
-//* @addr: register address
-//* @buffer: data buffer
-//* @len: bytes to read
-//* Return    <0: i2c error, 0: ok, 1:fail
+//
+// gt1x_i2c_read_dbl_check - read twice and double check
+// @addr: register address
+// @buffer: data buffer
+// @len: bytes to read
+// Return    <0: i2c error, 0: ok, 1:fail
 
 s32 gt1x_i2c_read_dbl_check(u16 addr, u8 *buffer, s32 len)
 {
@@ -493,10 +493,10 @@ s32 gt1x_i2c_read_dbl_check(u16 addr, u8 *buffer, s32 len)
 	return VALID;
 }
 
-//**
-//* gt1x_get_info - Get information from ic, such as resolution and
-//* int trigger type
-//* Return    <0: i2c failed, 0: i2c ok
+//
+// gt1x_get_info - Get information from ic, such as resolution and
+// int trigger type
+// Return    <0: i2c failed, 0: i2c ok
 
 s32 gt1x_get_info(void)
 {
@@ -523,11 +523,11 @@ s32 gt1x_get_info(void)
 	return 0;
 }
 
-//**
-//* gt1x_send_cfg - Send gt1x_config Function.
-//* @config: pointer of the configuration array.
-//* @cfg_len: length of configuration array.
-//* Return 0--success,non-0--fail.
+//
+// gt1x_send_cfg - Send gt1x_config Function.
+// @config: pointer of the configuration array.
+// @cfg_len: length of configuration array.
+// Return 0--success,non-0--fail.
 
 s32 gt1x_send_cfg(u8 *config, int cfg_len)
 {
@@ -556,7 +556,7 @@ s32 gt1x_send_cfg(u8 *config, int cfg_len)
 	if (config[GTP_REG_EXT_CFG_FLAG - GTP_REG_CONFIG_DATA] & 0x40) {
 		int total_len = GTP_CONFIG_EXT_LENGTH + GTP_CONFIG_ORG_LENGTH;
 
-		//* bit0 of first byte of extended config
+		// bit0 of first byte of extended config
 		// * must be set to 1, otherwise the firmware
 		// * will not accept the extended config data
 
@@ -625,13 +625,13 @@ s32 gt1x_send_cfg(u8 *config, int cfg_len)
 }
 
 #ifdef CONFIG_OF
-//**
-//* gt1x_parse_tp_config - get config data of touch panel
-//* @of_node: device node
-//* @cfg_name: config name prefix, e.g. "default-config"
-//* @sensor_id: config group ID
-//* @config: config data buffer
-//* return: > 0 size of config data, <0 error
+//
+// gt1x_parse_tp_config - get config data of touch panel
+// @of_node: device node
+// @cfg_name: config name prefix, e.g. "default-config"
+// @sensor_id: config group ID
+// @config: config data buffer
+// return: > 0 size of config data, <0 error
 u8 global_config;
 int gt1x_find_tp_config(struct device *dev,
 		char *cfg_name, u8 sensor_id, u8 *config)
@@ -678,11 +678,11 @@ int gt1x_find_tp_config(struct device *dev,
 }
 #endif
 
-//**
-//* gt1x_init_panel - Prepare config data for touch ic,
-//* don't call this function after initialization.
-//*
-//* Return 0--success,<0 --fail.
+//
+// gt1x_init_panel - Prepare config data for touch ic,
+// don't call this function after initialization.
+//
+// Return 0--success,<0 --fail.
 
 s32 gt1x_init_panel(void)
 {
@@ -703,7 +703,7 @@ s32 gt1x_init_panel(void)
 		return -EINVAL;
 	}
 
-	//* clear the flag, avoid failure when send
+	// clear the flag, avoid failure when send
 	// * the_config of driver. */
 	gt1x_config[0] &= 0x7F;
 
@@ -737,8 +737,8 @@ s32 gt1x_init_panel(void)
 		}
 #endif // END GTP_DRIVER_SEND_CFG_MI439 */
 
-	//* match resolution when gt1x_abs_x_max & gt1x_abs_y_max
-	//* have been set already */
+	// match resolution when gt1x_abs_x_max & gt1x_abs_y_max
+	// have been set already */
 	if ((gt1x_abs_x_max == 0) && (gt1x_abs_y_max == 0)) {
 		gt1x_abs_x_max = (gt1x_config[RESOLUTION_LOC + 1] << 8) +
 				gt1x_config[RESOLUTION_LOC];
@@ -939,16 +939,16 @@ s32 gt1x_reset_guitar(void)
 		usleep_range(8000, 8000);     //must >= 6ms
 #endif
 
-//* INT gpio is used to select i2c slave address
-//* during hardware reset, and INT synchronization
-//* flow informs the firmware that address selection
-//* has finished,if the kernel restricts the output
-//* of the gpio tied to IRQ line(kernel3.13 and
-//* later version), do the following steps:
-//*   1) select N to CONFIG_GTP_INT_SEL_SYNC_MI439
-//*      in menuconfig.
-//*   2) config pinctrl dts, pull-up INT gpio.
-//*   3) chose falling-edge IRQ trigger type.
+// INT gpio is used to select i2c slave address
+// during hardware reset, and INT synchronization
+// flow informs the firmware that address selection
+// has finished,if the kernel restricts the output
+// of the gpio tied to IRQ line(kernel3.13 and
+// later version), do the following steps:
+//   1) select N to CONFIG_GTP_INT_SEL_SYNC_MI439
+//      in menuconfig.
+//   2) config pinctrl dts, pull-up INT gpio.
+//   3) chose falling-edge IRQ trigger type.
 
 #ifdef CONFIG_GTP_INT_SEL_SYNC_MI439
 	//GTP_GPIO_OUTPUT(GTP_INT_PORT, 0);
@@ -965,10 +965,10 @@ s32 gt1x_reset_guitar(void)
 	return ret;
 }
 
-//**
-//* gt1x_read_version - Read gt1x version info.
-//* @ver_info: address to store version info
-//* Return 0-succeed.
+//
+// gt1x_read_version - Read gt1x version info.
+// @ver_info: address to store version info
+// Return 0-succeed.
 u8 global_patch_id;
 s32 gt1x_read_version(struct gt1x_version_info *ver_info)
 {
@@ -1034,10 +1034,10 @@ s32 gt1x_read_version(struct gt1x_version_info *ver_info)
 	return 0;
 }
 
-//**
-//* gt1x_get_chip_type - get chip type .
-//*
-//* different chip synchronize in different way,
+//
+// gt1x_get_chip_type - get chip type .
+//
+// different chip synchronize in different way,
 
 s32 gt1x_get_chip_type(void)
 {
@@ -1075,10 +1075,10 @@ s32 gt1x_get_chip_type(void)
 	}
 }
 
-//**
-//* gt1x_enter_sleep - Eter sleep function.
-//*
-//* Returns  0--success,non-0--fail.
+//
+// gt1x_enter_sleep - Eter sleep function.
+//
+// Returns  0--success,non-0--fail.
 
 static s32 gt1x_enter_sleep(void)
 {
@@ -1110,10 +1110,10 @@ static s32 gt1x_enter_sleep(void)
 #endif
 }
 
-//**
-//* gt1x_wakeup_sleep - wakeup from sleep mode Function.
-//*
-//* Return: 0--success,non-0--fail.
+//
+// gt1x_wakeup_sleep - wakeup from sleep mode Function.
+//
+// Return: 0--success,non-0--fail.
 
 static s32 gt1x_wakeup_sleep(void)
 {
@@ -1173,7 +1173,7 @@ static s32 gt1x_wakeup_sleep(void)
 	}
 
 	if (ret < 0 && flag) {
-		//* int  wakeup failed , try waking
+		// int  wakeup failed , try waking
 		// * up by reset */
 		while (retry--) {
 			ret = gt1x_reset_guitar();
@@ -1192,14 +1192,14 @@ static s32 gt1x_wakeup_sleep(void)
 #endif // END GTP_POWER_CTRL_SLEEP_MI439 */
 }
 
-//**
-//* gt1x_send_cmd - seng cmd
-//* must write data & checksum first
-//* byte    content
-//* 0       cmd
-//* 1       data
-//* 2       checksum
-//* Returns 0 - succeed,non-0 - failed
+//
+// gt1x_send_cmd - seng cmd
+// must write data & checksum first
+// byte    content
+// 0       cmd
+// 1       data
+// 2       checksum
+// Returns 0 - succeed,non-0 - failed
 
 s32 gt1x_send_cmd(u8 cmd, u8 data)
 {
@@ -1292,7 +1292,7 @@ s32 gt1x_request_event_handler(void)
 	return 0;
 }
 
-//**
+//
 // * gt1x_touch_event_handler - handle touch event
 // * (pen event, key event, finger touch envent)
 // * @data:
@@ -1325,10 +1325,10 @@ s32 gt1x_touch_event_handler(u8 *data, struct input_dev *dev,
 
 	memcpy(touch_data, data, 11);
 
-	//* read the remaining coor data
-		//* 0x814E(touch status) + 8(every coordinate
-		//* consist of 8 bytes data) * touch num +
-		//* keycode + checksum
+	// read the remaining coor data
+		// 0x814E(touch status) + 8(every coordinate
+		// consist of 8 bytes data) * touch num +
+		// keycode + checksum
 
 	if (touch_num > 1) {
 		ret = gt1x_i2c_read((GTP_READ_COOR_ADDR + 11),
@@ -1358,10 +1358,10 @@ s32 gt1x_touch_event_handler(u8 *data, struct input_dev *dev,
 				return ERROR_VALUE;
 			}
 		}
-//*
-//* cur_event , pre_event bit defination
-//* bits:     bit4	bit3		    bit2	 bit1	   bit0
-//* event:  hover  stylus_key  stylus    key    touch
+//
+// cur_event , pre_event bit defination
+// bits:     bit4	bit3		    bit2	 bit1	   bit0
+// event:  hover  stylus_key  stylus    key    touch
 
 	key_value = touch_data[1 + 8 * touch_num];
 //  start check current event */
@@ -1387,7 +1387,7 @@ s32 gt1x_touch_event_handler(u8 *data, struct input_dev *dev,
 // start handle current event and pre-event */
 #ifdef CONFIG_GTP_HAVE_STYLUS_KEY_MI439
 	if (CHK_BIT(cur_event, BIT_STYLUS_KEY) || CHK_BIT(pre_event, BIT_STYLUS_KEY)) {
-		//*
+		//
 		// * 0x10 -- stylus key0 down
 		// * 0x20 -- stylus key1 down
 		// * 0x40 -- stylus key0 & stylus key1 both down
@@ -1446,7 +1446,7 @@ s32 gt1x_touch_event_handler(u8 *data, struct input_dev *dev,
 	}
 #endif
 
-//* finger touch event*/
+// finger touch event*/
 	if (CHK_BIT(cur_event, BIT_TOUCH)) {
 		u8 report_num = 0;
 		coor_data = &touch_data[1];
@@ -1596,7 +1596,7 @@ void gt1x_pen_up(s32 id)
 }
 #endif
 
-//**
+//
 // *		Proximity Module
 
 #ifdef CONFIG_GTP_PROXIMITY_MI439
@@ -1912,8 +1912,8 @@ static void gt1x_ps_deinit(void)
 
 #endif //GTP_PROXIMITY_MI439 */
 
-//**
-//*			ESD Protect Module
+//
+//			ESD Protect Module
 
 #ifdef CONFIG_GTP_ESD_PROTECT_MI439
 static int esd_work_cycle = 200;
@@ -2002,8 +2002,8 @@ static void gt1x_esd_check_func(struct work_struct *work)
 }
 #endif
 
-//**
-//*              Smart Cover Module
+//
+//              Smart Cover Module
 
 #ifdef CONFIG_GTP_SMART_COVER_MI439
 struct smart_cover_device{
@@ -2016,8 +2016,8 @@ struct smart_cover_device{
 };
 static struct smart_cover_device *gt1x_sc_dev;
 
-//**
-//* gt1x_smart_cover_update_state - update smart cover config
+//
+// gt1x_smart_cover_update_state - update smart cover config
 
 static int gt1x_smart_cover_update_state(void)
 {
@@ -2074,9 +2074,9 @@ static ssize_t smart_cover_store(struct kobject *kobj,
 	return count;
 }
 
-//**
-//* gt1x_parse_sc_cfg - parse smart cover config
-//*  @sensor_id: sensor id of the hardware
+//
+// gt1x_parse_sc_cfg - parse smart cover config
+//  @sensor_id: sensor id of the hardware
 
 int gt1x_parse_sc_cfg(int sensor_id)
 {
@@ -2169,8 +2169,8 @@ static void gt1x_smart_cover_deinit(void)
 }
 #endif
 
-//**
-//*              Charger Detect & Switch Module
+//
+//              Charger Detect & Switch Module
 
 #ifdef CONFIG_GTP_CHARGER_SWITCH_MI439
 static u8 gt1x_config_charger[GTP_CONFIG_ORG_LENGTH +
@@ -2181,10 +2181,10 @@ static spinlock_t charger_lock;
 static int charger_running;
 static void gt1x_charger_work_func(struct work_struct *);
 
-//**
-//* gt1x_parse_chr_cfg - parse  charger config
-//*  @sensor_id: sensor id of the hardware
-//* Return:  0: succeed, <0 error
+//
+// gt1x_parse_chr_cfg - parse  charger config
+//  @sensor_id: sensor id of the hardware
+// Return:  0: succeed, <0 error
 
 int gt1x_parse_chr_cfg(int sensor_id)
 {
@@ -2226,10 +2226,10 @@ static void gt1x_init_charger(void)
 		}
 }
 
-//**
-//* gt1x_charger_switch - switch states of charging work thread
-//*
-//* @on: SWITCH_ON - start work thread, SWITCH_OFF: stop .
+//
+// gt1x_charger_switch - switch states of charging work thread
+//
+// @on: SWITCH_ON - start work thread, SWITCH_OFF: stop .
 
 void gt1x_charger_switch(s32 on)
 {
@@ -2256,11 +2256,11 @@ void gt1x_charger_switch(s32 on)
 	}
 }
 
-//**
-//* gt1x_charger_config - check and update charging status configuration
-//* @dir_update
-//* 	 0: check before send charging status configuration
-//*  	 1: directly send charging status configuration
+//
+// gt1x_charger_config - check and update charging status configuration
+// @dir_update
+// 	 0: check before send charging status configuration
+//  	 1: directly send charging status configuration
 
 void gt1x_charger_config(s32 dir_update)
 {
@@ -2383,7 +2383,7 @@ int gt1x_suspend(void)
 		}
 	}
 
-	//* to avoid waking up while not sleeping
+	// to avoid waking up while not sleeping
 		//delay 48 + 10ms to ensure reliability */
 	msleep(58);
 	GTP_INFO("Suspend end...");
