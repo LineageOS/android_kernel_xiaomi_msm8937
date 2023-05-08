@@ -26,6 +26,7 @@
 #include <linux/pwm.h>
 #include <linux/slab.h>
 #include <linux/io.h>
+#include <xiaomi-sdm439/backlight.h>
 
 #define NUM_DUAL_CHANNEL			2
 #define LMU_BACKLIGHT_DUAL_CHANNEL_USED		(BIT(0) | BIT(1))
@@ -206,7 +207,7 @@ static int dump_i2c_reg(struct ti_lmu_bl_chip *chip)
 	return 0;
 }
 
-int ti_hbm_set(enum backlight_hbm_mode hbm_mode)
+int ti_hbm_set(enum xiaomi_sdm439_backlight_hbm_mode hbm_mode)
 {
 	struct regmap *regmap = bl_chip->lmu->regmap;
 	int value = 0;
@@ -214,15 +215,15 @@ int ti_hbm_set(enum backlight_hbm_mode hbm_mode)
 	pr_err("[bkl] %s enter\n", __func__);
 
 	switch (hbm_mode) {
-	case HBM_MODE_DEFAULT:
+	case XIAOMI_SDM439_HBM_MODE_DEFAULT:
 		regmap_write(regmap, 0x18, 0x13);
 		pr_err("This is hbm mode 1\n");
 		break;
-	case HBM_MODE_LEVEL1:
+	case XIAOMI_SDM439_HBM_MODE_LEVEL1:
 		regmap_write(regmap, 0x18, 0x16);
 		pr_err("This is hbm mode 2\n");
 		break;
-	case HBM_MODE_LEVEL2:
+	case XIAOMI_SDM439_HBM_MODE_LEVEL2:
 		regmap_write(regmap, 0x18, 0x19);
 		pr_err("This is hbm mode 3\n");
 		break;

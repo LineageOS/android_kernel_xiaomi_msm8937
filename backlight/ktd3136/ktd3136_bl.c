@@ -20,6 +20,7 @@
 #include <xiaomi-sdm439/mfd/ktd3136.h>
 #include <linux/device.h>
 #include <linux/platform_device.h>
+#include <xiaomi-sdm439/backlight.h>
 
 struct ktd3137_chip *bkl_chip;
 
@@ -603,21 +604,21 @@ void ktd3137_brightness_set_workfunc(struct ktd3137_chip *chip, int brightness)
 	ktd3137_read_reg(chip->client, 0x08, &value);
 }
 
-int ktd_hbm_set(enum backlight_hbm_mode hbm_mode)
+int ktd_hbm_set(enum xiaomi_sdm439_backlight_hbm_mode hbm_mode)
 {
 	u8 value = 0;
 	LOG_DBG("%s enter\n", __func__);
 
 	switch (hbm_mode) {
-	case HBM_MODE_DEFAULT:
+	case XIAOMI_SDM439_HBM_MODE_DEFAULT:
 		ktd3137_write_reg(bkl_chip->client, REG_MODE, 0x99);
 		LOG_DBG("This is hbm mode 1\n");
 		break;
-	case HBM_MODE_LEVEL1:
+	case XIAOMI_SDM439_HBM_MODE_LEVEL1:
 		ktd3137_write_reg(bkl_chip->client, REG_MODE, 0xB1);
 		LOG_DBG("This is hbm mode 2\n");
 		break;
-	case HBM_MODE_LEVEL2:
+	case XIAOMI_SDM439_HBM_MODE_LEVEL2:
 		ktd3137_write_reg(bkl_chip->client, REG_MODE, 0xC9);
 		LOG_DBG("This is hbm mode 3\n");
 		break;
