@@ -32,6 +32,9 @@
 #if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
 #include <xiaomi-msm8937/mach.h>
 #endif
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+#include <xiaomi-sdm439/mach.h>
+#endif
 
 #include "mdss.h"
 #include "mdss_panel.h"
@@ -390,6 +393,10 @@ static int mdss_dsi_panel_power_off(struct mdss_panel_data *pdata)
 #if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_WINGTECH)
 	if (xiaomi_msm8937_mach_get_family() == XIAOMI_MSM8937_MACH_FAMILY_WINGTECH)
 		usleep_range(500, 500);
+#endif
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+	if (xiaomi_sdm439_mach_get())
+		msleep_interruptible(2);
 #endif
 
 	if (gpio_is_valid(ctrl_pdata->vdd_ext_gpio)) {
