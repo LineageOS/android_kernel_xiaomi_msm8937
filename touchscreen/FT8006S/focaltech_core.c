@@ -46,6 +46,7 @@
 #define FTS_SUSPEND_LEVEL 1	/* Early-suspend level */
 #endif
 #include "focaltech_core.h"
+#include <xiaomi-sdm439/mach.h>
 #include <xiaomi-sdm439/hqsysfs.h>
 #include <xiaomi-sdm439/touchscreen.h>
 
@@ -1812,6 +1813,9 @@ static struct spi_driver fts_ts_driver = {
 static int __init fts_ts_init(void)
 {
 	int ret = 0;
+
+	if (!xiaomi_sdm439_mach_get())
+		return -ENODEV;
 
 	FTS_FUNC_ENTER();
 	ret = spi_register_driver(&fts_ts_driver);

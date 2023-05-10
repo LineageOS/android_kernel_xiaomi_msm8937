@@ -19,6 +19,7 @@
  * You should have received a copy of the GNU General Public License
  */
 
+#include <xiaomi-sdm439/mach.h>
 #include "ilitek.h"
 
 #define DTS_INT_GPIO	"touch,irq-gpio"
@@ -466,6 +467,9 @@ static struct ilitek_hwif_info hwif = {
 
 static int __init ilitek_plat_dev_init(void)
 {
+	if (!xiaomi_sdm439_mach_get())
+		return -ENODEV;
+
 	ipio_info("ILITEK TP driver init for QCOM\n");
 	if (ilitek_tddi_dev_init(&hwif) < 0) {
 		ipio_err("Failed to register i2c/spi bus driver\n");

@@ -43,6 +43,7 @@
 
 /*Add by HQ-102007757 for sending tp hw info*/
 #include "focaltech_flash.h"
+#include <xiaomi-sdm439/mach.h>
 #include <xiaomi-sdm439/hqsysfs.h>
 #include <xiaomi-sdm439/touchscreen.h>
 /*****************************************************************************
@@ -1852,6 +1853,9 @@ static struct i2c_driver fts_ts_driver = {
 static int __init fts_ts_init(void)
 {
 	int ret = 0;
+
+	if (!xiaomi_sdm439_mach_get())
+		return -ENODEV;
 
 	FTS_FUNC_ENTER();
 	ret = i2c_add_driver(&fts_ts_driver);
