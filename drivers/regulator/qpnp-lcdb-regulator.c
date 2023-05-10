@@ -19,6 +19,9 @@
 #include <linux/qpnp/qpnp-revid.h>
 #if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
 #include <xiaomi-sdm439/mach.h>
+#if IS_ENABLED(CONFIG_TOUCHSCREEN_SYSCTL_MI439)
+#include <xiaomi-sdm439/touchscreen.h>
+#endif
 #endif
 
 #define QPNP_LCDB_REGULATOR_DRIVER_NAME		"qcom,qpnp-lcdb-regulator"
@@ -1364,6 +1367,11 @@ static int qpnp_lcdb_ldo_regulator_disable(struct regulator_dev *rdev)
 		return 0;
 
 	mutex_lock(&lcdb->lcdb_mutex);
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_OLIVE) && IS_ENABLED(CONFIG_TOUCHSCREEN_SYSCTL_MI439)
+	if (xiaomi_sdm439_mach_get_family() == XIAOMI_SDM439_MACH_FAMILY_OLIVE && xiaomi_sdm439_touchscreen_get_dt2w_state())
+		rc = 0;
+	else
+#endif
 	rc = qpnp_lcdb_disable(lcdb);
 	if (rc < 0)
 		pr_err("Failed to disable lcdb rc=%d\n", rc);
@@ -1452,6 +1460,11 @@ static int qpnp_lcdb_ncp_regulator_disable(struct regulator_dev *rdev)
 		return 0;
 
 	mutex_lock(&lcdb->lcdb_mutex);
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_OLIVE) && IS_ENABLED(CONFIG_TOUCHSCREEN_SYSCTL_MI439)
+	if (xiaomi_sdm439_mach_get_family() == XIAOMI_SDM439_MACH_FAMILY_OLIVE && xiaomi_sdm439_touchscreen_get_dt2w_state())
+		rc = 0;
+	else
+#endif
 	rc = qpnp_lcdb_disable(lcdb);
 	if (rc < 0)
 		pr_err("Failed to disable lcdb rc=%d\n", rc);
