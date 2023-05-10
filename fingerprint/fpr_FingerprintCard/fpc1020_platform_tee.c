@@ -37,6 +37,7 @@
 #include <linux/platform_device.h>
 #include <linux/regulator/consumer.h>
 #include <linux/pinctrl/consumer.h>
+#include <xiaomi-sdm439/mach.h>
 
 
 #define FPC_TTW_HOLD_TIME		1000
@@ -693,7 +694,12 @@ static struct platform_driver fpc1020_driver = {
 
 static int __init fpc1020_init(void)
 {
-	int rc = platform_driver_register(&fpc1020_driver);
+	int rc;
+
+	if (!xiaomi_sdm439_mach_get())
+		return -ENODEV;
+
+	rc = platform_driver_register(&fpc1020_driver);
 
 	if (!rc)
 		pr_info("%s OK\n", __func__);
