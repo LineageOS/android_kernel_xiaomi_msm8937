@@ -25,6 +25,12 @@ int xiaomi_sdm439_touchscreen_register_operations(struct xiaomi_sdm439_touchscre
 }
 EXPORT_SYMBOL(xiaomi_sdm439_touchscreen_register_operations);
 
+bool xiaomi_sdm439_touchscreen_get_dt2w_state(void)
+{
+	return !!xiaomi_sdm439_touchscreen_enable_dt2w_val;
+}
+EXPORT_SYMBOL(xiaomi_sdm439_touchscreen_get_dt2w_state);
+
 static int xiaomi_sdm439_touchscreen_toggle_enable_dt2w(struct ctl_table *table,
 					int write, void __user *buffer, size_t *lenp, loff_t *ppos)
 {

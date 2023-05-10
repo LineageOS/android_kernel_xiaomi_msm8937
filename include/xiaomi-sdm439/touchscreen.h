@@ -21,6 +21,7 @@ struct xiaomi_sdm439_touchscreen_operations_t {
 };
 
 extern int xiaomi_sdm439_touchscreen_register_operations(struct xiaomi_sdm439_touchscreen_operations_t *ts_ops);
+extern bool xiaomi_sdm439_touchscreen_get_dt2w_state(void);
 #endif
 
 #endif
