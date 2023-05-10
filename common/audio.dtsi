@@ -1,3 +1,7 @@
+/ {
+	qcom,enable-legacy-adsp-hacks;
+};
+
 &i2c_2 {
 	/delete-node/ wsa881x-i2c-codec@44;
 	/delete-node/ wsa881x-i2c-codec@45;
