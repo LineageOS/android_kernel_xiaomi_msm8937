@@ -150,7 +150,8 @@ do {                                                    \
 #define FAKE_REM_RETRY_ATTEMPTS 3
 #define MAX_IMPED 60000
 
-#define WCD_MBHC_BTN_PRESS_COMPL_TIMEOUT_MS  50
+static int wcd_mbhc_btn_press_compl_timeout_ms = 50;
+#define WCD_MBHC_BTN_PRESS_COMPL_TIMEOUT_MS  wcd_mbhc_btn_press_compl_timeout_ms
 #define ANC_DETECT_RETRY_CNT 7
 #define WCD_MBHC_SPL_HS_CNT  1
 

@@ -27,11 +27,20 @@
 #include <linux/completion.h>
 #include <sound/soc.h>
 #include <sound/jack.h>
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+#include <xiaomi-sdm439/mach.h>
+#endif
 #include "msm-cdc-pinctrl.h"
 #include "wcdcal-hwdep.h"
 #include "wcd-mbhc-legacy.h"
 #include "wcd-mbhc-adc.h"
 #include "wcd-mbhc-v2-api.h"
+
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+#define XIAOMI_SDM439_CAM_HS_IMPED 45000
+#define XIAOMI_SDM439_EUR_HS_LOW 5000
+#define XIAOMI_SDM439_EUR_HS_HIGH 15000
+#endif
 
 void wcd_mbhc_jack_report(struct wcd_mbhc *mbhc,
 			  struct snd_soc_jack *jack, int status, int mask)
@@ -715,6 +724,47 @@ void wcd_mbhc_report_plug(struct wcd_mbhc *mbhc, int insertion,
 				pr_debug("%s: Marking jack type as SND_JACK_LINEOUT\n",
 				__func__);
 			}
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+			if (xiaomi_sdm439_mach_get()) {
+				wcd_mbhc_set_and_turnoff_hph_padac(mbhc);
+				if ((mbhc->zl > XIAOMI_SDM439_CAM_HS_IMPED &&
+					mbhc->zl < MAX_IMPED) &&
+					(mbhc->zr > XIAOMI_SDM439_CAM_HS_IMPED &&
+					mbhc->zr < MAX_IMPED) &&
+					(jack_type == SND_JACK_UNSUPPORTED)) {
+						jack_type = SND_JACK_HEADSET;
+						mbhc->current_plug = MBHC_PLUG_TYPE_HEADSET;
+						mbhc->jiffies_atreport = jiffies;
+						if (mbhc->hph_status) {
+							mbhc->hph_status &= ~(SND_JACK_HEADSET |
+							SND_JACK_LINEOUT |
+							SND_JACK_UNSUPPORTED);
+							wcd_mbhc_jack_report(mbhc,
+							&mbhc->headset_jack,
+							mbhc->hph_status,
+							WCD_MBHC_JACK_MASK);
+					}
+				}
+
+				if ((mbhc->zl > XIAOMI_SDM439_EUR_HS_LOW &&
+					mbhc->zl < XIAOMI_SDM439_EUR_HS_HIGH) &&
+					(mbhc->zr > XIAOMI_SDM439_EUR_HS_LOW &&
+					mbhc->zr < XIAOMI_SDM439_EUR_HS_HIGH) &&
+					(jack_type == SND_JACK_UNSUPPORTED)) {
+						pr_info(" XIAOMI SDM439 EUR HS !");
+						jack_type = SND_JACK_HEADPHONE;
+						mbhc->current_plug = MBHC_PLUG_TYPE_HEADPHONE;
+						if (mbhc->hph_status) {
+							mbhc->hph_status &= ~(MBHC_PLUG_TYPE_HEADPHONE |
+							SND_JACK_UNSUPPORTED);
+							wcd_mbhc_jack_report(mbhc,
+							&mbhc->headset_jack,
+							mbhc->hph_status,
+							WCD_MBHC_JACK_MASK);
+					}
+				}
+			}
+#endif
 		}
 
 		mbhc->hph_status |= jack_type;
