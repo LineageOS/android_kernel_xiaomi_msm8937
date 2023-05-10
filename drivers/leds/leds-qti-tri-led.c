@@ -18,6 +18,9 @@
 #include <linux/pwm.h>
 #include <linux/regmap.h>
 #include <linux/types.h>
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+#include <xiaomi-sdm439/mach.h>
+#endif
 
 #define TRILED_REG_TYPE			0x04
 #define TRILED_REG_SUBTYPE		0x05
@@ -406,6 +409,10 @@ static int qpnp_tri_led_register(struct qpnp_tri_led_chip *chip)
 		mutex_init(&led->lock);
 		led->cdev.name = led->label;
 		led->cdev.max_brightness = LED_FULL;
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+		if (xiaomi_sdm439_mach_get())
+			led->cdev.max_brightness = 45;
+#endif
 		led->cdev.brightness_set_blocking = qpnp_tri_led_set_brightness;
 		led->cdev.brightness_get = qpnp_tri_led_get_brightness;
 		led->cdev.blink_set = qpnp_tri_led_set_blink;
