@@ -23,7 +23,10 @@ static int __init camera_legacy_init(void)
 		return -ENODEV;
 #endif
 
-	camera_legacy_enable = true;
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
+	if (xiaomi_msm8937_mach_get())
+		camera_legacy_enable = true;
+#endif
 
 #if IS_ENABLED(CONFIG_MSMB_CAMERA_LEGACY_M)
 #if IS_ENABLED(CONFIG_MACH_XIAOMI_LAND) || IS_ENABLED(CONFIG_MACH_XIAOMI_PRADA)
