@@ -20,6 +20,7 @@
 #include <linux/mutex.h>
 #include <linux/slab.h>
 #include <linux/regulator/consumer.h>
+#include <xiaomi-msm8937/mach.h>
 #include "leds-aw2013.h"
 
 /* register address */
@@ -641,6 +642,9 @@ static struct i2c_driver aw2013_led_driver = {
 
 static int __init aw2013_led_init(void)
 {
+	if (!xiaomi_msm8937_mach_get())
+		return -ENODEV;
+
 	return i2c_add_driver(&aw2013_led_driver);
 }
 module_init(aw2013_led_init);
