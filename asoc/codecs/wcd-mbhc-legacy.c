@@ -19,6 +19,9 @@
 #include <linux/completion.h>
 #include <sound/soc.h>
 #include <sound/jack.h>
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+#include <xiaomi-sdm439/mach.h>
+#endif
 #include "wcd-mbhc-legacy.h"
 #include <asoc/wcd-mbhc-v2.h>
 
@@ -173,6 +176,16 @@ static bool wcd_is_special_headset(struct wcd_mbhc *mbhc)
 	bool ret = false;
 	u16 hs_comp_res;
 	bool is_spl_hs = false;
+
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+	if (xiaomi_sdm439_mach_get()) {
+		/*
+		* We keep the micbias to 2.2V, if we detect an external cable,
+		* we don't need boost to 2.7V and then check again.
+		*/
+		return true;
+	}
+#endif
 
 	/*
 	 * Increase micbias to 2.7V to detect headsets with
@@ -677,6 +690,14 @@ correct_plug_type:
 				}
 			}
 			wrk_complete = false;
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+			if (xiaomi_sdm439_mach_get()) {
+				if ((plug_type == MBHC_PLUG_TYPE_HEADSET) || (plug_type == MBHC_PLUG_TYPE_ANC_HEADPHONE)){
+					pr_debug("%s: xiaomi sdm439 get plug_type = %d, exit while \n",  __func__, plug_type);
+					break;
+				}
+			}
+#endif
 		}
 	}
 	if (!wrk_complete && mbhc->btn_press_intr) {
@@ -765,6 +786,11 @@ exit:
 								MIC_BIAS_2);
 	}
 
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+	if (xiaomi_sdm439_mach_get())
+		pr_debug("%s: Skip some codes for Xiaomi SDM439\n", __func__);
+	else
+#endif
 	if (mbhc->mbhc_cfg->detect_extn_cable &&
 	    ((plug_type == MBHC_PLUG_TYPE_HEADPHONE) ||
 	     (plug_type == MBHC_PLUG_TYPE_HEADSET)) &&
@@ -1020,6 +1046,11 @@ static struct wcd_mbhc_fn mbhc_fn = {
  */
 void wcd_mbhc_legacy_init(struct wcd_mbhc *mbhc)
 {
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+	if (xiaomi_sdm439_mach_get())
+		WCD_MBHC_BTN_PRESS_COMPL_TIMEOUT_MS = 250;
+#endif
+
 	if (!mbhc) {
 		pr_err("%s: mbhc is NULL\n", __func__);
 		return;

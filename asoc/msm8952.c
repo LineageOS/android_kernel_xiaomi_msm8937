@@ -26,6 +26,9 @@
 #if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
 #include <xiaomi-msm8937/mach.h>
 #endif
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+#include <xiaomi-sdm439/mach.h>
+#endif
 
 #define DRV_NAME "msm8952-asoc-wcd"
 
@@ -1664,6 +1667,37 @@ static void *def_msm8952_wcd_mbhc_cal(void)
 			btn_high[3] = 510;
 			btn_low[4] = 530;
 			btn_high[4] = 540;
+		default:
+			break;
+	}
+#endif
+
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+	switch (xiaomi_sdm439_mach_get_family()) {
+		case XIAOMI_SDM439_MACH_FAMILY_PINE:
+			btn_low[0] = 89;
+			btn_high[0] = 89;
+			btn_low[1] = 288;
+			btn_high[1] = 288;
+			btn_low[2] = 488;
+			btn_high[2] = 555;
+			btn_low[3] = 488;
+			btn_high[3] = 555;
+			btn_low[4] = 488;
+			btn_high[4] = 555;
+			break;
+		case XIAOMI_SDM439_MACH_FAMILY_OLIVE:
+			btn_low[0] = 92;
+			btn_high[0] = 92;
+			btn_low[1] = 266;
+			btn_high[1] = 266;
+			btn_low[2] = 488;
+			btn_high[2] = 488;
+			btn_low[3] = 488;
+			btn_high[3] = 488;
+			btn_low[4] = 488;
+			btn_high[4] = 488;
+			break;
 		default:
 			break;
 	}
