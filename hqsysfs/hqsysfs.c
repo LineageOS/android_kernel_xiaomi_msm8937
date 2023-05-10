@@ -12,6 +12,7 @@
  * GNU General Public License for more details.
  */
 
+#include <xiaomi-sdm439/mach.h>
 #include <xiaomi-sdm439/hqsysfs.h>
 #include <linux/qpnp/qpnp-revid.h>
 #include "hqsys_misc.h"
@@ -455,6 +456,9 @@ __setup("androidboot.boot_reason=", get_boot_rease);
 
 static int __init hq_harware_init(void)
 {
+	if (!xiaomi_sdm439_mach_get())
+		return -ENODEV;
+
 	/* create sysfs entry at /sys/class/huaqin/interface/hw_info */
 	create_sysfs();
 

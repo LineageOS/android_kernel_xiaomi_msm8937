@@ -12,6 +12,7 @@
  * GNU General Public License for more details.
  */
 
+#include <xiaomi-sdm439/mach.h>
 #include "hqsys_misc.h"
 
 
@@ -248,6 +249,9 @@ static int __init create_misc(void)
 
 static int __init hq_misc_sys_init(void)
 {
+	if (!xiaomi_sdm439_mach_get())
+		return -ENODEV;
+
 	/* create sysfs entry at /sys/class/hq_misc/interface/misc */
 	create_misc();
 
