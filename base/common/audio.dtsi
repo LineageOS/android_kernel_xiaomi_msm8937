@@ -68,3 +68,8 @@
 	/delete-property/ qcom,msm-vdd-wsa-switch-voltage;
 	/delete-property/ qcom,msm-vdd-wsa-switch-current;
 };
+
+/* Adapted from stock msm-analog-cdc.c */
+&pmic_analog_codec {
+	qcom,cdc-micbias-cfilt-mv = <2200000>;
+};
