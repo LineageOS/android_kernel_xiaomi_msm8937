@@ -55,9 +55,9 @@ unsigned char aw87519_audio_off(void);
 /*******************************************************************************
  * aw87519 variable
  ******************************************************************************/
-struct aw87519 *aw87519;
-struct aw87519_container *aw87519_spk_cnt;
-struct aw87519_container *aw87519_rcv_cnt;
+static struct aw87519 *aw87519;
+static struct aw87519_container *aw87519_spk_cnt;
+static struct aw87519_container *aw87519_rcv_cnt;
 
 static char *aw87519_spk_name = "aw87519_spk.bin";
 static char *aw87519_rcv_name = "aw87519_rcv.bin";
@@ -110,7 +110,7 @@ static char *aw87519_rcv_name = "aw87519_rcv.bin";
 /*******************************************************************************
  * aw87519 hardware control
  ******************************************************************************/
-unsigned int aw87519_hw_on(struct aw87519 *aw87519)
+static unsigned int aw87519_hw_on(struct aw87519 *aw87519)
 {
     pr_info("%s enter\n", __func__);
 
@@ -128,7 +128,7 @@ unsigned int aw87519_hw_on(struct aw87519 *aw87519)
     return 0;
 }
 
-unsigned int aw87519_hw_off(struct aw87519 *aw87519)
+static unsigned int aw87519_hw_off(struct aw87519 *aw87519)
 {
     pr_info("%s enter\n", __func__);
 
@@ -470,7 +470,7 @@ static int aw87519_parse_dt(struct device *dev, struct device_node *np) {
     return 0;
 }
 
-int aw87519_hw_reset(struct aw87519 *aw87519)
+static int aw87519_hw_reset(struct aw87519 *aw87519)
 {
     pr_info("%s enter\n", __func__);
 
@@ -490,7 +490,7 @@ int aw87519_hw_reset(struct aw87519 *aw87519)
 /*****************************************************
  * check chip id
  *****************************************************/
-int aw87519_read_chipid(struct aw87519 *aw87519)
+static int aw87519_read_chipid(struct aw87519 *aw87519)
 {
     unsigned int cnt = 0;
     int ret = -1;

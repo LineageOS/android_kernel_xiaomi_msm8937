@@ -2,7 +2,7 @@
 #define __AW87519_H__
 
 
-unsigned char aw87519_spk_cfg_default[]={
+static unsigned char aw87519_spk_cfg_default[]={
 //    0x00,0x59,  CHIPID REG
     0x69,0x80,
     0x69,0xB7,
@@ -27,7 +27,7 @@ unsigned char aw87519_spk_cfg_default[]={
     0x68,0XD0
 };
 
-unsigned char aw87519_rcv_cfg_default[]={
+static unsigned char aw87519_rcv_cfg_default[]={
 //    0x00,0x59,  //CHIPID REG
     0x69,0x80,
     0x69,0xB7,
