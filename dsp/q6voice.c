@@ -9,6 +9,9 @@
 #include <linux/uaccess.h>
 #include <linux/wait.h>
 #include <linux/mutex.h>
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+#include <xiaomi-sdm439/mach.h>
+#endif
 
 #include <soc/qcom/socinfo.h>
 
@@ -4138,6 +4141,17 @@ static int voice_send_cvp_channel_info_v2(struct voice_data *v,
 		memcpy(&channel_info->channel_mapping,
 		       v->dev_rx.channel_mapping,
 		       VSS_NUM_CHANNELS_MAX * sizeof(uint8_t));
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+		if (xiaomi_sdm439_mach_get()) {
+			//force to mono
+			pr_debug("xiaomi sdm439 force to mono reference signal\n");
+			channel_info->num_channels = 1;
+			memset(&channel_info->channel_mapping,
+				0,
+				VSS_NUM_CHANNELS_MAX * sizeof(uint8_t));
+			channel_info->channel_mapping[0] = PCM_CHANNEL_FC;
+		}
+#endif
 		break;
 	default:
 		pr_err("%s: Invalid param type\n",
