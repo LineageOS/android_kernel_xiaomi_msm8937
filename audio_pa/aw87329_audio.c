@@ -37,6 +37,7 @@
 #include <linux/timer.h>
 #include <linux/workqueue.h>
 #include <linux/hrtimer.h>
+#include <xiaomi-sdm439/mach.h>
 
 /*******************************************************************************
  * aw87329 marco
@@ -850,6 +851,9 @@ static struct i2c_driver aw87329_i2c_driver = {
 
 static int __init aw87329_pa_init(void) {
     int ret;
+
+	if (!xiaomi_sdm439_mach_get())
+		return -ENODEV;
 
     pr_info("%s enter\n", __func__);
     pr_info("%s: driver version: %s\n", __func__, AW87329_DRIVER_VERSION);
