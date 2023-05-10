@@ -34,6 +34,7 @@
 * 1.Included header files
 *****************************************************************************/
 #include "focaltech_core.h"
+#include <xiaomi-sdm439/touchscreen.h>
 #if FTS_GESTURE_EN
 /******************************************************************************
 * Private constant and macro definitions using #define
@@ -130,6 +131,27 @@ static struct attribute *fts_gesture_mode_attrs[] = {
 static struct attribute_group fts_gesture_group = {
 	.attrs = fts_gesture_mode_attrs,
 };
+
+#if IS_ENABLED(CONFIG_TOUCHSCREEN_SYSCTL_MI439)
+static int ft5446_mi439_ops_enable_dt2w(struct device *dev, bool enable)
+{
+	mutex_lock(&xiaomi_sdm439_ft5446_fts_data->input_dev->mutex);
+	if (enable) {
+		FTS_DEBUG("enable gesture");
+		fts_gesture_data.mode = ENABLE;
+	} else {
+		FTS_DEBUG("disable gesture");
+		fts_gesture_data.mode = DISABLE;
+	}
+	mutex_unlock(&xiaomi_sdm439_ft5446_fts_data->input_dev->mutex);
+
+	return 0;
+}
+
+static struct xiaomi_sdm439_touchscreen_operations_t ft5446_mi439_ts_ops = {
+	.enable_dt2w = ft5446_mi439_ops_enable_dt2w,
+};
+#endif
 
 /************************************************************************
 * Name: fts_gesture_show
@@ -597,6 +619,11 @@ int xiaomi_sdm439_ft5446_fts_gesture_init(struct fts_ts_data *ts_data)
 	xiaomi_sdm439_ft5446_fts_create_gesture_sysfs(client);
 	fts_gesture_data.mode = DISABLE;
 	fts_gesture_data.active = DISABLE;
+
+#if IS_ENABLED(CONFIG_TOUCHSCREEN_SYSCTL_MI439)
+	ft5446_mi439_ts_ops.dev = &ts_data->client->dev;
+	xiaomi_sdm439_touchscreen_register_operations(&ft5446_mi439_ts_ops);
+#endif
 
 	FTS_FUNC_EXIT();
 	return 0;

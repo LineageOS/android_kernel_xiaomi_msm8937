@@ -26,6 +26,7 @@
 #include <linux/device.h>
 #include <linux/miscdevice.h>
 #include <linux/input.h>
+#include <xiaomi-sdm439/touchscreen.h>
 
 #include <asm/uaccess.h>
 #include <linux/proc_fs.h>	/*proc */
@@ -63,6 +64,20 @@ DOZE_T gesture_doze_status = DOZE_DISABLED; // doze status */
 static u8 gestures_flag[32];	// gesture flag, every bit stands for a gesture */
 static st_gesture_data gesture_data;	// gesture data buffer */
 static struct mutex gesture_data_mutex;	// lock for gesture data */
+
+#if IS_ENABLED(CONFIG_TOUCHSCREEN_SYSCTL_MI439)
+static int gt1x_mi439_ops_enable_dt2w(struct device *dev, bool enable)
+{
+	gesture_enabled = enable;
+	GTP_INFO("gesture enabled:%d", gesture_enabled);
+
+	return 0;
+}
+
+static struct xiaomi_sdm439_touchscreen_operations_t gt1x_mi439_ts_ops = {
+	.enable_dt2w = gt1x_mi439_ops_enable_dt2w,
+};
+#endif
 
 int gt1x_gesture_switch(struct input_dev *dev, unsigned int type, unsigned int code, int value)
 {
@@ -1008,6 +1023,12 @@ s32 gt1x_init_node(void)
 		GTP_INFO("Created misc device in /dev/hotknot.");
 	}
 #endif
+
+#if IS_ENABLED(CONFIG_TOUCHSCREEN_SYSCTL_MI439)
+	gt1x_mi439_ts_ops.dev = &gt1x_i2c_client->dev;
+	xiaomi_sdm439_touchscreen_register_operations(&gt1x_mi439_ts_ops);
+#endif
+
 	return 0;
 }
 

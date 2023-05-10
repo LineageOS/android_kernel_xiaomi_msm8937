@@ -20,6 +20,7 @@
  */
 
 #include "ilitek.h"
+#include <xiaomi-sdm439/touchscreen.h>
 
 #define USER_STR_BUFF		PAGE_SIZE
 #define IOCTL_I2C_BUFF		PAGE_SIZE
@@ -87,6 +88,21 @@
 #endif
 
 unsigned char g_user_buf[USER_STR_BUFF] = {0};
+
+#if IS_ENABLED(CONFIG_TOUCHSCREEN_SYSCTL_MI439)
+static int itk9881h_mi439_ops_enable_dt2w(struct device *dev, bool enable)
+{
+	idev->gesture = enable;
+	ilitek_gesture_flag = enable;
+	ipio_info("gesture = %d\n", idev->gesture);
+
+	return 0;
+}
+
+static struct xiaomi_sdm439_touchscreen_operations_t itk9881h_mi439_ts_ops = {
+	.enable_dt2w = itk9881h_mi439_ops_enable_dt2w,
+};
+#endif
 
 int str2hex(char *str)
 {
@@ -1974,4 +1990,9 @@ void ilitek_tddi_node_init(void)
 	}
 
 	netlink_init();
+
+#if IS_ENABLED(CONFIG_TOUCHSCREEN_SYSCTL_MI439)
+	itk9881h_mi439_ts_ops.dev = idev->dev;
+	xiaomi_sdm439_touchscreen_register_operations(&itk9881h_mi439_ts_ops);
+#endif
 }

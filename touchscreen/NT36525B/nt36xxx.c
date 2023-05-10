@@ -1541,6 +1541,22 @@ out:
 	return ret;
 }
 
+#if IS_ENABLED(CONFIG_TOUCHSCREEN_SYSCTL_MI439)
+static int nt36525b_mi439_ops_enable_dt2w(struct device *dev, bool enable)
+{
+#if WAKEUP_GESTURE
+	nvt_gesture_flag = enable;
+	NVT_LOG("gesture disabled:%d", nvt_gesture_flag);
+#endif
+
+	return 0;
+}
+
+static struct xiaomi_sdm439_touchscreen_operations_t nt36525b_mi439_ts_ops = {
+	.enable_dt2w = nt36525b_mi439_ops_enable_dt2w,
+};
+#endif
+
 #if WAKEUP_GESTURE
 
 
@@ -1854,6 +1870,11 @@ static int32_t nvt_ts_probe(struct spi_device *client)
 	NVT_LOG("end\n");
 
 	nvt_irq_enable(true);
+
+#if IS_ENABLED(CONFIG_TOUCHSCREEN_SYSCTL_MI439)
+	nt36525b_mi439_ts_ops.dev = &ts->client->dev;
+	xiaomi_sdm439_touchscreen_register_operations(&nt36525b_mi439_ts_ops);
+#endif
 
 	xiaomi_sdm439_touchscreen_type = XIAOMI_SDM439_TOUCHSCREEN_NT36525B;
 	return 0;
