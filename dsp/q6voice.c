@@ -55,6 +55,8 @@ struct cvd_version_table cvd_version_table_mapping[CVD_INT_VERSION_MAX] = {
 		{CVD_VERSION_2_4, CVD_INT_VERSION_2_4},
 };
 
+extern bool msm_enable_legacy_adsp_hacks;
+
 static struct common_data common;
 static bool module_initialized;
 
@@ -4417,18 +4419,19 @@ static int voice_send_cvp_mfc_config_cmd(struct voice_data *v)
 
 static int voice_get_avcs_version_per_service(uint32_t service_id)
 {
-#if 1
-	if (service_id == AVCS_SERVICE_ID_ALL) {
-		pr_err("%s: Invalid service id: %d", __func__,
-		       AVCS_SERVICE_ID_ALL);
-		return -EINVAL;
-	}
-	common.is_avcs_version_queried = true;
-	return CVP_VERSION_1;
-#else
 	int ret = 0;
 	size_t ver_size;
 	struct avcs_fwk_ver_info *ver_info = NULL;
+
+	if (msm_enable_legacy_adsp_hacks) {
+		if (service_id == AVCS_SERVICE_ID_ALL) {
+			pr_err("%s: Invalid service id: %d", __func__,
+				AVCS_SERVICE_ID_ALL);
+			return -EINVAL;
+		}
+		common.is_avcs_version_queried = true;
+		return CVP_VERSION_1;
+	}
 
 	if (service_id == AVCS_SERVICE_ID_ALL) {
 		pr_err("%s: Invalid service id: %d", __func__,
@@ -4451,7 +4454,6 @@ static int voice_get_avcs_version_per_service(uint32_t service_id)
 done:
 	kfree(ver_info);
 	return ret;
-#endif
 }
 
 static void voice_mic_break_work_fn(struct work_struct *work)

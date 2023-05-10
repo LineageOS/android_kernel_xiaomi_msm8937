@@ -3,12 +3,19 @@
  * Copyright (c) 2017, 2019-2020 The Linux Foundation. All rights reserved.
  */
 
+#include <linux/export.h>
 #include <linux/kernel.h>
 #include <linux/module.h>
+#include <linux/of.h>
 #include "q6_init.h"
+
+bool msm_enable_legacy_adsp_hacks = false;
+EXPORT_SYMBOL(msm_enable_legacy_adsp_hacks);
 
 static int __init audio_q6_init(void)
 {
+	msm_enable_legacy_adsp_hacks = of_property_read_bool(of_find_node_by_path("/"), "qcom,enable-legacy-adsp-hacks");
+
 	adsp_err_init();
 #ifdef MODULE
 	audio_cal_init();
