@@ -11,6 +11,7 @@ if MACH_XIAOMI_SDM439
 source "techpack/xiaomi-sdm439/hqsysfs/Kconfig"
 source "techpack/xiaomi-sdm439/mach/Kconfig"
 
+source "techpack/xiaomi-sdm439/audio_pa/Kconfig"
 source "techpack/xiaomi-sdm439/backlight/Kconfig"
 source "techpack/xiaomi-sdm439/fingerprint/Kconfig"
 source "techpack/xiaomi-sdm439/ir/Kconfig"
