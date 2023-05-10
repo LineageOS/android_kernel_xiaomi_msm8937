@@ -21,6 +21,9 @@
 #if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
 #include <xiaomi-msm8937/mach.h>
 #endif
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+#include <xiaomi-sdm439/mach.h>
+#endif
 
 #if IS_ENABLED(CONFIG_MACH_XIAOMI_TIARE)
 #define XIAOMI_TIARE_GC8034_USE_OTP
@@ -31,6 +34,10 @@ extern void xiaomi_tiare_gc8034_gcore_identify_otp(struct msm_sensor_ctrl_t *s_c
 
 #undef CDBG
 #define CDBG(fmt, args...) pr_debug(fmt, ##args)
+
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+#include "msm_sensor_xiaomi_sdm439.h"
+#endif
 
 static struct msm_camera_i2c_fn_t msm_sensor_cci_func_tbl;
 static struct msm_camera_i2c_fn_t msm_sensor_secure_func_tbl;
@@ -141,6 +148,13 @@ int msm_sensor_power_down(struct msm_sensor_ctrl_t *s_ctrl)
 
 	if (s_ctrl->is_csid_tg_mode)
 		return 0;
+
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+	if (xiaomi_sdm439_mach_get()) {
+		if (xiaomi_sdm439_read_otp_after_write_for_gc02m1(s_ctrl, s_ctrl->sensordata->sensor_name) < 0)
+			pr_err("%s: xiaomi sdm439 xiaomi_sdm439_read_otp_after_write_for_gc02m1 is fail\n", __func__);
+	}
+#endif
 
 	power_info = &s_ctrl->sensordata->power_info;
 	sensor_device_type = s_ctrl->sensor_device_type;
@@ -303,6 +317,14 @@ int msm_sensor_match_id(struct msm_sensor_ctrl_t *s_ctrl)
 			pr_info("%s: Enter gc8034_otp\n", __func__);
 			xiaomi_tiare_gc8034_gcore_identify_otp(s_ctrl);
 		}
+	}
+#endif
+
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+	if (xiaomi_sdm439_mach_get()) {
+		rc = xiaomi_sdm439_read_otp_info_for_gc02m1(s_ctrl, sensor_name);
+		if (rc < 0)
+			pr_err("%s: %s: xiaomi sdm439 2nd match failed\n", __func__, sensor_name);
 	}
 #endif
 

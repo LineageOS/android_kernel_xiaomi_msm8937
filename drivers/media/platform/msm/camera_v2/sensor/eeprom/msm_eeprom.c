@@ -21,6 +21,9 @@
 #if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
 #include <xiaomi-msm8937/mach.h>
 #endif
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+#include <xiaomi-sdm439/mach.h>
+#endif
 
 #if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_ULYSSE)
 extern void xiaomi_ulysse_set_s_vendor_eeprom(struct platform_device *pdev, struct msm_eeprom_ctrl_t *e_ctrl, struct msm_eeprom_board_info *eb_info);
@@ -34,6 +37,10 @@ extern int xiaomi_wingtech_eeprom_init_ov13850_reg_otp(struct msm_eeprom_ctrl_t 
 
 #undef CDBG
 #define CDBG(fmt, args...) pr_debug(fmt, ##args)
+
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+#include "msm_eeprom_xiaomi_sdm439.h"
+#endif
 
 DEFINE_MSM_MUTEX(msm_eeprom_mutex);
 #ifdef CONFIG_COMPAT
@@ -1850,6 +1857,16 @@ static int msm_eeprom_platform_probe(struct platform_device *pdev)
 			xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_ROLEX) {
 			if (!strcmp(eb_info->eeprom_name, "ov13850")) {
 				xiaomi_wingtech_eeprom_init_ov13850_reg_otp(e_ctrl);
+			}
+		}
+#endif
+
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+		if (xiaomi_sdm439_mach_get()) {
+			rc = xiaomi_sdm439_read_eeprom_info_for_gc5035(e_ctrl, &e_ctrl->cal_data);
+			if (rc < 0) {
+				pr_err("%s: xiaomi_sdm439_read_eeprom_info_for_gc5035 failed\n", __func__);
+				goto power_down;
 			}
 		}
 #endif

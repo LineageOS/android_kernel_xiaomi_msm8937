@@ -20,6 +20,9 @@
 #if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
 #include <xiaomi-msm8937/mach.h>
 #endif
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+#include <xiaomi-sdm439/mach.h>
+#endif
 
 DEFINE_MSM_MUTEX(msm_actuator_mutex);
 
@@ -903,6 +906,11 @@ static int32_t msm_actuator_park_lens(struct msm_actuator_ctrl_t *a_ctrl)
 #if IS_ENABLED(CONFIG_MACH_XIAOMI_TIARE)
 		if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_TIARE)
 			usleep_range(13000, 14000);
+		else
+#endif
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+		if (xiaomi_sdm439_mach_get())
+			usleep_range(8000, 10000);
 		else
 #endif
 		usleep_range(10000, 12000);

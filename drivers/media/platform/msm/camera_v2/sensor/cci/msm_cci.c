@@ -27,6 +27,9 @@
 #if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
 #include <xiaomi-msm8937/mach.h>
 #endif
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+#include <xiaomi-sdm439/mach.h>
+#endif
 
 #define V4L2_IDENT_CCI 50005
 #define CCI_I2C_QUEUE_0_SIZE 64
@@ -1435,10 +1438,17 @@ static int32_t msm_cci_init(struct v4l2_subdev *sd,
 	for (i = 0; i < NUM_QUEUES; i++)
 		reinit_completion(&cci_dev->cci_master_info[
 				master].report_q[i]);
-#if IS_ENABLED(CONFIG_MACH_XIAOMI_RIVA) || IS_ENABLED(CONFIG_MACH_XIAOMI_ROLEX) || IS_ENABLED(CONFIG_MACH_XIAOMI_TIARE)
-	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_RIVA ||
-		xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_ROLEX ||
-		xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_TIARE) {
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_RIVA) || IS_ENABLED(CONFIG_MACH_XIAOMI_ROLEX) || IS_ENABLED(CONFIG_MACH_XIAOMI_TIARE) || IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+	if (false
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
+		|| xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_RIVA
+		|| xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_ROLEX
+		|| xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_TIARE
+#endif
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+		|| xiaomi_sdm439_mach_get()
+#endif
+		) {
 		reinit_completion(&cci_dev->cci_master_info[MASTER_0].reset_complete);
 		for (i = 0; i < NUM_QUEUES; i++)
 			reinit_completion(&cci_dev->cci_master_info[MASTER_0].

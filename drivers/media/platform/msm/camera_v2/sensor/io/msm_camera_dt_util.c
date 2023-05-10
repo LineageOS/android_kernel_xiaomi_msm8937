@@ -15,6 +15,9 @@
 #include "msm_camera_io_util.h"
 #include "msm_camera_i2c_mux.h"
 #include "msm_cci.h"
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+#include <xiaomi-sdm439/mach.h>
+#endif
 
 #define CAM_SENSOR_PINCTRL_STATE_SLEEP "cam_suspend"
 #define CAM_SENSOR_PINCTRL_STATE_DEFAULT "cam_default"
@@ -1442,6 +1445,13 @@ int msm_camera_power_up(struct msm_camera_power_ctrl_t *ctrl,
 	} else {
 		ctrl->cam_pinctrl_status = 1;
 	}
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+	if (xiaomi_sdm439_mach_get()) {
+		rc = msm_camera_request_gpio_table(
+			ctrl->gpio_conf->cam_gpio_req_tbl,
+			ctrl->gpio_conf->cam_gpio_req_tbl_size, 0);
+	}
+#endif
 	rc = msm_camera_request_gpio_table(
 		ctrl->gpio_conf->cam_gpio_req_tbl,
 		ctrl->gpio_conf->cam_gpio_req_tbl_size, 1);
