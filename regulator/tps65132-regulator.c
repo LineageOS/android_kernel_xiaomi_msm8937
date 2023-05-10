@@ -27,6 +27,7 @@
 #include <linux/regulator/machine.h>
 #include <linux/bitops.h>
 #include <linux/types.h>
+#include <xiaomi-msm8937/mach.h>
 
 struct tps65132_regulator {
 	struct regulator_init_data	*init_data;
@@ -617,6 +618,9 @@ static struct i2c_driver tps65132_regulator_driver = {
 
 static int __init tps65132_init(void)
 {
+	if (!xiaomi_msm8937_mach_get())
+		return -ENODEV;
+
 	return i2c_add_driver(&tps65132_regulator_driver);
 }
 subsys_initcall(tps65132_init);
