@@ -25,6 +25,7 @@
 #include <linux/err.h>
 #include <linux/gpio.h>
 #include <linux/of_gpio.h>
+#include <xiaomi-msm8937/mach.h>
 
 struct vibrator_gpio_data {
 	struct	platform_device *dev;
@@ -223,6 +224,10 @@ static int vibrator_gpio_probe(struct platform_device *pdev)
 	struct vibrator_gpio_data *pdata;
 
 	int  ret, i;
+
+	if (!xiaomi_msm8937_mach_get())
+		return -ENODEV;
+
 	pr_info("%s: vibrator gpio probe enter\n", __func__);
 
 	pdata =devm_kzalloc(&pdev->dev, sizeof(struct vibrator_gpio_data), GFP_KERNEL);
