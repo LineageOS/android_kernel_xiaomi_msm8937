@@ -3712,6 +3712,14 @@ static int __init msm8952_machine_init(void)
 	}
 #endif
 
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+	if (xiaomi_sdm439_mach_get()) {
+		mbhc_cfg.key_code[1] = KEY_VOLUMEUP;
+		mbhc_cfg.key_code[2] = KEY_VOLUMEDOWN;
+		mbhc_cfg.key_code[3] = 0;
+	}
+#endif
+
 	return platform_driver_register(&msm8952_asoc_machine_driver);
 }
 module_init(msm8952_machine_init);
