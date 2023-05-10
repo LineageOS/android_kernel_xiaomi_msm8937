@@ -1543,7 +1543,7 @@ out:
 }
 
 #if IS_ENABLED(CONFIG_TOUCHSCREEN_SYSCTL_MI439)
-static int nt36525b_mi439_ops_enable_dt2w(struct device *dev, bool enable)
+static int nt36525b_mi439_ops_enable_dt2w(bool enable)
 {
 #if WAKEUP_GESTURE
 	nvt_gesture_flag = enable;
@@ -1873,7 +1873,6 @@ static int32_t nvt_ts_probe(struct spi_device *client)
 	nvt_irq_enable(true);
 
 #if IS_ENABLED(CONFIG_TOUCHSCREEN_SYSCTL_MI439)
-	nt36525b_mi439_ts_ops.dev = &ts->client->dev;
 	xiaomi_sdm439_touchscreen_register_operations(&nt36525b_mi439_ts_ops);
 #endif
 

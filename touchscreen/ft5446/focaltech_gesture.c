@@ -133,7 +133,7 @@ static struct attribute_group fts_gesture_group = {
 };
 
 #if IS_ENABLED(CONFIG_TOUCHSCREEN_SYSCTL_MI439)
-static int ft5446_mi439_ops_enable_dt2w(struct device *dev, bool enable)
+static int ft5446_mi439_ops_enable_dt2w(bool enable)
 {
 	mutex_lock(&xiaomi_sdm439_ft5446_fts_data->input_dev->mutex);
 	if (enable) {
@@ -621,7 +621,6 @@ int xiaomi_sdm439_ft5446_fts_gesture_init(struct fts_ts_data *ts_data)
 	fts_gesture_data.active = DISABLE;
 
 #if IS_ENABLED(CONFIG_TOUCHSCREEN_SYSCTL_MI439)
-	ft5446_mi439_ts_ops.dev = &ts_data->client->dev;
 	xiaomi_sdm439_touchscreen_register_operations(&ft5446_mi439_ts_ops);
 #endif
 

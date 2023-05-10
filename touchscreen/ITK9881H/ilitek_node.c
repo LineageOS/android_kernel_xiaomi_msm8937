@@ -90,7 +90,7 @@
 unsigned char g_user_buf[USER_STR_BUFF] = {0};
 
 #if IS_ENABLED(CONFIG_TOUCHSCREEN_SYSCTL_MI439)
-static int itk9881h_mi439_ops_enable_dt2w(struct device *dev, bool enable)
+static int itk9881h_mi439_ops_enable_dt2w(bool enable)
 {
 	idev->gesture = enable;
 	ilitek_gesture_flag = enable;
@@ -1992,7 +1992,6 @@ void ilitek_tddi_node_init(void)
 	netlink_init();
 
 #if IS_ENABLED(CONFIG_TOUCHSCREEN_SYSCTL_MI439)
-	itk9881h_mi439_ts_ops.dev = idev->dev;
 	xiaomi_sdm439_touchscreen_register_operations(&itk9881h_mi439_ts_ops);
 #endif
 }

@@ -16,8 +16,7 @@ extern enum xiaomi_sdm439_touchscreen_types xiaomi_sdm439_touchscreen_type;
 #include <linux/device.h>
 
 struct xiaomi_sdm439_touchscreen_operations_t {
-	struct device *dev;
-	int (*enable_dt2w)(struct device *dev, bool enable);
+	int (*enable_dt2w)(bool enable);
 };
 
 extern int xiaomi_sdm439_touchscreen_register_operations(struct xiaomi_sdm439_touchscreen_operations_t *ts_ops);

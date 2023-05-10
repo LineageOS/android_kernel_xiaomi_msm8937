@@ -13,16 +13,11 @@ int xiaomi_sdm439_touchscreen_register_operations(struct xiaomi_sdm439_touchscre
 	if (IS_ERR_OR_NULL(ts_ops))
 		return -EINVAL;
 
-	if (!dev_get_drvdata(ts_ops->dev)) {
-		pr_err("%s: no driver data\n", __func__);
-		return -EINVAL;
-	}
-
 	xiaomi_sdm439_touchscreen_operations = ts_ops;
 
 	/* Set initial state to false */
 	if (!IS_ERR_OR_NULL(xiaomi_sdm439_touchscreen_operations->enable_dt2w))
-		xiaomi_sdm439_touchscreen_operations->enable_dt2w(xiaomi_sdm439_touchscreen_operations->dev, false);
+		xiaomi_sdm439_touchscreen_operations->enable_dt2w(false);
 
 	return 0;
 }
@@ -50,10 +45,10 @@ static int xiaomi_sdm439_touchscreen_toggle_enable_dt2w(struct ctl_table *table,
 	if (rc == 0 && write && *valp != old_val) {
 		switch (*valp) {
 			case 0:
-				rc = xiaomi_sdm439_touchscreen_operations->enable_dt2w(xiaomi_sdm439_touchscreen_operations->dev, false);
+				rc = xiaomi_sdm439_touchscreen_operations->enable_dt2w(false);
 				break;
 			case 1:
-				rc = xiaomi_sdm439_touchscreen_operations->enable_dt2w(xiaomi_sdm439_touchscreen_operations->dev, true);
+				rc = xiaomi_sdm439_touchscreen_operations->enable_dt2w(true);
 				break;
 			default:
 				rc = -EINVAL;

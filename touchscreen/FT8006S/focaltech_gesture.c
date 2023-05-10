@@ -105,7 +105,7 @@ static struct fts_gesture_st fts_gesture_data;
 * Static function prototypes
 *****************************************************************************/
 #if IS_ENABLED(CONFIG_TOUCHSCREEN_SYSCTL_MI439)
-static int ft8006s_mi439_ops_enable_dt2w(struct device *dev, bool enable)
+static int ft8006s_mi439_ops_enable_dt2w(bool enable)
 {
 	struct fts_ts_data *ts_data = xiaomi_sdm439_ft8006s_fts_data;
 
@@ -497,7 +497,6 @@ int xiaomi_sdm439_ft8006s_fts_gesture_init(struct fts_ts_data *ts_data)
 	ts_data->gesture_mode = DISABLE;
 
 #if IS_ENABLED(CONFIG_TOUCHSCREEN_SYSCTL_MI439)
-	ft8006s_mi439_ts_ops.dev = ts_data->dev;
 	xiaomi_sdm439_touchscreen_register_operations(&ft8006s_mi439_ts_ops);
 #endif
 

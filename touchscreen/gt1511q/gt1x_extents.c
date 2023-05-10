@@ -66,7 +66,7 @@ static st_gesture_data gesture_data;	// gesture data buffer */
 static struct mutex gesture_data_mutex;	// lock for gesture data */
 
 #if IS_ENABLED(CONFIG_TOUCHSCREEN_SYSCTL_MI439)
-static int gt1x_mi439_ops_enable_dt2w(struct device *dev, bool enable)
+static int gt1x_mi439_ops_enable_dt2w(bool enable)
 {
 	gesture_enabled = enable;
 	GTP_INFO("gesture enabled:%d", gesture_enabled);
@@ -1025,7 +1025,6 @@ s32 gt1x_init_node(void)
 #endif
 
 #if IS_ENABLED(CONFIG_TOUCHSCREEN_SYSCTL_MI439)
-	gt1x_mi439_ts_ops.dev = &gt1x_i2c_client->dev;
 	xiaomi_sdm439_touchscreen_register_operations(&gt1x_mi439_ts_ops);
 #endif
 
