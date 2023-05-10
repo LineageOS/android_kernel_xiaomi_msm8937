@@ -89,9 +89,9 @@ static const unsigned char aw87329_reg_access[aw87329_REG_MAX] = {
 /*******************************************************************************
  * aw87329 functions
  ******************************************************************************/
-unsigned char aw87329_audio_off(void);
-unsigned char aw87329_audio_kspk(void);
-unsigned char aw87329_audio_drcv(void);
+unsigned char xiaomi_sdm439_aw87329_audio_off(void);
+unsigned char xiaomi_sdm439_aw87329_audio_kspk(void);
+unsigned char xiaomi_sdm439_aw87329_audio_drcv(void);
 static unsigned char aw87329_audio_abrcv(void);
 
 
@@ -240,7 +240,7 @@ static unsigned char aw87329_abrcv_reg_val(unsigned char reg)
     }
 }
 
-unsigned char aw87329_audio_kspk(void)
+unsigned char xiaomi_sdm439_aw87329_audio_kspk(void)
 {
     if(aw87329 == NULL) {
         pr_err("%s: aw87329 is NULL\n", __func__);
@@ -271,7 +271,7 @@ unsigned char aw87329_audio_kspk(void)
     return 0;
 }
 
-unsigned char aw87329_audio_drcv(void)
+unsigned char xiaomi_sdm439_aw87329_audio_drcv(void)
 {
     if(aw87329 == NULL) {
         pr_err("%s: aw87329 is NULL\n", __func__);
@@ -333,7 +333,7 @@ static unsigned char aw87329_audio_abrcv(void)
     return 0;
 }
 
-unsigned char aw87329_audio_off(void)
+unsigned char xiaomi_sdm439_aw87329_audio_off(void)
 {
     if(aw87329 == NULL) {
         pr_err("%s: aw87329 is NULL\n", __func__);
@@ -643,15 +643,15 @@ static ssize_t aw87329_set_mode(struct device* cd, struct device_attribute *attr
 
     sscanf(buf,"%d",&databuf[0]);
     if(databuf[0] == 0) {
-        aw87329_audio_off();
+        xiaomi_sdm439_aw87329_audio_off();
     } else if(databuf[0] == 1) {
-        aw87329_audio_kspk();
+        xiaomi_sdm439_aw87329_audio_kspk();
     } else if(databuf[0] == 2) {
-        aw87329_audio_drcv();
+        xiaomi_sdm439_aw87329_audio_drcv();
     } else if(databuf[0] == 3) {
         aw87329_audio_abrcv();
     } else {
-        aw87329_audio_off();
+        xiaomi_sdm439_aw87329_audio_off();
     }
 
     return len;
@@ -868,9 +868,9 @@ static void __exit aw87329_pa_exit(void) {
     i2c_del_driver(&aw87329_i2c_driver);
 }
 
-EXPORT_SYMBOL(aw87329_audio_kspk);
-EXPORT_SYMBOL(aw87329_audio_drcv);
-EXPORT_SYMBOL(aw87329_audio_off);
+EXPORT_SYMBOL(xiaomi_sdm439_aw87329_audio_kspk);
+EXPORT_SYMBOL(xiaomi_sdm439_aw87329_audio_drcv);
+EXPORT_SYMBOL(xiaomi_sdm439_aw87329_audio_off);
 
 module_init(aw87329_pa_init);
 module_exit(aw87329_pa_exit);

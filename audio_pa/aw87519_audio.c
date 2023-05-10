@@ -48,9 +48,9 @@
 /*******************************************************************************
  * aw87519 functions
  ******************************************************************************/
-unsigned char aw87519_audio_receiver(void);
-unsigned char aw87519_audio_speaker(void);
-unsigned char aw87519_audio_off(void);
+unsigned char xiaomi_sdm439_aw87519_audio_receiver(void);
+unsigned char xiaomi_sdm439_aw87519_audio_speaker(void);
+unsigned char xiaomi_sdm439_aw87519_audio_off(void);
 
 /*******************************************************************************
  * aw87519 variable
@@ -146,7 +146,7 @@ static unsigned int aw87519_hw_off(struct aw87519 *aw87519)
 /*******************************************************************************
  * aw87519 control interface
  ******************************************************************************/
-unsigned char aw87519_audio_receiver(void)
+unsigned char xiaomi_sdm439_aw87519_audio_receiver(void)
 {
     unsigned int i;
     unsigned int length;
@@ -175,7 +175,7 @@ unsigned char aw87519_audio_receiver(void)
     return 0;
 }
 
-unsigned char aw87519_audio_speaker(void)
+unsigned char xiaomi_sdm439_aw87519_audio_speaker(void)
 {
     unsigned int i;
     unsigned int length;
@@ -205,7 +205,7 @@ unsigned char aw87519_audio_speaker(void)
     return 0;
 }
 
-unsigned char aw87519_audio_off(void)
+unsigned char xiaomi_sdm439_aw87519_audio_off(void)
 {
     if(NULL == aw87519) {
         return 2;
@@ -425,14 +425,14 @@ static ssize_t aw87519_set_mode(struct device* dev, struct device_attribute *att
 
     sscanf(buf,"%d",&databuf[0]);
     if(databuf[0] == 0) {
-        aw87519_audio_off();
+        xiaomi_sdm439_aw87519_audio_off();
     } else if(databuf[0] == 1) {
-        aw87519_audio_speaker();
+        xiaomi_sdm439_aw87519_audio_speaker();
     } else if(databuf[0] == 2) {
-        aw87519_audio_receiver();
+        xiaomi_sdm439_aw87519_audio_receiver();
 
     } else {
-        aw87519_audio_off();
+        xiaomi_sdm439_aw87519_audio_off();
     }
 
     return len;
@@ -641,9 +641,9 @@ static void __exit aw87519_pa_exit(void) {
     i2c_del_driver(&aw87519_i2c_driver);
 }
 
-EXPORT_SYMBOL(aw87519_audio_speaker);
-EXPORT_SYMBOL(aw87519_audio_off);
-EXPORT_SYMBOL(aw87519_audio_receiver);
+EXPORT_SYMBOL(xiaomi_sdm439_aw87519_audio_speaker);
+EXPORT_SYMBOL(xiaomi_sdm439_aw87519_audio_off);
+EXPORT_SYMBOL(xiaomi_sdm439_aw87519_audio_receiver);
 
 module_init(aw87519_pa_init);
 module_exit(aw87519_pa_exit);
