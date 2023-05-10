@@ -37,6 +37,7 @@
 #include <linux/miscdevice.h>
 #include <uapi/linux/lirc.h>
 #include <asm/uaccess.h>
+#include <xiaomi-sdm439/mach.h>
 
 #define IR_SPI_DRIVER_NAME "ir-spi"
 
@@ -249,6 +250,10 @@ static int ir_spi_probe(struct spi_device *spi)
 {
 	struct ir_spi_data *idata;
 	u8 *buffer = NULL;
+
+	if (!xiaomi_sdm439_mach_get())
+		return -ENODEV;
+
 	idata = devm_kzalloc(&spi->dev, sizeof(*idata), GFP_KERNEL);
 	if (!idata)
 		return -ENOMEM;
