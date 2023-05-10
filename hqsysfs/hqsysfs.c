@@ -466,7 +466,7 @@ static int __init hq_harware_init(void)
 	return 0;
 }
 
-core_initcall(hq_harware_init);
+postcore_initcall(hq_harware_init);
 MODULE_AUTHOR("KaKa Ni <nigang@huaqin.com>");
 MODULE_DESCRIPTION("Huaqin Hardware Info Driver");
 MODULE_LICENSE("GPL");
