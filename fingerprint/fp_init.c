@@ -45,6 +45,9 @@ extern int xiaomi_msm8937_fingerprint_goodix_santoni_init(void);
 
 static int __init xiaomi_msm8937_fingerprint_init(void)
 {
+	if (!xiaomi_msm8937_mach_get())
+		return -ENODEV;
+
 #if IS_ENABLED(CONFIG_PARSE_ANDROIDBOOT_MODE)
 	if (androidboot_mode_get() == ANDROIDBOOT_MODE_CHARGER)
 		return -ENODEV;
