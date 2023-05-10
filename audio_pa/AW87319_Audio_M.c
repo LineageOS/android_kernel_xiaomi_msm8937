@@ -31,6 +31,7 @@
 #include <linux/module.h>
 #include <linux/moduleparam.h>
 #include <linux/mutex.h>
+#include <xiaomi-msm8937/mach.h>
 
 
 #define AW87319_I2C_NAME	"AW87319_PA-mi8937"
@@ -438,6 +439,10 @@ static struct i2c_driver aw87319_i2c_driver = {
 
 static int __init aw87319_pa_init(void) {
 	int ret;
+
+	if (!xiaomi_msm8937_mach_get())
+		return -ENODEV;
+
 	printk("%s Enter\n", __func__);
 
 	ret = i2c_add_driver(&aw87319_i2c_driver);
