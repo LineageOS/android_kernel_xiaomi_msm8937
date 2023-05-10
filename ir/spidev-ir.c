@@ -37,6 +37,7 @@
 
 #include <linux/uaccess.h>
 
+#include <xiaomi-msm8937/mach.h>
 
 /*
  * This supports access to SPI devices using normal userspace I/O calls.
@@ -847,6 +848,9 @@ static struct spi_driver spidev_spi_driver = {
 static int __init spidev_init(void)
 {
 	int status;
+
+	if (!xiaomi_msm8937_mach_get())
+		return -ENODEV;
 
 	/* Claim our 256 reserved device numbers.  Then register a class
 	 * that will key udev/mdev to add/remove /dev nodes.  Last, register

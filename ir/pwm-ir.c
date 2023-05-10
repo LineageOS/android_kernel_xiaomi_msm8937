@@ -21,6 +21,7 @@
 #include <linux/regulator/consumer.h>
 #include <linux/sched.h>
 #include <linux/slab.h>
+#include <xiaomi-msm8937/mach.h>
 #include "pwm-ir.h"
 #include <media/rc-core.h>
 struct pwm_ir_dev {
@@ -432,6 +433,9 @@ static struct platform_driver pwm_ir_driver = {
 
 static int __init pwm_ir_init(void)
 {
+	if (!xiaomi_msm8937_mach_get())
+		return -ENODEV;
+
 	return platform_driver_register(&pwm_ir_driver);
 }
 late_initcall(pwm_ir_init);

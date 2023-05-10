@@ -27,6 +27,7 @@
 #include <linux/init.h>
 #include <linux/pinctrl/consumer.h>
 #include <linux/pm_qos.h>
+#include <xiaomi-msm8937/mach.h>
 
 #define DUTY_CLCLE 50
 #define ADJUST_NUM 15
@@ -573,6 +574,9 @@ static int gpio_led_probe(struct platform_device *pdev)
 	struct gpio_leds_priv *priv;
 	struct pinctrl *pinctrl;
 	int i, ret = 0;
+
+	if (!xiaomi_msm8937_mach_get())
+		return -ENODEV;
 
 	pinctrl = devm_pinctrl_get_select_default(&pdev->dev);
 	if (IS_ERR(pinctrl))
