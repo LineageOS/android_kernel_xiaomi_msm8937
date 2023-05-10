@@ -26,6 +26,7 @@
 #include <linux/pwm.h>
 #include <linux/slab.h>
 #include <linux/io.h>
+#include <xiaomi-sdm439/mach.h>
 #include <xiaomi-sdm439/backlight.h>
 
 #include "ti-lmu-backlight-data.h"
@@ -905,6 +906,9 @@ static int ti_lmu_backlight_probe(struct platform_device *pdev)
 	struct ti_lmu *lmu = dev_get_drvdata(dev->parent);
 	struct ti_lmu_bl_chip *chip;
 	int ret;
+
+	if (!xiaomi_sdm439_mach_get())
+		return -ENODEV;
 
 	pr_err("[bkl] %s enter\n", __func__);
 

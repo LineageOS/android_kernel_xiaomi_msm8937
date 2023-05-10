@@ -24,6 +24,7 @@
 #include <linux/of_device.h>
 #include <linux/of_gpio.h>
 #include <linux/slab.h>
+#include <xiaomi-sdm439/mach.h>
 #include <xiaomi-sdm439/backlight.h>
 
 struct ti_lmu_data {
@@ -208,6 +209,10 @@ static int ti_lmu_probe(struct i2c_client *cl, const struct i2c_device_id *id)
 	struct regmap_config regmap_cfg;
 	struct ti_lmu *lmu;
 	int ret;
+
+	if (!xiaomi_sdm439_mach_get())
+		return -ENODEV;
+
 	if (xiaomi_sdm439_backlight_ic_type_get() != XIAOMI_SDM439_BACKLIGHT_IC_LM3697)
 		return -ENODEV;
 	pr_err("[bkl] %s enter\n", __func__);

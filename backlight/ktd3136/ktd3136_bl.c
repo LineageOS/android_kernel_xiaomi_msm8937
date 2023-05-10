@@ -1124,6 +1124,9 @@ static int __init ktd3137_init(void)
 {
 	int err;
 
+	if (!xiaomi_sdm439_mach_get())
+		return -ENODEV;
+
 	ktd3137_class = class_create(THIS_MODULE, "ktd3137");
 	if (IS_ERR(ktd3137_class)) {
 		pr_err("unable to create ktd3137 class; errno = %ld\n", PTR_ERR(ktd3137_class));
