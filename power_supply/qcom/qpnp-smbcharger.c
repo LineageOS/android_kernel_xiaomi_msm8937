@@ -8851,6 +8851,9 @@ static struct platform_driver smbchg_driver = {
 
 static int __init smbchg_init(void)
 {
+	if (!xiaomi_msm8937_mach_get())
+		return -ENODEV;
+
 #if IS_ENABLED(CONFIG_MACH_XIAOMI_LAND)
 	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_LAND)
 		smbchg_default_dcp_icl_ma = 2000;

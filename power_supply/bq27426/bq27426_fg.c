@@ -2035,6 +2035,9 @@ static int bq_fg_probe(struct i2c_client *client,
 	struct bq_fg_chip *bq;
 	u8 *regs;
 
+	if (!xiaomi_msm8937_mach_get())
+		return -ENODEV;
+
 	bq = devm_kzalloc(&client->dev, sizeof(*bq), GFP_KERNEL);
 
 	if (!bq) {

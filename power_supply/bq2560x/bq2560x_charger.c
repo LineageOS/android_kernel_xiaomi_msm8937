@@ -2264,6 +2264,9 @@ static int bq2560x_charger_probe(struct i2c_client *client,
 
 	int ret;
 	
+	if (!xiaomi_msm8937_mach_get())
+		return -ENODEV;
+
 	usb_psy = power_supply_get_by_name("usb");
 	if (!usb_psy) {
 		dev_dbg(&client->dev, "USB supply not found, defer probe\n");

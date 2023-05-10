@@ -3145,6 +3145,10 @@ static int smb358_charger_probe(struct i2c_client *client,
 	struct power_supply *usb_psy;
 	struct power_supply_config batt_psy_cfg = {};
 	u8 reg = 0;
+
+	if (!xiaomi_msm8937_mach_get())
+		return -ENODEV;
+
 	usb_psy = power_supply_get_by_name("usb");
 	if (!usb_psy) {
 		dev_dbg(&client->dev, "USB psy not found; deferring probe\n");

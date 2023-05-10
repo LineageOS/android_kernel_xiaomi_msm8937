@@ -6,6 +6,7 @@
 #include <linux/power_supply.h>
 #include <linux/printk.h>
 #include <linux/regulator/consumer.h>
+#include <xiaomi-msm8937/mach.h>
 
 struct msm_usb_psy_platform_data {
 	bool dpdm_always_on;
@@ -360,6 +361,9 @@ static struct platform_driver msm_usb_psy_driver = {
 
 static int __init msm_usb_psy_init(void)
 {
+	if (!xiaomi_msm8937_mach_get())
+		return -ENODEV;
+
 	return platform_driver_register(&msm_usb_psy_driver);
 }
 

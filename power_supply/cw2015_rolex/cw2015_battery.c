@@ -25,6 +25,8 @@
 
 #include <linux/pm_wakeup.h>
 
+#include <xiaomi-msm8937/mach.h>
+
 #include "cw2015_battery.h"
 
 #define REG_VERSION             	0x0
@@ -1301,6 +1303,9 @@ static struct i2c_driver cw_bat_driver = {
 
 static int __init cw_bat_init(void)
 {
+	if (!xiaomi_msm8937_mach_get())
+		return -ENODEV;
+
 	return i2c_add_driver(&cw_bat_driver);
 }
 

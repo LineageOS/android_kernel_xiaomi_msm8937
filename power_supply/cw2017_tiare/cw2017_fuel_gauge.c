@@ -19,6 +19,7 @@
 #include <linux/qpnp/qpnp-adc.h>
 #include <linux/err.h>
 #include <linux/pm_wakeup.h>
+#include <xiaomi-msm8937/mach.h>
 
 
 #define SMB_VTG_MIN_UV		1800000
@@ -1172,6 +1173,9 @@ static int __init cw2017_init(void)
 
 
 
+
+	if (!xiaomi_msm8937_mach_get())
+		return -ENODEV;
 
     i2c_add_driver(&cw2017_driver);
     return 0;
