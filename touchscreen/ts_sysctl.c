@@ -4,6 +4,8 @@
 #include <xiaomi-sdm439/mach.h>
 #include <xiaomi-sdm439/touchscreen.h>
 
+#define ADD_OLD_DT2W_SYSCTL
+
 struct xiaomi_sdm439_touchscreen_operations_t *xiaomi_sdm439_touchscreen_operations;
 
 static int xiaomi_sdm439_touchscreen_enable_dt2w_val = -1;
@@ -75,14 +77,24 @@ static struct ctl_table xiaomi_sdm439_touchscreen_files[] = {
 	{ }
 };
 
-/* dir in /proc/sys/dev */
 static struct ctl_table xiaomi_sdm439_touchscreen_dir[] = {
+/* dir in /proc/sys/dev */
 	{
 		.procname	= "xiaomi_sdm439_touchscreen",
 		.maxlen		= 0,
 		.mode		= 0555,
 		.child		= xiaomi_sdm439_touchscreen_files,
 	},
+/* file(s) in /proc/sys/dev/ */
+#ifdef ADD_OLD_DT2W_SYSCTL
+	{
+		.procname	= "dt2w",
+		.data		= &xiaomi_sdm439_touchscreen_enable_dt2w_val,
+		.maxlen		= sizeof(int),
+		.mode		= 0666,
+		.proc_handler	= xiaomi_sdm439_touchscreen_toggle_enable_dt2w,
+	},
+#endif
 	{ }
 };
 
