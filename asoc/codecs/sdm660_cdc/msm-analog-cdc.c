@@ -2108,6 +2108,90 @@ static int msm_anlg_cdc_mi8937_aw87329_pa_set(struct snd_kcontrol *kcontrol,
 }
 #endif
 
+#if IS_ENABLED(CONFIG_SND_SOC_AW87329_MI439)
+extern unsigned char xiaomi_sdm439_aw87329_audio_kspk(void);
+extern unsigned char xiaomi_sdm439_aw87329_audio_drcv(void);
+extern unsigned char xiaomi_sdm439_aw87329_audio_off(void);
+static int msm_anlg_cdc_mi439_aw87329_pa_value = 0;
+
+static int msm_anlg_cdc_mi439_aw87329_pa_get(struct snd_kcontrol *kcontrol,
+					  struct snd_ctl_elem_value *ucontrol)
+{
+	ucontrol->value.integer.value[0] = msm_anlg_cdc_mi439_aw87329_pa_value;
+	return 0;
+}
+
+static int msm_anlg_cdc_mi439_aw87329_pa_set(struct snd_kcontrol *kcontrol,
+					  struct snd_ctl_elem_value *ucontrol)
+{
+	struct snd_soc_component *component =
+				snd_soc_kcontrol_component(kcontrol);
+
+	dev_dbg(component->dev, "%s: ucontrol->value.integer.value[0] = %ld\n",
+		__func__, ucontrol->value.integer.value[0]);
+
+	switch (ucontrol->value.integer.value[0]) {
+		case 0:
+			xiaomi_sdm439_aw87329_audio_off();
+			break;
+		case 1:
+			xiaomi_sdm439_aw87329_audio_kspk();
+			break;
+		case 2:
+			xiaomi_sdm439_aw87329_audio_drcv();
+			break;
+		default:
+			return -EINVAL;
+	}
+
+	msm_anlg_cdc_mi439_aw87329_pa_value = ucontrol->value.integer.value[0];
+
+	return 0;
+}
+#endif
+
+#if IS_ENABLED(CONFIG_SND_SOC_AW87519_MI439)
+extern unsigned char xiaomi_sdm439_aw87519_audio_speaker(void);
+extern unsigned char xiaomi_sdm439_aw87519_audio_receiver(void);
+extern unsigned char xiaomi_sdm439_aw87519_audio_off(void);
+static int msm_anlg_cdc_mi439_aw87519_pa_value = 0;
+
+static int msm_anlg_cdc_mi439_aw87519_pa_get(struct snd_kcontrol *kcontrol,
+					  struct snd_ctl_elem_value *ucontrol)
+{
+	ucontrol->value.integer.value[0] = msm_anlg_cdc_mi439_aw87519_pa_value;
+	return 0;
+}
+
+static int msm_anlg_cdc_mi439_aw87519_pa_set(struct snd_kcontrol *kcontrol,
+					  struct snd_ctl_elem_value *ucontrol)
+{
+	struct snd_soc_component *component =
+				snd_soc_kcontrol_component(kcontrol);
+
+	dev_dbg(component->dev, "%s: ucontrol->value.integer.value[0] = %ld\n",
+		__func__, ucontrol->value.integer.value[0]);
+
+	switch (ucontrol->value.integer.value[0]) {
+		case 0:
+			xiaomi_sdm439_aw87519_audio_off();
+			break;
+		case 1:
+			xiaomi_sdm439_aw87519_audio_speaker();
+			break;
+		case 2:
+			xiaomi_sdm439_aw87519_audio_receiver();
+			break;
+		default:
+			return -EINVAL;
+	}
+
+	msm_anlg_cdc_mi439_aw87519_pa_value = ucontrol->value.integer.value[0];
+
+	return 0;
+}
+#endif
+
 static const char * const msm_anlg_cdc_ear_pa_boost_ctrl_text[] = {
 		"DISABLE", "ENABLE"};
 static const struct soc_enum msm_anlg_cdc_ear_pa_boost_ctl_enum[] = {
@@ -2173,6 +2257,22 @@ static const struct soc_enum msm_anlg_cdc_mi8937_aw87329_pa_ctl_enum[] = {
 };
 #endif
 
+#if IS_ENABLED(CONFIG_SND_SOC_AW87329_MI439)
+static const char * const msm_anlg_cdc_mi439_aw87329_pa_ctrl_text[] = {
+		"Off", "Speaker", "Receiver"};
+static const struct soc_enum msm_anlg_cdc_mi439_aw87329_pa_ctl_enum[] = {
+		SOC_ENUM_SINGLE_EXT(3, msm_anlg_cdc_mi439_aw87329_pa_ctrl_text),
+};
+#endif
+
+#if IS_ENABLED(CONFIG_SND_SOC_AW87519_MI439)
+static const char * const msm_anlg_cdc_mi439_aw87519_pa_ctrl_text[] = {
+		"Off", "Speaker", "Receiver"};
+static const struct soc_enum msm_anlg_cdc_mi439_aw87519_pa_ctl_enum[] = {
+		SOC_ENUM_SINGLE_EXT(3, msm_anlg_cdc_mi439_aw87519_pa_ctrl_text),
+};
+#endif
+
 /*cut of frequency for high pass filter*/
 static const char * const cf_text[] = {
 	"MIN_3DB_4Hz", "MIN_3DB_75Hz", "MIN_3DB_150Hz"
@@ -2213,6 +2313,16 @@ static const struct snd_kcontrol_new msm_anlg_cdc_snd_controls[] = {
 #if IS_ENABLED(CONFIG_SND_SOC_AW87329_MI8937)
 	SOC_ENUM_EXT("MI8937 AW87329 PA", msm_anlg_cdc_mi8937_aw87329_pa_ctl_enum[0],
 		msm_anlg_cdc_mi8937_aw87329_pa_get, msm_anlg_cdc_mi8937_aw87329_pa_set),
+#endif
+
+#if IS_ENABLED(CONFIG_SND_SOC_AW87329_MI439)
+	SOC_ENUM_EXT("MI439 AW87329 PA", msm_anlg_cdc_mi439_aw87329_pa_ctl_enum[0],
+		msm_anlg_cdc_mi439_aw87329_pa_get, msm_anlg_cdc_mi439_aw87329_pa_set),
+#endif
+
+#if IS_ENABLED(CONFIG_SND_SOC_AW87519_MI439)
+	SOC_ENUM_EXT("MI439 AW87519 PA", msm_anlg_cdc_mi439_aw87519_pa_ctl_enum[0],
+		msm_anlg_cdc_mi439_aw87519_pa_get, msm_anlg_cdc_mi439_aw87519_pa_set),
 #endif
 
 	SOC_SINGLE_TLV("ADC1 Volume", MSM89XX_PMIC_ANALOG_TX_1_EN, 3,
