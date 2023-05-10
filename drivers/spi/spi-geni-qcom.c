@@ -19,9 +19,13 @@
 #include <linux/spi/spi.h>
 #include <linux/spi/spi-geni-qcom.h>
 #include <linux/pinctrl/consumer.h>
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+#include <xiaomi-sdm439/mach.h>
+#endif
 
 #define SPI_NUM_CHIPSELECT	(4)
-#define SPI_XFER_TIMEOUT_MS	(250)
+static int spi_xfer_timeout_ms = 250;
+#define SPI_XFER_TIMEOUT_MS	spi_xfer_timeout_ms
 #define SPI_AUTO_SUSPEND_DELAY	(250)
 /* SPI SE specific registers */
 #define SE_SPI_CPHA		(0x224)
@@ -1616,6 +1620,11 @@ static int spi_geni_probe(struct platform_device *pdev)
 	struct platform_device *wrapper_pdev;
 	struct device_node *wrapper_ph_node;
 	bool rt_pri;
+
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+	if (xiaomi_sdm439_mach_get())
+		spi_xfer_timeout_ms = 1500;
+#endif
 
 	spi = spi_alloc_master(&pdev->dev, sizeof(struct spi_geni_master));
 	if (!spi) {
