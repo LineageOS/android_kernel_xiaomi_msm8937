@@ -895,6 +895,8 @@ extern bool msmb_camera_enable;
 
 static int __init msm_eeprom_xiaomi_wingtech_init()
 {
+	if (xiaomi_msm8937_mach_get_family() != XIAOMI_MSM8937_MACH_FAMILY_WINGTECH)
+		return -ENODEV;
 	if (!msmb_camera_enable)
 		return -ENODEV;
 	kobject_init_and_add(&kobj_back, &ktype_back, NULL,
