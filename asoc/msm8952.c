@@ -3385,10 +3385,33 @@ static struct snd_soc_card *msm8952_populate_sndcard_dailinks(
 {
 	struct snd_soc_card *card = &bear_card;
 	struct snd_soc_dai_link *dailink;
-	int len1;
+	int i, len1;
 
 	card->name = dev_name(dev);
 	len1 = ARRAY_SIZE(msm8952_dai);
+	if (of_property_read_bool(dev->of_node,
+		"qcom,use-legacy-voice-cpu-dais")) {
+		dev_info(dev, "%s(): Use legacy voice cpu dais\n",
+				__func__);
+		for (i = 0; i < len1; i++) {
+			switch (msm8952_dai[i].id) {
+				case MSM_FRONTEND_DAI_CS_VOICE:
+					msm8952_dai[i].cpu_dai_name = "CS-VOICE";
+					break;
+				case MSM_FRONTEND_DAI_VOICE2:
+					msm8952_dai[i].cpu_dai_name = "Voice2";
+					break;
+				case MSM_FRONTEND_DAI_VOLTE:
+					msm8952_dai[i].cpu_dai_name = "VoLTE";
+					break;
+				case MSM_FRONTEND_DAI_VOWLAN:
+					msm8952_dai[i].cpu_dai_name = "VoWLAN";
+					break;
+				default:
+					break;
+			}
+		}
+	}
 	memcpy(msm8952_dai_links, msm8952_dai, sizeof(msm8952_dai));
 	dailink = msm8952_dai_links;
 
