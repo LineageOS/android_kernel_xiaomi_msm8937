@@ -13,8 +13,10 @@ int xiaomi_sdm439_touchscreen_register_operations(struct xiaomi_sdm439_touchscre
 	if (IS_ERR_OR_NULL(ts_ops))
 		return -EINVAL;
 
-	if (!dev_get_drvdata(ts_ops->dev))
+	if (!dev_get_drvdata(ts_ops->dev)) {
+		pr_err("%s: no driver data\n", __func__);
 		return -EINVAL;
+	}
 
 	xiaomi_sdm439_touchscreen_operations = ts_ops;
 
