@@ -8082,7 +8082,7 @@ err_remove_fs:
  * configures SRAM transaction, namely: address, and count.
  * @returns valid pointer on success or NULL
  */
-struct dentry *fg_dfs_get_root(void)
+static struct dentry *fg_dfs_get_root(void)
 {
 	if (dbgfs_data.root)
 		return dbgfs_data.root;
@@ -8101,7 +8101,7 @@ struct dentry *fg_dfs_get_root(void)
  * fg_dfs_create: adds new fg_mem if debugfs entry
  * @return zero on success
  */
-int fg_dfs_create(struct fg_chip *chip)
+static int fg_dfs_create(struct fg_chip *chip)
 {
 	struct dentry *root;
 	struct dentry *file;

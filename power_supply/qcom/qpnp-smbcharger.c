@@ -3865,7 +3865,7 @@ static int smbchg_otg_regulator_is_enable(struct regulator_dev *rdev)
 	return (reg & OTG_EN_BIT) ? 1 : 0;
 }
 
-struct regulator_ops smbchg_otg_reg_ops = {
+static struct regulator_ops smbchg_otg_reg_ops = {
 	.enable		= smbchg_otg_regulator_enable,
 	.disable	= smbchg_otg_regulator_disable,
 	.is_enabled	= smbchg_otg_regulator_is_enable,
@@ -3961,7 +3961,7 @@ static int smbchg_external_otg_regulator_is_enable(struct regulator_dev *rdev)
 	return get_client_vote(chip->usb_suspend_votable, OTG_EN_VOTER);
 }
 
-struct regulator_ops smbchg_external_otg_reg_ops = {
+static struct regulator_ops smbchg_external_otg_reg_ops = {
 	.enable		= smbchg_external_otg_regulator_enable,
 	.disable	= smbchg_external_otg_regulator_disable,
 	.is_enabled	= smbchg_external_otg_regulator_is_enable,
@@ -4869,7 +4869,7 @@ static void handle_usb_insertion(struct smbchg_chip *chip)
 	}
 }
 
-void update_usb_status(struct smbchg_chip *chip, bool usb_present, bool force)
+static void update_usb_status(struct smbchg_chip *chip, bool usb_present, bool force)
 {
 	mutex_lock(&chip->usb_status_lock);
 	if (force) {
