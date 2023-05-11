@@ -1895,7 +1895,11 @@ static int fts_read_touchdata(struct fts_ts_data *data)
 	u8 *buf = data->point_buf;
 
 	memset(buf, 0xFF, data->pnt_buf_size);
-	buf[0] = 0x01;
+
+	if (data->pdata->use_old_touchdata_reading_behavior)
+		buf[0] = 0x00;
+	else
+		buf[0] = 0x01;
 
 	if (data->gesture_mode) {
 		if (0 == fts_gesture_readdata(data, NULL)) {
@@ -1904,7 +1908,10 @@ static int fts_read_touchdata(struct fts_ts_data *data)
 		}
 	}
 
-	ret = fts_read(buf, 1, buf + 1, data->pnt_buf_size - 1);
+	if (data->pdata->use_old_touchdata_reading_behavior)
+		ret = fts_read(buf, 1, buf, data->pnt_buf_size);
+	else
+		ret = fts_read(buf, 1, buf + 1, data->pnt_buf_size - 1);
 	if (ret < 0) {
 		FTS_ERROR("read touchdata failed, ret:%d", ret);
 		return ret;
@@ -2657,6 +2664,8 @@ static int fts_parse_dt(struct device *dev, struct fts_ts_platform_data *pdata)
 
 	pdata->esdcheck = of_property_read_bool(np, "focaltech,esd-check");
 	pdata->ignore_id_check = of_property_read_bool(np, "focaltech,ignore-id-check");
+	pdata->use_old_touchdata_reading_behavior =
+		of_property_read_bool(np, "focaltech,use-old-touchdata-reading-behavior");
 
 	FTS_FUNC_EXIT();
 	return 0;

@@ -145,6 +145,7 @@ struct fts_ts_platform_data {
 	u32 max_touch_number;
 	bool esdcheck;
 	bool ignore_id_check;
+	bool use_old_touchdata_reading_behavior;
 };
 
 struct ts_event {
