@@ -1,7 +1,3 @@
-&i2c_2 {
-	/delete-node/ aw87329@58;
-};
-
 &int_codec {
 	/* WARNING: Override
 	   Changes:
@@ -29,9 +25,5 @@
 			"PDM_IN_RX1", "PDM_OUT_RX1",
 			"PDM_IN_RX2", "PDM_OUT_RX2",
 			"PDM_IN_RX3", "PDM_OUT_RX3",
-			"MI439 AW87519 PA SPK", "LINEOUT PA";
-};
-
-&wsa881x_i2c_45 {
-	status = "disabled";
+			"MI439 AW87329 PA SPK", "LINEOUT PA";
 };
