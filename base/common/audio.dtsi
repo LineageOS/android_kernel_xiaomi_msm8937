@@ -14,22 +14,6 @@
 	/delete-property/ qcom,msm-vdd-wsa-switch-current;
 };
 
-&i2c_2 {
-	aw87329@58{
-		status = "okay";
-		compatible = "awinic,aw87329_pa";
-		reg = <0x58>;
-		reset-gpio = <&tlmm 125 0x01>;
-	};
-
-	aw87519@58{
-		status = "okay";
-		compatible = "awinic,aw87519";
-		reg = <0x58>;
-		reset-gpio = <&tlmm 125 0x01>;
-	};
-};
-
 &wsa881x_i2c_f {
 	status = "disabled";
 };
