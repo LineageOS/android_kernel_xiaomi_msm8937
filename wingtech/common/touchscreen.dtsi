@@ -22,6 +22,7 @@
 		focaltech,keys = <139 172 158>;
 		focaltech,key-y-coords = <2000 2000 2000>;
 		focaltech,ignore-id-check;
+		focaltech,use-old-touchdata-reading-behavior;
 #else
 		ftech,name = "ft5336";
 		ftech,family-id = <0x36>;
