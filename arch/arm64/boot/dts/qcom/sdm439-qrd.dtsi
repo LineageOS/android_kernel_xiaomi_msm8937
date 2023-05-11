@@ -12,7 +12,11 @@
  */
 
 #include "msm8937-mdss-panels.dtsi"
+#ifdef DO_NOT_INCLUDE_DEFAULT_CAMERA_SENSOR_DTSI
+#include <dt-bindings/clock/msm-clocks-8952.h>
+#else
 #include "sdm439-camera-sensor-qrd.dtsi"
+#endif
 
 &blsp1_uart2 {
 	status = "ok";
