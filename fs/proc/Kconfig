@@ -103,3 +103,11 @@ config PROC_UID
 	depends on PROC_FS && RT_MUTEXES
 	help
 	Provides aggregated per-uid information under /proc/uid.
+
+config PROC_CMDLINE_APPEND_ANDROID_FSTAB_SUFFIX
+	bool "Append Android fstab suffix parameter to /proc/cmdline"
+	depends on OF
+	default n
+	help
+	  Append Android fstab suffix parameter to /proc/cmdline.
+	  Parameter value is read from dt property "/android,fstab_suffix".
