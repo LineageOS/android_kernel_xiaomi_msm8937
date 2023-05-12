@@ -58,6 +58,7 @@
 		focaltech,key-y-coords = <1350 1350 1350>;
 		focaltech,max-touch-number = <10>;
 		focaltech,use-old-touchdata-reading-behavior;
+		focaltech,ignore-id-check;
 #else
 		compatible = "focaltech,fts";
 #endif
