@@ -42,22 +42,6 @@
 		ktd,linear_ramp = <1>; /*default is exponential*/
 		ktd,linear_backlight = <1>; /*default is exponential*/
 	};
-
-	vituralsar@33{/*Add by HQ-102007757 for vituralsar*/
-		compatible = "virtualsar,sar";
-		reg = <0x33>;
-		interrupt-parent = <&tlmm>;
-		interrupts = <126 0x02>;
-		vituralsar,irq-gpio = <&tlmm 126 0x2008>;
-	};
-};
-
-&soc {
-	gpio_keys {
-		camera_snapshot {
-			linux,code = <0x2B1>;
-		};
-	};
 };
 
 &mdss_dsi0 {
