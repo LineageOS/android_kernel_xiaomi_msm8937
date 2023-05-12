@@ -4,7 +4,8 @@
 		reg = <0x38>;
 #ifdef CONFIG_TOUCHSCREEN_FTS_MI8937
 		focaltech,ic-type = <0x53460002>; // _FT5346
-		focaltech,key-x-coords = <140 360 580>;
+		focaltech,key-x-coords = <140 360 610>;
+		focaltech,key-y-coords = <1745 1745 1745>;
 #else
 		compatible = "focaltech,5346";
 		ftech,virtual-key1 = <139 140 2000>;/*menu*/
