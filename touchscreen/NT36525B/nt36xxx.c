@@ -1547,7 +1547,7 @@ static int nt36525b_mi439_ops_enable_dt2w(bool enable)
 {
 #if WAKEUP_GESTURE
 	nvt_gesture_flag = enable;
-	NVT_LOG("gesture disabled:%d", nvt_gesture_flag);
+	NVT_LOG("gesture enabled:%d", nvt_gesture_flag);
 #endif
 
 	return 0;
