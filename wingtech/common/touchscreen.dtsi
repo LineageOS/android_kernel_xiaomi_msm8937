@@ -18,6 +18,7 @@
 		focaltech,display-coords = <0 0 720 1280>;
 		focaltech,max-touch-number = <10>;
 		focaltech,have-key;
+		focaltech,vkeys-y-beyond-maxy;
 		focaltech,ignore-id-check;
 		focaltech,use-old-touchdata-reading-behavior;
 #else
