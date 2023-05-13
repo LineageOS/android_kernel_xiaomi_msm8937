@@ -1727,6 +1727,10 @@ static int fts_input_report_key_vkeys(struct fts_ts_data *data, int index)
 			return 0;
 		}
 	}
+	if (x > pdata->x_max && x > pdata->vkeys_x2[i])
+		FTS_ERROR("unhandled x=%d", x);
+	if (y > pdata->y_max && y > pdata->vkeys_y_beyond_maxy)
+		FTS_ERROR("unhandled y=%d", y);
 	return -EINVAL;
 }
 
@@ -1779,6 +1783,10 @@ static int fts_input_report_key(struct fts_ts_data *data, int index)
 			return 0;
 		}
 	}
+	if (x > data->pdata->x_max && x > x_dim[i] + data->pdata->key_dim)
+		FTS_ERROR("unhandled x=%d", x);
+	if (y > data->pdata->y_max && y > y_dim[i] + data->pdata->key_dim)
+		FTS_ERROR("unhandled y=%d", y);
 	return -EINVAL;
 }
 
