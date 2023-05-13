@@ -52,6 +52,7 @@
 #include <linux/earlysuspend.h>
 #define FTS_SUSPEND_LEVEL 1     /* Early-suspend level */
 #endif
+#include <xiaomi-msm8937/mach.h>
 #include <xiaomi-msm8937/touchscreen.h>
 #include "focaltech_core.h"
 
@@ -1752,6 +1753,28 @@ static int fts_input_report_key(struct fts_ts_data *data, int index)
 	int y = data->events[index].y;
 	int *x_dim = &data->pdata->key_x_coords[0];
 	int *y_dim = &data->pdata->key_y_coords[0];
+
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_LAND) || IS_ENABLED(CONFIG_MACH_XIAOMI_SANTONI)
+	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_LAND ||
+		xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_SANTONI) {
+		if (y == 2000) {
+			data->events[index].y = 1344;
+			switch (x) {
+				case 180:
+					data->events[index].x = 150;
+					break;
+				case 540:
+					data->events[index].x = 360;
+					break;
+				case 900:
+					data->events[index].x = 580;
+					break;
+				default:
+					break;
+			}
+		}
+	}
+#endif
 
 	if (data->pdata->key_is_vkeys)
 		return fts_input_report_key_vkeys(data, index);
