@@ -6,6 +6,7 @@
 #ifdef CONFIG_TOUCHSCREEN_FTS_MI8937
 		compatible = "focaltech,fts_ts-mi8937";
 		focaltech,ic-type = <0x54350402>; // _FT5435
+		focaltech,key-dim = <50>;
 		focaltech,key-y-coords = <1350 1350 1350>;
 		focaltech,esd-check;
 		focaltech,use-old-touchdata-reading-behavior;
