@@ -44,6 +44,7 @@
 #include <linux/regulator/consumer.h>
 #include <soc/qcom/scm.h>
 #include <linux/platform_device.h>
+#include <xiaomi-msm8937/mach.h>
 
 #define FPC1020_RESET_LOW_US 1000
 #define FPC1020_RESET_HIGH1_US 100
@@ -290,6 +291,28 @@ static ssize_t spi_prepare_set(struct device *dev,
 static DEVICE_ATTR(spi_prepare, S_IWUSR, NULL, spi_prepare_set);
 
 /**
+ * sysfs node for controlling whether the driver is allowed
+ * to wake up the platform on interrupt.
+ */
+static ssize_t wakeup_enable_set(struct device *dev,
+	struct device_attribute *attr, const char *buf, size_t count)
+{
+	struct  fpc1020_data *fpc1020 = dev_get_drvdata(dev);
+
+	if (!strncmp(buf, "enable", strlen("enable"))) {
+		atomic_set(&fpc1020->wakeup_enabled, true);
+		smp_wmb();
+	} else if (!strncmp(buf, "disable", strlen("disable"))) {
+		atomic_set(&fpc1020->wakeup_enabled, false);
+		smp_wmb();
+	} else
+		return -EINVAL;
+
+	return count;
+}
+static DEVICE_ATTR(wakeup_enable, S_IWUSR, NULL, wakeup_enable_set);
+
+/**
  * sysf node to check the interrupt status of the sensor, the interrupt
  * handler should perform sysf_notify to allow userland to poll the node.
  */
@@ -418,6 +441,7 @@ static struct attribute *attributes[] = {
 	&dev_attr_pinctl_set.attr,
 	&dev_attr_spi_prepare.attr,
 	&dev_attr_hw_reset.attr,
+	&dev_attr_wakeup_enable.attr,
 	&dev_attr_compatible_all.attr,
 #ifdef LINUX_CONTROL_SPI_CLK
 	&dev_attr_clk_enable.attr,
@@ -537,6 +561,11 @@ static int fpc1020_probe(struct platform_device *pdev)
 
 
 
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_LAND)
+	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_LAND)
+		atomic_set(&fpc1020->wakeup_enabled, 0);
+	else
+#endif
 	atomic_set(&fpc1020->wakeup_enabled, 1);
 #ifdef LINUX_CONTROL_SPI_CLK
 	fpc1020->clocks_enabled = false;
