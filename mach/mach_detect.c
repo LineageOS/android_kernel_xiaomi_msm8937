@@ -1,6 +1,7 @@
 #include <linux/export.h>
 #include <linux/kobject.h>
 #include <linux/init.h>
+#include <linux/kernel.h>
 #include <linux/of.h>
 #include <linux/printk.h>
 #include <linux/string.h>
@@ -148,7 +149,31 @@ static int xiaomi_msm8937_mach_detect(void) {
 		}
 	}
 
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_WINGTECH_MSM8917)
+	if (saved_wingtech_board_id[0]) {
+		if ((saved_mach == XIAOMI_MSM8937_MACH_ROLEX && strncmp(saved_wingtech_board_id, "S88503", 6) != 0) ||
+			(saved_mach == XIAOMI_MSM8937_MACH_RIVA  && strncmp(saved_wingtech_board_id, "S88505", 6) != 0) ||
+			(saved_mach == XIAOMI_MSM8937_MACH_TIARE && strncmp(saved_wingtech_board_id, "S88508", 6) != 0)) {
+#if !IS_ENABLED(CONFIG_MACH_XIAOMI_RIVA_OREO)
+			if (!strncmp(saved_wingtech_board_id, "S88505", 6))
+				pr_emerg("%s: %d: !!! This device is Redmi 5A. Make sure to use Nougat bootloader. Oreo bootloader is NOT supported on this kernel build !!!\n", __func__, __LINE__);
+#endif
+			goto emerg_wingtech_board_id;
+		}
+	}
+#endif
+
 	return rc;
+
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_WINGTECH_MSM8917)
+emerg_wingtech_board_id:
+	pr_emerg("%s: %d: Machine type mismatches with wingtech board ID!\n", __func__, __LINE__);
+	pr_emerg("%s: %d: Current machine codename: \"%s\", Current wingtech board ID:\"%s\"\n", __func__, __LINE__, xiaomi_msm8937_mach_table[saved_mach].codename, saved_wingtech_board_id);
+	pr_emerg("%s: %d: Triggering kernel panic\n", __func__, __LINE__);
+	panic("Xiaomi MSM8937 machine type mismatches with wingtech board ID\n");
+#endif
+
+	return -ENODEV;
 }
 
 static int __init xiaomi_msm8937_mach_detect_init(void) {
