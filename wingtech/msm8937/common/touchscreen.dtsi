@@ -1,19 +1,8 @@
-&i2c_3 {
-	qcom,clk-freq-out = <100000>;
-	ftech {
-#ifdef CONFIG_TOUCHSCREEN_FTS_MI8937
-		focaltech,ic-type = <0x53360402>; // _FT5336
-		focaltech,key-y-coords = <2000 2000 2000>;
-#else
-		compatible = "focaltech,5336";
-#endif
-	};
-};
-
-#ifndef CONFIG_TOUCHSCREEN_FTS_MI8937
 &soc {
-	gen-vkey1 {
+	vkeys_fts: gen-vkey1 {
+#ifndef CONFIG_TOUCHSCREEN_FTS_MI8937
 		compatible = "qcom,gen-vkeys";
+#endif
 		label = "ft5x06_720p";
 		qcom,disp-maxx = <720>;
 		qcom,disp-maxy = <1280>;
@@ -23,4 +12,15 @@
 		qcom,y-offset = <0>;
 	};
 };
+
+&i2c_3 {
+	qcom,clk-freq-out = <100000>;
+	ftech {
+#ifdef CONFIG_TOUCHSCREEN_FTS_MI8937
+		focaltech,ic-type = <0x53360402>; // _FT5336
+		focaltech,vkeys-node = <&vkeys_fts>;
+#else
+		compatible = "focaltech,5336";
 #endif
+	};
+};
