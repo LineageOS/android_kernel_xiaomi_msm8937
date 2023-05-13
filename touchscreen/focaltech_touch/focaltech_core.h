@@ -153,6 +153,7 @@ struct fts_ts_platform_data {
 
 	// QCOM vkeys
 	bool key_is_vkeys;
+	bool vkeys_y_beyond_maxy;
 	struct vkeys_platform_data *vkeys_pdata;
 	u32 vkeys_maxy;
 	u32 *vkeys_x1;

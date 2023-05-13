@@ -1711,7 +1711,8 @@ static int fts_input_report_key_vkeys(struct fts_ts_data *data, int index)
 
 	for (i = 0; i < vkeys_pdata->num_keys; i++) {
 		if ((x >= pdata->vkeys_x1[i]) && (x <= pdata->vkeys_x2[i]) &&
-			(y >= vkeys_pdata->disp_maxy) && (y <= pdata->vkeys_maxy)) {
+			(y >= vkeys_pdata->disp_maxy) &&
+			(pdata->vkeys_y_beyond_maxy || y <= pdata->vkeys_maxy)) {
 			if (EVENT_DOWN(data->events[index].flag)
 				&& !(data->key_state & (1 << i))) {
 				input_report_key(data->input_dev, vkeys_pdata->keycodes[i], 1);
@@ -2768,6 +2769,7 @@ static int fts_parse_dt(struct device *dev, struct fts_ts_platform_data *pdata)
 					pdata->have_key = false;
 				}
 				pdata->key_is_vkeys = true;
+				pdata->vkeys_y_beyond_maxy = of_property_read_bool(np, "focaltech,vkeys-y-beyond-maxy");
 			} else {
 				FTS_ERROR("Unable to allocate memory for pdata->vkeys_pdata!");
 				pdata->have_key = false;
