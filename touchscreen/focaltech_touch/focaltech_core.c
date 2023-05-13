@@ -1691,6 +1691,44 @@ void fts_release_all_finger(void)
 	FTS_FUNC_EXIT();
 }
 
+static int fts_input_report_key_vkeys(struct fts_ts_data *data, int index)
+{
+	int i = 0;
+	int x = data->events[index].x;
+	int y = data->events[index].y;
+	struct fts_ts_platform_data *pdata = data->pdata;
+	struct vkeys_platform_data *vkeys_pdata = pdata->vkeys_pdata;
+
+	if (!data->pdata->have_key || !data->pdata->key_is_vkeys) {
+		return -EINVAL;
+	}
+
+#if IS_ENABLED(CONFIG_TOUCHSCREEN_SYSCTL_MI8937)
+	if (data->disable_keys) {
+		return -EINVAL;
+	}
+#endif
+
+	for (i = 0; i < vkeys_pdata->num_keys; i++) {
+		if ((x >= pdata->vkeys_x1[i]) && (x <= pdata->vkeys_x2[i]) &&
+			(y >= vkeys_pdata->disp_maxy) && (y <= pdata->vkeys_maxy)) {
+			if (EVENT_DOWN(data->events[index].flag)
+				&& !(data->key_state & (1 << i))) {
+				input_report_key(data->input_dev, vkeys_pdata->keycodes[i], 1);
+				data->key_state |= (1 << i);
+				FTS_DEBUG("VKey%d(%d,%d) DOWN!", i, x, y);
+			} else if (EVENT_UP(data->events[index].flag)
+				&& (data->key_state & (1 << i))) {
+				input_report_key(data->input_dev, vkeys_pdata->keycodes[i], 0);
+				data->key_state &= ~(1 << i);
+				FTS_DEBUG("VKey%d(%d,%d) Up!", i, x, y);
+			}
+			return 0;
+		}
+	}
+	return -EINVAL;
+}
+
 /*****************************************************************************
 * Name: fts_input_report_key
 * Brief: process key events,need report key-event if key enable.
@@ -1709,6 +1747,9 @@ static int fts_input_report_key(struct fts_ts_data *data, int index)
 	int y = data->events[index].y;
 	int *x_dim = &data->pdata->key_x_coords[0];
 	int *y_dim = &data->pdata->key_y_coords[0];
+
+	if (data->pdata->key_is_vkeys)
+		return fts_input_report_key_vkeys(data, index);
 
 	if (!data->pdata->have_key) {
 		return -EINVAL;
@@ -2100,8 +2141,13 @@ static int fts_input_init(struct fts_ts_data *ts_data)
 
 	if (pdata->have_key) {
 		FTS_INFO("set key capabilities");
-		for (key_num = 0; key_num < pdata->key_number; key_num++)
-			input_set_capability(input_dev, EV_KEY, pdata->keys[key_num]);
+		if (pdata->key_is_vkeys) {
+			for (key_num = 0; key_num < pdata->vkeys_pdata->num_keys; key_num++)
+				input_set_capability(input_dev, EV_KEY, pdata->vkeys_pdata->keycodes[key_num]);
+		} else {
+			for (key_num = 0; key_num < pdata->key_number; key_num++)
+				input_set_capability(input_dev, EV_KEY, pdata->keys[key_num]);
+		}
 	}
 
 #if FTS_MT_PROTOCOL_B_EN
@@ -2578,10 +2624,119 @@ static int fts_get_dt_coords(struct device *dev, char *name,
 	return 0;
 }
 
+static int vkey_parse_dt(struct device *dev, struct device_node *np,
+			struct vkeys_platform_data *pdata,
+			struct fts_ts_platform_data *fts_pdata)
+{
+	struct property *prop;
+	int rc, val;
+
+	// Imported from gen_vkeys.c
+	rc = of_property_read_string(np, "label", &pdata->name);
+	if (rc) {
+		FTS_ERROR("Failed to read label");
+		return -EINVAL;
+	}
+
+	rc = of_property_read_u32(np, "qcom,disp-maxx", &pdata->disp_maxx);
+	if (rc) {
+		FTS_ERROR("Failed to read display max x");
+		return -EINVAL;
+	}
+
+	rc = of_property_read_u32(np, "qcom,disp-maxy", &pdata->disp_maxy);
+	if (rc) {
+		FTS_ERROR("Failed to read display max y");
+		return -EINVAL;
+	}
+
+	rc = of_property_read_u32(np, "qcom,panel-maxx", &pdata->panel_maxx);
+	if (rc) {
+		FTS_ERROR("Failed to read panel max x");
+		return -EINVAL;
+	}
+
+	rc = of_property_read_u32(np, "qcom,panel-maxy", &pdata->panel_maxy);
+	if (rc) {
+		FTS_ERROR("Failed to read panel max y");
+		return -EINVAL;
+	}
+
+	prop = of_find_property(np, "qcom,key-codes", NULL);
+	if (prop) {
+		pdata->num_keys = prop->length / sizeof(u32);
+		pdata->keycodes = devm_kzalloc(dev,
+			sizeof(u32) * pdata->num_keys, GFP_KERNEL);
+		if (!pdata->keycodes)
+			return -ENOMEM;
+		rc = of_property_read_u32_array(np, "qcom,key-codes",
+				pdata->keycodes, pdata->num_keys);
+		if (rc) {
+			FTS_ERROR("Failed to read key codes");
+			return -EINVAL;
+		}
+	}
+
+	pdata->y_offset = VKEY_Y_OFFSET_DEFAULT;
+	rc = of_property_read_u32(np, "qcom,y-offset", &val);
+	if (!rc)
+		pdata->y_offset = val;
+	else if (rc != -EINVAL) {
+		FTS_ERROR("Failed to read y position offset");
+		return rc;
+	}
+
+	return 0;
+}
+
+static int vkey_calculate(struct device *dev,
+			struct vkeys_platform_data *pdata,
+			struct fts_ts_platform_data *fts_pdata)
+{
+	int border, width, height;
+	int x1 = 0, x2 = 0, i, ret;
+
+#define BORDER_ADJUST_NUM 3
+#define BORDER_ADJUST_DENOM 4
+#define HEIGHT_SCALE_NUM 8
+#define HEIGHT_SCALE_DENOM 10
+
+	border = (pdata->panel_maxx - pdata->disp_maxx) * 2;
+	width = ((pdata->disp_maxx - (border * (pdata->num_keys - 1)))
+			/ pdata->num_keys);
+	height = (pdata->panel_maxy - pdata->disp_maxy);
+	height = height * HEIGHT_SCALE_NUM / HEIGHT_SCALE_DENOM;
+
+	x2 -= border * BORDER_ADJUST_NUM / BORDER_ADJUST_DENOM;
+
+	fts_pdata->vkeys_maxy = pdata->disp_maxy + height + pdata->y_offset;
+
+	fts_pdata->vkeys_x1 = devm_kzalloc(dev,
+		sizeof(u32) * pdata->num_keys, GFP_KERNEL);
+	fts_pdata->vkeys_x2 = devm_kzalloc(dev,
+		sizeof(u32) * pdata->num_keys, GFP_KERNEL);
+	if (!fts_pdata->vkeys_x1 || !fts_pdata->vkeys_x2)
+		return -ENOMEM;
+
+	for (i = 0; i < pdata->num_keys; i++) {
+		x1 = x2 + border;
+		x2 = x2 + border + width;
+
+		fts_pdata->vkeys_x1[i] = x1;
+		fts_pdata->vkeys_x2[i] = x2;
+
+		FTS_DEBUG("vkeys_x1[%d] = %d", i, fts_pdata->vkeys_x1[i]);
+		FTS_DEBUG("vkeys_x2[%d] = %d", i, fts_pdata->vkeys_x2[i]);
+	}
+
+	return 0;
+}
+
 static int fts_parse_dt(struct device *dev, struct fts_ts_platform_data *pdata)
 {
 	int ret = 0;
 	struct device_node *np = dev->of_node;
+	struct device_node *np_vkeys;
 	u32 temp_val = 0;
 
 	FTS_FUNC_ENTER();
@@ -2597,36 +2752,58 @@ static int fts_parse_dt(struct device *dev, struct fts_ts_platform_data *pdata)
 	/* key */
 	pdata->have_key = of_property_read_bool(np, "focaltech,have-key");
 	if (pdata->have_key) {
-		ret = of_property_read_u32(np, "focaltech,key-number", &pdata->key_number);
-		if (ret < 0)
-			FTS_ERROR("Key number undefined!");
+		np_vkeys = of_parse_phandle(np, "focaltech,vkeys-node", 0);
+		if (!IS_ERR_OR_NULL(np_vkeys)) {
+			pdata->vkeys_pdata = devm_kzalloc(dev,
+				sizeof(struct vkeys_platform_data), GFP_KERNEL);
+			if (pdata->vkeys_pdata) {
+				ret = vkey_parse_dt(dev, np_vkeys, pdata->vkeys_pdata, pdata);
+				if (ret) {
+					FTS_ERROR("Parsing Vkeys DT failed(%d)", ret);
+					pdata->have_key = false;
+				}
+				ret = vkey_calculate(dev, pdata->vkeys_pdata, pdata);
+				if (ret < 0) {
+					FTS_ERROR("Calculate Vkeys failed(%d)", ret);
+					pdata->have_key = false;
+				}
+				pdata->key_is_vkeys = true;
+			} else {
+				FTS_ERROR("Unable to allocate memory for pdata->vkeys_pdata!");
+				pdata->have_key = false;
+			}
+		} else {
+			ret = of_property_read_u32(np, "focaltech,key-number", &pdata->key_number);
+			if (ret < 0)
+				FTS_ERROR("Key number undefined!");
 
-		ret = of_property_read_u32_array(np, "focaltech,keys",
-						pdata->keys, pdata->key_number);
-		if (ret < 0)
-			FTS_ERROR("Keys undefined!");
-		else if (pdata->key_number > FTS_MAX_KEYS)
-			pdata->key_number = FTS_MAX_KEYS;
+			ret = of_property_read_u32_array(np, "focaltech,keys",
+							pdata->keys, pdata->key_number);
+			if (ret < 0)
+				FTS_ERROR("Keys undefined!");
+			else if (pdata->key_number > FTS_MAX_KEYS)
+				pdata->key_number = FTS_MAX_KEYS;
 
-		ret = of_property_read_u32_array(np, "focaltech,key-x-coords",
-						pdata->key_x_coords,
-						pdata->key_number);
-		if (ret < 0)
-			FTS_ERROR("Key Y Coords undefined!");
+			ret = of_property_read_u32_array(np, "focaltech,key-x-coords",
+							pdata->key_x_coords,
+							pdata->key_number);
+			if (ret < 0)
+				FTS_ERROR("Key Y Coords undefined!");
 
-		ret = of_property_read_u32_array(np, "focaltech,key-y-coords",
-						pdata->key_y_coords,
-						pdata->key_number);
-		if (ret < 0)
-			FTS_ERROR("Key X Coords undefined!");
+			ret = of_property_read_u32_array(np, "focaltech,key-y-coords",
+							pdata->key_y_coords,
+							pdata->key_number);
+			if (ret < 0)
+				FTS_ERROR("Key X Coords undefined!");
 
-		FTS_INFO("VK Number:%d, key:(%d,%d,%d), "
-			"coords:(%d,%d),(%d,%d),(%d,%d)",
-			pdata->key_number,
-			pdata->keys[0], pdata->keys[1], pdata->keys[2],
-			pdata->key_x_coords[0], pdata->key_y_coords[0],
-			pdata->key_x_coords[1], pdata->key_y_coords[1],
-			pdata->key_x_coords[2], pdata->key_y_coords[2]);
+			FTS_INFO("VK Number:%d, key:(%d,%d,%d), "
+				"coords:(%d,%d),(%d,%d),(%d,%d)",
+				pdata->key_number,
+				pdata->keys[0], pdata->keys[1], pdata->keys[2],
+				pdata->key_x_coords[0], pdata->key_y_coords[0],
+				pdata->key_x_coords[1], pdata->key_y_coords[1],
+				pdata->key_x_coords[2], pdata->key_y_coords[2]);
+		}
 	}
 
 	/* reset, irq gpio info */

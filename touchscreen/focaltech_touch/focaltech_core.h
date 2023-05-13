@@ -65,6 +65,7 @@
 #include <linux/gunyah/gh_irq_lend.h>
 #include <linux/gunyah/gh_mem_notifier.h>
 #endif
+#include <linux/input/gen_vkeys.h>
 #include "focaltech_common.h"
 
 /*****************************************************************************
@@ -105,6 +106,8 @@
 #define FTX_MAX_COMPATIBLE_TYPE             4
 #define FTX_MAX_COMMMAND_LENGTH             16
 
+// QCOM vkeys
+#define VKEY_Y_OFFSET_DEFAULT 0
 
 /*****************************************************************************
 *  Alternative mode (When something goes wrong, the modules may be able to solve the problem.)
@@ -146,6 +149,13 @@ struct fts_ts_platform_data {
 	bool esdcheck;
 	bool ignore_id_check;
 	bool use_old_touchdata_reading_behavior;
+
+	// QCOM vkeys
+	bool key_is_vkeys;
+	struct vkeys_platform_data *vkeys_pdata;
+	u32 vkeys_maxy;
+	u32 *vkeys_x1;
+	u32 *vkeys_x2;
 };
 
 struct ts_event {
