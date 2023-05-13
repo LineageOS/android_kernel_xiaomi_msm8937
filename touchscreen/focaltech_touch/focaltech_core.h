@@ -138,6 +138,7 @@ struct fts_ts_platform_data {
 	u32 reset_gpio_flags;
 	bool have_key;
 	u32 key_number;
+	u32 key_dim;
 	u32 keys[FTS_MAX_KEYS];
 	u32 key_y_coords[FTS_MAX_KEYS];
 	u32 key_x_coords[FTS_MAX_KEYS];

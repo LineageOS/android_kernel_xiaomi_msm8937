@@ -1762,8 +1762,8 @@ static int fts_input_report_key(struct fts_ts_data *data, int index)
 #endif
 
 	for (i = 0; i < data->pdata->key_number; i++) {
-		if ((x >= x_dim[i] - FTS_KEY_DIM) && (x <= x_dim[i] + FTS_KEY_DIM) &&
-			(y >= y_dim[i] - FTS_KEY_DIM) && (y <= y_dim[i] + FTS_KEY_DIM)) {
+		if ((x >= x_dim[i] - data->pdata->key_dim) && (x <= x_dim[i] + data->pdata->key_dim) &&
+			(y >= y_dim[i] - data->pdata->key_dim) && (y <= y_dim[i] + data->pdata->key_dim)) {
 			if (EVENT_DOWN(data->events[index].flag)
 				&& !(data->key_state & (1 << i))) {
 				input_report_key(data->input_dev, data->pdata->keys[i], 1);
@@ -2776,6 +2776,12 @@ static int fts_parse_dt(struct device *dev, struct fts_ts_platform_data *pdata)
 			ret = of_property_read_u32(np, "focaltech,key-number", &pdata->key_number);
 			if (ret < 0)
 				FTS_ERROR("Key number undefined!");
+
+			ret = of_property_read_u32(np, "focaltech,key-dim", &pdata->key_dim);
+			if (ret < 0) {
+				FTS_ERROR("Key dim undefined!");
+				pdata->key_dim = FTS_KEY_DIM;
+			}
 
 			ret = of_property_read_u32_array(np, "focaltech,keys",
 							pdata->keys, pdata->key_number);
