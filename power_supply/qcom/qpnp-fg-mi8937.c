@@ -9404,6 +9404,11 @@ static int __init fg_init(void)
 		settings[FG_MEM_VBAT_EST_DIFF].value = 100;
 #endif
 
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_PRADA)
+	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_PRADA)
+		fg_sram_update_period_ms = 10000;
+#endif
+
 	return platform_driver_register(&fg_driver);
 }
 

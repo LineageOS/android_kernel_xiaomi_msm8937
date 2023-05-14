@@ -8878,6 +8878,11 @@ static int __init smbchg_init(void)
 	}
 #endif
 
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_PRADA)
+	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_PRADA)
+		smbchg_default_dcp_icl_ma = 2000;
+#endif
+
 	return platform_driver_register(&smbchg_driver);
 }
 
