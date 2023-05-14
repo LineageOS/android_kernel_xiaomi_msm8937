@@ -6430,7 +6430,7 @@ fail:
 	return -EINVAL;
 }
 
-#if IS_ENABLED(CONFIG_MACH_XIAOMI_SANTONI)
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SANTONI) || IS_ENABLED(CONFIG_MACH_XIAOMI_PRADA)
 #define XIAOMI_SANTONI_REDO_BATID_DURING_FIRST_EST	BIT(4)
 static void xiaomi_santoni_fg_hw_restart(struct fg_chip *chip)
 {
@@ -6482,7 +6482,7 @@ static int fg_batt_profile_init(struct fg_chip *chip)
 	const char *data, *batt_type_str;
 	bool tried_again = false, vbat_in_range, profiles_same;
 	u8 reg = 0;
-#if IS_ENABLED(CONFIG_MACH_XIAOMI_SANTONI)
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SANTONI) || IS_ENABLED(CONFIG_MACH_XIAOMI_PRADA)
 	int xiaomi_santoni_value = 0;
 #endif
 
@@ -6514,6 +6514,15 @@ wait:
 			((xiaomi_santoni_value > 24000) && (xiaomi_santoni_value < 35000)))) {
 			xiaomi_santoni_fg_hw_restart(chip);
 		}
+	}
+#endif
+
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_PRADA)
+	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_PRADA) {
+		pr_info("%s: Execute xiaomi_santoni_fg_hw_restart(chip) on prada\n");
+		xiaomi_santoni_value = get_sram_prop_now(chip, FG_DATA_BATT_ID);
+		pr_err("wingtech later init FG_DATA_BATT_ID =%d\n", xiaomi_santoni_value);
+		xiaomi_santoni_fg_hw_restart(chip);
 	}
 #endif
 
