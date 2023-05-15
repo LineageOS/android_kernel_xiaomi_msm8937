@@ -1,5 +1,5 @@
-#ifndef _DTS_MITHORIUM_INCLUDE_AW2013_H
-#define _DTS_MITHORIUM_INCLUDE_AW2013_H
+#ifndef _DTS_MI8937_INCLUDE_AW2013_H
+#define _DTS_MI8937_INCLUDE_AW2013_H
 
 #define AW2013_LED(led_color, led_id) \
 	aw2013,##led_color { \
