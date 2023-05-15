@@ -45,6 +45,11 @@ static int select_pin_ctl(struct gf_dev *gf_dev, const char *name)
 	int rc;
 	struct device *dev = &gf_dev->spi->dev;
 
+	if (IS_ERR_OR_NULL(gf_dev->fingerprint_pinctrl)) {
+		dev_err(dev, "pinctrl is invalid\n");
+		return -ENODEV;
+	}
+
 	for (i = 0; i < ARRAY_SIZE(gf_dev->pinctrl_state); i++) {
 		const char *n = pctl_names[i];
 		if (!strncmp(n, name, strlen(n))) {
