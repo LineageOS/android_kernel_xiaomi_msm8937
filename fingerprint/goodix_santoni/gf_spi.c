@@ -58,7 +58,7 @@
 #define GF_SPIDEV_NAME		"goodix,fingerprint-santoni"
 
 #define GF_DEV_NAME		"goodix_fp"
-#define GF_INPUT_NAME		"gf3208"
+#define GF_INPUT_NAME		"uinput-gf"
 
 #define CHRD_DRIVER_NAME		"goodix_fp_spi"
 #define CLASS_NAME		"goodix_fp"
