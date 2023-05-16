@@ -33,6 +33,13 @@
 #include "msm-analog-cdc-regmap.h"
 #include "../wcd-mbhc-v2-api.h"
 
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
+#include "msm-analog-cdc-xiaomi_msm8937.h"
+#endif
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+#include "msm-analog-cdc-xiaomi_sdm439.h"
+#endif
+
 #define DRV_NAME "pmic_analog_codec"
 #define SDM660_CDC_RATES (SNDRV_PCM_RATE_8000 | SNDRV_PCM_RATE_16000 |\
 			SNDRV_PCM_RATE_32000 | SNDRV_PCM_RATE_44100 |\
@@ -4471,6 +4478,14 @@ static int msm_anlg_cdc_soc_probe(struct snd_soc_codec *codec)
 
 	snd_soc_dapm_ignore_suspend(dapm, "PDM Playback");
 	snd_soc_dapm_ignore_suspend(dapm, "PDM Capture");
+
+	/* Add device specific routes */
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
+	msm_anlg_cdc_add_xiaomi_msm8937_routes(dapm);
+#endif
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+	msm_anlg_cdc_add_xiaomi_sdm439_routes(dapm);
+#endif
 
 	snd_soc_dapm_sync(dapm);
 
