@@ -1,0 +1,9 @@
+/* Custom */
+&pmi632_rgb {
+	red {
+		label = "white";
+	};
+
+	/delete-node/ green;
+	/delete-node/ blue;
+};

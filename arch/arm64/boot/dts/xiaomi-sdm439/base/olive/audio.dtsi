@@ -1,0 +1,12 @@
+&i2c_2 {
+	aw87519@58{
+		status = "okay";
+		compatible = "awinic,aw87519";
+		reg = <0x58>;
+		reset-gpio = <&tlmm 125 0x01>;
+	};
+};
+
+&wsa881x_i2c_45 {
+	status = "disabled";
+};

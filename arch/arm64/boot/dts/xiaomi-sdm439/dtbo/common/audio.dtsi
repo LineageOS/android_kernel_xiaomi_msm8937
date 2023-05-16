@@ -1,0 +1,12 @@
+/* From stock sdm439-qrd.dtsi */
+&int_codec {
+	qcom,msm-hs-micbias-type = "internal";
+};
+
+&wsa881x_i2c_f {
+	status = "disabled";
+};
+
+&wsa881x_i2c_45 {
+	status = "disabled";
+};

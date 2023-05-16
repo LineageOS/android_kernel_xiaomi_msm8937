@@ -1,0 +1,10 @@
+&soc {
+	simtray {
+		compatible = "xiaomi,simtray-status";
+		status-gpio = <&tlmm 54 0x00>;
+	};
+};
+
+&usb_otg {
+	qcom,hsusb-otg-phy-init-seq =  <0x43 0x80 0x37 0x81 0x76 0x82 0xffffffff>;
+};

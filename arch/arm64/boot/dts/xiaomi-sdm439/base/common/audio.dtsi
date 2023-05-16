@@ -1,0 +1,59 @@
+/* From stock msm8937-audio.dtsi */
+&int_codec {
+	qcom,msm-mbhc-hphl-swh = <1>;
+	qcom,msm-mbhc-gnd-swh = <1>;
+	qcom,msm-hs-micbias-type = "internal";
+
+	/delete-property/ qcom,cdc-us-eu-gpios;
+	/delete-property/ qcom,quin-mi2s-gpios;
+
+	/delete-property/ asoc-wsa-codec-names;
+	/delete-property/ asoc-wsa-codec-prefixes;
+	/delete-property/ msm-vdd-wsa-switch-supply;
+	/delete-property/ qcom,msm-vdd-wsa-switch-voltage;
+	/delete-property/ qcom,msm-vdd-wsa-switch-current;
+
+	/* WARNING: Override
+	   Changes:
+	   - "MIC BIAS External2", "Headset Mic", => "MIC BIAS Internal2", "Headset Mic",
+	   - "AMIC2", "MIC BIAS External2", => "AMIC2", "MIC BIAS Internal2",
+	   - Remove "WSA_SPK OUT", "VDD_WSA_SWITCH",
+	   - Remove "SpkrMono WSA_IN", "WSA_SPK OUT"
+	*/
+	qcom,audio-routing =
+			"RX_BIAS", "MCLK",
+			"SPK_RX_BIAS", "MCLK",
+			"INT_LDO_H", "MCLK",
+			"RX_I2S_CLK", "MCLK",
+			"TX_I2S_CLK", "MCLK",
+			"MIC BIAS External", "Handset Mic",
+			"MIC BIAS Internal2", "Headset Mic",
+			"MIC BIAS External", "Secondary Mic",
+			"AMIC1", "MIC BIAS External",
+			"AMIC2", "MIC BIAS Internal2",
+			"AMIC3", "MIC BIAS External",
+			"ADC1_IN", "ADC1_OUT",
+			"ADC2_IN", "ADC2_OUT",
+			"ADC3_IN", "ADC3_OUT",
+			"PDM_IN_RX1", "PDM_OUT_RX1",
+			"PDM_IN_RX2", "PDM_OUT_RX2",
+			"PDM_IN_RX3", "PDM_OUT_RX3";
+};
+
+&wsa881x_i2c_f {
+	status = "disabled";
+};
+
+/* From stock sdm439-audio.dtsi */
+&int_codec {
+	/delete-property/ qcom,msm-micbias2-ext-cap;
+	qcom,wsa-disabled;
+	/delete-property/ msm-vdd-wsa-switch-supply;
+	/delete-property/ qcom,msm-vdd-wsa-switch-voltage;
+	/delete-property/ qcom,msm-vdd-wsa-switch-current;
+};
+
+/* Adapted from stock msm-analog-cdc.c */
+&pmic_analog_codec {
+	qcom,cdc-micbias-cfilt-mv = <2200000>;
+};
