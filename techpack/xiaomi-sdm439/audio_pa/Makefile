@@ -1,0 +1,2 @@
+obj-$(CONFIG_SND_SOC_AW87329_MI439) += aw87329_audio.o
+obj-$(CONFIG_SND_SOC_AW87519_MI439) += aw87519_audio.o

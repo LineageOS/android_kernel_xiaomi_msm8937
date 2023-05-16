@@ -1,0 +1,15 @@
+menu "Touchscreen"
+	depends on INPUT_TOUCHSCREEN
+
+config TOUCHSCREEN_SYSCTL_MI439
+	bool "Sysctl control interface for Xiaomi SDM439 touchscreens"
+	help
+	  Say Y here to enable sysctl control interface for Xiaomi SDM439 touchscreens
+
+source "techpack/xiaomi-sdm439/touchscreen/ft5446/Kconfig"
+source "techpack/xiaomi-sdm439/touchscreen/FT8006S/Kconfig"
+source "techpack/xiaomi-sdm439/touchscreen/gt1511q/Kconfig"
+source "techpack/xiaomi-sdm439/touchscreen/ITK9881H/Kconfig"
+source "techpack/xiaomi-sdm439/touchscreen/NT36525B/Kconfig"
+
+endmenu
