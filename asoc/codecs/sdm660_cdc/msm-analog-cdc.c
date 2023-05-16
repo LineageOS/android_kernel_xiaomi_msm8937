@@ -1974,154 +1974,6 @@ static int msm_anlg_cdc_ext_spk_boost_set(struct snd_kcontrol *kcontrol,
 	return 0;
 }
 
-#if IS_ENABLED(CONFIG_SND_SOC_AW87319_MI8937)
-extern void xiaomi_msm8937_AW87319_Audio_Speaker(void);
-extern void xiaomi_msm8937_AW87319_Audio_OFF(void);
-static int msm_anlg_cdc_mi8937_aw87319_pa_value = 0;
-
-static int msm_anlg_cdc_mi8937_aw87319_pa_get(struct snd_kcontrol *kcontrol,
-					  struct snd_ctl_elem_value *ucontrol)
-{
-	ucontrol->value.integer.value[0] = msm_anlg_cdc_mi8937_aw87319_pa_value;
-	return 0;
-}
-
-static int msm_anlg_cdc_mi8937_aw87319_pa_set(struct snd_kcontrol *kcontrol,
-					  struct snd_ctl_elem_value *ucontrol)
-{
-	struct snd_soc_component *component =
-				snd_soc_kcontrol_component(kcontrol);
-
-	dev_dbg(component->dev, "%s: ucontrol->value.integer.value[0] = %ld\n",
-		__func__, ucontrol->value.integer.value[0]);
-
-	if (ucontrol->value.integer.value[0])
-		xiaomi_msm8937_AW87319_Audio_Speaker();
-	else
-		xiaomi_msm8937_AW87319_Audio_OFF();
-
-	msm_anlg_cdc_mi8937_aw87319_pa_value = ucontrol->value.integer.value[0];
-
-	return 0;
-}
-#endif
-
-#if IS_ENABLED(CONFIG_SND_SOC_AW87329_MI8937)
-extern unsigned int xiaomi_msm8937_aw87329_audio_kspk(void);
-extern unsigned int xiaomi_msm8937_aw87329_audio_off(void);
-static int msm_anlg_cdc_mi8937_aw87329_pa_value = 0;
-
-static int msm_anlg_cdc_mi8937_aw87329_pa_get(struct snd_kcontrol *kcontrol,
-					  struct snd_ctl_elem_value *ucontrol)
-{
-	ucontrol->value.integer.value[0] = msm_anlg_cdc_mi8937_aw87329_pa_value;
-	return 0;
-}
-
-static int msm_anlg_cdc_mi8937_aw87329_pa_set(struct snd_kcontrol *kcontrol,
-					  struct snd_ctl_elem_value *ucontrol)
-{
-	struct snd_soc_component *component =
-				snd_soc_kcontrol_component(kcontrol);
-
-	dev_dbg(component->dev, "%s: ucontrol->value.integer.value[0] = %ld\n",
-		__func__, ucontrol->value.integer.value[0]);
-
-	if (ucontrol->value.integer.value[0])
-		xiaomi_msm8937_aw87329_audio_kspk();
-	else
-		xiaomi_msm8937_aw87329_audio_off();
-
-	msm_anlg_cdc_mi8937_aw87329_pa_value = ucontrol->value.integer.value[0];
-
-	return 0;
-}
-#endif
-
-#if IS_ENABLED(CONFIG_SND_SOC_AW87329_MI439)
-extern unsigned char xiaomi_sdm439_aw87329_audio_kspk(void);
-extern unsigned char xiaomi_sdm439_aw87329_audio_drcv(void);
-extern unsigned char xiaomi_sdm439_aw87329_audio_off(void);
-static int msm_anlg_cdc_mi439_aw87329_pa_value = 0;
-
-static int msm_anlg_cdc_mi439_aw87329_pa_get(struct snd_kcontrol *kcontrol,
-					  struct snd_ctl_elem_value *ucontrol)
-{
-	ucontrol->value.integer.value[0] = msm_anlg_cdc_mi439_aw87329_pa_value;
-	return 0;
-}
-
-static int msm_anlg_cdc_mi439_aw87329_pa_set(struct snd_kcontrol *kcontrol,
-					  struct snd_ctl_elem_value *ucontrol)
-{
-	struct snd_soc_component *component =
-				snd_soc_kcontrol_component(kcontrol);
-
-	dev_dbg(component->dev, "%s: ucontrol->value.integer.value[0] = %ld\n",
-		__func__, ucontrol->value.integer.value[0]);
-
-	switch (ucontrol->value.integer.value[0]) {
-		case 0:
-			xiaomi_sdm439_aw87329_audio_off();
-			break;
-		case 1:
-			xiaomi_sdm439_aw87329_audio_kspk();
-			break;
-		case 2:
-			xiaomi_sdm439_aw87329_audio_drcv();
-			break;
-		default:
-			return -EINVAL;
-	}
-
-	msm_anlg_cdc_mi439_aw87329_pa_value = ucontrol->value.integer.value[0];
-
-	return 0;
-}
-#endif
-
-#if IS_ENABLED(CONFIG_SND_SOC_AW87519_MI439)
-extern unsigned char xiaomi_sdm439_aw87519_audio_speaker(void);
-extern unsigned char xiaomi_sdm439_aw87519_audio_receiver(void);
-extern unsigned char xiaomi_sdm439_aw87519_audio_off(void);
-static int msm_anlg_cdc_mi439_aw87519_pa_value = 0;
-
-static int msm_anlg_cdc_mi439_aw87519_pa_get(struct snd_kcontrol *kcontrol,
-					  struct snd_ctl_elem_value *ucontrol)
-{
-	ucontrol->value.integer.value[0] = msm_anlg_cdc_mi439_aw87519_pa_value;
-	return 0;
-}
-
-static int msm_anlg_cdc_mi439_aw87519_pa_set(struct snd_kcontrol *kcontrol,
-					  struct snd_ctl_elem_value *ucontrol)
-{
-	struct snd_soc_component *component =
-				snd_soc_kcontrol_component(kcontrol);
-
-	dev_dbg(component->dev, "%s: ucontrol->value.integer.value[0] = %ld\n",
-		__func__, ucontrol->value.integer.value[0]);
-
-	switch (ucontrol->value.integer.value[0]) {
-		case 0:
-			xiaomi_sdm439_aw87519_audio_off();
-			break;
-		case 1:
-			xiaomi_sdm439_aw87519_audio_speaker();
-			break;
-		case 2:
-			xiaomi_sdm439_aw87519_audio_receiver();
-			break;
-		default:
-			return -EINVAL;
-	}
-
-	msm_anlg_cdc_mi439_aw87519_pa_value = ucontrol->value.integer.value[0];
-
-	return 0;
-}
-#endif
-
 static const char * const msm_anlg_cdc_ear_pa_boost_ctrl_text[] = {
 		"DISABLE", "ENABLE"};
 static const struct soc_enum msm_anlg_cdc_ear_pa_boost_ctl_enum[] = {
@@ -2159,38 +2011,6 @@ static const struct soc_enum msm_anlg_cdc_hph_mode_ctl_enum[] = {
 			msm_anlg_cdc_hph_mode_ctrl_text),
 };
 
-#if IS_ENABLED(CONFIG_SND_SOC_AW87319_MI8937)
-static const char * const msm_anlg_cdc_mi8937_aw87319_pa_ctrl_text[] = {
-		"Off", "On"};
-static const struct soc_enum msm_anlg_cdc_mi8937_aw87319_pa_ctl_enum[] = {
-		SOC_ENUM_SINGLE_EXT(2, msm_anlg_cdc_mi8937_aw87319_pa_ctrl_text),
-};
-#endif
-
-#if IS_ENABLED(CONFIG_SND_SOC_AW87329_MI8937)
-static const char * const msm_anlg_cdc_mi8937_aw87329_pa_ctrl_text[] = {
-		"Off", "On"};
-static const struct soc_enum msm_anlg_cdc_mi8937_aw87329_pa_ctl_enum[] = {
-		SOC_ENUM_SINGLE_EXT(2, msm_anlg_cdc_mi8937_aw87329_pa_ctrl_text),
-};
-#endif
-
-#if IS_ENABLED(CONFIG_SND_SOC_AW87329_MI439)
-static const char * const msm_anlg_cdc_mi439_aw87329_pa_ctrl_text[] = {
-		"Off", "Speaker", "Receiver"};
-static const struct soc_enum msm_anlg_cdc_mi439_aw87329_pa_ctl_enum[] = {
-		SOC_ENUM_SINGLE_EXT(3, msm_anlg_cdc_mi439_aw87329_pa_ctrl_text),
-};
-#endif
-
-#if IS_ENABLED(CONFIG_SND_SOC_AW87519_MI439)
-static const char * const msm_anlg_cdc_mi439_aw87519_pa_ctrl_text[] = {
-		"Off", "Speaker", "Receiver"};
-static const struct soc_enum msm_anlg_cdc_mi439_aw87519_pa_ctl_enum[] = {
-		SOC_ENUM_SINGLE_EXT(3, msm_anlg_cdc_mi439_aw87519_pa_ctrl_text),
-};
-#endif
-
 /*cut of frequency for high pass filter*/
 static const char * const cf_text[] = {
 	"MIN_3DB_4Hz", "MIN_3DB_75Hz", "MIN_3DB_150Hz"
@@ -2216,26 +2036,6 @@ static const struct snd_kcontrol_new msm_anlg_cdc_snd_controls[] = {
 
 	SOC_ENUM_EXT("Ext Spk Boost", msm_anlg_cdc_ext_spk_boost_ctl_enum[0],
 		msm_anlg_cdc_ext_spk_boost_get, msm_anlg_cdc_ext_spk_boost_set),
-
-#if IS_ENABLED(CONFIG_SND_SOC_AW87319_MI8937)
-	SOC_ENUM_EXT("MI8937 AW87319 PA", msm_anlg_cdc_mi8937_aw87319_pa_ctl_enum[0],
-		msm_anlg_cdc_mi8937_aw87319_pa_get, msm_anlg_cdc_mi8937_aw87319_pa_set),
-#endif
-
-#if IS_ENABLED(CONFIG_SND_SOC_AW87329_MI8937)
-	SOC_ENUM_EXT("MI8937 AW87329 PA", msm_anlg_cdc_mi8937_aw87329_pa_ctl_enum[0],
-		msm_anlg_cdc_mi8937_aw87329_pa_get, msm_anlg_cdc_mi8937_aw87329_pa_set),
-#endif
-
-#if IS_ENABLED(CONFIG_SND_SOC_AW87329_MI439)
-	SOC_ENUM_EXT("MI439 AW87329 PA", msm_anlg_cdc_mi439_aw87329_pa_ctl_enum[0],
-		msm_anlg_cdc_mi439_aw87329_pa_get, msm_anlg_cdc_mi439_aw87329_pa_set),
-#endif
-
-#if IS_ENABLED(CONFIG_SND_SOC_AW87519_MI439)
-	SOC_ENUM_EXT("MI439 AW87519 PA", msm_anlg_cdc_mi439_aw87519_pa_ctl_enum[0],
-		msm_anlg_cdc_mi439_aw87519_pa_get, msm_anlg_cdc_mi439_aw87519_pa_set),
-#endif
 
 	SOC_SINGLE_TLV("ADC1 Volume", MSM89XX_PMIC_ANALOG_TX_1_EN, 3,
 					8, 0, analog_gain),
@@ -2412,6 +2212,23 @@ static const struct snd_kcontrol_new hph_pa_gpio_switch =
 	SOC_DAPM_SINGLE("Switch", SND_SOC_NOPM, 0, 1, 0);
 static const struct snd_kcontrol_new spk_pa_gpio_switch =
 	SOC_DAPM_SINGLE("Switch", SND_SOC_NOPM, 0, 1, 0);
+
+#if IS_ENABLED(CONFIG_SND_SOC_AW87319_MI8937)
+static const struct snd_kcontrol_new mi8937_aw87319_pa_switch =
+	SOC_DAPM_SINGLE("Switch", SND_SOC_NOPM, 0, 1, 0);
+#endif
+#if IS_ENABLED(CONFIG_SND_SOC_AW87329_MI8937)
+static const struct snd_kcontrol_new mi8937_aw87329_pa_switch =
+	SOC_DAPM_SINGLE("Switch", SND_SOC_NOPM, 0, 1, 0);
+#endif
+#if IS_ENABLED(CONFIG_SND_SOC_AW87329_MI439)
+static const struct snd_kcontrol_new mi439_aw87329_pa_switch =
+	SOC_DAPM_SINGLE("Switch", SND_SOC_NOPM, 0, 1, 0);
+#endif
+#if IS_ENABLED(CONFIG_SND_SOC_AW87519_MI439)
+static const struct snd_kcontrol_new mi439_aw87519_pa_switch =
+	SOC_DAPM_SINGLE("Switch", SND_SOC_NOPM, 0, 1, 0);
+#endif
 
 static void msm_anlg_cdc_codec_enable_adc_block(
 				struct snd_soc_component *component,
@@ -3684,6 +3501,118 @@ static int msm_anlg_cdc_codec_enable_spk_pa_gpio(struct snd_soc_dapm_widget *w,
 	return 0;
 }
 
+#if IS_ENABLED(CONFIG_SND_SOC_AW87319_MI8937)
+extern void xiaomi_msm8937_AW87319_Audio_Speaker(void);
+extern void xiaomi_msm8937_AW87319_Audio_OFF(void);
+
+static int msm_anlg_cdc_codec_enable_mi8937_aw87319_pa_spk(struct snd_soc_dapm_widget *w,
+						struct snd_kcontrol *kcontrol,
+						int event)
+{
+	struct snd_soc_component *component =
+					snd_soc_dapm_to_component(w->dapm);
+
+	dev_dbg(component->dev, "%s: %s event = %d\n", __func__, w->name, event);
+	switch (event) {
+	case SND_SOC_DAPM_POST_PMU:
+		dev_dbg(component->dev,
+			"%s: Enable Xiaomi MSM8937 AW87319 Speaker PA\n", __func__);
+		xiaomi_msm8937_AW87319_Audio_Speaker();
+		break;
+	case SND_SOC_DAPM_PRE_PMD:
+		dev_dbg(component->dev,
+			"%s: Disable Xiaomi MSM8937 AW87319 Speaker PA\n", __func__);
+		xiaomi_msm8937_AW87319_Audio_OFF();
+		break;
+	}
+	return 0;
+}
+#endif
+
+#if IS_ENABLED(CONFIG_SND_SOC_AW87329_MI8937)
+extern unsigned int xiaomi_msm8937_aw87329_audio_kspk(void);
+extern unsigned int xiaomi_msm8937_aw87329_audio_off(void);
+
+static int msm_anlg_cdc_codec_enable_mi8937_aw87329_pa_spk(struct snd_soc_dapm_widget *w,
+						struct snd_kcontrol *kcontrol,
+						int event)
+{
+	struct snd_soc_component *component =
+					snd_soc_dapm_to_component(w->dapm);
+
+	dev_dbg(component->dev, "%s: %s event = %d\n", __func__, w->name, event);
+	switch (event) {
+	case SND_SOC_DAPM_POST_PMU:
+		dev_dbg(component->dev,
+			"%s: Enable Xiaomi MSM8937 AW87329 Speaker PA\n", __func__);
+		xiaomi_msm8937_aw87329_audio_kspk();
+		break;
+	case SND_SOC_DAPM_PRE_PMD:
+		dev_dbg(component->dev,
+			"%s: Disable Xiaomi MSM8937 AW87329 Speaker PA\n", __func__);
+		xiaomi_msm8937_aw87329_audio_off();
+		break;
+	}
+	return 0;
+}
+#endif
+
+#if IS_ENABLED(CONFIG_SND_SOC_AW87329_MI439)
+extern unsigned char xiaomi_sdm439_aw87329_audio_kspk(void);
+extern unsigned char xiaomi_sdm439_aw87329_audio_off(void);
+
+static int msm_anlg_cdc_codec_enable_mi439_aw87329_pa_spk(struct snd_soc_dapm_widget *w,
+						struct snd_kcontrol *kcontrol,
+						int event)
+{
+	struct snd_soc_component *component =
+					snd_soc_dapm_to_component(w->dapm);
+
+	dev_dbg(component->dev, "%s: %s event = %d\n", __func__, w->name, event);
+	switch (event) {
+	case SND_SOC_DAPM_POST_PMU:
+		dev_dbg(component->dev,
+			"%s: Enable Xiaomi SDM439 AW87329 Speaker PA\n", __func__);
+		xiaomi_sdm439_aw87329_audio_kspk();
+		break;
+	case SND_SOC_DAPM_PRE_PMD:
+		dev_dbg(component->dev,
+			"%s: Disable Xiaomi SDM439 AW87329 Speaker PA\n", __func__);
+		xiaomi_sdm439_aw87329_audio_off();
+		break;
+	}
+	return 0;
+}
+#endif
+
+#if IS_ENABLED(CONFIG_SND_SOC_AW87519_MI439)
+extern unsigned char xiaomi_sdm439_aw87519_audio_speaker(void);
+extern unsigned char xiaomi_sdm439_aw87519_audio_off(void);
+
+static int msm_anlg_cdc_codec_enable_mi439_aw87519_pa_spk(struct snd_soc_dapm_widget *w,
+						struct snd_kcontrol *kcontrol,
+						int event)
+{
+	struct snd_soc_component *component =
+					snd_soc_dapm_to_component(w->dapm);
+
+	dev_dbg(component->dev, "%s: %s event = %d\n", __func__, w->name, event);
+	switch (event) {
+	case SND_SOC_DAPM_POST_PMU:
+		dev_dbg(component->dev,
+			"%s: Enable Xiaomi SDM439 AW87519 Speaker PA\n", __func__);
+		xiaomi_sdm439_aw87519_audio_speaker();
+		break;
+	case SND_SOC_DAPM_PRE_PMD:
+		dev_dbg(component->dev,
+			"%s: Disable Xiaomi SDM439 AW87519 Speaker PA\n", __func__);
+		xiaomi_sdm439_aw87519_audio_off();
+		break;
+	}
+	return 0;
+}
+#endif
+
 static int msm_anlg_cdc_codec_enable_ear_pa(struct snd_soc_dapm_widget *w,
 					    struct snd_kcontrol *kcontrol,
 					    int event)
@@ -3914,6 +3843,31 @@ static const struct snd_soc_dapm_widget msm_anlg_cdc_dapm_widgets[] = {
 		SND_SOC_NOPM, 0, 0, &spk_pa_gpio_switch,
 		msm_anlg_cdc_codec_enable_spk_pa_gpio,
 		SND_SOC_DAPM_POST_PMU | SND_SOC_DAPM_PRE_PMD),
+
+#if IS_ENABLED(CONFIG_SND_SOC_AW87319_MI8937)
+	SND_SOC_DAPM_SWITCH_E("MI8937 AW87319 PA",
+		SND_SOC_NOPM, 0, 0, &mi8937_aw87319_pa_switch,
+		msm_anlg_cdc_codec_enable_mi8937_aw87319_pa_spk,
+		SND_SOC_DAPM_POST_PMU | SND_SOC_DAPM_PRE_PMD),
+#endif
+#if IS_ENABLED(CONFIG_SND_SOC_AW87329_MI8937)
+	SND_SOC_DAPM_SWITCH_E("MI8937 AW87329 PA",
+		SND_SOC_NOPM, 0, 0, &mi8937_aw87329_pa_switch,
+		msm_anlg_cdc_codec_enable_mi8937_aw87329_pa_spk,
+		SND_SOC_DAPM_POST_PMU | SND_SOC_DAPM_PRE_PMD),
+#endif
+#if IS_ENABLED(CONFIG_SND_SOC_AW87329_MI439)
+	SND_SOC_DAPM_SWITCH_E("MI439 AW87329 PA",
+		SND_SOC_NOPM, 0, 0, &mi439_aw87329_pa_switch,
+		msm_anlg_cdc_codec_enable_mi439_aw87329_pa_spk,
+		SND_SOC_DAPM_POST_PMU | SND_SOC_DAPM_PRE_PMD),
+#endif
+#if IS_ENABLED(CONFIG_SND_SOC_AW87519_MI439)
+	SND_SOC_DAPM_SWITCH_E("MI439 AW87519 PA",
+		SND_SOC_NOPM, 0, 0, &mi439_aw87519_pa_switch,
+		msm_anlg_cdc_codec_enable_mi439_aw87519_pa_spk,
+		SND_SOC_DAPM_POST_PMU | SND_SOC_DAPM_PRE_PMD),
+#endif
 };
 
 static const struct sdm660_cdc_reg_mask_val msm_anlg_cdc_reg_defaults[] = {
