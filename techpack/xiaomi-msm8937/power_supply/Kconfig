@@ -1,0 +1,17 @@
+menu "Power supply"
+	depends on POWER_SUPPLY
+
+config MSM_USB_POWER_SUPPLY_MI8937
+	bool "MSM USB Power supply driver"
+	help
+	  Say Y here to enable MSM USB Power supply driver, It
+	  implements the old style USB power supply for MSM USB
+
+source "techpack/xiaomi-msm8937/power_supply/bq2560x/Kconfig"
+source "techpack/xiaomi-msm8937/power_supply/bq27426/Kconfig"
+source "techpack/xiaomi-msm8937/power_supply/cw2015_rolex/Kconfig"
+source "techpack/xiaomi-msm8937/power_supply/cw2017_tiare/Kconfig"
+source "techpack/xiaomi-msm8937/power_supply/qcom/Kconfig"
+source "techpack/xiaomi-msm8937/power_supply/smb358_rolex/Kconfig"
+
+endmenu

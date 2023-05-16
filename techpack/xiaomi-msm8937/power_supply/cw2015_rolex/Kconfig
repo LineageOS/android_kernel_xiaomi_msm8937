@@ -1,0 +1,5 @@
+config BATTERY_CW2015_ROLEX
+	tristate "CW2015 battery driver"
+	depends on I2C
+	help
+	  Say Y here to enable Test sysfs Interface for CW2015 Drivers.

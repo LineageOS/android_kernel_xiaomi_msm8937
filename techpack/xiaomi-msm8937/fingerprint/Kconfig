@@ -1,0 +1,9 @@
+menu "Fingerprint"
+
+source "techpack/xiaomi-msm8937/fingerprint/fpc_ugg/Kconfig"
+source "techpack/xiaomi-msm8937/fingerprint/gf3208_ugg/Kconfig"
+
+source "techpack/xiaomi-msm8937/fingerprint/fpc_santoni/Kconfig"
+source "techpack/xiaomi-msm8937/fingerprint/goodix_santoni/Kconfig"
+
+endmenu

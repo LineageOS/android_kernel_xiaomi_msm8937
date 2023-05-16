@@ -1,0 +1,5 @@
+
+config TOUCHSCREEN_ATMEL308U_MI8937
+	tristate "ATMEL A308U touchpanel driver"
+	depends on INPUT_TOUCHSCREEN
+	default n

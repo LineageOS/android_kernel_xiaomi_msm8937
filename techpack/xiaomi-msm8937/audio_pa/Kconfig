@@ -1,0 +1,13 @@
+menu "Audio Power Amplifier"
+	depends on SND_SOC
+
+config SND_SOC_AW87319_MI8937
+       tristate "Build AWINIC AW87319 ASoc Speaker PA"
+
+config SND_SOC_AW87329_MI8937
+	tristate "SoC Audio for awinic AW87329 Smart K PA"
+	depends on I2C
+	help
+	This option enables support for AW87329 Smart K PA.
+
+endmenu
