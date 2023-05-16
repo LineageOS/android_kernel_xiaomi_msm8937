@@ -1,0 +1,3 @@
+&led_aw2013 {
+	AW2013_LED(white, 0)
+};

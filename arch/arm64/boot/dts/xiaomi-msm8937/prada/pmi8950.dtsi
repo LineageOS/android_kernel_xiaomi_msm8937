@@ -1,0 +1,82 @@
+&flash_led {
+	/delete-property/ pinctrl-0;
+	/delete-property/ pinctrl-1;
+	/delete-property/ pinctrl-names;
+	/delete-node/ qcom,flash_1;
+	/delete-node/ qcom,switch;
+	/delete-node/ qcom,torch_1;
+};
+
+&pmi8950_flash0 {
+	qcom,current = <1000>;
+	reg0 {
+		regulator-name = "pon_spare_reg";
+	};
+};
+
+&pmi8950_torch0 {
+	qcom,led-name = "flashlight";
+	qcom,current = <200>;
+
+	reg0 {
+		regulator-name = "pon_spare_reg";
+	};
+};
+
+/*
+&pmi8950_gpios {
+	gpio@c000 {
+		qcom,invert = <0>;
+		qcom,master-en = <1>;
+		qcom,mode = <1>;
+		qcom,out-strength = <1>;
+		qcom,out-type = <0>;
+		qcom,pin-num = <1>;
+		qcom,pull = <5>;
+		qcom,src-sel = <2>;
+		qcom,vin-sel = <0>;
+		reg = <0xc000 0x100>;
+		status = "okay";
+	};
+};
+*/
+&pmi8950_gpios {
+	pwm_ir {
+		pwm_ir_default: pwm_ir_default {
+			pins = "gpio1";
+			function = "func1";
+			qcom,drive-strength = <3>;
+#ifdef CONFIG_IR_PWM_MI8937
+			output-high;
+#else
+			output-low;
+#endif
+			bias-disable;
+			status = "okay";
+		};
+
+#ifdef CONFIG_IR_PWM_MI8937
+		pwm_ir_sleep: pwm_ir_sleep {
+			pins = "gpio1";
+			function = "func1";
+			qcom,drive-strength = <3>;
+			output-low;
+			bias-pull-down;
+			status = "okay";
+		};
+#endif
+	};
+};
+
+&pmi8950_pwm {
+	status = "okay";
+	qcom,channel-id = <2>;
+	qcom,force-pwm-size = <9>;
+	qcom,mode-select = <0>;
+	qcom,ramp-index = <0>;
+	qcom,period = <26>;
+	qcom,pwm {
+		qcom,duty = <13>;
+		label = "pwm";
+	};
+};

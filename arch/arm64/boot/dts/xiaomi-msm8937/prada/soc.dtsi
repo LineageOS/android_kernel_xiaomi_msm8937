@@ -1,0 +1,26 @@
+/ {
+	reserved-memory {
+		fih_removed_regions@0 {
+			compatible = "removed-dma-pool";
+			no-map;
+			reg = <0x0 0x91400000 0x0 0x200000>;
+			label = "fih_memory_hole";
+		};
+	};
+};
+
+&other_ext_mem {
+	reg = <0x0 0x84F00000 0x0 0x1900000>;
+};
+
+&qcom_seecom {
+	reg = <0x84f00000 0x1400000>;
+};
+
+&soc {
+	sn_fuse: snfuse@0xA0128 {
+		compatible = "qcom,sn-fuse";
+		reg = <0xa4128 0x4>;
+		reg-names = "sn-base";
+	};
+};

@@ -1,0 +1,5 @@
+&int_codec {
+#ifdef MI8937_V2
+	qcom,use-legacy-voice-cpu-dais;
+#endif
+};

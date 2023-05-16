@@ -1,0 +1,27 @@
+/dts-v1/;
+
+#include "common/include/config.h"
+
+#include "wingtech/msm8917/common/fragments/include-qcom.dtsi"
+
+#include "common/fragments/delete-msm89x7-camera-sensor-qrd.dtsi"
+
+#define IS_MSM8917
+
+#include "common/common.dtsi"
+#include "wingtech/common/common.dtsi"
+#include "wingtech/msm8917/common/common.dtsi"
+#include "wingtech/msm8917/tiare/tiare.dtsi"
+
+/* From stock msm8917-pmi8937-qrd-sku5_S88508.dts */
+/ {
+	model = "Qualcomm Technologies, Inc. MSM8917 QRD SKU5";
+	compatible = "qcom,msm8917-qrd-sku5", "qcom,msm8917-qrd",
+		   "qcom,msm8917", "qcom,qrd", "xiaomi,tiare";
+	qcom,board-id= <0x1000b 1>;
+
+#ifndef MI8937_V2
+	xiaomi,series = "rova";
+	xiaomi,device = "tiare";
+#endif
+};

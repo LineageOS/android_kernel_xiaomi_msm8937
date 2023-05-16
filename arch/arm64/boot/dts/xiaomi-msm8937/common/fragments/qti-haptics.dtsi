@@ -1,0 +1,62 @@
+#ifdef CONFIG_INPUT_QTI_HAPTICS
+&spmi_bus {
+	qcom,pmi8950@3 {
+#ifndef CONFIG_PARSE_ANDROIDBOOT_MODE
+		/delete-node/ qcom,haptics@c000;
+#endif
+		pmi_qcom_haptics: qcom,qcom_haptics@c000 {};
+	};
+};
+&pmi_qcom_haptics {
+	status = "okay";
+	compatible = "qcom,haptics";
+	reg = <0xc000 0x100>;
+	interrupts = <0x3 0xc0 0x0 IRQ_TYPE_EDGE_BOTH>,
+		     <0x3 0xc0 0x1 IRQ_TYPE_EDGE_BOTH>;
+	interrupt-names = "hap-sc-irq", "hap-play-irq";
+	qcom,actuator-type = "erm"; // Default actuator type was ERM in kernel 3.18
+	qcom,vmax-mv = <2000>;
+	qcom,ilim-ma = <800>;
+	qcom,play-rate-us = <10000>;
+	wf_0 {
+		/* CLICK */
+		qcom,effect-id = <0>;
+		qcom,wf-vmax-mv = <2000>;
+		qcom,wf-pattern = [3e 3e 3e];
+		qcom,wf-brake-pattern = [01 00 00 00];
+	};
+	wf_1 {
+		/* DOUBLE CLICK */
+		qcom,effect-id = <1>;
+		qcom,wf-vmax-mv = <2000>;
+		qcom,wf-pattern = [7e 7e 02 02 02 02 02 02];
+		qcom,wf-repeat-count = <2>;
+		qcom,wf-s-repeat-count = <1>;
+	};
+	wf_2 {
+		/* TICK */
+		qcom,effect-id = <2>;
+		qcom,wf-vmax-mv = <2000>;
+		qcom,wf-pattern = [7e 7e];
+	};
+	wf_3 {
+		/* THUD */
+		qcom,effect-id = <3>;
+		qcom,wf-vmax-mv = <2000>;
+		qcom,wf-pattern = [7e 7e 7e];
+	};
+	wf_4 {
+		/* POP */
+		qcom,effect-id = <4>;
+		qcom,wf-vmax-mv = <2000>;
+		qcom,wf-pattern = [7e 7e];
+	};
+	wf_5 {
+		/* HEAVY CLICK */
+		qcom,effect-id = <5>;
+		qcom,wf-vmax-mv = <2000>;
+		qcom,wf-pattern = [7e 7e 7e];
+		qcom,wf-play-rate-us = <6667>;
+	};
+};
+#endif

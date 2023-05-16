@@ -1,0 +1,98 @@
+/* From stock msm8917-pmi8937-qrd-sku5_S8850?.dtsi */
+
+&soc {
+	vkeys_fts: gen-vkeys_ft {
+		/* From stock msm8917-pmi8937-qrd-sku5_S88503.dtsi */
+#ifndef CONFIG_TOUCHSCREEN_FTS_MI8937
+		compatible = "qcom,gen-vkeys";
+#endif
+		label = "ft5346";
+		qcom,disp-maxx = <720>;
+		qcom,disp-maxy = <1280>;
+		qcom,panel-maxx = <720>;
+		qcom,panel-maxy = <2080>;
+		qcom,key-codes = <139 172 158>;
+		qcom,y-offset = <0>;
+	};
+};
+
+&i2c_3 { /* BLSP1 QUP3 */
+	ftech {
+		reg = <0x38>;
+#ifdef CONFIG_TOUCHSCREEN_FTS_MI8937
+		focaltech,ic-type = <0x53460002>; // _FT5346
+		focaltech,vkeys-node = <&vkeys_fts>;
+#else
+		compatible = "focaltech,5346";
+		ftech,virtual-key1 = <139 140 2000>;/*menu*/
+		ftech,virtual-key2 = <172 360 2000>;/*home*/
+		ftech,virtual-key3 = <158 580 2000>;/*back*/
+#endif
+	};
+	goodix_ts@5d {
+#ifdef CONFIG_TOUCHSCREEN_GT9XX_MI8937
+		compatible = "goodix,gt9xx-mi8937";
+#else
+		compatible = "goodix,gt9xx";
+#endif
+		status = "okay";
+		reg = <0x5d>;
+		vdd_ana-supply = <&pm8937_l10>;
+		vcc_i2c-supply = <&pm8937_l5>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <65 0x2008>;
+		pinctrl-names = "gdix_ts_int_default", "gdix_ts_int_output_low",
+				"gdix_ts_int_output_high", "gdix_ts_int_input",
+				"gdix_ts_rst_default", "gdix_ts_rst_output_low",
+				"gdix_ts_rst_output_high", "gdix_ts_rst_input";
+		pinctrl-0 = <&ts_int_default>;
+		pinctrl-1 = <&ts_int_output_low>;
+		pinctrl-2 = <&ts_int_output_high>;
+		pinctrl-3 = <&ts_int_input>;
+		pinctrl-4 = <&ts_rst_default>;
+		pinctrl-5 = <&ts_rst_output_low>;
+		pinctrl-6 = <&ts_rst_output_high>;
+		pinctrl-7 = <&ts_rst_input>;
+		reset-gpios = <&tlmm 64 0x00>;
+		irq-gpios = <&tlmm 65 0x2008>;
+		irq-flags = <1>;
+		touchscreen-max-id = <10>;
+		touchscreen-size-x = <720>;
+		touchscreen-size-y = <1280>;
+		touchscreen-max-w = <1024>;
+		touchscreen-max-p = <1024>;
+		touchscreen-key-map = <139 172 158>;
+		goodix,type-a-report = <0>;
+		goodix,driver-send-cfg = <1>;
+		goodix,wakeup-with-reset = <0>;
+		goodix,resume-in-workqueue = <1>;
+		goodix,int-sync = <1>;
+		goodix,swap-x2y = <0>;
+		goodix,esd-protect = <1>;
+		goodix,pen-suppress-finger = <0>;
+		goodix,auto-update = <0>;
+		goodix,auto-update-cfg = <0>;
+		goodix,power-off-sleep = <0>;
+		goodix,slide-wakeup = <1>;
+		goodix,rst-gpio = <&tlmm 64 0x00>;
+		goodix,irq-gpio = <&tlmm 65 0x2008>;
+		goodix,cfg-group0 = [
+				41 D0 02 00 05 05 75 01 01 0F 24
+				0F 64 3C 03 05 00 00 00 02 00 00
+				00 16 19 1C 14 8C 0E 0E 24 00 31
+				0D 00 00 00 83 33 1D 00 41 00 00
+				00 00 00 08 0A 00 2B 1C 3C 94 D5
+				03 08 00 00 04 93 1E 00 82 23 00
+				74 29 00 69 2F 00 5F 37 00 5F 20
+				40 60 00 F0 40 30 55 50 27 00 00
+				00 00 00 00 00 00 00 00 00 00 00
+				00 00 00 00 00 00 00 14 19 00 00
+				50 50 02 04 06 08 0A 0C 0E 10 12
+				14 16 18 1A 1C 00 00 00 00 00 00
+				00 00 00 00 00 00 00 00 00 00 1D
+				1E 1F 20 21 22 24 26 28 29 2A 1C
+				18 16 14 13 12 10 0F 0C 0A 08 06
+				04 02 00 00 00 00 00 00 00 00 00
+				00 00 00 00 00 00 00 00 9C 01];
+	};
+};

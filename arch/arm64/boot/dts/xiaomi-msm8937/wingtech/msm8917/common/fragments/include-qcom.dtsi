@@ -1,0 +1,9 @@
+/* From stock msm8917-pmi8937-qrd-sku5_S8850?.dts */
+#include "qcom/msm8917.dtsi"
+
+/* msm-4.9 */
+#include "qcom/msm8917-audio.dtsi"
+
+/* From stock msm8917-pmi8937-qrd-sku5_S8850?.dtsi */
+#include "qcom/msm8917-qrd.dtsi"
+#include "qcom/msm8937-mdss-panels.dtsi"

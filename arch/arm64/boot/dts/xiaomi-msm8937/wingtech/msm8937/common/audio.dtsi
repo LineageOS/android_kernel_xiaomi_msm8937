@@ -1,0 +1,13 @@
+/* Custom */
+#ifdef MI8937_V2
+#include "../../../common/include/msm-cdc-pinctrl.h"
+MSM_CDC_PINCTRL_PA_GPIO_SINGLE_PIN(spk, gpio124)
+#endif
+
+&int_codec {
+#ifdef MI8937_V2
+	qcom,use-legacy-voice-cpu-dais;
+#else
+	ext-spk-amp-gpio = <&tlmm 124 0>;
+#endif
+};

@@ -1,0 +1,52 @@
+&i2c_2 {
+	/delete-node/ pericom-type-c@1d;
+};
+
+&i2c_5 {
+	/delete-node/ nq@28;
+};
+
+#ifndef IS_MSM8917
+&mdss_dsi1 {
+	/delete-property/ qcom,dsi-pref-prim-pan;
+};
+#endif
+
+&mdss_mdp {
+	/delete-node/ qcom,mdss_dsi_sim_video;
+	/delete-node/ qcom,mdss_dsi_sim_cmd;
+	/delete-node/ qcom,mdss_dsi_truly_1080p_video;
+	/delete-node/ qcom,mdss_dsi_truly_1080p_cmd;
+	/delete-node/ qcom,mdss_dsi_r69006_1080p_cmd;
+	/delete-node/ qcom,mdss_dsi_r69006_1080p_video;
+//	/delete-node/ qcom,mdss_dsi_hx8394f_720p_video;
+	/delete-node/ qcom,mdss_dsi_adv7533_1080p;
+	/delete-node/ qcom,mdss_dsi_adv7533_720p;
+	/delete-node/ qcom,mdss_dsi_truly_720p_video;
+	/delete-node/ qcom,mdss_dsi_truly_wuxga_video;
+	/delete-node/ qcom,mdss_dsi_truly_720p_cmd;
+	/delete-node/ qcom,mdss_dsi_lead_fl10802_fwvga_video;
+	/delete-node/ qcom,mdss_dsi_icn9706_720_1440p_video;
+};
+
+&pm8937_gpios {
+	/delete-node/ nfc_clk;
+};
+
+&soc {
+	/delete-node/ hbtp;
+	gpio_keys {
+		/delete-node/ camera_focus;
+		/delete-node/ camera_snapshot;
+	};
+};
+
+&spi_3 {
+	/delete-node/ maxim_sti@0;
+};
+
+&tlmm {
+	/delete-node/ fpc_reset_int;
+	/delete-node/ nfc;
+	/delete-node/ usbc_int_default;
+};

@@ -1,0 +1,9 @@
+/* From stock msm8917-pmi8937-qrd-sku5_S8850?.dts */
+&int_codec {
+	qcom,model = "msm8917-sku5-snd-card";
+};
+
+/* Custom */
+&pmic_analog_codec {
+	qcom,cdc-micbias-cfilt-mv = <2400000>;
+};

@@ -1,0 +1,26 @@
+/dts-v1/;
+
+#include "common/include/config.h"
+
+#include "qcom/msm8940.dtsi"
+#include "qcom/msm8940-pmi8937-mtp.dtsi"
+
+#include "common/fragments/delete-msm89x7-camera-sensor-mtp.dtsi"
+#include "common/fragments/restore-old-msm8937-camera-pinctrl.dtsi"
+
+#include "common/common.dtsi"
+#include "ulysse/common/common.dtsi"
+#include "ulysse/ugg/ugg.dtsi"
+
+/* From stock msm8940-pmi8937-mtp.dts */
+/ {
+	model = "Qualcomm Technologies, Inc. MSM8940-PMI8937 MTP";
+	compatible = "qcom,msm8940-mtp", "qcom,msm8940", "qcom,mtp", "xiaomi,ugg";
+	qcom,board-id= <8 0>;
+	qcom,pmic-id = <0x10019 0x0 0x0 0x0>;
+
+#ifndef MI8937_V2
+	xiaomi,series = "ulysse";
+	xiaomi,device = "ugg";
+#endif
+};

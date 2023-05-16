@@ -1,0 +1,19 @@
+&dsi_panel_pwr_supply {
+	qcom,panel-supply-entry@2 {
+		reg = <2>;
+		qcom,supply-name = "lab";
+	};
+
+	qcom,panel-supply-entry@3 {
+		reg = <3>;
+		qcom,supply-name = "ibb";
+	};
+};
+
+&mdss_dsi0 {
+	qcom,platform-reset-gpio = <&tlmm 60 0>;
+	qcom,platform-te-gpio = <&tlmm 24 0>;
+
+	qcom,platform-regulator-settings = [ 00 01 01 00 20 07 00];
+	qcom,regulator-ldo-mode;
+};

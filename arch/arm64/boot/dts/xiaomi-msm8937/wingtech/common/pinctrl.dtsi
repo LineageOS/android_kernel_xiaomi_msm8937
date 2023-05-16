@@ -1,0 +1,26 @@
+&tlmm {
+	gpio_led_pins {
+		gpio_led_off: gpio_led_off {
+			mux {
+				function = "gpio";
+			};
+
+			config {
+				drive-strength = <6>;
+			};
+		};
+	};
+};
+
+
+/* Custom */
+&gpio_key_active {
+	mux {
+		pins = "gpio91";
+	};
+};
+&gpio_key_suspend {
+	mux {
+		pins = "gpio91";
+	};
+};

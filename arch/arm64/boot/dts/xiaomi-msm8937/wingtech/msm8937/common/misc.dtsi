@@ -1,0 +1,5 @@
+&soc {
+	boardinfo {
+		compatible = "wt:boardinfo";
+	};
+};

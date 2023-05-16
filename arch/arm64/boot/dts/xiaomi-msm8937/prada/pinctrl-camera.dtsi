@@ -1,0 +1,92 @@
+&tlmm {
+	cam_sensor_rear_default {
+		mux {
+			pins = "gpio36";
+		};
+
+		config {
+			pins = "gpio36";
+		};
+	};
+	
+	cam_sensor_rear_sleep {
+		mux {
+			pins = "gpio36";
+		};
+
+		config {
+			pins = "gpio36";
+		};
+	};
+	
+	cam_sensor_rear_comp_pin: cam_sensor_rear_comp_pin {
+		mux {
+			pins = "gpio61";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio61";
+			drive-strength = <2>;
+			bias-pull-up;
+		};
+	};
+
+	cam_sensor_rear_comp_pin_sleep: cam_sensor_rear_comp_pin_sleep {
+		mux {
+			pins = "gpio61";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio61";
+			drive-strength = <2>;
+			bias-pull-up;
+		};
+	};
+	
+	cam_sensor_front1_default {
+		mux {
+			pins = "gpio40";
+		};
+
+		config {
+			pins = "gpio40";
+		};
+	};
+	
+	cam_sensor_front1_sleep {
+		mux {
+			pins = "gpio40";
+		};
+
+		config {
+			pins = "gpio40";
+		};
+	};
+	
+	cam_sensor_front_comp_pin: cam_sensor_front_comp_pin {
+		mux {
+			pins = "gpio41";
+			function = "gpio";
+		};
+		config {
+			pins = "gpio41";
+			drive-strength = <2>;
+			bias-pull-up;
+		};
+	};
+
+	cam_sensor_front_comp_pin_sleep: cam_sensor_front_comp_pin_sleep {
+		mux {
+			pins = "gpio41";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio41";
+			drive-strength = <2>;
+			bias-pull-up;
+		};
+	};
+};

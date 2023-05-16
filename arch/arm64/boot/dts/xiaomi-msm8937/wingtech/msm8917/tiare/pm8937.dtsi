@@ -1,0 +1,16 @@
+/* From stock msm-pm8937.dtsi */
+&spmi_bus {
+	qcom,pm8937@0 {
+		qcom,power-on@800 {
+			qcom,pon_3 {
+				qcom,pon-type = <3>;
+				qcom,support-reset = <1>;
+				qcom,s1-timer = <3072>;
+				qcom,s2-timer = <500>;
+				qcom,s2-type = <1>;
+				qcom,pull-up = <1>;
+				qcom,use-bark;
+			};
+		};
+	};
+};

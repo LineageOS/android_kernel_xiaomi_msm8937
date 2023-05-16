@@ -1,0 +1,25 @@
+/* From stock msm8917-pinctrl.dtsi */
+&gpio_led_off {
+	mux {
+		pins = "gpio45";
+	};
+	config {
+		pins = "gpio45";
+	};
+};
+&pri_tlmm_lines_act {
+	mux {
+		pins = "gpio88";
+	};
+	config {
+		pins = "gpio88";
+	};
+};
+&pri_tlmm_lines_sus {
+	mux {
+		pins = "gpio88";
+	};
+	config {
+		pins = "gpio88";
+	};
+};

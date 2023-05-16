@@ -1,0 +1,31 @@
+&qpnp_smbcharger {
+#ifdef CONFIG_QPNP_SMBCHARGER_MI8937
+	compatible = "qcom,qpnp-smbcharger-mi8937";
+#endif
+
+	/delete-property/ qcom,autoadjust-vfloat;
+	dpdm-supply = <&usb_otg>;
+	qcom,float-voltage-mv = <4400>;
+	status = "okay";
+};
+
+&qpnp_fg {
+#ifdef CONFIG_QPNP_FG_MI8937
+	compatible = "qcom,qpnp-fg-mi8937";
+#endif
+
+	qcom,bad-battery-detection-enable;
+	qcom,cl-max-increment-deciperc = <1>;
+	qcom,cl-max-decrement-deciperc = <1>;
+	qcom,cold-bat-decidegc = <(0)>;
+	qcom,fg-delta-soc = <1>;
+	qcom,hold-soc-while-full;
+	qcom,resume-soc-raw = <254>;
+	qcom,vbat-estimate-diff-mv = <100>;
+	qcom,warm-bat-decidegc = <450>;
+	qcom,warm-bat-india-decidegc = <500>;
+};
+
+&usb_otg {
+	extcon = <&qpnp_smbcharger>;
+};

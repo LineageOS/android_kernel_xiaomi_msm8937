@@ -1,0 +1,13 @@
+/* From stock msm8937-mtp.dtsi */
+&soc {
+	vibrator_gpio {
+#ifdef CONFIG_LEDS_VIBRATOR_GPIO_MI8937
+		compatible = "qcom,vibrator-gpio-mi8937";
+#else
+		compatible = "qcom,vibrator-gpio";
+#endif
+		qcom,vibrator-timeout-ms = <15000>;
+		qcom,vib-gpio_one = <&tlmm 9 0x00>;
+		label = "vibrator";
+	};
+};

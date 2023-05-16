@@ -1,0 +1,4 @@
+/* From stock msm8937-mtp.dtsi */
+&sdhc_2 {
+	cd-gpios = <&tlmm 67 0x0>;
+};

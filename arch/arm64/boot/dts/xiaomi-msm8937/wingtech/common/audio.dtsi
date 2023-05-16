@@ -1,0 +1,10 @@
+#ifdef MI8937_V2
+#include "../../common/include/msm-cdc-pinctrl.h"
+MSM_CDC_PINCTRL_PA_GPIO_SINGLE_PIN(hph, gpio129)
+#endif
+
+&int_codec {
+#ifndef MI8937_V2
+	headset-gpio = <&tlmm 129 0>;
+#endif
+};
