@@ -739,9 +739,10 @@ int mdss_dsi_panel_reset(struct mdss_panel_data *pdata, int enable)
 			gpio_free(ctrl_pdata->disp_en_gpio);
 		}
 		if (gpio_is_valid(ctrl_pdata->rst_gpio)) {
-#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_OLIVE)
 			if (xiaomi_sdm439_mach_get_family() == XIAOMI_SDM439_MACH_FAMILY_OLIVE)
 				gpio_set_value((ctrl_pdata->rst_gpio), 1);
+			else
 #endif
 			gpio_set_value((ctrl_pdata->rst_gpio), 0);
 			gpio_free(ctrl_pdata->rst_gpio);
