@@ -787,6 +787,15 @@ config LEDS_QTI_TRI_LED
 	  at max and each is controlled by a PWM channel used for dimming
 	  or blinking.
 
+config LEDS_QPNP_FLASH
+	tristate "Support for QPNP Flash LEDs"
+	depends on LEDS_CLASS && MFD_SPMI_PMIC
+	help
+	  This driver supports the flash LED functionality of Qualcomm
+	  Technologies, Inc. QPNP PMICs.  This driver supports PMICs up through
+	  PM8994.  It can configure the flash LED target current for several
+	  independent channels.
+
 config LEDS_QPNP_FLASH_V2
         tristate "Support for QPNP V2 Flash LEDs"
         depends on LEDS_CLASS && MFD_SPMI_PMIC
