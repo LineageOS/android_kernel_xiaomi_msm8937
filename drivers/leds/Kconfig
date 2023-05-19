@@ -853,6 +853,15 @@ config LEDS_QPNP_HAPTICS
 	  module provides haptic feedback for user actions such as a long press
 	  on the touch screen.
 
+config LEDS_QPNP_WLED
+	tristate "Support for QPNP WLED"
+	depends on LEDS_CLASS && SPMI
+	help
+	  This driver supports the WLED (White LED) functionality of Qualcomm
+	  Technologies, Inc. QPNP PMICs.  WLED is used for LCD backlight with
+	  variable brightness.  It also supports outputting the Avdd supply for
+	  AMOLED displays.
+
 comment "LED Triggers"
 source "drivers/leds/trigger/Kconfig"
 
