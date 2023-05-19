@@ -168,6 +168,9 @@ static int select_pin_ctl(struct fpc1020_data *fpc1020, const char *name)
 	size_t i;
 	int rc;
 	struct device *dev = fpc1020->dev;
+	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_PRADA &&
+		!strncmp(name, "fpc1020_spi_active", strlen("fpc1020_spi_active")))
+		return 0;
 	for (i = 0; i < ARRAY_SIZE(fpc1020->pinctrl_state); i++) {
 		const char *n = pctl_names[i];
 		if (!strncmp(n, name, strlen(n))) {
@@ -373,8 +376,11 @@ static ssize_t compatible_all_set(struct device *dev,
 
 		for (i = 0; i < ARRAY_SIZE(fpc1020->pinctrl_state); i++) {
 			const char *n = pctl_names[i];
-			struct pinctrl_state *state =
-				pinctrl_lookup_state(fpc1020->fingerprint_pinctrl, n);
+			struct pinctrl_state *state;
+			if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_PRADA &&
+				!strncmp(n, "fpc1020_spi_active", strlen("fpc1020_spi_active")))
+				continue;
+			state = pinctrl_lookup_state(fpc1020->fingerprint_pinctrl, n);
 			if (IS_ERR(state)) {
 				dev_err(dev, "cannot find '%s'\n", n);
 				rc = -EINVAL;
