@@ -8,11 +8,10 @@
 #include <linux/gpio.h>
 #include <linux/delay.h>
 #include <linux/slab.h>
-#ifndef CONFIG_BACKLIGHT_CLASS_DEVICE
-#include <linux/leds.h>
-#else
+#ifdef CONFIG_BACKLIGHT_CLASS_DEVICE
 #include <linux/backlight.h>
 #endif
+#include <linux/leds.h>
 #include <linux/pwm.h>
 #include <linux/err.h>
 #include <linux/string.h>
@@ -25,9 +24,7 @@
 #define DEFAULT_MDP_TRANSFER_TIME 14000
 
 #define VSYNC_DELAY msecs_to_jiffies(17)
-#ifndef CONFIG_BACKLIGHT_CLASS_DEVICE
 DEFINE_LED_TRIGGER(bl_led_trigger);
-#endif
 
 void mdss_dsi_panel_pwm_cfg(struct mdss_dsi_ctrl_pdata *ctrl)
 {
@@ -878,11 +875,12 @@ static void mdss_dsi_panel_bl_ctrl(struct mdss_panel_data *pdata,
 
 	switch (ctrl_pdata->bklt_ctrl) {
 	case BL_WLED:
-#ifndef CONFIG_BACKLIGHT_CLASS_DEVICE
-		led_trigger_event(bl_led_trigger, bl_level);
-#else
-		backlight_device_set_brightness(ctrl_pdata->raw_bd, bl_level);
+#ifdef CONFIG_BACKLIGHT_CLASS_DEVICE
+		if (ctrl_pdata->raw_bd)
+			backlight_device_set_brightness(ctrl_pdata->raw_bd, bl_level);
+		else
 #endif
+		led_trigger_event(bl_led_trigger, bl_level);
 		break;
 	case BL_PWM:
 		mdss_dsi_panel_bklt_pwm(ctrl_pdata, bl_level);
@@ -2411,16 +2409,19 @@ int mdss_panel_parse_bl_settings(struct device_node *np,
 	data = of_get_property(np, "qcom,mdss-dsi-bl-pmic-control-type", NULL);
 	if (data) {
 		if (!strcmp(data, "bl_ctrl_wled")) {
-#ifndef CONFIG_BACKLIGHT_CLASS_DEVICE
-			led_trigger_register_simple("bkl-trigger",
-				&bl_led_trigger);
-#else
+#ifdef CONFIG_BACKLIGHT_CLASS_DEVICE
 			rc = dsi_panel_wled_register(ctrl_pdata);
-			if (rc)
-				return rc;
+			if (!rc) {
+				pr_debug("%s: SUCCESS-> WLED TRIGGER register (Backlight class)\n",
+					__func__);
+			} else
 #endif
-			pr_debug("%s: SUCCESS-> WLED TRIGGER register\n",
-				__func__);
+			{
+				led_trigger_register_simple("bkl-trigger",
+					&bl_led_trigger);
+				pr_debug("%s: SUCCESS-> WLED TRIGGER register (LED class)\n",
+					__func__);
+			}
 			ctrl_pdata->bklt_ctrl = BL_WLED;
 		} else if (!strcmp(data, "bl_ctrl_pwm")) {
 			ctrl_pdata->bklt_ctrl = BL_PWM;
@@ -2519,13 +2520,12 @@ int mdss_dsi_panel_timing_switch(struct mdss_dsi_ctrl_pdata *ctrl,
 	return 0;
 }
 
-#ifndef CONFIG_BACKLIGHT_CLASS_DEVICE
 void mdss_dsi_unregister_bl_settings(struct mdss_dsi_ctrl_pdata *ctrl_pdata)
 {
 	if (ctrl_pdata->bklt_ctrl == BL_WLED)
 		led_trigger_unregister_simple(bl_led_trigger);
 }
-#endif
+
 static int mdss_dsi_panel_timing_from_dt(struct device_node *np,
 		struct dsi_panel_timing *pt,
 		struct mdss_panel_data *panel_data)
