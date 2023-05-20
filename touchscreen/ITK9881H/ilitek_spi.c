@@ -637,7 +637,7 @@ static int ilitek_spi_probe(struct spi_device *spi)
 		idev->gesture = DISABLE;
 	}
 
-	idev->gesture_process_ws = wakeup_source_register("gesture_wake_lock");
+	idev->gesture_process_ws = wakeup_source_register(&spi->dev, "gesture_wake_lock");
 	if (!idev->gesture_process_ws) {
 		ipio_err("gesture_process_ws request failed\n");
 	}
