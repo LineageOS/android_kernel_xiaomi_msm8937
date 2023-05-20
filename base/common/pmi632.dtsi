@@ -84,65 +84,30 @@
 	quiet-therm-step {
 		thermal-sensors = <&pmi632_adc_tm 0x13>;
 		/delete-property/ wake-capable-sensor;
-		/delete-node/ trips;
+
 		trips {
-			/* Note: A lot has changed, just redefine the node here */
+			/delete-node/ quiet-bt-trp6-mdm-trp3;
+			/delete-node/ quiet-batt-trip7;
+
 			quiet_modem_439_trip1: quiet-modem-trip0 {
 				temperature = <59000>;
-				hysteresis = <4000>;
-				type = "passive";
 			};
 			quiet_modem_439_trip2: quiet-modem-trip1 {
 				temperature = <61000>;
-				hysteresis = <4000>;
-				type = "passive";
-			};
-			quiet_cpus_439_trip: quiet-cpus-trip {
-				temperature = <48000>;
-				hysteresis = <0>;
-				type = "passive";
 			};
 			quiet_modem_439_trip3: quiet-modem-trip2 {
 				temperature = <63000>;
 				hysteresis = <2000>;
 				type = "passive";
 			};
-			quiet_batt_439_trip1: quiet-batt-trip1 {
-				temperature = <38000>;
-				hysteresis = <4000>;
-				type = "passive";
-			};
-			quiet_gpu_439_trip: quiet-gpu-trip {
-				temperature = <50000>;
-				hysteresis = <0>;
-				type = "passive";
-			};
-			quiet_batt_439_trip2: quiet-batt-trip2 {
-				temperature = <40000>;
-				hysteresis = <2000>;
-				type = "passive";
-			};
-			quiet_batt_439_trip3: quiet-batt-trip3 {
-				temperature = <43000>;
-				hysteresis = <2000>;
-				type = "passive";
-			};
-			quiet_batt_439_trip4: quiet-batt-trip4 {
-				temperature = <48000>;
-				hysteresis = <2000>;
-				type = "passive";
-			};
 			quiet_modem_439_trip4: quiet-modem-trip3 {
 				temperature = <70000>;
-				hysteresis = <5000>;
-				type = "passive";
 			};
-			quiet_batt_439_trip5: quiet-batt-trip5 {
-				temperature = <56000>;
-				hysteresis = <2000>;
-				type = "passive";
+			quiet_batt_439_trip1: quiet-batt-trip1 {
+				hysteresis = <4000>;
 			};
 		};
+
 		cooling-maps {
 			modem_lvl2 {
 				trip = <&quiet_modem_439_trip3>;
