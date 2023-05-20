@@ -9,8 +9,8 @@
 		goodix,gpio_reset    = <&tlmm 124 0>;
 		goodix,gpio_irq      = <&tlmm 48 0>;
 		clock-names = "iface_clk", "core_clk";
-		clocks = <&clock_gcc clk_gcc_blsp1_ahb_clk>,
-		<&clock_gcc clk_gcc_blsp1_qup1_spi_apps_clk>;
+		clocks = <&gcc GCC_BLSP1_AHB_CLK>,
+			<&gcc GCC_BLSP1_QUP1_SPI_APPS_CLK>;
 		fpc,enable-on-boot;
 		pinctrl-names = "goodixfp_spi_active",
 			"goodixfp_reset_reset",
