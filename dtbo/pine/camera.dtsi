@@ -12,7 +12,8 @@
  * GNU General Public License for more details.
  */
 
-#include <dt-bindings/clock/msm-clocks-8952.h>
+#include <dt-bindings/clock/qcom,gcc-sdm429w.h>
+#include <dt-bindings/clock/qcom,rpmcc.h>
 
 &cci {
 	pine_actuator0: qcom,actuator@0 {
@@ -66,8 +67,8 @@
 			"CAM_RESET0",
 			"CAM_VANA";
 		status = "ok";
-		clocks = <&clock_gcc clk_mclk0_clk_src>,
-			<&clock_gcc clk_gcc_camss_mclk0_clk>;
+		clocks = <&gcc MCLK0_CLK_SRC>,
+			<&gcc GCC_CAMSS_MCLK0_CLK>;
 		clock-names = "cam_src_clk", "cam_clk";
 		qcom,clock-rates = <24000000 0>;
 		qcom,cam-power-seq-type = "sensor_vreg",
@@ -640,8 +641,8 @@
 		qcom,cam-power-seq-cfg-val = <0 1 1 1 24000000 1>;
 		qcom,cam-power-seq-delay = <1 0 0 0 10 1>;
 		status = "ok";
-		clocks = <&clock_gcc clk_mclk2_clk_src>,
-			<&clock_gcc clk_gcc_camss_mclk2_clk>;
+		clocks = <&gcc MCLK2_CLK_SRC>,
+			<&gcc GCC_CAMSS_MCLK2_CLK>;
 		clock-names = "cam_src_clk", "cam_clk";
 		qcom,clock-rates = <24000000 0>;
 	};
@@ -682,8 +683,8 @@
 		qcom,gpio-req-tbl-flags = <1 0 0>;
 		qcom,gpio-req-tbl-label = "CAMIF_MCLK0", "CAM_RESET0", "CAM_VANA";
 		status = "ok";
-		clocks = <&clock_gcc clk_mclk0_clk_src>,
-			<&clock_gcc clk_gcc_camss_mclk0_clk>;
+		clocks = <&gcc MCLK0_CLK_SRC>,
+			<&gcc GCC_CAMSS_MCLK0_CLK>;
 		clock-names = "cam_src_clk", "cam_clk";
 		qcom,clock-rates = <24000000 0>;
 		qcom,cam-power-seq-type = "sensor_vreg", "sensor_vreg", "sensor_clk",
@@ -1255,8 +1256,8 @@
 		qcom,cam-power-seq-cfg-val = <0 1 1 1 24000000 1>;
 		qcom,cam-power-seq-delay = <1 0 0 0 10 1>;
 		status = "ok";
-		clocks = <&clock_gcc clk_mclk2_clk_src>,
-				<&clock_gcc clk_gcc_camss_mclk2_clk>;
+		clocks = <&gcc MCLK2_CLK_SRC>,
+				<&gcc GCC_CAMSS_MCLK2_CLK>;
 		clock-names = "cam_src_clk", "cam_clk";
 		qcom,clock-rates = <24000000 0>;
 	};
@@ -1300,8 +1301,8 @@
 					"CAM_RESET0",
 					"CAM_VANA";
 		status = "ok";
-		clocks = <&clock_gcc clk_mclk0_clk_src>,
-			<&clock_gcc clk_gcc_camss_mclk0_clk>;
+		clocks = <&gcc MCLK0_CLK_SRC>,
+			<&gcc GCC_CAMSS_MCLK0_CLK>;
 		clock-names = "cam_src_clk", "cam_clk";
 		qcom,clock-rates = <24000000 0>;
 		qcom,cam-power-seq-type = "sensor_vreg",
@@ -1875,8 +1876,8 @@
 		qcom,cam-power-seq-cfg-val = <0 1 1 1 24000000 1>;
 		qcom,cam-power-seq-delay = <1 0 0 0 10 1>;
 		status = "ok";
-		clocks = <&clock_gcc clk_mclk2_clk_src>,
-				<&clock_gcc clk_gcc_camss_mclk2_clk>;
+		clocks = <&gcc MCLK2_CLK_SRC>,
+				<&gcc GCC_CAMSS_MCLK2_CLK>;
 		clock-names = "cam_src_clk", "cam_clk";
 		qcom,clock-rates = <24000000 0>;
 	};
@@ -1920,8 +1921,8 @@
 					"CAM_RESET0",
 					"CAM_VANA";
 		status = "ok";
-		clocks = <&clock_gcc clk_mclk0_clk_src>,
-			<&clock_gcc clk_gcc_camss_mclk0_clk>;
+		clocks = <&gcc MCLK0_CLK_SRC>,
+			<&gcc GCC_CAMSS_MCLK0_CLK>;
 		clock-names = "cam_src_clk", "cam_clk";
 		qcom,clock-rates = <24000000 0>;
 		qcom,cam-power-seq-type = "sensor_vreg",
@@ -1973,8 +1974,8 @@
 					"CAM_RESET0",
 					"CAM_VANA";
 		status = "ok";
-		clocks = <&clock_gcc clk_mclk0_clk_src>,
-			<&clock_gcc clk_gcc_camss_mclk0_clk>;
+		clocks = <&gcc MCLK0_CLK_SRC>,
+			<&gcc GCC_CAMSS_MCLK0_CLK>;
 		clock-names = "cam_src_clk", "cam_clk";
 		qcom,clock-rates = <24000000 0>;
 		qcom,cam-power-seq-type = "sensor_vreg",
@@ -2025,8 +2026,8 @@
 		qcom,sensor-mode = <0>;
 		qcom,cci-master = <0>;
 		status = "ok";
-		clocks = <&clock_gcc clk_mclk0_clk_src>,
-			<&clock_gcc clk_gcc_camss_mclk0_clk>;
+		clocks = <&gcc MCLK0_CLK_SRC>,
+			<&gcc GCC_CAMSS_MCLK0_CLK>;
 		clock-names = "cam_src_clk", "cam_clk";
 		qcom,clock-rates = <24000000 0>;
 	};
@@ -2062,8 +2063,8 @@
 		qcom,sensor-mode = <0>;
 		qcom,cci-master = <1>;
 		status = "ok";
-		clocks = <&clock_gcc clk_mclk2_clk_src>,
-			<&clock_gcc clk_gcc_camss_mclk2_clk>;
+		clocks = <&gcc MCLK2_CLK_SRC>,
+			<&gcc GCC_CAMSS_MCLK2_CLK>;
 		clock-names = "cam_src_clk", "cam_clk";
 		qcom,clock-rates = <24000000 0>;
 	};
