@@ -25,11 +25,18 @@
 #include <linux/poll.h>
 #include <linux/sched.h>
 #include <linux/wait.h>
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
+#include <xiaomi-msm8937/mach.h>
+#endif
 
 #include "rc-core-priv.h"
 #include <uapi/linux/lirc.h>
 
-#define LIRCBUF_SIZE	1024
+#define LIRCBUF_SIZE_DEFAULT_VALUE 256
+static int lircbuf_size = LIRCBUF_SIZE_DEFAULT_VALUE;
+#define LIRCBUF_SIZE lircbuf_size
+
+static bool is_xiaomi_lirc = false;
 
 static dev_t lirc_base_dev;
 
@@ -343,16 +350,19 @@ static ssize_t ir_lirc_transmit_ir(struct file *file, const char __user *buf,
 		}
 	}
 
-	for (i = 0; i < count; i++) {
-		if (txbuf[i] > IR_MAX_DURATION / 1000 - duration || !txbuf[i]) {
-			ret = -EINVAL;
-			goto out_kfree;
-		}
+	if (!is_xiaomi_lirc) {
+		for (i = 0; i < count; i++) {
+			if (txbuf[i] > IR_MAX_DURATION / 1000 - duration || !txbuf[i]) {
+				ret = -EINVAL;
+				goto out_kfree;
+			}
 
-		duration += txbuf[i];
+			duration += txbuf[i];
+		}
 	}
 
-	start = ktime_get();
+	if (!is_xiaomi_lirc)
+		start = ktime_get();
 
 	ret = dev->tx_ir(dev, txbuf, count);
 	if (ret < 0)
@@ -367,11 +377,13 @@ static ssize_t ir_lirc_transmit_ir(struct file *file, const char __user *buf,
 	 * wait for the actual IR signal to be transmitted before
 	 * returning.
 	 */
-	towait = ktime_us_delta(ktime_add_us(start, duration),
-				ktime_get());
-	if (towait > 0) {
-		set_current_state(TASK_INTERRUPTIBLE);
-		schedule_timeout(usecs_to_jiffies(towait));
+	if (!is_xiaomi_lirc) {
+		towait = ktime_us_delta(ktime_add_us(start, duration),
+					ktime_get());
+		if (towait > 0) {
+			set_current_state(TASK_INTERRUPTIBLE);
+			schedule_timeout(usecs_to_jiffies(towait));
+		}
 	}
 
 	return n;
@@ -825,6 +837,14 @@ void ir_lirc_unregister(struct rc_dev *dev)
 int __init lirc_dev_init(void)
 {
 	int retval;
+
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
+	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_PRADA ||
+		xiaomi_msm8937_mach_get_family() == XIAOMI_MSM8937_MACH_FAMILY_ULYSSE) {
+		is_xiaomi_lirc = true;
+		lircbuf_size = 1024;
+	}
+#endif
 
 	lirc_class = class_create(THIS_MODULE, "lirc");
 	if (IS_ERR(lirc_class)) {
