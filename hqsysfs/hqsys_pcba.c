@@ -4,12 +4,13 @@
 #include <linux/fs.h>
 #include <linux/slab.h>
 #include <linux/err.h>
-#include <soc/qcom/smem.h>
+#include <linux/soc/qcom/smem.h>
 #include <linux/platform_device.h>
 #include <linux/qpnp/qpnp-adc.h>
 #include <xiaomi-sdm439/mach.h>
 #include "hqsys_pcba.h"
 
+#define SMEM_ID_VENDOR1 135
 
 static PCBA_CONFIG huaqin_pcba_config;
 
@@ -21,19 +22,20 @@ extern void xiaomi_sdm439_mach_notify_hq_pcba_config(PCBA_CONFIG hq_pcba);
 
 static void read_pcba_config_form_smem(void)
 {
+	size_t size;
 	PCBA_CONFIG *pcba_config = NULL;
-	pcba_config = (PCBA_CONFIG *)smem_find(SMEM_ID_VENDOR1, sizeof(PCBA_CONFIG), 0, SMEM_ANY_HOST_FLAG);
-	if (pcba_config) {
+	pcba_config = (PCBA_CONFIG *)qcom_smem_get(QCOM_SMEM_HOST_ANY, SMEM_ID_VENDOR1, &size);
+	if (IS_ERR(pcba_config) || !size) {
+		printk(KERN_ERR "pcba config fail\n");
+
+		huaqin_pcba_config = PCBA_UNKNOW;
+	} else {
 		printk(KERN_ERR "pcba config =%d.\n", *(pcba_config));
 		if (*(pcba_config) > PCBA_UNKNOW && *(pcba_config) < PCBA_END) {
 			huaqin_pcba_config = *pcba_config;
 		} else {
 			huaqin_pcba_config = PCBA_UNKNOW;
 		}
-	} else {
-		printk(KERN_ERR "pcba config fail\n");
-
-		huaqin_pcba_config = PCBA_UNKNOW;
 	}
 
 	xiaomi_sdm439_mach_notify_hq_pcba_config(huaqin_pcba_config);
