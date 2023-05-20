@@ -25,8 +25,8 @@
 		pinctrl-names = "spi_default", "spi_sleep";
 		pinctrl-0 = <&spi6_default &spi6_cs0_active>;
 		pinctrl-1 = <&spi6_sleep &spi6_cs0_sleep>;
-		clocks = <&clock_gcc clk_gcc_blsp2_ahb_clk>,
-			<&clock_gcc clk_gcc_blsp2_qup2_spi_apps_clk>;
+		clocks = <&gcc GCC_BLSP2_AHB_CLK>,
+			<&gcc GCC_BLSP2_QUP2_SPI_APPS_CLK>;
 		clock-names = "iface_clk", "core_clk";
 		qcom,infinite-mode = <0>;
 		qcom,use-bam;
