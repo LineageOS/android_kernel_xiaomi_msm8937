@@ -397,12 +397,13 @@
 	interrupt-parent = <&tlmm>;
 	interrupts = <61 IRQ_TYPE_LEVEL_LOW>;
 	status = "ok";
-	smb1355_charger: qcom,smb1355-charger@1000 {
-		status = "ok";
-		qcom,parallel-mode = <1>;
-		qcom,disable-ctm;
-		qcom,hw-die-temp-mitigation;
-	};
+};
+
+&smb1355_charger {
+	status = "ok";
+	qcom,parallel-mode = <1>;
+	qcom,disable-ctm;
+	qcom,hw-die-temp-mitigation;
 };
 
 &smb1355_0 {
@@ -412,12 +413,13 @@
 	interrupt-parent = <&tlmm>;
 	interrupts = <61 IRQ_TYPE_LEVEL_LOW>;
 	status = "ok";
-	smb1355_charger_0: qcom,smb1355-charger@1000 {
-		status = "ok";
-		qcom,parallel-mode = <1>;
-		qcom,disable-ctm;
-		qcom,hw-die-temp-mitigation;
-	};
+};
+
+&smb1355_charger_0 {
+	status = "ok";
+	qcom,parallel-mode = <1>;
+	qcom,disable-ctm;
+	qcom,hw-die-temp-mitigation;
 };
 
 &pmi632_charger {
