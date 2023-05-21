@@ -206,7 +206,7 @@
 };
 
 &gcc {
-	compatible = "qcom,gcc-8940";
+	compatible = "qcom,gcc-msm8940";
 };
 
 &debugcc {
