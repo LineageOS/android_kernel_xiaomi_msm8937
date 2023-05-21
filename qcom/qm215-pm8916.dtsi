@@ -37,6 +37,10 @@
 		};
 	};
 
+	qcom,clock-cpu@b011050 {
+		/delete-property/ cpu-vdd-supply;
+	};
+
 	qcom,gcc@1800000 {
 		/delete-property/ vdd_cx-supply;
 		/delete-property/ vdd_hf_dig-supply;
@@ -189,6 +193,12 @@
 			qcom,supply-disable-load = <100>;
 		};
 	};
+};
+
+&apsscc {
+	cpu-vdd-supply = <&apc_vreg_corner>;
+	vdd_dig_ao-supply = <&pm8916_s1_level_ao>;
+	vdd_hf_pll-supply = <&pm8916_l7_ao>;
 };
 
 &gcc {
