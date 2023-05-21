@@ -3,7 +3,6 @@
 #
 menuconfig TOUCHSCREEN_SYNAPTICS_TCM
 	bool "Synaptics TCM touchscreen"
-	default y
 	help
 	  Say Y here if you have a Synaptics TCM touchscreen connected
 	  to your system.
@@ -42,7 +41,6 @@ endchoice
 config TOUCHSCREEN_SYNAPTICS_TCM_CORE
 	tristate "Synaptics TCM core module"
 	depends on I2C || SPI_MASTER
-	default y
 	help
 	  Say Y here to enable core functionality.
 
