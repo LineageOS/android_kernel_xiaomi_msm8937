@@ -109,6 +109,8 @@
 };
 
 &gcc {
+	reg = <0x1800000 0x80000>;
+	reg-names = "cc_base";
 	vdd_cx-supply = <&pm8953_s2_level>;
 };
 
