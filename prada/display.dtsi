@@ -7,9 +7,14 @@
 };
 
 &wled {
+#ifdef CONFIG_BACKLIGHT_QCOM_WLED
+	/delete-property/ qcom,external-pfet;
+	qcom,cabc;
+#else
 	/delete-property/ qcom,en-ext-pfet-sc-pro;
 	qcom,en-cabc;
 	qcom,wled-stepper-en;
+#endif
 };
 
 /* From msm-3.18 msm8937-mtp.dtsi */
