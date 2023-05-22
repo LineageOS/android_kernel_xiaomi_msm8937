@@ -80,7 +80,8 @@
 		//interrupts = <46 2>;//cw2017 interrupt pin to gpio46, but not really use this interrupt
 		//pinctrl-names = "default";
 		//pinctrl-0 = <&cw_int_default>;
-		qcom,battid-vadc = <&pm8937_vadc>;
+		io-channels = <&pm8937_vadc VADC_P_MUX4_1_1>;
+		io-channel-names = "batt_id";
 		qcom,battery-data = <&qrd_batterydata>;
 	};
 };

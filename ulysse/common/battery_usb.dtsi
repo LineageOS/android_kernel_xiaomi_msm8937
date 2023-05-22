@@ -70,11 +70,8 @@
 		ti,battery-type-b = "feimaotui_3080mah";
 		ti,battery-type-a = "guangyu_3080mah";
 		ti,batt-profile-select;
-#ifdef CONFIG_FUEL_GAUGE_BQ27426_MI8937
-		qcom,batt_id-vadc = <&pm8937_vadc>;
-#else
-		qcom,battid-vadc = <&pm8937_vadc>;
-#endif
+		io-channels = <&pm8937_vadc VADC_P_MUX2_1_1>;
+		io-channel-names = "batt_id";
 		ti,profile-a-rid-kohm = <22>;
 		ti,profile-b-rid-kohm = <110>;
 		ti,batt-id-vref-uv = <1800000>;

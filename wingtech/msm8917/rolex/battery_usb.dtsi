@@ -36,7 +36,10 @@
 
 		qcom,bms-controlled-charging;
 		qcom,chg-inhibit-disabled;
-		qcom,chg-vadc = <&pm8937_vadc>;
+		io-channels = <&pm8937_vadc VADC_P_MUX2_1_1>,
+		      		  <&pm8937_vadc VADC_P_MUX4_1_1>;
+		io-channel-names = "batt_therm",
+						   "batt_id_therm";
 		qcom,chg-adc_tm = <&pm8937_adc_tm>;
 		qcom,using-pmic-therm;
 		qcom,bat-present-decidegc = <(300)>;
@@ -74,7 +77,10 @@
 		regulator-name = "smb358_otg_vreg";
 		qcom,bms-psy-name = "bms";
 		qcom,chg-inhibit-disabled;
-		qcom,chg-vadc = <&pm8937_vadc>;
+		io-channels = <&pm8937_vadc VADC_P_MUX2_1_1>,
+		      		  <&pm8937_vadc VADC_P_MUX4_1_1>;
+		io-channel-names = "batt_therm",
+						   "batt_id_therm";
 		qcom,iterm-ma = <150>;
 		/* Optional Properties */
 		qcom,thermal-mitigation = <1500 1000 700 700>;

@@ -12,8 +12,6 @@
 	qcom,battery-data = <&qrd_batterydata>;
 	qcom,chg-inhibit-fg;
 	qcom,thermal-mitigation = <2000 1500 1200 700 0>;
-	qcom,vchg_sns-vadc = <&pmi8950_vadc>;
-	qcom,vchg-adc-channel-id = <3>;
 };
 
 &qpnp_fg {

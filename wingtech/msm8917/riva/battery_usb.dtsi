@@ -77,11 +77,8 @@
 		vcc_i2c-supply = <&pm8937_l5>;
 		interrupt-parent = <&tlmm>;
 		interrupts = <25 2>;
-#ifdef CONFIG_FUEL_GAUGE_BQ27426_MI8937
-		qcom,batt_id-vadc = <&pm8937_vadc>;
-#else
-		qcom,battid-vadc = <&pm8937_vadc>;
-#endif
+		io-channels = <&pm8937_vadc VADC_P_MUX4_1_1>;
+		io-channel-names = "batt_id";
 		pinctrl-names = "default";
 		pinctrl-0 = <&bq_int_default>;
 	};
