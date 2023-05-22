@@ -19,6 +19,7 @@
 #include <linux/qpnp/qpnp-adc.h>
 #include <linux/err.h>
 #include <linux/pm_wakeup.h>
+#include <linux/iio/consumer.h>
 #include <xiaomi-msm8937/mach.h>
 
 
@@ -154,7 +155,7 @@ struct cw_battery {
 
 
 	struct regulator *vcc_i2c;
-	struct qpnp_vadc_chip *vadc_dev;
+	struct iio_channel *batt_id_chan;
 	const char *battery_type;
 	int battery_id;
 
@@ -617,15 +618,15 @@ static int cw_get_battid_resister(struct cw_battery *cw_bat)
 	int rc = 0;
 	u64 div1 = 0;
 	int batt_id_kohm = 0;
-	struct qpnp_vadc_result results;
+	int res = 0;
 
-	rc = qpnp_vadc_read(cw_bat->vadc_dev, P_MUX4_1_1, &results);
-	if (rc) {
+	rc = iio_read_channel_processed(cw_bat->batt_id_chan, &res);
+	if (rc < 0) {
 		pr_err("cw2017: Unable to read batt id resister rc=%d\n", rc);
 		batt_id_kohm = DEFAULT_RESISTER_KOHM;
 	} else {
-		div1 =(u64)(results.physical*100);
-		do_div(div1, (1800000 - results.physical));
+		div1 = (u64)(res * 100);
+		do_div(div1, (1800000 - res));
 		batt_id_kohm = (int)div1;
 	}
 	pr_err("cw2017: read batt_id_kohm =%d\n", batt_id_kohm);
@@ -987,13 +988,13 @@ static int cw2017_probe(struct i2c_client *client, const struct i2c_device_id *i
 	cw_bat->voltage_before_change = 0;
 
 
-	cw_bat->vadc_dev = qpnp_get_vadc(cw_bat->dev, "battid");
-	if (IS_ERR(cw_bat->vadc_dev)) {
-		ret = PTR_ERR(cw_bat->vadc_dev);
+	cw_bat->batt_id_chan = iio_channel_get(cw_bat->dev, "batt_id");
+	if (IS_ERR(cw_bat->batt_id_chan)) {
+		ret = PTR_ERR(cw_bat->batt_id_chan);
 		if (ret == -EPROBE_DEFER)
-			pr_err("cw2017: vadc not found - defer ret=%d\n", ret);
+			pr_err("cw2017: batt_id channel not found - defer ret=%d\n", ret);
 		else
-			pr_err("cw2017: vadc property missing, ret=%d\n", ret);
+			pr_err("cw2017: batt_id property missing, ret=%d\n", ret);
 
 		return ret;
 	}
