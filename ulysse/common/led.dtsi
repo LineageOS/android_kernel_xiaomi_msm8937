@@ -7,9 +7,17 @@
 		compatible = "awinic,aw2013";
 #endif
 		reg = <0x45>;
+#ifdef CONFIG_LEDS_AW2013_MI8937
 		vdd-supply = <&pm8937_l10>;
 		vcc-supply = <&pm8937_l5>;
+#else
+		vcc-supply = <&pm8937_l10>;
+#endif
 
+#ifdef CONFIG_LEDS_AW2013_MI8937
 		AW2013_LED(white, 0)
+#else
+		AW2013_MAINLINE_LED(white, 0, LED_COLOR_ID_WHITE)
+#endif
 	};
 };
