@@ -373,9 +373,9 @@ static int parser_get_ini_key_value(char *section, char *key, char *value)
 {
 	int i = 0;
 	int ret = -2;
-	int len = 0;
+	//int len = 0;
 
-	len = strlen(key);
+	//len = strlen(key);
 
 	for (i = 0; i < g_ini_items; i++) {
 		if (strcmp(section, ilitek_ini_file_data[i].pSectionName) != 0)
