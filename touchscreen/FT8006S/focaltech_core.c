@@ -727,14 +727,16 @@ static void fts_irq_read_report(void)
 static irqreturn_t fts_irq_handler(int irq, void *data)
 {
 	struct fts_ts_data *ts_data = (struct fts_ts_data *)data;
-	int ret = 0;
+//	int ret = 0;
 
 	if (ts_data->suspended) {
-		ret = wait_for_completion_timeout(&ts_data->dev_pm_suspend_completion, msecs_to_jiffies(400));
-		if (0) {
+		/* ret = */ wait_for_completion_timeout(&ts_data->dev_pm_suspend_completion, msecs_to_jiffies(400));
+/*
+		if (ret = 0) {
 			FTS_ERROR("system(i2c) can't finished resuming procedure, skip it");
 			return IRQ_HANDLED;
 		}
+*/
 	}
 
 	fts_irq_read_report();
