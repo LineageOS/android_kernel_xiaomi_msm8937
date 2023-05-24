@@ -98,7 +98,7 @@
 #else
 	extcon = <&bq2560x_otg_supply>;
 #endif
-	interrupts = <0 134 0>,<0 140 0>,<0 136 0>;
+	interrupts = <0 134 IRQ_TYPE_LEVEL_HIGH>,<0 140 IRQ_TYPE_LEVEL_HIGH>,<0 136 IRQ_TYPE_LEVEL_HIGH>;
 	interrupt-names = "core_irq", "async_irq","phy_irq";
 	qcom,hsusb-otg-mode = <3>;
 	vbus_otg-supply = <&bq2560x_otg_supply>;
