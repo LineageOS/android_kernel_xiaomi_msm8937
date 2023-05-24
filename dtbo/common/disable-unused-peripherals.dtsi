@@ -10,12 +10,10 @@
 	};
 };
 
-/*
-&smb1355_0 {
+&smb1355 {
 	status = "disabled";
 };
 
-&smb1355_1 {
+&smb1355_0 {
 	status = "disabled";
 };
-*/
