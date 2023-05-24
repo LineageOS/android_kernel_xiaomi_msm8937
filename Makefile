@@ -1345,12 +1345,9 @@ headers_install: __headers
 	  $(error Headers not exportable for the $(SRCARCH) architecture))
 	$(Q)$(MAKE) $(hdr-inst)=include/uapi
 	$(Q)$(MAKE) $(hdr-inst)=arch/$(hdr-arch)/include/uapi $(hdr-dst)
-	$(Q)$(MAKE) $(hdr-inst)=techpack/audio-legacy/include/uapi
+	$(Q)$(MAKE) $(hdr-inst)=techpack/audio-legacy/include/uapi dst=techpack/audio/include
 	$(Q)$(MAKE) $(hdr-inst)=techpack/camera-legacy/include/uapi
 	$(Q)$(MAKE) $(hdr-inst)=techpack/camera-legacy-m/include/uapi
-	@if [ -d $(O)/usr/techpack/audio-legacy ] && [ ! -e $(O)/usr/techpack/audio ]; then \
-		ln -sf audio-legacy $(O)/usr/techpack/audio; \
-	fi
 
 PHONY += headers_check_all
 headers_check_all: headers_install_all
@@ -1360,7 +1357,7 @@ PHONY += headers_check
 headers_check: headers_install
 	$(Q)$(MAKE) $(hdr-inst)=include/uapi HDRCHECK=1
 	$(Q)$(MAKE) $(hdr-inst)=arch/$(hdr-arch)/include/uapi $(hdr-dst) HDRCHECK=1
-	$(Q)$(MAKE) $(hdr-inst)=techpack/audio-legacy/include/uapi HDRCHECK=1
+	$(Q)$(MAKE) $(hdr-inst)=techpack/audio-legacy/include/uapi dst=techpack/audio/include HDRCHECK=1
 	$(Q)$(MAKE) $(hdr-inst)=techpack/camera-legacy/include/uapi HDRCHECK=1
 	$(Q)$(MAKE) $(hdr-inst)=techpack/camera-legacy-m/include/uapi HDRCHECK=1
 
