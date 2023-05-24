@@ -10,6 +10,9 @@
 #ifdef CONFIG_BACKLIGHT_QCOM_WLED
 	/delete-property/ qcom,external-pfet;
 	qcom,cabc;
+
+	default-brightness = <1024>;
+	max-brightness = <2047>;
 #else
 	/delete-property/ qcom,en-ext-pfet-sc-pro;
 	qcom,en-cabc;

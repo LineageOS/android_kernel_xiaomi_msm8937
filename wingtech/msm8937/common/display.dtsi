@@ -45,5 +45,9 @@
 };
 
 &wled {
+#ifdef CONFIG_BACKLIGHT_QCOM_WLED
+	default-brightness = <1024>;
+	max-brightness = <2047>;
+#endif
 	qcom,wled-stepper-en;
 };
