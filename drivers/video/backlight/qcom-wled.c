@@ -18,7 +18,7 @@
 #define MOD_A						0
 #define MOD_B						1
 
-#define WLED_DEFAULT_BRIGHTNESS				2048
+#define WLED_DEFAULT_BRIGHTNESS_MULTIPLIER		0.5
 #define WLED_SOFT_START_DLY_US				10000
 #define WLED3_SINK_REG_BRIGHT_MAX			0xFFF
 #define WLED5_SINK_REG_BRIGHT_MAX_12B			0xFFF
@@ -1709,7 +1709,7 @@ static int wled_probe(struct platform_device *pdev)
 	if (rc < 0)
 		return rc;
 
-	val = WLED_DEFAULT_BRIGHTNESS;
+	val = wled->max_brightness * WLED_DEFAULT_BRIGHTNESS_MULTIPLIER;
 	of_property_read_u32(pdev->dev.of_node, "default-brightness", &val);
 
 	memset(&props, 0, sizeof(struct backlight_properties));
