@@ -57,6 +57,17 @@ static int msm_usb_psy_set_dp_dm(struct msm_usb_psy_data *data, int value)
 {
 	int rc = 0;
 
+	/* Get DP/DM regulator */
+	if (IS_ERR_OR_NULL(data->dpdm_reg)) {
+		data->dpdm_reg = devm_regulator_get(data->dev, "dpdm");
+		if (IS_ERR_OR_NULL(data->dpdm_reg)) {
+			rc = PTR_ERR(data->dpdm_reg);
+			dev_err(data->dev, "Unable to get DP/DM regulator rc=%d\n",
+					rc);
+			return rc;
+		}
+	}
+
 	switch (value) {
 		case POWER_SUPPLY_DP_DM_DPF_DMF:
 			if (!regulator_is_enabled(data->dpdm_reg)) {
@@ -152,7 +163,10 @@ static int msm_usb_psy_get_property(struct power_supply *psy,
 
 		/* Misc */
 		case POWER_SUPPLY_PROP_DP_DM:
-			val->intval = !!regulator_is_enabled(data->dpdm_reg);
+			if (IS_ERR_OR_NULL(data->dpdm_reg))
+				val->intval = false;
+			else
+				val->intval = !!regulator_is_enabled(data->dpdm_reg);
 			break;
 
 		default:
@@ -257,20 +271,11 @@ static int msm_usb_psy_probe(struct platform_device *pdev)
 	data->dev = &pdev->dev;
 	dev_set_drvdata(&pdev->dev, data);
 
-	/* Get DP/DM regulator */
-	data->dpdm_reg = devm_regulator_get(data->dev, "dpdm");
-	if (IS_ERR_OR_NULL(data->dpdm_reg)) {
-		rc = PTR_ERR(data->dpdm_reg);
-		dev_err(data->dev, "Unable to get DP/DM regulator rc=%d\n",
-				rc);
-		goto err_undo_alloc_mem;
-	}
-
 	/* Parse device tree */
 	rc = msm_usb_psy_parse_dt(data);
 	if (rc < 0) {
 		dev_err(data->dev, "Failed to parse device tree, rc=%d\n", rc);
-		goto err_undo_get_dpdm_regulator;
+		goto err_undo_alloc_mem;
 	}
 
 	/* Register extcon device */
@@ -325,8 +330,6 @@ err_undo_extcon_allocate:
 	devm_extcon_dev_free(data->dev, data->extcon);
 err_undo_parse_dt:
 	devm_kfree(&pdev->dev, data->pdata);
-err_undo_get_dpdm_regulator:
-	devm_regulator_put(data->dpdm_reg);
 err_undo_alloc_mem:
 	devm_kfree(&pdev->dev, data);
 err:
@@ -340,7 +343,8 @@ static int msm_usb_psy_remove(struct platform_device *pdev)
 	devm_extcon_dev_unregister(data->dev, data->extcon);
 	devm_extcon_dev_free(data->dev, data->extcon);
 	devm_kfree(&pdev->dev, data->pdata);
-	devm_regulator_put(data->dpdm_reg);
+	if (!IS_ERR_OR_NULL(data->dpdm_reg))
+		devm_regulator_put(data->dpdm_reg);
 	devm_kfree(&pdev->dev, data);
 	return 0;
 }
