@@ -111,7 +111,6 @@ extern u8 tp_color;
 #define EVENT_TIMER_INTERVAL			(HZ * timer_period_ms / 1000)
 #define CHECK_CHARGER_INTERVAL          (HZ * 100 / 1000)
 u32 event_ms = 0, timer_ms = 0;
-static struct timer_list event_timer;
 static struct timespec t_current;	/* nano seconds */
 int timer_period_ms = 500;	/* 500 msec */
 
@@ -326,7 +325,7 @@ void ist30xx_start(struct ist30xx_data *data)
 	if (data->initialized) {
 		data->scan_count = 0;
 		data->scan_retry = 0;
-		mod_timer(&event_timer,
+		mod_timer(&data->event_timer,
 			  get_jiffies_64() + EVENT_TIMER_INTERVAL * 2);
 	}
 
@@ -1333,7 +1332,7 @@ irq_ignore:
 	data->irq_working = false;
 	event_ms = (u32) get_milli_second();
 	if (data->initialized)
-		mod_timer(&event_timer,
+		mod_timer(&data->event_timer,
 			  get_jiffies_64() + EVENT_TIMER_INTERVAL);
 	return IRQ_HANDLED;
 
@@ -1342,7 +1341,7 @@ irq_ic_err:
 	data->irq_working = false;
 	event_ms = (u32) get_milli_second();
 	if (data->initialized)
-		mod_timer(&event_timer,
+		mod_timer(&data->event_timer,
 			  get_jiffies_64() + EVENT_TIMER_INTERVAL);
 	return IRQ_HANDLED;
 }
@@ -1402,7 +1401,7 @@ static int ist30xx_suspend(struct device *dev)
 	if (data->debugging_mode)
 		return 0;
 
-	del_timer(&event_timer);
+	del_timer(&data->event_timer);
 	cancel_delayed_work_sync(&data->work_noise_protect);
 	cancel_delayed_work_sync(&data->work_reset_check);
 	cancel_delayed_work_sync(&data->work_debug_algorithm);
@@ -1860,9 +1859,9 @@ static void debug_work_func(struct work_struct *work)
 #endif
 }
 
-void timer_handler(unsigned long timer_data)
+void timer_handler(struct timer_list *t)
 {
-	struct ist30xx_data *data = (struct ist30xx_data *)timer_data;
+	struct ist30xx_data *data = from_timer(data, t, event_timer);
 	struct ist30xx_status *status = &data->status;
 
 	if (data->irq_working || !data->initialized || data->rec_mode)
@@ -1910,7 +1909,7 @@ void timer_handler(unsigned long timer_data)
 	}
 
 restart_timer:
-	mod_timer(&event_timer, get_jiffies_64() + EVENT_TIMER_INTERVAL);
+	mod_timer(&data->event_timer, get_jiffies_64() + EVENT_TIMER_INTERVAL);
 }
 
 static int ist30xx_parse_dt(struct device *dev,
@@ -2338,11 +2337,9 @@ static int ist30xx_probe(struct i2c_client *client,
 	INIT_DELAYED_WORK(&data->work_noise_protect, noise_work_func);
 	INIT_DELAYED_WORK(&data->work_debug_algorithm, debug_work_func);
 
-	init_timer(&event_timer);
-	event_timer.data = (unsigned long)data;
-	event_timer.function = timer_handler;
-	event_timer.expires = jiffies_64 + (EVENT_TIMER_INTERVAL);
-	mod_timer(&event_timer, get_jiffies_64() + EVENT_TIMER_INTERVAL * 2);
+	timer_setup(&data->event_timer, timer_handler, 0);
+	data->event_timer.expires = jiffies_64 + (EVENT_TIMER_INTERVAL);
+	mod_timer(&data->event_timer, get_jiffies_64() + EVENT_TIMER_INTERVAL * 2);
 
 	ret = ist30xx_get_info(data);
 	if (unlikely(ret))
@@ -2496,7 +2493,7 @@ static void ist30xx_shutdown(struct i2c_client *client)
 {
 	struct ist30xx_data *data = i2c_get_clientdata(client);
 
-	del_timer(&event_timer);
+	del_timer(&data->event_timer);
 #if CTP_CHARGER_DETECT
 	cancel_delayed_work_sync(&data->work_charger_check);
 #endif

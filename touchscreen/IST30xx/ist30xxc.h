@@ -534,6 +534,7 @@ struct ist30xx_data {
 	u32 product_id;
 	u32 lockdown_upper;
 	bool disable_keys;
+	struct timer_list event_timer;
 };
 
 #if (defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE))
