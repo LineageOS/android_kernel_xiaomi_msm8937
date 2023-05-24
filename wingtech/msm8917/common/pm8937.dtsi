@@ -47,5 +47,8 @@
 		reg = <VADC_P_MUX4_1_1>;
 		qcom,hw-settle-time = <200>;
 		qcom,pre-scaling = <1 1>;
+
+		qcom,iio-chan-type-override = "IIO_VOLTAGE";
+		qcom,scale-fn-type = <0>; // SCALE_DEFAULT
 	};
 };
