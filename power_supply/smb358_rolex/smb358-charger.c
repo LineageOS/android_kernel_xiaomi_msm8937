@@ -1320,6 +1320,7 @@ static int smb358_get_prop_batt_temp(struct smb358_charger *chip)
 			return DEFAULT_TEMP;
 		}
 	}
+	batt_therm_result /= 1000;
 	pr_err("get_bat_temp %d", batt_therm_result);
 
 	#ifdef CONFIG_DISABLE_TEMP_PROTECT
