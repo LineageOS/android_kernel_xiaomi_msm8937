@@ -429,9 +429,11 @@ static int mdss_dsi_panel_power_on(struct mdss_panel_data *pdata)
 
 #if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_ULYSSE)
 	if (xiaomi_msm8937_mach_get_family() == XIAOMI_MSM8937_MACH_FAMILY_ULYSSE) {
-		ctrl_pdata->xiaomi_ulysse_ID0_status = gpio_get_value(59);
-		ctrl_pdata->xiaomi_ulysse_ID1_status = gpio_get_value(66);
-		pr_info("%s: xiaomi_ulysse_ID0_status=%d, xiaomi_ulysse_ID1_status=%d\n", __func__, ctrl_pdata->xiaomi_ulysse_ID0_status, ctrl_pdata->xiaomi_ulysse_ID1_status);
+		if (gpio_is_valid(ctrl_pdata->xiaomi_ulysse_ID0_status_gpio) && gpio_is_valid(ctrl_pdata->xiaomi_ulysse_ID1_status_gpio)) {
+			ctrl_pdata->xiaomi_ulysse_ID0_status = gpio_get_value(ctrl_pdata->xiaomi_ulysse_ID0_status_gpio);
+			ctrl_pdata->xiaomi_ulysse_ID1_status = gpio_get_value(ctrl_pdata->xiaomi_ulysse_ID1_status_gpio);
+			pr_info("%s: xiaomi_ulysse_ID0_status=%d, xiaomi_ulysse_ID1_status=%d\n", __func__, ctrl_pdata->xiaomi_ulysse_ID0_status, ctrl_pdata->xiaomi_ulysse_ID1_status);
+		}
 	}
 #endif
 
@@ -3296,6 +3298,18 @@ static struct device_node *mdss_dsi_config_panel(struct platform_device *pdev,
 		return NULL;
 	}
 
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_ULYSSE)
+	if (xiaomi_msm8937_mach_get_family() == XIAOMI_MSM8937_MACH_FAMILY_ULYSSE) {
+		ctrl_pdata->xiaomi_ulysse_board_id0_gpio = of_get_named_gpio(pdev->dev.of_node, "qcom,xiaomi-ulysse-board-id-gpios", 0);
+		if(!gpio_is_valid(ctrl_pdata->xiaomi_ulysse_board_id0_gpio))
+			pr_info("%s: xiaomi_ulysse_board_id0_gpio not specified\n",__func__);
+
+		ctrl_pdata->xiaomi_ulysse_board_id1_gpio = of_get_named_gpio(pdev->dev.of_node, "qcom,xiaomi-ulysse-board-id-gpios", 1);
+		if(!gpio_is_valid(ctrl_pdata->xiaomi_ulysse_board_id1_gpio))
+			pr_info("%s: xiaomi_ulysse_board_id1_gpio not specified\n",__func__);
+	}
+#endif
+
 	rc = mdss_dsi_panel_init(dsi_pan_node, ctrl_pdata, ndx);
 	if (rc) {
 		pr_err("%s: dsi panel init failed\n", __func__);
@@ -4543,6 +4557,14 @@ static int mdss_dsi_parse_gpio_params(struct platform_device *ctrl_pdev,
 		ctrl_pdata->xiaomi_ulysse_lcmio_en_gpio = of_get_named_gpio(ctrl_pdev->dev.of_node, "qcom,vddio-gpio", 0);
 		if(!gpio_is_valid(ctrl_pdata->xiaomi_ulysse_lcmio_en_gpio))
 			pr_info("%s: xiaomi_ulysse_lcmio_en_gpio not specified\n",__func__);
+
+		ctrl_pdata->xiaomi_ulysse_ID0_status_gpio = of_get_named_gpio(ctrl_pdev->dev.of_node, "qcom,xiaomi-ulysse-ID-status-gpios", 0);
+		if(!gpio_is_valid(ctrl_pdata->xiaomi_ulysse_ID0_status_gpio))
+			pr_info("%s: xiaomi_ulysse_ID0_status_gpio not specified\n",__func__);
+
+		ctrl_pdata->xiaomi_ulysse_ID1_status_gpio = of_get_named_gpio(ctrl_pdev->dev.of_node, "qcom,xiaomi-ulysse-ID-status-gpios", 1);
+		if(!gpio_is_valid(ctrl_pdata->xiaomi_ulysse_ID1_status_gpio))
+			pr_info("%s: xiaomi_ulysse_ID1_status_gpio not specified\n",__func__);
 	}
 #endif
 

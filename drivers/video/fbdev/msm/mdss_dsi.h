@@ -596,6 +596,11 @@ struct mdss_dsi_ctrl_pdata {
 	int xiaomi_ulysse_lcm_vci_en_gpio;
 	int xiaomi_ulysse_ocp2131_enp_gpio;
 	int xiaomi_ulysse_ocp2131_enn_gpio;
+
+	int xiaomi_ulysse_board_id0_gpio; // 20
+	int xiaomi_ulysse_board_id1_gpio; // 21
+	int xiaomi_ulysse_ID0_status_gpio; // 59
+	int xiaomi_ulysse_ID1_status_gpio; // 66
 #endif
 };
 

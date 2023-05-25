@@ -2849,27 +2849,33 @@ static int  mdss_dsi_panel_config_res_properties(struct device_node *np,
 		struct mdss_panel_data *panel_data,
 		bool default_timing)
 {
+	struct mdss_dsi_ctrl_pdata *ctrl_pdata = NULL;
 #if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_ULYSSE)
 	int xiaomi_ulysse_board_id0 = 0;
 	int xiaomi_ulysse_board_id1 = 0;
 #endif
 	int rc = 0;
 
+	ctrl_pdata = container_of(panel_data, struct mdss_dsi_ctrl_pdata,
+							panel_data);
+
 	mdss_dsi_parse_roi_alignment(np, pt);
 
 #if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_ULYSSE)
 	if(xiaomi_msm8937_mach_get_family() == XIAOMI_MSM8937_MACH_FAMILY_ULYSSE) {
-		xiaomi_ulysse_board_id0 = gpio_get_value(20);
-		xiaomi_ulysse_board_id1 = gpio_get_value(21);
-		pr_info("%s: xiaomi_ulysse_board_id0=%d, xiaomi_ulysse_board_id1=%d\n", __func__, xiaomi_ulysse_board_id0, xiaomi_ulysse_board_id1);
-		if (!strcmp(panel_data->panel_info.panel_name, "hx otm1901a 720p video mode dsi panel")) {
-			if((xiaomi_ulysse_board_id0 == 1 && xiaomi_ulysse_board_id1 == 0) ||
-				(xiaomi_ulysse_board_id0 == 1 && xiaomi_ulysse_board_id1 == 1)) {
-				pr_info("%s: Parse qcom,mdss-dsi-india-on-command\n", __func__);
-				mdss_dsi_parse_dcs_cmds(np, &pt->on_cmds,
-				"qcom,mdss-dsi-india-on-command",
-				"qcom,mdss-dsi-on-command-state");
-				goto parsed_dsi_on_command;
+		if (gpio_is_valid(ctrl_pdata->xiaomi_ulysse_board_id0_gpio) && gpio_is_valid(ctrl_pdata->xiaomi_ulysse_board_id1_gpio)) {
+			xiaomi_ulysse_board_id0 = gpio_get_value(ctrl_pdata->xiaomi_ulysse_board_id0_gpio);
+			xiaomi_ulysse_board_id1 = gpio_get_value(ctrl_pdata->xiaomi_ulysse_board_id1_gpio);
+			pr_info("%s: xiaomi_ulysse_board_id0=%d, xiaomi_ulysse_board_id1=%d\n", __func__, xiaomi_ulysse_board_id0, xiaomi_ulysse_board_id1);
+			if (!strcmp(panel_data->panel_info.panel_name, "hx otm1901a 720p video mode dsi panel")) {
+				if((xiaomi_ulysse_board_id0 == 1 && xiaomi_ulysse_board_id1 == 0) ||
+					(xiaomi_ulysse_board_id0 == 1 && xiaomi_ulysse_board_id1 == 1)) {
+					pr_info("%s: Parse qcom,mdss-dsi-india-on-command\n", __func__);
+					mdss_dsi_parse_dcs_cmds(np, &pt->on_cmds,
+					"qcom,mdss-dsi-india-on-command",
+					"qcom,mdss-dsi-on-command-state");
+					goto parsed_dsi_on_command;
+				}
 			}
 		}
 	}
