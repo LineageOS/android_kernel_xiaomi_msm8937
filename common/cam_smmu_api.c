@@ -790,14 +790,6 @@ static int cam_smmu_map_buffer_and_add_to_list(int idx, int ion_fd,
 		goto err_detach;
 	}
 
-	rc = msm_dma_map_sg_lazy(iommu_cb_set.cb_info[idx].dev, table->sgl,
-			table->nents, dma_dir, buf);
-	if (rc != table->nents) {
-		pr_err("Error: msm_dma_map_sg_lazy failed\n");
-		rc = -ENOMEM;
-		goto err_unmap_sg;
-	}
-
 	if (table->sgl) {
 		CDBG("DMA buf: %pK, device: %pK, attach: %pK, table: %pK\n",
 				(void *)buf,
@@ -871,9 +863,6 @@ static int cam_smmu_unmap_buf_and_remove_from_list(
 	}
 
 	/* iommu buffer clean up */
-	msm_dma_unmap_sg(iommu_cb_set.cb_info[idx].dev,
-		mapping_info->table->sgl, mapping_info->table->nents,
-		mapping_info->dir, mapping_info->buf);
 	dma_buf_unmap_attachment(mapping_info->attach,
 		mapping_info->table, mapping_info->dir);
 	dma_buf_detach(mapping_info->buf, mapping_info->attach);
