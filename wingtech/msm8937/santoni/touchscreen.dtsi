@@ -1,4 +1,8 @@
 &i2c_3 {
+#ifdef MI8937_V2
+	/delete-property/ qcom,disable-dma;
+#endif
+
 	ftech {
 		reg = <0x38>;
 #ifdef CONFIG_TOUCHSCREEN_FTS_MI8937

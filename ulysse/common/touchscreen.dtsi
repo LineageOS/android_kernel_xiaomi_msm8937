@@ -2,6 +2,9 @@
 &i2c_3 {
 	status = "ok";
 	clock-frequency = <400000>;
+#ifdef MI8937_V2
+	/delete-property/ qcom,disable-dma;
+#endif
 	focaltech@38 {
 #ifdef CONFIG_TOUCHSCREEN_FTS_MI8937
 		compatible = "focaltech,fts_ts-mi8937";
