@@ -1,10 +1,14 @@
 #ifndef _DTS_MI8937_CONFIG_H
 #define _DTS_MI8937_CONFIG_H
 
+#ifndef CONFIG_MACH_XIAOMI // This option only exist in old mi8937 kernel
+#define MI8937_V2
+#endif // CONFIG_MACH_XIAOMI=n
+
+#ifndef CONFIG_OF // In case of autoconf.h is not included
 #define CONFIG_INPUT_QTI_HAPTICS
 
-#define MI8937_V2
-#ifdef MI8937_V2
+#ifdef MI8937_V2 // Mi8937v2 config options
 #define CONFIG_MSM_BCL_PERIPHERAL_CTL_LEGACY
 
 #define CONFIG_PARSE_ANDROIDBOOT_MODE
@@ -39,6 +43,7 @@
 #define CONFIG_TOUCHSCREEN_IST30XX_MI8937
 
 #define CONFIG_LEDS_VIBRATOR_GPIO_MI8937
-#endif
+#endif // MI8937_V2
+#endif // CONFIG_OF=n
 
 #endif

@@ -18,11 +18,10 @@
 		clock-names = "iface_clk", "core_clk";
 		clocks = <&clock_gcc clk_gcc_blsp1_ahb_clk>,
 				<&clock_gcc clk_gcc_blsp1_qup1_spi_apps_clk>;
-		pinctrl-names = "fpc1020_reset_reset", "fpc1020_reset_active", "fpc1020_irq_active", "fpc1020_spi_active";
+		pinctrl-names = "fpc1020_reset_reset", "fpc1020_reset_active", "fpc1020_irq_active";
 		pinctrl-0 = <&fpc_reset_reset>;
 		pinctrl-1 = <&fpc_reset_active>;
 		pinctrl-2 = <&fpc_irq_active>;
-		pinctrl-3 = <&goodix_spi_active>;
 	};
 
 	goodix_fp {
