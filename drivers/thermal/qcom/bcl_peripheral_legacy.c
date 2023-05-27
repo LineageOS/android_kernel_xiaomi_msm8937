@@ -637,10 +637,23 @@ static void power_supply_callback(struct power_supply *psy)
 	}
 }
 
+static enum power_supply_property bcl_psy_properties[] = {
+	POWER_SUPPLY_PROP_PRESENT,
+	POWER_SUPPLY_PROP_ONLINE,
+};
+
 static int bcl_psy_get_property(struct power_supply *psy,
 				enum power_supply_property prop,
 				union power_supply_propval *val)
 {
+	switch (prop) {
+		case POWER_SUPPLY_PROP_PRESENT:
+		case POWER_SUPPLY_PROP_ONLINE:
+			val->intval = 1;
+			break;
+		default:
+			return 0;
+	}
 	return 0;
 }
 static int bcl_psy_set_property(struct power_supply *psy,
@@ -884,7 +897,8 @@ static int bcl_probe(struct platform_device *pdev)
 	bcl_psy_d.type = POWER_SUPPLY_TYPE_BMS;
 	bcl_psy_d.get_property = bcl_psy_get_property;
 	bcl_psy_d.set_property = bcl_psy_set_property;
-	bcl_psy_d.num_properties = 0;
+	bcl_psy_d.properties = bcl_psy_properties;
+	bcl_psy_d.num_properties = ARRAY_SIZE(bcl_psy_properties);
 	bcl_psy_d.external_power_changed = power_supply_callback;
 
 	bcl_psy_cfg.num_supplicants = 0;
