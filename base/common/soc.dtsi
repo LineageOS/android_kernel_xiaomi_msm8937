@@ -58,3 +58,15 @@
 		qcom,force-warm-reboot;
 	};
 };
+
+&i2c_2 {
+	qcom,disable-dma;
+};
+
+&i2c_3 {
+	qcom,disable-dma;
+};
+
+&i2c_5 {
+	qcom,disable-dma;
+};
