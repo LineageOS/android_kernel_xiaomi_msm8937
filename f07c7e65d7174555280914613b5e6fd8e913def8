@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c354ccc5_ba4cef0d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 32245
+      },
+      "writtenOn": "2023-06-04T13:10:31Z",
+      "side": 1,
+      "message": "just apply it to `arch/arm64/configs/vendor/xiaomi/common.config` please, thanks\n\nhow to confirm that it works? I\u0027ll try on my devices",
+      "revId": "f07c7e65d7174555280914613b5e6fd8e913def8",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
+    }
+  ]
+}
