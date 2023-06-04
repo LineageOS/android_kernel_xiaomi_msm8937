@@ -8,11 +8,3 @@
 		vituralsar,irq-gpio = <&tlmm 126 0x2008>;
 	};
 };
-
-&soc {
-	gpio_keys {
-		camera_snapshot {
-			linux,code = <0x2B1>;
-		};
-	};
-};
