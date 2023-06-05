@@ -1,5 +1,5 @@
 menu "IR"
-	depends on MEDIA_RC_SUPPORT
+	depends on RC_CORE
 
 config IR_SPI_MI439
        tristate "SPI connected IR LED"

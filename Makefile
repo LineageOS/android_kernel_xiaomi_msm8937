@@ -5,7 +5,7 @@ obj-$(CONFIG_HQ_SYSFS_SUPPORT_MI439) += hqsysfs/
 obj-$(CONFIG_SND_SOC) += audio_pa/
 obj-$(CONFIG_BACKLIGHT_LCD_SUPPORT) += backlight/
 obj-y += fingerprint/
-obj-$(CONFIG_MEDIA_RC_SUPPORT) += ir/
+obj-$(CONFIG_RC_CORE) += ir/
 obj-$(CONFIG_INPUT_TOUCHSCREEN) += touchscreen/
 else
 ccflags-y := -Wno-unused-function
