@@ -2197,9 +2197,12 @@ static void msm_hsusb_vbus_power(struct msm_otg *motg, bool on)
 	if (vbus_is_on == on)
 		return;
 
-	if (!vbus_otg) {
-		pr_err("vbus_otg is NULL.\n");
-		return;
+	if (IS_ERR_OR_NULL(vbus_otg)) {
+		vbus_otg = devm_regulator_get(motg->phy.dev, "vbus_otg");
+		if (IS_ERR(vbus_otg)) {
+			dev_err(motg->phy.dev, "Unable to get vbus_otg\n");
+			return;
+		}
 	}
 
 	/*
@@ -2239,16 +2242,7 @@ static int msm_otg_set_host(struct usb_otg *otg, struct usb_bus *host)
 		return -ENODEV;
 	}
 
-	if (host) {
-		vbus_otg = devm_regulator_get(motg->phy.dev, "vbus_otg");
-		if (IS_ERR(vbus_otg)) {
-			msm_otg_dbg_log_event(&motg->phy,
-					"UNABLE TO GET VBUS_OTG",
-					otg->state, 0);
-			dev_err(otg->usb_phy->dev, "Unable to get vbus_otg\n");
-			return PTR_ERR(vbus_otg);
-		}
-	} else {
+	if (!host) {
 		if (otg->state == OTG_STATE_A_HOST) {
 			msm_otg_start_host(otg, 0);
 			otg->host = NULL;
