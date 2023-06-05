@@ -1,7 +1,7 @@
 menu "IR"
 	depends on RC_CORE
 
-config IR_SPI_MI
+config IR_SPI_MI439
 	tristate "SPI connected IR LED"
 	depends on SPI && LIRC
 	depends on OF || COMPILE_TEST
