@@ -89,12 +89,22 @@ static ssize_t ir_spi_chardev_write(struct file *file,
 		ret = -EFAULT;
 		goto out_free;
 	}
+#if 1
+	ret = regulator_enable(idata->regulator);
+	if (ret) {
+		dev_err(&idata->spi->dev, "failed to power on the LED\n");
+		goto out_free;
+	}
+#endif
 	idata->xfer.tx_buf = idata->buffer;
 	dev_warn(&idata->spi->dev, "xfer.len%d buffer_size %d\n",
 		 (int)idata->xfer.len, idata->buffer_size);
 	ret = spi_sync_transfer(idata->spi, &idata->xfer, 1);
 	if (ret)
 		dev_err(&idata->spi->dev, "unable to deliver the signal\n");
+#if 1
+	regulator_disable(idata->regulator);
+#endif
 out_free:
 	if (please_free) {
 		kfree(idata->buffer);
@@ -242,6 +252,11 @@ static int ir_spi_probe(struct spi_device *spi)
 	idata = devm_kzalloc(&spi->dev, sizeof(*idata), GFP_KERNEL);
 	if (!idata)
 		return -ENOMEM;
+#if 1
+	idata->regulator = devm_regulator_get(&spi->dev, "vdd");
+	if (IS_ERR(idata->regulator))
+		return PTR_ERR(idata->regulator);
+#endif
 
 	mutex_init(&idata->mutex);
 
