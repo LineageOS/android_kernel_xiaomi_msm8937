@@ -126,6 +126,9 @@ int wlan_hdd_ftm_start(hdd_context_t *pAdapter);
 #ifdef WLAN_FEATURE_PACKET_FILTERING
 #include "wlan_hdd_packet_filtering.h"
 #endif
+#if IS_ENABLED(CONFIG_MACH_MOTOROLA_MSM8937)
+#include <motorola-msm8937/mach.h>
+#endif
 
 #ifdef MODULE
 #define WLAN_MODULE_NAME  module_name(THIS_MODULE)
@@ -236,10 +239,8 @@ static vos_wake_lock_t wlan_wake_lock;
 /* set when SSR is needed after unload */
 static e_hdd_ssr_required isSsrRequired = HDD_SSR_NOT_REQUIRED;
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 14, 0))
 #define WLAN_NV_FILE_SIZE 64
 static char wlan_nv_bin[WLAN_NV_FILE_SIZE];
-#endif
 
 //internal function declaration
 static VOS_STATUS wlan_hdd_framework_restart(hdd_context_t *pHddCtx);
@@ -8859,9 +8860,17 @@ VOS_STATUS hdd_release_firmware(char *pFileName,v_VOID_t *pCtx)
    return status;
 }
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 14, 0))
 char* hdd_get_nv_bin()
 {
+#if IS_ENABLED(CONFIG_MACH_MOTOROLA_MSM8937)
+	if (motorola_msm8937_mach_get() != MOTOROLA_MSM8937_MACH_UNKNOWN) {
+		snprintf(wlan_nv_bin, sizeof(wlan_nv_bin),
+			"wlan/prima/%s_WCNSS_qcom_wlan_nv.bin",
+			motorola_msm8937_mach_get_variant_str());
+		return wlan_nv_bin;
+	}
+#endif
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 14, 0))
 	if (wcnss_get_nv_name(wlan_nv_bin)) {
 		hddLog(VOS_TRACE_LEVEL_ERROR,
 		       "%s: NV binary is invalid", __func__);
@@ -8869,8 +8878,10 @@ char* hdd_get_nv_bin()
 	}
 
 	return wlan_nv_bin;
-}
+#else
+	return kstrdup("wlan/prima/WCNSS_qcom_wlan_nv.bin", GFP_KERNEL);
 #endif
+}
 
 /**---------------------------------------------------------------------------
 
