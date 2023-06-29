@@ -41,16 +41,18 @@
 
 &usb_otg {
 	/delete-property/ clocks;
-	clocks = <&clock_gcc clk_gcc_usb_hs_ahb_clk>,
-			 <&clock_gcc clk_gcc_usb_hs_system_clk>,
-			 <&clock_gcc clk_gcc_usb2a_phy_sleep_clk>,
-			 <&clock_gcc clk_bimc_usb_clk>,
-			 <&clock_gcc clk_snoc_usb_clk>,
-			 <&clock_gcc clk_pnoc_usb_clk>,
+	clocks = <&gcc GCC_USB_HS_AHB_CLK>,
+			 <&gcc GCC_USB_HS_SYSTEM_CLK>,
+			 <&gcc GCC_USB2A_PHY_SLEEP_CLK>,
+			 <&rpmcc BIMC_USB_CLK>,
+			 <&rpmcc SNOC_USB_CLK>,
+			 <&rpmcc PNOC_USB_CLK>,
+/* TODO
 			 <&clock_gcc clk_gcc_qusb2_phy_clk>,
 			 <&clock_gcc clk_gcc_usb2_hs_phy_only_clk>,
-			 <&clock_gcc clk_gcc_usb_hs_phy_cfg_ahb_clk>,
-			 <&clock_gcc clk_xo_otg_clk>;
+*/
+			 <&gcc GCC_USB_HS_PHY_CFG_AHB_CLK>,
+			 <&rpmcc CXO_SMD_OTG_CLK>;
 
 	qcom,usbbam@78c4000 {
 		/delete-property/ qcom,reset-bam-on-disconnect;
@@ -115,7 +117,7 @@
 		qcom,wan-rx-ring-size = <192>; /* IPA WAN-rx-ring-size*/
 		qcom,lan-rx-ring-size = <192>; /* IPA LAN-rx-ring-size*/
 		clock-names = "core_clk";
-		clocks = <&clock_gcc clk_ipa_clk>;
+		clocks = <&rpmcc RPM_SMD_IPA_CLK>;
 		qcom,ee = <0>;
 		qcom,use-ipa-tethering-bridge;
 		qcom,modem-cfg-emb-pipe-flt;
@@ -229,8 +231,8 @@
 		reg-names = "cti-base";
 		coresight-name = "coresight-cti-modem-cpu0";
 
-		clocks = <&clock_gcc clk_qdss_clk>,
-			 <&clock_gcc clk_qdss_a_clk>;
+		clocks = <&rpmcc RPM_SMD_QDSS_CLK>,
+			 <&rpmcc RPM_SMD_QDSS_A_CLK>;
 		clock-names = "apb_pclk";
 	};
 
@@ -242,8 +244,8 @@
 		reg-names = "cti-base";
 		coresight-name = "coresight-cti-modem-cpu1";
 
-		clocks = <&clock_gcc clk_qdss_clk>,
-			 <&clock_gcc clk_qdss_a_clk>;
+		clocks = <&rpmcc RPM_SMD_QDSS_CLK>,
+			 <&rpmcc RPM_SMD_QDSS_A_CLK>;
 		clock-names = "apb_pclk";
 	};
 
