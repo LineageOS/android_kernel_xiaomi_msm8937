@@ -23,8 +23,25 @@
 	soc: soc { };
 };
 
-&secure_mem {
-	status = "ok";
+/ {
+	reserved-memory {
+		secure_mem: secure_region@0 {
+			compatible = "shared-dma-pool";
+			reusable;
+			alignment = <0 0x400000>;
+			size = <0 0x7000000>;
+		};
+	};
+};
+
+&soc {
+	qcom,ion {
+		qcom,ion-heap@8 { /* CP_MM HEAP */
+			reg = <8>;
+			memory-region = <&secure_mem>;
+			qcom,ion-heap-type = "SECURE_DMA";
+		};
+	};
 };
 
 &modem_mem {
