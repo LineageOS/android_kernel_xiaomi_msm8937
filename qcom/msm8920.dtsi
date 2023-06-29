@@ -175,12 +175,8 @@
 	compatible = "qcom,gcc-msm8920";
 };
 
-&clock_debug {
-	compatible = "qcom,cc-debug-8920";
-};
-
-&clock_gcc_mdss {
-	compatible = "qcom,gcc-mdss-8920";
+&rpmcc {
+	compatible = "qcom,rpmcc-msm8920";
 };
 
 &apc_vreg_corner {
