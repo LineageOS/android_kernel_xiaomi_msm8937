@@ -1195,6 +1195,7 @@ static const struct of_device_id rpm_smd_clk_match_table[] = {
 	{ .compatible = "qcom,rpmcc-sdm660",  .data = &rpm_clk_sdm660  },
 	{ .compatible = "qcom,rpmcc-qm215",  .data = &rpm_clk_qm215 },
 	{ .compatible = "qcom,rpmcc-sdm439",  .data = &rpm_clk_qm215 },
+	{ .compatible = "qcom,rpmcc-msm8920",  .data = &rpm_clk_qm215 },
 	{ .compatible = "qcom,rpmcc-msm8940",  .data = &rpm_clk_qm215 },
 	{ }
 };
@@ -1206,7 +1207,7 @@ static int rpm_smd_clk_probe(struct platform_device *pdev)
 	struct clk *clk;
 	struct rpm_cc *rcc;
 	struct clk_onecell_data *data;
-	int ret, is_bengal, is_scuba, is_sdm660, is_qm215, is_sdm439, is_msm8940;
+	int ret, is_bengal, is_scuba, is_sdm660, is_qm215, is_sdm439, is_msm8920, is_msm8940;
 	size_t num_clks, i;
 	struct clk_hw **hw_clks;
 	const struct rpm_smd_clk_desc *desc;
@@ -1231,10 +1232,15 @@ static int rpm_smd_clk_probe(struct platform_device *pdev)
 	is_sdm439 = of_device_is_compatible(pdev->dev.of_node,
 						"qcom,rpmcc-sdm439");
 
+	is_msm8920 = of_device_is_compatible(pdev->dev.of_node,
+						"qcom,rpmcc-msm8920");
+
 	is_msm8940 = of_device_is_compatible(pdev->dev.of_node,
 						"qcom,rpmcc-msm8940");
 
-	if (is_msm8940) {
+	if (is_msm8920) {
+		is_qm215 = 1;
+	} else if (is_msm8940) {
 		is_sdm439 = 1;
 	} else if (is_sdm439 || is_qm215) {
 		rpm_clk_qm215.clks[RPM_SMD_IPA_CLK] = NULL;
