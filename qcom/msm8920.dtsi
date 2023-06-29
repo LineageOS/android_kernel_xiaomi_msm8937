@@ -171,8 +171,8 @@
 	};
 };
 
-&clock_gcc {
-	compatible = "qcom,gcc-8920";
+&gcc {
+	compatible = "qcom,gcc-msm8920";
 };
 
 &clock_debug {
