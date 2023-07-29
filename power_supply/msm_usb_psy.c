@@ -192,6 +192,7 @@ static int msm_usb_psy_set_property(struct power_supply *psy,
 		case POWER_SUPPLY_PROP_CURRENT_MAX:
 		case POWER_SUPPLY_PROP_SDP_CURRENT_MAX:
 			data->current_max = val->intval / 1000;
+			break;
 
 		default:
 			dev_err(data->dev, "%s: Could not set unsupported property %d\n", __func__, psp);
