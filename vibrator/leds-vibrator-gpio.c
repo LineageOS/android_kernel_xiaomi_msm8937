@@ -51,7 +51,7 @@ static enum hrtimer_restart vibrator_gpio_timer_func(struct hrtimer *timer)
 }
 
 #ifdef CONFIG_PM
-static vibrator_gpio_suspend(struct device *dev) {
+static int vibrator_gpio_suspend(struct device *dev) {
 	struct vibrator_gpio_data *pdata = dev_get_drvdata(dev);
 
 	hrtimer_cancel(&pdata->vib_timer);
