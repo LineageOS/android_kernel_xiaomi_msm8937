@@ -969,7 +969,7 @@ tSirRetStatus PopulateDot11fRRMIe( tpAniSirGlobal pMac,
 
 #if defined WLAN_FEATURE_VOWIFI_11R
 void PopulateMDIE( tpAniSirGlobal        pMac,
-                   tDot11fIEMobilityDomain *pDot11f, tANI_U8 mdie[] );
+                   tDot11fIEMobilityDomain *pDot11f, tANI_U8 mdie[SIR_MDIE_SIZE] );
 void PopulateFTInfo( tpAniSirGlobal      pMac,
                      tDot11fIEFTInfo     *pDot11f );
 #endif

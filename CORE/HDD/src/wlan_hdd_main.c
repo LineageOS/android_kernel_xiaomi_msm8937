@@ -1359,7 +1359,7 @@ hdd_extract_assigned_int_from_str
 {
     int tempInt;
     int v = 0;
-    char buf[32];
+    char buf[33];
     int val = 0;
     *pLastArg = FALSE;
 
