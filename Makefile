@@ -11,6 +11,8 @@ ccflags-y += -Itechpack/camera-legacy-m/jpeg_dma
 ccflags-y += -Itechpack/camera-legacy-m/fd
 ccflags-y += -Itechpack/camera-legacy-m/common
 
+ccflags-y += $(DISABLE_CFI_CLANG) $(DISABLE_LTO_CLANG)
+
 # Use USERINCLUDE when you must reference the UAPI directories only.
 USERINCLUDE     += \
                 -I$(srctree)/techpack/camera-legacy-m/include/uapi \
