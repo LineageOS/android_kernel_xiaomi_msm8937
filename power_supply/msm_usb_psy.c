@@ -6,6 +6,7 @@
 #include <linux/power_supply.h>
 #include <linux/printk.h>
 #include <linux/regulator/consumer.h>
+#include <linux/workqueue.h>
 #include <xiaomi-msm8937/mach.h>
 
 struct msm_usb_psy_platform_data {
@@ -19,6 +20,9 @@ struct msm_usb_psy_data {
 
 	/* DP/DM regulator */
 	struct regulator *dpdm_reg;
+
+	struct delayed_work dpdm_enable_work;
+	int dpdm_enable_work_retry_count;
 
 	/* Extcon */
 	struct extcon_dev *extcon;
@@ -102,6 +106,21 @@ static int msm_usb_psy_set_dp_dm(struct msm_usb_psy_data *data, int value)
 	}
 
 	return rc;
+}
+
+static void msm_usb_psy_dpdm_enable_work(struct work_struct *work)
+{
+	struct msm_usb_psy_data *data = container_of(work, struct msm_usb_psy_data, dpdm_enable_work.work);
+	int rc = 0;
+
+	rc = msm_usb_psy_set_dp_dm(data, POWER_SUPPLY_DP_DM_DPF_DMF);
+	if (rc < 0) {
+		data->dpdm_enable_work_retry_count++;
+		if (data->dpdm_enable_work_retry_count <= 10) {
+			dev_err(data->dev, "Reschedule DP/DM enable work");
+			schedule_delayed_work(&data->dpdm_enable_work, msecs_to_jiffies(500));
+		}
+	}
 }
 
 static int msm_usb_psy_set_cable_state(struct msm_usb_psy_data *data, bool state)
@@ -318,8 +337,12 @@ static int msm_usb_psy_probe(struct platform_device *pdev)
 		goto err_undo_extcon_register;
 	}
 
-	if (data->pdata->dpdm_always_on)
-		msm_usb_psy_set_dp_dm(data, POWER_SUPPLY_DP_DM_DPF_DMF);
+	INIT_DELAYED_WORK(&data->dpdm_enable_work, msm_usb_psy_dpdm_enable_work);
+
+	if (data->pdata->dpdm_always_on) {
+		data->dpdm_enable_work_retry_count = 0;
+		schedule_delayed_work(&data->dpdm_enable_work, msecs_to_jiffies(3000));
+	}
 
 	dev_info(data->dev, "probed successfully!\n");
 	return 0;
@@ -340,6 +363,7 @@ static int msm_usb_psy_remove(struct platform_device *pdev)
 {
 	struct msm_usb_psy_data *data =
 	    (struct msm_usb_psy_data *)platform_get_drvdata(pdev);
+	cancel_delayed_work_sync(&data->dpdm_enable_work);
 	devm_extcon_dev_unregister(data->dev, data->extcon);
 	devm_extcon_dev_free(data->dev, data->extcon);
 	devm_kfree(&pdev->dev, data->pdata);
