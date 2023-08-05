@@ -620,7 +620,7 @@ static int qpnp_lcdb_ttw_enter(struct qpnp_lcdb *lcdb)
 		return rc;
 
 	val = 0;
-#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_OLIVE)
 	if (xiaomi_sdm439_mach_get_family() == XIAOMI_SDM439_MACH_FAMILY_OLIVE)
 		val = 2;
 #endif
