@@ -611,6 +611,11 @@ struct mdss_dsi_ctrl_pdata {
 #if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_WINGTECH)
 	bool wingtech_is_Lcm_Present;
 #endif
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+	struct dsi_panel_cmds xiaomi_sdm439_CABC_off_cmds;
+	struct dsi_panel_cmds xiaomi_sdm439_CE_off_cmds;
+	struct dsi_panel_cmds xiaomi_sdm439_default_gamma_cmds;
+#endif
 };
 
 struct dsi_status_data {
