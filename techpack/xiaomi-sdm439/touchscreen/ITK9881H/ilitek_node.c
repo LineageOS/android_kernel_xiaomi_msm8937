@@ -792,7 +792,7 @@ static ssize_t ilitek_proc_get_debug_mode_data_read(struct file *filp, char __us
 
 	/* initialize file */
 	memset(csv.file_name, 0, sizeof(csv.file_name));
-	snprintf(csv.file_name, PAGE_SIZE, "%s", DEBUG_DATA_FILE_PATH);
+	snprintf(csv.file_name, sizeof(csv.file_name), "%s", DEBUG_DATA_FILE_PATH);
 	csv.file_len = 0;
 	csv.file_max_zise = DEBUG_DATA_FILE_SIZE;
 	csv.ptr = vmalloc(csv.file_max_zise);
@@ -918,7 +918,7 @@ void ilitek_tp_lock_down_info(void)
 		 read_reg[i] = idev->chip->read_reg_data;
 	 }
 
-	snprintf (temp, sizeof(g_user_buf), "%02x%02x%02x%02x%02x%02x%02x%02x",
+	snprintf (temp, sizeof(temp), "%02x%02x%02x%02x%02x%02x%02x%02x",
 												read_reg[0], read_reg[1],
 												read_reg[2], read_reg[3],
 												read_reg[4], read_reg[5],
@@ -1968,7 +1968,7 @@ void ilitek_tp_selftest(void)
 
 void ilitek_tddi_node_init(void)
 {
-	int i = 0, ret = 0;
+	int i = 0;
 
 	ilitek_tddi_node_lock_down_info();
 	ilitek_mp_test();
@@ -1982,7 +1982,6 @@ void ilitek_tddi_node_init(void)
 		if (proc_table[i].node == NULL) {
 			proc_table[i].isCreated = false;
 			ipio_err("Failed to create %s under /proc\n", proc_table[i].name);
-			ret = -ENODEV;
 		} else {
 			proc_table[i].isCreated = true;
 			ipio_info("Succeed to create %s under /proc\n", proc_table[i].name);

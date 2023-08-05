@@ -2400,7 +2400,7 @@ static ssize_t fts_tp_selftest_read(struct file *file, char __user *buf, size_t 
 	if (*pos != 0)
 		return 0;
 
-	cnt = snprintf(tmp, PAGE_SIZE, "%d\n", my_test_result);
+	cnt = snprintf(tmp, sizeof(tmp), "%d\n", my_test_result);
 
 	FTS_TEST_INFO("%s: tmp = %s, self_test_result=%d\n", __func__, tmp, my_test_result);
 	if (copy_to_user(buf, tmp, strlen(tmp)))

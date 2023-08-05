@@ -600,7 +600,7 @@ return:
 static int32_t nvt_write_firmware(const u8 *fwdata, size_t fwsize)
 {
 	uint32_t list = 0;
-	char *name;
+	//char *name;
 	uint32_t BIN_addr, SRAM_addr, size;
 	int32_t ret = 0;
 
@@ -611,7 +611,7 @@ static int32_t nvt_write_firmware(const u8 *fwdata, size_t fwsize)
 		SRAM_addr = bin_map[list].SRAM_addr;
 		size = bin_map[list].size;
 		BIN_addr = bin_map[list].BIN_addr;
-		name = bin_map[list].name;
+		//name = bin_map[list].name;
 
 //		NVT_LOG("[%d][%s] SRAM (0x%08X), SIZE (0x%08X), BIN (0x%08X)\n",
 //				list, name, SRAM_addr, size, BIN_addr);

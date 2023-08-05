@@ -1051,7 +1051,8 @@ static int ilitek_tddi_fw_flash_upgrade(u8 *pfw)
 
 static void ilitek_tddi_fw_update_block_info(u8 *pfw, u8 type)
 {
-	u32 ges_area_section, ges_info_addr, ges_fw_start, ges_fw_end;
+	//u32 ges_area_section;
+	u32 ges_info_addr, ges_fw_start, ges_fw_end;
 	u32 ap_end, ap_len;
 
 	ipio_debug("Upgarde = %s, Tag = %x\n", type ? "IRAM" : "Flash", tfd.hex_tag);
@@ -1066,7 +1067,7 @@ static void ilitek_tddi_fw_update_block_info(u8 *pfw, u8 type)
 
 			/* Parsing gesture info form AP code */
 			ges_info_addr = (fbi[AP].end + 1 - 60);
-			ges_area_section = (pfw[ges_info_addr + 3] << 24) + (pfw[ges_info_addr + 2] << 16) + (pfw[ges_info_addr + 1] << 8) + pfw[ges_info_addr];
+			//ges_area_section = (pfw[ges_info_addr + 3] << 24) + (pfw[ges_info_addr + 2] << 16) + (pfw[ges_info_addr + 1] << 8) + pfw[ges_info_addr];
 			fbi[GESTURE].mem_start = (pfw[ges_info_addr + 7] << 24) + (pfw[ges_info_addr + 6] << 16) + (pfw[ges_info_addr + 5] << 8) + pfw[ges_info_addr + 4];
 			ap_end = (pfw[ges_info_addr + 11] << 24) + (pfw[ges_info_addr + 10] << 16) + (pfw[ges_info_addr + 9] << 8) + pfw[ges_info_addr + 8];
 			ap_len = ap_end - fbi[GESTURE].mem_start + 1;
@@ -1090,7 +1091,7 @@ static void ilitek_tddi_fw_update_block_info(u8 *pfw, u8 type)
 
 			/* Parsing gesture info form AP code */
 			ges_info_addr = (MAX_AP_FIRMWARE_SIZE - 60);
-			ges_area_section = (pfw[ges_info_addr + 3] << 24) + (pfw[ges_info_addr + 2] << 16) + (pfw[ges_info_addr + 1] << 8) + pfw[ges_info_addr];
+			//ges_area_section = (pfw[ges_info_addr + 3] << 24) + (pfw[ges_info_addr + 2] << 16) + (pfw[ges_info_addr + 1] << 8) + pfw[ges_info_addr];
 			fbi[GESTURE].mem_start = (pfw[ges_info_addr + 7] << 24) + (pfw[ges_info_addr + 6] << 16) + (pfw[ges_info_addr + 5] << 8) + pfw[ges_info_addr + 4];
 			ap_end = (pfw[ges_info_addr + 11] << 24) + (pfw[ges_info_addr + 10] << 16) + (pfw[ges_info_addr + 9] << 8) + pfw[ges_info_addr + 8];
 			ap_len = ap_end - fbi[GESTURE].mem_start + 1;
