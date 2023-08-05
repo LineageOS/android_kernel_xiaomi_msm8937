@@ -1376,8 +1376,8 @@ static int qpnp_lcdb_ldo_regulator_disable(struct regulator_dev *rdev)
 		return 0;
 
 	mutex_lock(&lcdb->lcdb_mutex);
-#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439) && IS_ENABLED(CONFIG_TOUCHSCREEN_SYSCTL_MI439)
-	if (xiaomi_sdm439_mach_get() && xiaomi_sdm439_touchscreen_get_dt2w_state())
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_OLIVE) && IS_ENABLED(CONFIG_TOUCHSCREEN_SYSCTL_MI439)
+	if (xiaomi_sdm439_mach_get_family() == XIAOMI_SDM439_MACH_FAMILY_OLIVE && xiaomi_sdm439_touchscreen_get_dt2w_state())
 		rc = 0;
 	else
 #endif
@@ -1469,8 +1469,8 @@ static int qpnp_lcdb_ncp_regulator_disable(struct regulator_dev *rdev)
 		return 0;
 
 	mutex_lock(&lcdb->lcdb_mutex);
-#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439) && IS_ENABLED(CONFIG_TOUCHSCREEN_SYSCTL_MI439)
-	if (xiaomi_sdm439_mach_get() && xiaomi_sdm439_touchscreen_get_dt2w_state())
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_OLIVE) && IS_ENABLED(CONFIG_TOUCHSCREEN_SYSCTL_MI439)
+	if (xiaomi_sdm439_mach_get_family() == XIAOMI_SDM439_MACH_FAMILY_OLIVE && xiaomi_sdm439_touchscreen_get_dt2w_state())
 		rc = 0;
 	else
 #endif
