@@ -1197,6 +1197,17 @@ static int mdss_dsi_panel_on(struct mdss_panel_data *pdata)
 	if (on_cmds->cmd_cnt)
 		mdss_dsi_panel_cmds_send(ctrl, on_cmds, CMD_REQ_COMMIT);
 
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+	if (xiaomi_sdm439_mach_get()) {
+		if (ctrl->xiaomi_sdm439_default_gamma_cmds.cmd_cnt)
+			mdss_dsi_panel_cmds_send(ctrl, &ctrl->xiaomi_sdm439_default_gamma_cmds, CMD_REQ_COMMIT);
+		if (ctrl->xiaomi_sdm439_CE_off_cmds.cmd_cnt)
+			mdss_dsi_panel_cmds_send(ctrl, &ctrl->xiaomi_sdm439_CE_off_cmds, CMD_REQ_COMMIT);
+		if (ctrl->xiaomi_sdm439_CABC_off_cmds.cmd_cnt)
+			mdss_dsi_panel_cmds_send(ctrl, &ctrl->xiaomi_sdm439_CABC_off_cmds, CMD_REQ_COMMIT);
+	}
+#endif
+
 	if (pinfo->compression_mode == COMPRESSION_DSC)
 		mdss_dsi_panel_dsc_pps_send(ctrl, pinfo);
 
@@ -3263,6 +3274,20 @@ static int mdss_panel_parse_dt(struct device_node *np,
 	mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->idle_off_cmds,
 		"qcom,mdss-dsi-idle-off-command",
 		"qcom,mdss-dsi-idle-off-command-state");
+
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+	if (xiaomi_sdm439_mach_get()) {
+		mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->xiaomi_sdm439_CABC_off_cmds,
+			"qcom,mdss-dsi-CABC_off-command",
+			"qcom,mdss-dsi-CABC_off-command-state");
+		mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->xiaomi_sdm439_CE_off_cmds,
+			"qcom,mdss-dsi-CE_off-command",
+			"qcom,mdss-dsi-CE_off-command-state");
+		mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->xiaomi_sdm439_default_gamma_cmds,
+			"qcom,mdss-dsi-default_gamma-command",
+			"qcom,mdss-dsi-default_gamma-command-state");
+	}
+#endif
 
 	rc = of_property_read_u32(np, "qcom,mdss-dsi-idle-fps", &tmp);
 	pinfo->mipi.frame_rate_idle = (!rc ? tmp : 60);
