@@ -782,6 +782,9 @@ struct mdss_panel_info {
 
 	/* HDR properties of display panel*/
 	struct mdss_panel_hdr_properties hdr_properties;
+
+	u32 cabc_mode;
+	u32 ce_mode;
 };
 
 struct mdss_panel_timing {
@@ -821,6 +824,8 @@ struct mdss_panel_timing {
 struct mdss_panel_data {
 	struct mdss_panel_info panel_info;
 	void (*set_backlight)(struct mdss_panel_data *pdata, u32 bl_level);
+	int (*set_cabc)(struct mdss_panel_data *pdata, u32 cabc_mode);
+	int (*set_ce)(struct mdss_panel_data *pdata, u32 ce_mode);
 	int (*apply_display_setting)(struct mdss_panel_data *pdata, u32 mode);
 	unsigned char *mmss_cc_base;
 

@@ -915,6 +915,140 @@ static ssize_t mdss_fb_idle_pc_notify(struct device *dev,
 	return scnprintf(buf, PAGE_SIZE, "idle power collapsed\n");
 }
 
+static ssize_t mdss_fb_change_cabc(struct device *dev,
+		struct device_attribute *attr, const char *buf, size_t len)
+{
+	struct fb_info *fbi = dev_get_drvdata(dev);
+	struct msm_fb_data_type *mfd = (struct msm_fb_data_type *)fbi->par;
+	struct mdss_panel_info *pinfo = NULL;
+	struct mdss_panel_data *pdata;
+	int ret = 0;
+	u32 cabc_mode;
+
+	if (!mfd || !mfd->panel_info) {
+		pr_err("%s: Panel info is NULL!\n", __func__);
+	return len;
+	}
+
+	pinfo = mfd->panel_info;
+
+	if (kstrtouint(buf, 0, &cabc_mode)) {
+		pr_err("kstrtouint buf error!\n");
+		return len;
+	}
+
+	mutex_lock(&mfd->mdss_sysfs_lock);
+	if (mdss_panel_is_power_off(mfd->panel_power_state)) {
+		pinfo->cabc_mode = cabc_mode;
+		goto end;
+	}
+
+	mutex_lock(&mfd->bl_lock);
+
+	pdata = dev_get_platdata(&mfd->pdev->dev);
+	if ((pdata) && (pdata->set_cabc))
+		ret = pdata->set_cabc(pdata, cabc_mode);
+
+	mutex_unlock(&mfd->bl_lock);
+
+	if (ret == 0) {
+		pr_debug("%s: cabc mode %d\n", __func__, cabc_mode);
+		pinfo->cabc_mode = cabc_mode;
+	}
+
+end:
+	mutex_unlock(&mfd->mdss_sysfs_lock);
+	return len;
+}
+
+static ssize_t mdss_fb_get_cabc(struct device *dev,
+		struct device_attribute *attr, char *buf)
+{
+	struct fb_info *fbi = dev_get_drvdata(dev);
+	struct msm_fb_data_type *mfd = (struct msm_fb_data_type *)fbi->par;
+	struct mdss_panel_data *pdata;
+	struct mdss_panel_info *pinfo;
+	int ret;
+
+	pdata = dev_get_platdata(&mfd->pdev->dev);
+	if (!pdata) {
+		pr_err("no panel connected!\n");
+		return -EINVAL;
+	}
+	pinfo = &pdata->panel_info;
+
+	ret = scnprintf(buf, PAGE_SIZE, "%d\n", pinfo->cabc_mode);
+
+	return ret;
+}
+
+static ssize_t mdss_fb_change_ce(struct device *dev,
+		struct device_attribute *attr, const char *buf, size_t len)
+{
+	struct fb_info *fbi = dev_get_drvdata(dev);
+	struct msm_fb_data_type *mfd = (struct msm_fb_data_type *)fbi->par;
+	struct mdss_panel_info *pinfo = NULL;
+	struct mdss_panel_data *pdata;
+	int ret = 0;
+	u32 ce_mode;
+
+	if (!mfd || !mfd->panel_info) {
+		pr_err("%s: Panel info is NULL!\n", __func__);
+	return len;
+	}
+
+	pinfo = mfd->panel_info;
+
+	if (kstrtouint(buf, 0, &ce_mode)) {
+		pr_err("kstrtouint buf error!\n");
+		return len;
+	}
+
+	mutex_lock(&mfd->mdss_sysfs_lock);
+	if (mdss_panel_is_power_off(mfd->panel_power_state)) {
+		pinfo->ce_mode = ce_mode;
+		goto end;
+	}
+
+	mutex_lock(&mfd->bl_lock);
+
+	pdata = dev_get_platdata(&mfd->pdev->dev);
+	if ((pdata) && (pdata->set_ce))
+		ret = pdata->set_ce(pdata, ce_mode);
+
+	mutex_unlock(&mfd->bl_lock);
+
+	if (ret == 0) {
+		pr_debug("%s: ce mode %d\n", __func__, ce_mode);
+		pinfo->ce_mode = ce_mode;
+	}
+
+end:
+	mutex_unlock(&mfd->mdss_sysfs_lock);
+	return len;
+}
+
+static ssize_t mdss_fb_get_ce(struct device *dev,
+		struct device_attribute *attr, char *buf)
+{
+	struct fb_info *fbi = dev_get_drvdata(dev);
+	struct msm_fb_data_type *mfd = (struct msm_fb_data_type *)fbi->par;
+	struct mdss_panel_data *pdata;
+	struct mdss_panel_info *pinfo;
+	int ret;
+
+	pdata = dev_get_platdata(&mfd->pdev->dev);
+	if (!pdata) {
+		pr_err("no panel connected!\n");
+		return -EINVAL;
+	}
+	pinfo = &pdata->panel_info;
+
+	ret = scnprintf(buf, PAGE_SIZE, "%d\n", pinfo->ce_mode);
+
+	return ret;
+}
+
 #if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
 static int xiaomi_sdm439_hbm_mode = 0;
 #if IS_ENABLED(CONFIG_MFD_TI_LMU_MI439)
@@ -989,6 +1123,10 @@ static DEVICE_ATTR(measured_fps, 0664,
 static DEVICE_ATTR(msm_fb_persist_mode, 0644,
 	mdss_fb_get_persist_mode, mdss_fb_change_persist_mode);
 static DEVICE_ATTR(idle_power_collapse, 0444, mdss_fb_idle_pc_notify, NULL);
+static DEVICE_ATTR(cabc, 0644,
+	mdss_fb_get_cabc, mdss_fb_change_cabc);
+static DEVICE_ATTR(color_enhance, 0644,
+	mdss_fb_get_ce, mdss_fb_change_ce);
 static DEVICE_ATTR(hbm, 0644,
 	mdss_fb_get_hbm, mdss_fb_change_hbm);
 
@@ -1006,6 +1144,8 @@ static struct attribute *mdss_fb_attrs[] = {
 	&dev_attr_measured_fps.attr,
 	&dev_attr_msm_fb_persist_mode.attr,
 	&dev_attr_idle_power_collapse.attr,
+	&dev_attr_cabc.attr,
+	&dev_attr_color_enhance.attr,
 	&dev_attr_hbm.attr,
 	NULL,
 };
