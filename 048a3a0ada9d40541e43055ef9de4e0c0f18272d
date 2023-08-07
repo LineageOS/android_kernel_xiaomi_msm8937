@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "87211179_67a49bab",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 32245
+      },
+      "writtenOn": "2023-08-07T16:30:23Z",
+      "side": 1,
+      "message": "crash happened right after I\u0027ve submitted the commit...",
+      "revId": "048a3a0ada9d40541e43055ef9de4e0c0f18272d",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
+    }
+  ]
+}
