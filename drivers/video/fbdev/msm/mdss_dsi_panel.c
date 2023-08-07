@@ -1177,6 +1177,18 @@ static void mdss_dsi_panel_bl_ctrl(struct mdss_panel_data *pdata,
 	}
 }
 
+static int mdss_dsi_panel_set_cabc_mode(struct mdss_panel_data *pdata, u32 cabc_mode)
+{
+	// TODO: Implement device specific code here, Returns 0 on success
+	return 0;
+}
+
+static int mdss_dsi_panel_set_ce_mode(struct mdss_panel_data *pdata, u32 ce_mode)
+{
+	// TODO: Implement device specific code here, Returns 0 on success
+	return 0;
+}
+
 static int mdss_dsi_panel_on(struct mdss_panel_data *pdata)
 {
 	struct mdss_dsi_ctrl_pdata *ctrl = NULL;
@@ -1231,6 +1243,9 @@ static int mdss_dsi_panel_on(struct mdss_panel_data *pdata)
 
 	/* Ensure low persistence mode is set as before */
 	mdss_dsi_panel_apply_display_setting(pdata, pinfo->persist_mode);
+
+	mdss_dsi_panel_set_cabc_mode(pdata, pinfo->cabc_mode);
+	mdss_dsi_panel_set_ce_mode(pdata, pinfo->ce_mode);
 
 end:
 	pr_debug("%s:-\n", __func__);
@@ -3420,6 +3435,8 @@ int mdss_dsi_panel_init(struct device_node *node,
 	ctrl_pdata->off = mdss_dsi_panel_off;
 	ctrl_pdata->low_power_config = mdss_dsi_panel_low_power_config;
 	ctrl_pdata->panel_data.set_backlight = mdss_dsi_panel_bl_ctrl;
+	ctrl_pdata->panel_data.set_cabc = mdss_dsi_panel_set_cabc_mode;
+	ctrl_pdata->panel_data.set_ce = mdss_dsi_panel_set_ce_mode;
 	ctrl_pdata->panel_data.apply_display_setting =
 			mdss_dsi_panel_apply_display_setting;
 	ctrl_pdata->switch_mode = mdss_dsi_panel_switch_mode;
