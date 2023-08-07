@@ -916,7 +916,7 @@ static ssize_t mdss_fb_idle_pc_notify(struct device *dev,
 }
 
 #if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
-static unsigned int xiaomi_sdm439_hbm_mode = 0;
+static int xiaomi_sdm439_hbm_mode = 0;
 #if IS_ENABLED(CONFIG_MFD_TI_LMU_MI439)
 extern int xiaomi_sdm439_ti_hbm_set(enum xiaomi_sdm439_backlight_hbm_mode hbm_mode);
 #endif
@@ -930,7 +930,7 @@ static ssize_t mdss_fb_get_hbm(struct device *dev,
 {
 #if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
 	if (xiaomi_sdm439_mach_get())
-		return scnprintf(buf, PAGE_SIZE, "hbm_mode:%d\n", xiaomi_sdm439_hbm_mode);
+		return scnprintf(buf, PAGE_SIZE, "%d\n", (xiaomi_sdm439_hbm_mode <= XIAOMI_SDM439_HBM_MODE_DEFAULT) ? 0 : xiaomi_sdm439_hbm_mode);
 #endif
 
 	return scnprintf(buf, PAGE_SIZE, "hbm is unsupported\n");
@@ -941,9 +941,11 @@ static ssize_t mdss_fb_change_hbm(struct device *dev,
 #if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
 	if (xiaomi_sdm439_mach_get()) {
 		sscanf(buf, "%d", &xiaomi_sdm439_hbm_mode) ;
-		if (xiaomi_sdm439_hbm_mode >= XIAOMI_SDM439_HBM_MODE_LEVEL_MAX)
-			xiaomi_sdm439_hbm_mode = XIAOMI_SDM439_HBM_MODE_LEVEL_MAX - 1;
-		if (xiaomi_sdm439_hbm_mode < XIAOMI_SDM439_HBM_MODE_DEFAULT)
+		if (xiaomi_sdm439_hbm_mode == 12 || xiaomi_sdm439_hbm_mode == 1)
+			xiaomi_sdm439_hbm_mode = XIAOMI_SDM439_HBM_MODE_LEVEL2;
+		else if (xiaomi_sdm439_hbm_mode == 11)
+			xiaomi_sdm439_hbm_mode = XIAOMI_SDM439_HBM_MODE_LEVEL1;
+		else
 			xiaomi_sdm439_hbm_mode = XIAOMI_SDM439_HBM_MODE_DEFAULT;
 
 		switch (xiaomi_sdm439_backlight_ic_type_get()) {
@@ -987,7 +989,7 @@ static DEVICE_ATTR(measured_fps, 0664,
 static DEVICE_ATTR(msm_fb_persist_mode, 0644,
 	mdss_fb_get_persist_mode, mdss_fb_change_persist_mode);
 static DEVICE_ATTR(idle_power_collapse, 0444, mdss_fb_idle_pc_notify, NULL);
-static DEVICE_ATTR(msm_fb_hbm, 0644,
+static DEVICE_ATTR(hbm, 0644,
 	mdss_fb_get_hbm, mdss_fb_change_hbm);
 
 static struct attribute *mdss_fb_attrs[] = {
@@ -1004,7 +1006,7 @@ static struct attribute *mdss_fb_attrs[] = {
 	&dev_attr_measured_fps.attr,
 	&dev_attr_msm_fb_persist_mode.attr,
 	&dev_attr_idle_power_collapse.attr,
-	&dev_attr_msm_fb_hbm.attr,
+	&dev_attr_hbm.attr,
 	NULL,
 };
 
