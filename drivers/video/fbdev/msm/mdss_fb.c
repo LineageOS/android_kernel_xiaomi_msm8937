@@ -921,7 +921,7 @@ static ssize_t idle_power_collapse_show(struct device *dev,
 }
 
 #if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
-static unsigned int xiaomi_sdm439_hbm_mode = 0;
+static int xiaomi_sdm439_hbm_mode = 0;
 #if IS_ENABLED(CONFIG_MFD_TI_LMU_MI439)
 extern int xiaomi_sdm439_ti_hbm_set(enum xiaomi_sdm439_backlight_hbm_mode hbm_mode);
 #endif
@@ -930,25 +930,27 @@ extern int xiaomi_sdm439_ktd_hbm_set(enum xiaomi_sdm439_backlight_hbm_mode hbm_m
 #endif
 #endif
 
-static ssize_t msm_fb_hbm_show(struct device *dev,
+static ssize_t hbm_show(struct device *dev,
 		struct device_attribute *attr, char *buf)
 {
 #if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
 	if (xiaomi_sdm439_mach_get())
-		return scnprintf(buf, PAGE_SIZE, "hbm_mode:%d\n", xiaomi_sdm439_hbm_mode);
+		return scnprintf(buf, PAGE_SIZE, "%d\n", (xiaomi_sdm439_hbm_mode <= XIAOMI_SDM439_HBM_MODE_DEFAULT) ? 0 : xiaomi_sdm439_hbm_mode);
 #endif
 
 	return scnprintf(buf, PAGE_SIZE, "hbm is unsupported\n");
 }
-static ssize_t msm_fb_hbm_store(struct device *dev,
+static ssize_t hbm_store(struct device *dev,
 	struct device_attribute *attr, const char *buf, size_t len)
 {
 #if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
 	if (xiaomi_sdm439_mach_get()) {
 		sscanf(buf, "%d", &xiaomi_sdm439_hbm_mode) ;
-		if (xiaomi_sdm439_hbm_mode >= XIAOMI_SDM439_HBM_MODE_LEVEL_MAX)
-			xiaomi_sdm439_hbm_mode = XIAOMI_SDM439_HBM_MODE_LEVEL_MAX - 1;
-		if (xiaomi_sdm439_hbm_mode < XIAOMI_SDM439_HBM_MODE_DEFAULT)
+		if (xiaomi_sdm439_hbm_mode == 12 || xiaomi_sdm439_hbm_mode == 1)
+			xiaomi_sdm439_hbm_mode = XIAOMI_SDM439_HBM_MODE_LEVEL2;
+		else if (xiaomi_sdm439_hbm_mode == 11)
+			xiaomi_sdm439_hbm_mode = XIAOMI_SDM439_HBM_MODE_LEVEL1;
+		else
 			xiaomi_sdm439_hbm_mode = XIAOMI_SDM439_HBM_MODE_DEFAULT;
 
 		switch (xiaomi_sdm439_backlight_ic_type_get()) {
@@ -984,7 +986,7 @@ static DEVICE_ATTR_RW(msm_fb_dfps_mode);
 static DEVICE_ATTR_RO(measured_fps);
 static DEVICE_ATTR_RW(msm_fb_persist_mode);
 static DEVICE_ATTR_RO(idle_power_collapse);
-static DEVICE_ATTR_RW(msm_fb_hbm);
+static DEVICE_ATTR_RW(hbm);
 
 static struct attribute *mdss_fb_attrs[] = {
 	&dev_attr_msm_fb_type.attr,
@@ -1000,7 +1002,7 @@ static struct attribute *mdss_fb_attrs[] = {
 	&dev_attr_measured_fps.attr,
 	&dev_attr_msm_fb_persist_mode.attr,
 	&dev_attr_idle_power_collapse.attr,
-	&dev_attr_msm_fb_hbm.attr,
+	&dev_attr_hbm.attr,
 	NULL,
 };
 
