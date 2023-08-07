@@ -1164,6 +1164,15 @@ static int mdss_dsi_panel_set_combined_cabc_ce_mode(struct mdss_panel_data *pdat
 		return -EINVAL;
 	}
 
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_WINGTECH)
+	if (xiaomi_msm8937_mach_get_family() == XIAOMI_MSM8937_MACH_FAMILY_WINGTECH) {
+		mdss_dsi_clk_ctrl(ctrl, ctrl->dsi_clk_handle, MDSS_DSI_ALL_CLKS, MDSS_DSI_CLK_ON);
+
+		if (ctrl->cabc_on_cmds.link_state == DSI_HS_MODE)
+			mdss_dsi_set_tx_power_mode(0, &ctrl->panel_data);
+	}
+#endif
+
 	if (cabc_mode && ce_mode) {
 		// Both ON
 		if (ctrl->cabc_ce_on_cmds.cmd_cnt)
@@ -1190,6 +1199,13 @@ static int mdss_dsi_panel_set_combined_cabc_ce_mode(struct mdss_panel_data *pdat
 			return -ENXIO;
 	}
 
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_WINGTECH)
+	if (xiaomi_msm8937_mach_get_family() == XIAOMI_MSM8937_MACH_FAMILY_WINGTECH) {
+		if (ctrl->cabc_on_cmds.link_state == DSI_HS_MODE)
+			mdss_dsi_set_tx_power_mode(1, &ctrl->panel_data);
+	}
+#endif
+
 	return 0;
 }
 
@@ -1209,12 +1225,28 @@ int mdss_dsi_panel_set_cabc_mode(struct mdss_panel_data *pdata, u32 cabc_mode)
 		return mdss_dsi_panel_set_combined_cabc_ce_mode(pdata, cabc_mode, pdata->panel_info.ce_mode);
 	}
 
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_WINGTECH)
+	if (xiaomi_msm8937_mach_get_family() == XIAOMI_MSM8937_MACH_FAMILY_WINGTECH) {
+		mdss_dsi_clk_ctrl(ctrl, ctrl->dsi_clk_handle, MDSS_DSI_ALL_CLKS, MDSS_DSI_CLK_ON);
+
+		if (ctrl->cabc_on_cmds.link_state == DSI_HS_MODE)
+			mdss_dsi_set_tx_power_mode(0, &ctrl->panel_data);
+	}
+#endif
+
 	if (cabc_mode && ctrl->cabc_on_cmds.cmd_cnt)
 		mdss_dsi_panel_cmds_send(ctrl, &ctrl->cabc_on_cmds, CMD_REQ_COMMIT);
 	else if (!cabc_mode && ctrl->cabc_off_cmds.cmd_cnt)
 		mdss_dsi_panel_cmds_send(ctrl, &ctrl->cabc_off_cmds, CMD_REQ_COMMIT);
 	else
 		return -ENXIO;
+
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_WINGTECH)
+	if (xiaomi_msm8937_mach_get_family() == XIAOMI_MSM8937_MACH_FAMILY_WINGTECH) {
+		if (ctrl->cabc_on_cmds.link_state == DSI_HS_MODE)
+			mdss_dsi_set_tx_power_mode(1, &ctrl->panel_data);
+	}
+#endif
 
 	return 0;
 }
@@ -1235,12 +1267,28 @@ int mdss_dsi_panel_set_ce_mode(struct mdss_panel_data *pdata, u32 ce_mode)
 		return mdss_dsi_panel_set_combined_cabc_ce_mode(pdata, pdata->panel_info.cabc_mode, ce_mode);
 	}
 
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_WINGTECH)
+	if (xiaomi_msm8937_mach_get_family() == XIAOMI_MSM8937_MACH_FAMILY_WINGTECH) {
+		mdss_dsi_clk_ctrl(ctrl, ctrl->dsi_clk_handle, MDSS_DSI_ALL_CLKS, MDSS_DSI_CLK_ON);
+
+		if (ctrl->cabc_on_cmds.link_state == DSI_HS_MODE)
+			mdss_dsi_set_tx_power_mode(0, &ctrl->panel_data);
+	}
+#endif
+
 	if (ce_mode && ctrl->ce_on_cmds.cmd_cnt)
 		mdss_dsi_panel_cmds_send(ctrl, &ctrl->ce_on_cmds, CMD_REQ_COMMIT);
 	else if (!ce_mode && ctrl->ce_off_cmds.cmd_cnt)
 		mdss_dsi_panel_cmds_send(ctrl, &ctrl->ce_off_cmds, CMD_REQ_COMMIT);
 	else
 		return -ENXIO;
+
+#if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_WINGTECH)
+	if (xiaomi_msm8937_mach_get_family() == XIAOMI_MSM8937_MACH_FAMILY_WINGTECH) {
+		if (ctrl->cabc_on_cmds.link_state == DSI_HS_MODE)
+			mdss_dsi_set_tx_power_mode(1, &ctrl->panel_data);
+	}
+#endif
 
 	return 0;
 }
