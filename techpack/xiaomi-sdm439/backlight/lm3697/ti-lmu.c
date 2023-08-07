@@ -37,7 +37,7 @@ static int ti_lmu_enable_hw(struct ti_lmu *lmu, enum ti_lmu_id id)
 {
 	int ret;
 
-	pr_err("[bkl] %s enter\n", __func__);
+	pr_debug("[bkl] %s enter\n", __func__);
 
 	if (gpio_is_valid(lmu->en_gpio)) {
 		ret = devm_gpio_request_one(lmu->dev, lmu->en_gpio,
@@ -59,7 +59,7 @@ static int ti_lmu_enable_hw(struct ti_lmu *lmu, enum ti_lmu_id id)
 					  LM3631_LCD_EN_MASK);
 	}
 
-	pr_err("[bkl] %s finish\n", __func__);
+	pr_debug("[bkl] %s finish\n", __func__);
 
 	return 0;
 }
@@ -215,7 +215,7 @@ static int ti_lmu_probe(struct i2c_client *cl, const struct i2c_device_id *id)
 
 	if (xiaomi_sdm439_backlight_ic_type_get() != XIAOMI_SDM439_BACKLIGHT_IC_LM3697)
 		return -ENODEV;
-	pr_err("[bkl] %s enter\n", __func__);
+	pr_debug("[bkl] %s enter\n", __func__);
 	match = of_match_device(ti_lmu_of_match, dev);
 	if (!match)
 		return -ENODEV;
@@ -257,7 +257,7 @@ static int ti_lmu_probe(struct i2c_client *cl, const struct i2c_device_id *id)
 
 	i2c_set_clientdata(cl, lmu);
 
-	pr_err("[bkl] %s finish\n", __func__);
+	pr_debug("[bkl] %s finish\n", __func__);
 
 	return mfd_add_devices(lmu->dev, 0, data->cells,
 			       data->num_cells, NULL, 0, NULL);
