@@ -491,6 +491,17 @@ struct mdss_dsi_ctrl_pdata {
 	struct dsi_panel_cmds status_cmds;
 	struct dsi_panel_cmds idle_on_cmds; /* for lp mode */
 	struct dsi_panel_cmds idle_off_cmds;
+
+	/* LiveDisplay cmds - Single */
+	struct dsi_panel_cmds cabc_on_cmds;
+	struct dsi_panel_cmds cabc_off_cmds;
+	struct dsi_panel_cmds ce_on_cmds;
+	struct dsi_panel_cmds ce_off_cmds;
+	/* LiveDisplay cmds - Combined*/
+	bool cabc_ce_cmds_combined;
+	struct dsi_panel_cmds cabc_ce_on_cmds;
+	struct dsi_panel_cmds cabc_ce_off_cmds;
+
 	u32 *status_valid_params;
 	u32 *status_cmds_rlen;
 	u32 *status_value;
