@@ -48,18 +48,18 @@ static int __init xiaomi_msm8937_touchscreen_init(void)
 
 #if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_ULYSSE)
 	if (xiaomi_msm8937_mach_get_family() == XIAOMI_MSM8937_MACH_FAMILY_ULYSSE) {
-		pr_info("%s: Mach family is ULYSSE, Initialize touchscreen driver depending on panel name.\n", __func__);
+		pr_info("%s: Mach family is ULYSSE, Initialize touchscreen driver depending on display panel name.\n", __func__);
 		if (strstr(mdss_mdp_panel, "mdss_dsi_sc_ili9881c_720p_video")) {
-			pr_info("%s: Initialize FocalTech Touchscreen driver, for ili9881c panel.\n", __func__);
+			pr_info("%s: Initialize FocalTech Touchscreen driver, for ili9881c display panel only.\n", __func__);
 #if IS_ENABLED(CONFIG_TOUCHSCREEN_FTS_MI8937)
-			return xiaomi_msm8937_touchscreen_fts_ts_init();
-#endif
-		} else {
-			pr_info("%s: Initialize Goodix Touchscreen driver, for other panels.\n", __func__);
-#if IS_ENABLED(CONFIG_TOUCHSCREEN_GT9XX_MI8937)
-			return xiaomi_msm8937_touchscreen_gtp_init();
+			xiaomi_msm8937_touchscreen_fts_ts_init();
 #endif
 		}
+		pr_info("%s: Initialize Goodix Touchscreen driver, for all display panels.\n", __func__);
+#if IS_ENABLED(CONFIG_TOUCHSCREEN_GT9XX_MI8937)
+		xiaomi_msm8937_touchscreen_gtp_init();
+#endif
+		return 0;
 	}
 #endif
 
