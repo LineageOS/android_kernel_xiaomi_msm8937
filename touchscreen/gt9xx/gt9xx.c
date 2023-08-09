@@ -24,6 +24,7 @@
 #include <xiaomi-msm8937/touchscreen.h>
 #include "gt9xx.h"
 
+#define DELAY_FOR_DISCHARGING		35
 #define GOODIX_COORDS_ARR_SIZE	4
 #define PROP_NAME_SIZE		24
 #define I2C_MAX_TRANSFER_SIZE   255
@@ -694,6 +695,41 @@ void gtp_int_sync(struct goodix_ts_data *ts, s32 ms)
 	}
 }
 
+void gtp_rst_output(struct goodix_ts_data *ts, int level)
+{
+	if (level == 0) {
+		if (ts->pinctrl.pinctrl)
+			pinctrl_select_state(ts->pinctrl.pinctrl,
+					     ts->pinctrl.rst_out_low);
+		else if (gpio_is_valid(ts->pdata->rst_gpio))
+			gpio_direction_output(ts->pdata->rst_gpio, 0);
+		else
+			dev_err(&ts->client->dev,
+				"Failed set rst pin output low\n");
+	} else {
+		if (ts->pinctrl.pinctrl)
+			pinctrl_select_state(ts->pinctrl.pinctrl,
+					     ts->pinctrl.rst_out_high);
+		else if (gpio_is_valid(ts->pdata->rst_gpio))
+			gpio_direction_output(ts->pdata->rst_gpio, 1);
+		else
+			dev_err(&ts->client->dev,
+				"Failed set rst pin output high\n");
+	}
+}
+
+void gtp_rst_input(struct goodix_ts_data *ts)
+{
+	if (ts->pinctrl.pinctrl)
+		pinctrl_select_state(ts->pinctrl.pinctrl,
+					 ts->pinctrl.rst_input);
+	else if (gpio_is_valid(ts->pdata->rst_gpio))
+		gpio_direction_input(ts->pdata->rst_gpio);
+	else
+		dev_err(&ts->client->dev,
+			"Failed set rst pin input\n");
+}
+
 /*******************************************************
  * Function:
  *	Reset chip. Control the reset pin and int-pin(if
@@ -715,16 +751,16 @@ void gtp_reset_guitar(struct i2c_client *client, s32 ms)
 		return;
 	}
 
-	gpio_direction_output(ts->pdata->rst_gpio, 0);
+	gtp_rst_output(ts, 0);
 	usleep_range(ms * 1000, ms * 1000 + 100);	/*  T2: > 10ms */
 
 	gtp_int_output(ts, client->addr == 0x14);
 
 	usleep_range(2000, 3000);		/*  T3: > 100us (2ms)*/
-	gpio_direction_output(ts->pdata->rst_gpio, 1);
+	gtp_rst_output(ts, 1);
 
 	usleep_range(6000, 7000);		/*  T4: > 5ms */
-	gpio_direction_input(ts->pdata->rst_gpio);
+	gtp_rst_input(ts);
 
 	gtp_int_sync(ts, 50);
 	if (ts->pdata->esd_protect)
@@ -1359,45 +1395,86 @@ static int gtp_pinctrl_init(struct goodix_ts_data *ts)
 		return 0;
 	}
 
-	pinctrl->default_sta = pinctrl_lookup_state(pinctrl->pinctrl,
-						    "default");
-	if (IS_ERR_OR_NULL(pinctrl->default_sta)) {
+	/* INT pinctrl */
+	pinctrl->int_default = pinctrl_lookup_state(pinctrl->pinctrl,
+						    "gdix_ts_int_default");
+	if (IS_ERR_OR_NULL(pinctrl->int_default)) {
 		dev_info(&ts->client->dev,
-			 "Failed get pinctrl state:default state\n");
+			 "Failed get pinctrl state:INT default state\n");
 		goto exit_pinctrl_init;
 	}
 
 	pinctrl->int_out_high = pinctrl_lookup_state(pinctrl->pinctrl,
-						     "int-output-high");
+						     "gdix_ts_int_output_high");
 	if (IS_ERR_OR_NULL(pinctrl->int_out_high)) {
 		dev_info(&ts->client->dev,
-			 "Failed get pinctrl state:output_high\n");
+			 "Failed get pinctrl state:INT output_high\n");
 		goto exit_pinctrl_init;
 	}
 
 	pinctrl->int_out_low = pinctrl_lookup_state(pinctrl->pinctrl,
-						    "int-output-low");
+						    "gdix_ts_int_output_low");
 	if (IS_ERR_OR_NULL(pinctrl->int_out_low)) {
 		dev_info(&ts->client->dev,
-			 "Failed get pinctrl state:output_low\n");
+			 "Failed get pinctrl state:INT output_low\n");
 		goto exit_pinctrl_init;
 	}
 
 	pinctrl->int_input = pinctrl_lookup_state(pinctrl->pinctrl,
-						  "int-input");
+						  "gdix_ts_int_input");
 	if (IS_ERR_OR_NULL(pinctrl->int_input)) {
 		dev_info(&ts->client->dev,
 			 "Failed get pinctrl state:int-input\n");
 		goto exit_pinctrl_init;
 	}
-	dev_info(&ts->client->dev, "Success init pinctrl\n");
+	dev_info(&ts->client->dev, "Success init INT pinctrl\n");
+
+	/* RST pinctrl */
+	pinctrl->rst_default = pinctrl_lookup_state(pinctrl->pinctrl,
+						    "gdix_ts_rst_default");
+	if (IS_ERR_OR_NULL(pinctrl->rst_default)) {
+		dev_info(&ts->client->dev,
+			 "Failed get pinctrl state:RST default state\n");
+		goto exit_pinctrl_init;
+	}
+
+	pinctrl->rst_out_high = pinctrl_lookup_state(pinctrl->pinctrl,
+						     "gdix_ts_rst_output_high");
+	if (IS_ERR_OR_NULL(pinctrl->rst_out_high)) {
+		dev_info(&ts->client->dev,
+			 "Failed get pinctrl state:RST output_high\n");
+		goto exit_pinctrl_init;
+	}
+
+	pinctrl->rst_out_low = pinctrl_lookup_state(pinctrl->pinctrl,
+						    "gdix_ts_rst_output_low");
+	if (IS_ERR_OR_NULL(pinctrl->rst_out_low)) {
+		dev_info(&ts->client->dev,
+			 "Failed get pinctrl state:RST output_low\n");
+		goto exit_pinctrl_init;
+	}
+
+	pinctrl->rst_input = pinctrl_lookup_state(pinctrl->pinctrl,
+						  "gdix_ts_rst_input");
+	if (IS_ERR_OR_NULL(pinctrl->rst_input)) {
+		dev_info(&ts->client->dev,
+			 "Failed get pinctrl state:rst-input\n");
+		goto exit_pinctrl_init;
+	}
+	dev_info(&ts->client->dev, "Success init RST pinctrl\n");
+
 	return 0;
 exit_pinctrl_init:
 	devm_pinctrl_put(pinctrl->pinctrl);
 	pinctrl->pinctrl = NULL;
+	pinctrl->int_default = NULL;
 	pinctrl->int_out_high = NULL;
 	pinctrl->int_out_low = NULL;
 	pinctrl->int_input = NULL;
+	pinctrl->rst_default = NULL;
+	pinctrl->rst_out_high = NULL;
+	pinctrl->rst_out_low = NULL;
+	pinctrl->rst_input = NULL;
 	return -EINVAL;
 }
 
@@ -1959,13 +2036,6 @@ static int gtp_probe(struct i2c_client *client, const struct i2c_device_id *id)
 		goto exit_free_client_data;
 	}
 
-	ret = gtp_power_on(ts);
-	if (ret) {
-		dev_err(&client->dev, "Failed power on device\n");
-		ret = -EINVAL;
-		goto exit_deinit_power;
-	}
-
 	ret = gtp_pinctrl_init(ts);
 	if (ret < 0) {
 		/* if define pinctrl must define the following state
@@ -1979,7 +2049,18 @@ static int gtp_probe(struct i2c_client *client, const struct i2c_device_id *id)
 	ret = gtp_request_io_port(ts);
 	if (ret < 0) {
 		dev_err(&client->dev, "Failed request IO port\n");
-		goto exit_power_off;
+		goto exit_pinctrl;
+	}
+
+	/*wait for discharging power, which from i2c pull-up flow backward*/
+	gtp_rst_output(ts, 0);
+	msleep(DELAY_FOR_DISCHARGING);
+
+	ret = gtp_power_on(ts);
+	if (ret) {
+		dev_err(&client->dev, "Failed power on device\n");
+		ret = -EINVAL;
+		goto exit_free_io_port;
 	}
 
 	gtp_reset_guitar(ts->client, 20);
@@ -1987,7 +2068,7 @@ static int gtp_probe(struct i2c_client *client, const struct i2c_device_id *id)
 	ret = gtp_i2c_test(client);
 	if (ret) {
 		dev_err(&client->dev, "Failed communicate with IC use I2C\n");
-		goto exit_free_io_port;
+		goto exit_power_off;
 	}
 
 	dev_info(&client->dev, "I2C Addr is %x\n", client->addr);
@@ -1995,7 +2076,7 @@ static int gtp_probe(struct i2c_client *client, const struct i2c_device_id *id)
 	ret = gtp_get_fw_info(client, &ts->fw_info);
 	if (ret < 0) {
 		dev_err(&client->dev, "Failed read FW version\n");
-		goto exit_free_io_port;
+		goto exit_power_off;
 	}
 
 	pdata->config.data[0] = GTP_REG_CONFIG_DATA >> 8;
@@ -2007,7 +2088,7 @@ static int gtp_probe(struct i2c_client *client, const struct i2c_device_id *id)
 	ret = gtp_request_input_dev(ts);
 	if (ret < 0) {
 		dev_err(&client->dev, "Failed request input device\n");
-		goto exit_free_io_port;
+		goto exit_power_off;
 	}
 
 	mutex_init(&ts->lock);
@@ -2054,13 +2135,14 @@ exit_powermanager:
 	gtp_unregister_powermanager(ts);
 exit_unreg_input_dev:
 	input_unregister_device(ts->input_dev);
+exit_power_off:
+	gtp_power_off(ts);
 exit_free_io_port:
 	if (gpio_is_valid(ts->pdata->rst_gpio))
 		gpio_free(ts->pdata->rst_gpio);
 	if (gpio_is_valid(ts->pdata->irq_gpio))
 		gpio_free(ts->pdata->irq_gpio);
-exit_power_off:
-	gtp_power_off(ts);
+exit_pinctrl:
 	gtp_pinctrl_deinit(ts);
 exit_deinit_power:
 	gtp_power_deinit(ts);
