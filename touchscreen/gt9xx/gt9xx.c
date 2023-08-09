@@ -24,6 +24,11 @@
 #include <xiaomi-msm8937/touchscreen.h>
 #include "gt9xx.h"
 
+#define GOODIX_VTG_MIN_UV	2600000
+#define GOODIX_VTG_MAX_UV	3300000
+#define GOODIX_I2C_VTG_MIN_UV	1800000
+#define GOODIX_I2C_VTG_MAX_UV	1800000
+
 #define DELAY_FOR_DISCHARGING		35
 #define GOODIX_COORDS_ARR_SIZE	4
 #define PROP_NAME_SIZE		24
@@ -1828,6 +1833,14 @@ static int gtp_power_on(struct goodix_ts_data *ts)
 	int ret = 0;
 
 	if (ts->vdd_ana) {
+		ret = regulator_set_voltage(ts->vdd_ana, GOODIX_VTG_MIN_UV,
+					    GOODIX_VTG_MAX_UV);
+		if (ret) {
+			dev_err(&ts->client->dev,
+				"Regulator set_vtg failed vdd ret=%d\n",
+				ret);
+			goto err_set_vtg_vdd_ana;
+		}
 		ret = regulator_enable(ts->vdd_ana);
 		if (ret) {
 			dev_err(&ts->client->dev,
@@ -1838,6 +1851,14 @@ static int gtp_power_on(struct goodix_ts_data *ts)
 	}
 
 	if (ts->vcc_i2c) {
+		ret = regulator_set_voltage(ts->vcc_i2c, GOODIX_I2C_VTG_MIN_UV,
+					    GOODIX_I2C_VTG_MAX_UV);
+		if (ret) {
+			dev_err(&ts->client->dev,
+				"Regulator set_vtg failed vcc_i2c ret=%d\n",
+				ret);
+			goto err_set_vtg_vcc_i2c;
+		}
 		ret = regulator_enable(ts->vcc_i2c);
 		if (ret) {
 			dev_err(&ts->client->dev,
@@ -1850,9 +1871,15 @@ static int gtp_power_on(struct goodix_ts_data *ts)
 	return 0;
 
 err_enable_vcc_i2c:
+	if (ts->vcc_i2c)
+		regulator_set_voltage(ts->vcc_i2c, 0, GOODIX_I2C_VTG_MAX_UV);
+err_set_vtg_vcc_i2c:
 	if (ts->vdd_ana)
 		regulator_disable(ts->vdd_ana);
 err_enable_vdd_ana:
+	if (ts->vdd_ana)
+		regulator_set_voltage(ts->vdd_ana, 0, GOODIX_VTG_MAX_UV);
+err_set_vtg_vdd_ana:
 	set_bit(POWER_OFF_MODE, &ts->flags);
 	return ret;
 }
@@ -1863,6 +1890,14 @@ static int gtp_power_off(struct goodix_ts_data *ts)
 
 	if (ts->vcc_i2c) {
 		set_bit(POWER_OFF_MODE, &ts->flags);
+		ret = regulator_set_voltage(ts->vcc_i2c, 0,
+					    GOODIX_I2C_VTG_MAX_UV);
+		if (ret < 0) {
+			dev_err(&ts->client->dev,
+				"Regulator vcc_i2c set_vtg failed ret=%d\n",
+				ret);
+			goto err_set_vtg_vcc_i2c;
+		}
 		ret = regulator_disable(ts->vcc_i2c);
 		if (ret) {
 			dev_err(&ts->client->dev,
@@ -1876,6 +1911,13 @@ static int gtp_power_off(struct goodix_ts_data *ts)
 
 	if (ts->vdd_ana) {
 		set_bit(POWER_OFF_MODE, &ts->flags);
+		ret = regulator_set_voltage(ts->vdd_ana, 0, GOODIX_VTG_MAX_UV);
+		if (ret < 0) {
+			dev_err(&ts->client->dev,
+					"Regulator vdd set_vtg failed ret=%d\n",
+					ret);
+			goto err_set_vtg_vdd_ana;
+		}
 		ret = regulator_disable(ts->vdd_ana);
 		if (ret) {
 			dev_err(&ts->client->dev,
@@ -1889,9 +1931,17 @@ static int gtp_power_off(struct goodix_ts_data *ts)
 	return ret;
 
 err_disable_vdd_ana:
+	if (ts->vdd_ana)
+		regulator_set_voltage(ts->vdd_ana, GOODIX_VTG_MIN_UV,
+				      GOODIX_VTG_MAX_UV);
+err_set_vtg_vdd_ana:
 	if (ts->vcc_i2c)
 		ret = regulator_enable(ts->vcc_i2c);
 err_disable_vcc_i2c:
+	if (ts->vcc_i2c)
+		regulator_set_voltage(ts->vcc_i2c, GOODIX_I2C_VTG_MIN_UV,
+				      GOODIX_I2C_VTG_MAX_UV);
+err_set_vtg_vcc_i2c:
 	clear_bit(POWER_OFF_MODE, &ts->flags);
 	return ret;
 }
