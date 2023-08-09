@@ -127,7 +127,7 @@ enum {
 
 struct goodix_pinctrl {
 	struct pinctrl *pinctrl;
-	struct pinctrl_state *default_sta;
+	struct pinctrl_state *int_default;
 	struct pinctrl_state *int_out_high;
 	struct pinctrl_state *int_out_low;
 	struct pinctrl_state *int_input;
@@ -368,6 +368,8 @@ extern void uninit_wr_node(void);
 extern struct i2c_client *i2c_connect_client;
 extern void gtp_reset_guitar(struct i2c_client *client, s32 ms);
 extern void gtp_int_output(struct goodix_ts_data *ts, int level);
+extern void gtp_rst_output(struct goodix_ts_data *ts, int level);
+extern void gtp_rst_input(struct goodix_ts_data *ts);
 extern s32 gtp_send_cfg(struct i2c_client *client);
 extern s32 gtp_get_fw_info(struct i2c_client *, struct goodix_fw_info *fw_info);
 extern s32 gtp_i2c_read_dbl_check(struct i2c_client *, u16, u8 *, int);
