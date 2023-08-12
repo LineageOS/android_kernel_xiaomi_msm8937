@@ -783,6 +783,8 @@ struct mdss_panel_info {
 	/* HDR properties of display panel*/
 	struct mdss_panel_hdr_properties hdr_properties;
 
+	/* LiveDisplay */
+	bool livedisplay_disable;
 	u32 cabc_mode;
 	u32 ce_mode;
 };
