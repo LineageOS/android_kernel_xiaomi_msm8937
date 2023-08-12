@@ -1177,18 +1177,55 @@ static void mdss_dsi_panel_bl_ctrl(struct mdss_panel_data *pdata,
 	}
 }
 
-static int mdss_dsi_panel_set_combined_cabc_ce_mode(struct mdss_panel_data *pdata,
-	u32 cabc_mode, u32 ce_mode)
+static int mdss_dsi_panel_livedisplay_check_panel_alive(struct mdss_panel_data *pdata)
 {
 	struct mdss_dsi_ctrl_pdata *ctrl = NULL;
+	struct mdss_panel_info *pinfo;
+	int ret = 0;
 
 	if (pdata == NULL) {
 		pr_err("%s: Invalid input data\n", __func__);
 		return -EINVAL;
 	}
+
+	pinfo = &pdata->panel_info;
+	ctrl = container_of(pdata, struct mdss_dsi_ctrl_pdata,
+				panel_data);
+
+	if (!ctrl->check_read_status)
+		return 0;
+
+	msleep(10);
+
+	ret = ctrl->check_read_status(ctrl);
+	if (ret == -EINVAL) {
+		pr_err("%s: Panel has gone bad after setting LiveDisplay mode, Disable LiveDisplay.\n", __func__);
+		pinfo->livedisplay_disable = true;
+		return -EIO;
+	}
+
+	return 0;
+}
+
+static int mdss_dsi_panel_set_combined_cabc_ce_mode(struct mdss_panel_data *pdata,
+	u32 cabc_mode, u32 ce_mode)
+{
+	struct mdss_dsi_ctrl_pdata *ctrl = NULL;
+	struct mdss_panel_info *pinfo;
+
+	if (pdata == NULL) {
+		pr_err("%s: Invalid input data\n", __func__);
+		return -EINVAL;
+	}
+	pinfo = &pdata->panel_info;
 	ctrl = container_of(pdata, struct mdss_dsi_ctrl_pdata,
 				panel_data);
 	pr_debug("%s: ndx=%d\n", __func__, ctrl->ndx);
+
+	if (pinfo->livedisplay_disable) {
+		pr_err("%s: LiveDisplay is disabled.\n", __func__);
+		return -EIO;
+	}
 
 	if (!ctrl->cabc_ce_cmds_combined) {
 		pr_err("%s: CABC & CE modes are not combined\n", __func__);
@@ -1221,23 +1258,30 @@ static int mdss_dsi_panel_set_combined_cabc_ce_mode(struct mdss_panel_data *pdat
 			return -ENXIO;
 	}
 
-	return 0;
+	return mdss_dsi_panel_livedisplay_check_panel_alive(pdata);
 }
 
 static int mdss_dsi_panel_set_cabc_mode(struct mdss_panel_data *pdata, u32 cabc_mode)
 {
 	struct mdss_dsi_ctrl_pdata *ctrl = NULL;
+	struct mdss_panel_info *pinfo;
 
 	if (pdata == NULL) {
 		pr_err("%s: Invalid input data\n", __func__);
 		return -EINVAL;
 	}
+	pinfo = &pdata->panel_info;
 	ctrl = container_of(pdata, struct mdss_dsi_ctrl_pdata,
 				panel_data);
 	pr_debug("%s: ndx=%d\n", __func__, ctrl->ndx);
 
+	if (pinfo->livedisplay_disable) {
+		pr_err("%s: LiveDisplay is disabled.\n", __func__);
+		return -EIO;
+	}
+
 	if (ctrl->cabc_ce_cmds_combined) {
-		return mdss_dsi_panel_set_combined_cabc_ce_mode(pdata, cabc_mode, pdata->panel_info.ce_mode);
+		return mdss_dsi_panel_set_combined_cabc_ce_mode(pdata, cabc_mode, pinfo->ce_mode);
 	}
 
 	if (cabc_mode && ctrl->cabc_on_cmds.cmd_cnt)
@@ -1247,23 +1291,30 @@ static int mdss_dsi_panel_set_cabc_mode(struct mdss_panel_data *pdata, u32 cabc_
 	else
 		return -ENXIO;
 
-	return 0;
+	return mdss_dsi_panel_livedisplay_check_panel_alive(pdata);
 }
 
 static int mdss_dsi_panel_set_ce_mode(struct mdss_panel_data *pdata, u32 ce_mode)
 {
 	struct mdss_dsi_ctrl_pdata *ctrl = NULL;
+	struct mdss_panel_info *pinfo;
 
 	if (pdata == NULL) {
 		pr_err("%s: Invalid input data\n", __func__);
 		return -EINVAL;
 	}
+	pinfo = &pdata->panel_info;
 	ctrl = container_of(pdata, struct mdss_dsi_ctrl_pdata,
 				panel_data);
 	pr_debug("%s: ndx=%d\n", __func__, ctrl->ndx);
 
+	if (pinfo->livedisplay_disable) {
+		pr_err("%s: LiveDisplay is disabled.\n", __func__);
+		return -EIO;
+	}
+
 	if (ctrl->cabc_ce_cmds_combined) {
-		return mdss_dsi_panel_set_combined_cabc_ce_mode(pdata, pdata->panel_info.cabc_mode, ce_mode);
+		return mdss_dsi_panel_set_combined_cabc_ce_mode(pdata, pinfo->cabc_mode, ce_mode);
 	}
 
 	if (ce_mode && ctrl->ce_on_cmds.cmd_cnt)
@@ -1273,7 +1324,7 @@ static int mdss_dsi_panel_set_ce_mode(struct mdss_panel_data *pdata, u32 ce_mode
 	else
 		return -ENXIO;
 
-	return 0;
+	return mdss_dsi_panel_livedisplay_check_panel_alive(pdata);
 }
 
 static int mdss_dsi_panel_on(struct mdss_panel_data *pdata)
@@ -1331,11 +1382,13 @@ static int mdss_dsi_panel_on(struct mdss_panel_data *pdata)
 	/* Ensure low persistence mode is set as before */
 	mdss_dsi_panel_apply_display_setting(pdata, pinfo->persist_mode);
 
-	if (ctrl->cabc_ce_cmds_combined) {
-		mdss_dsi_panel_set_combined_cabc_ce_mode(pdata, pinfo->cabc_mode, pinfo->ce_mode);
-	} else {
-		mdss_dsi_panel_set_cabc_mode(pdata, pinfo->cabc_mode);
-		mdss_dsi_panel_set_ce_mode(pdata, pinfo->ce_mode);
+	if (!pinfo->livedisplay_disable) {
+		if (ctrl->cabc_ce_cmds_combined) {
+			mdss_dsi_panel_set_combined_cabc_ce_mode(pdata, pinfo->cabc_mode, pinfo->ce_mode);
+		} else {
+			mdss_dsi_panel_set_cabc_mode(pdata, pinfo->cabc_mode);
+			mdss_dsi_panel_set_ce_mode(pdata, pinfo->ce_mode);
+		}
 	}
 
 end:
@@ -3637,6 +3690,7 @@ int mdss_dsi_panel_init(struct device_node *node,
 
 	pinfo->dynamic_switch_pending = false;
 	pinfo->is_lpm_mode = false;
+	pinfo->livedisplay_disable = false;
 	pinfo->esd_rdy = false;
 	pinfo->persist_mode = false;
 

@@ -938,6 +938,8 @@ struct mdss_panel_info {
 	/* esc clk recommended for the panel */
 	u32 esc_clk_rate_hz;
 
+	/* LiveDisplay */
+	bool livedisplay_disable;
 	u32 cabc_mode;
 	u32 ce_mode;
 };
