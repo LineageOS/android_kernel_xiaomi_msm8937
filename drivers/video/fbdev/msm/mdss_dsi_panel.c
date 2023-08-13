@@ -1230,7 +1230,7 @@ static int mdss_dsi_panel_set_combined_cabc_ce_mode(struct mdss_panel_data *pdat
 	return mdss_dsi_panel_livedisplay_check_panel_alive(pdata);
 }
 
-int mdss_dsi_panel_set_cabc_mode(struct mdss_panel_data *pdata, u32 cabc_mode)
+static int mdss_dsi_panel_set_cabc_mode(struct mdss_panel_data *pdata, u32 cabc_mode)
 {
 	struct mdss_dsi_ctrl_pdata *ctrl = NULL;
 	struct mdss_panel_info *pinfo;
@@ -1263,7 +1263,7 @@ int mdss_dsi_panel_set_cabc_mode(struct mdss_panel_data *pdata, u32 cabc_mode)
 	return mdss_dsi_panel_livedisplay_check_panel_alive(pdata);
 }
 
-int mdss_dsi_panel_set_ce_mode(struct mdss_panel_data *pdata, u32 ce_mode)
+static int mdss_dsi_panel_set_ce_mode(struct mdss_panel_data *pdata, u32 ce_mode)
 {
 	struct mdss_dsi_ctrl_pdata *ctrl = NULL;
 	struct mdss_panel_info *pinfo;
