@@ -1031,60 +1031,6 @@ static s32 gtp_init_panel(struct goodix_ts_data *ts)
 	return 0;
 }
 
-static ssize_t gtp_config_read_proc(struct file *file, char __user *page,
-				    size_t size, loff_t *ppos)
-{
-	int i, ret;
-	char *ptr;
-	size_t data_len = 0;
-	char temp_data[GTP_CONFIG_MAX_LENGTH + 2] = {
-					(u8)(GTP_REG_CONFIG_DATA >> 8),
-					(u8)GTP_REG_CONFIG_DATA };
-	struct goodix_ts_data *ts = i2c_get_clientdata(i2c_connect_client);
-	struct goodix_config_data *cfg = &ts->pdata->config;
-
-	ptr = kzalloc(4096, GFP_KERNEL);
-	if (!ptr) {
-		dev_err(&ts->client->dev, "Failed alloc memory for config\n");
-		return -ENOMEM;
-	}
-
-	data_len += snprintf(ptr + data_len, 4096 - data_len,
-			     "====init value====\n");
-	for (i = 0 ; i < GTP_CONFIG_MAX_LENGTH ; i++) {
-		data_len += snprintf(ptr + data_len, 4096 - data_len,
-				     "0x%02X ", cfg->data[i + 2]);
-
-		if (i % 8 == 7)
-			data_len += snprintf(ptr + data_len,
-					     4096 - data_len, "\n");
-	}
-	data_len += snprintf(ptr + data_len, 4096 - data_len, "\n");
-
-	data_len += snprintf(ptr + data_len, 4096 - data_len,
-			     "====real value====\n");
-	ret = gtp_i2c_read(i2c_connect_client, temp_data,
-			   GTP_CONFIG_MAX_LENGTH + 2);
-	if (ret < 0) {
-		data_len += snprintf(ptr + data_len, 4096 - data_len,
-				     "Failed read real config data\n");
-	} else {
-		for (i = 0; i < GTP_CONFIG_MAX_LENGTH; i++) {
-			data_len += snprintf(ptr + data_len, 4096 - data_len,
-					     "0x%02X ", temp_data[i + 2]);
-
-			if (i % 8 == 7)
-				data_len += snprintf(ptr + data_len,
-						     4096 - data_len, "\n");
-		}
-	}
-
-	data_len = simple_read_from_buffer(page, size, ppos, ptr, data_len);
-	kfree(ptr);
-	ptr = NULL;
-	return data_len;
-}
-
 int gtp_ascii_to_array(const u8 *src_buf, int src_len, u8 *dst_buf)
 {
 	int i, ret;
@@ -1122,82 +1068,6 @@ int gtp_ascii_to_array(const u8 *src_buf, int src_len, u8 *dst_buf)
 convert_failed:
 	return ret;
 }
-
-static ssize_t gtp_config_write_proc(struct file *filp,
-				     const char __user *buffer,
-				     size_t count, loff_t *off)
-{
-	u8 *temp_buf;
-	u8 *file_config;
-	int file_cfg_len;
-	s32 ret = 0;
-	struct goodix_ts_data *ts = i2c_get_clientdata(i2c_connect_client);
-
-	dev_dbg(&ts->client->dev, "write count %zu\n", count);
-
-	if (count > PAGE_SIZE) {
-		dev_err(&ts->client->dev, "config to long %zu\n", count);
-		return -EFAULT;
-	}
-
-	temp_buf = kzalloc(count, GFP_KERNEL);
-	if (!temp_buf) {
-		dev_err(&ts->client->dev, "failed alloc temp memory");
-		return -ENOMEM;
-	}
-
-	file_config = kzalloc(GTP_CONFIG_MAX_LENGTH + GTP_ADDR_LENGTH,
-			      GFP_KERNEL);
-	if (!file_config) {
-		dev_err(&ts->client->dev, "failed alloc config memory");
-		kfree(temp_buf);
-		return -ENOMEM;
-	}
-	file_config[0] = GTP_REG_CONFIG_DATA >> 8;
-	file_config[1] = GTP_REG_CONFIG_DATA & 0xff;
-
-	if (copy_from_user(temp_buf, buffer, count)) {
-		dev_err(&ts->client->dev, "Failed copy from user\n");
-		ret = -EFAULT;
-		goto send_cfg_err;
-	}
-
-	file_cfg_len = gtp_ascii_to_array(temp_buf, (int)count,
-					  &file_config[GTP_ADDR_LENGTH]);
-	if (file_cfg_len < 0) {
-		dev_err(&ts->client->dev, "failed covert ascii to hex");
-		ret = -EFAULT;
-		goto send_cfg_err;
-	}
-
-	GTP_DEBUG_ARRAY(file_config + GTP_ADDR_LENGTH, file_cfg_len);
-
-	ret = gtp_i2c_write(ts->client, file_config, file_cfg_len + 2);
-	if (ret > 0) {
-		dev_info(&ts->client->dev, "Send config SUCCESS.");
-		ret = count;
-	} else {
-		dev_err(&ts->client->dev, "Send config i2c error.");
-		ret = -EFAULT;
-	}
-
-send_cfg_err:
-	kfree(temp_buf);
-	kfree(file_config);
-	return ret;
-}
-
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 6, 0))
-static const struct proc_ops config_proc_ops = {
-	.proc_read = gtp_config_read_proc,
-	.proc_write = gtp_config_write_proc,
-};
-#else
-static const struct file_operations config_proc_ops = {
-	.read = gtp_config_read_proc,
-	.write = gtp_config_write_proc,
-};
-#endif
 
 static ssize_t gtp_workmode_show(struct device *dev,
 		struct device_attribute *attr, char *buf)
@@ -1299,35 +1169,6 @@ static struct attribute *gtp_attrs[] = {
 static const struct attribute_group gtp_attr_group = {
 	.attrs = gtp_attrs,
 };
-
-static int gtp_create_file(struct goodix_ts_data *ts)
-{
-	int ret;
-	struct i2c_client *client = ts->client;
-
-	/*  Create proc file system */
-	gtp_config_proc = NULL;
-	gtp_config_proc = proc_create(GT91XX_CONFIG_PROC_FILE, 0664,
-				      NULL, &config_proc_ops);
-	if (!gtp_config_proc)
-		dev_err(&client->dev, "create_proc_entry %s failed\n",
-			GT91XX_CONFIG_PROC_FILE);
-	else
-		dev_info(&client->dev, "create proc entry %s success\n",
-			 GT91XX_CONFIG_PROC_FILE);
-
-	ret = sysfs_create_group(&client->dev.kobj, &gtp_attr_group);
-	if (ret) {
-		dev_err(&client->dev, "Failure create sysfs group %d\n", ret);
-		/*TODO: debug change */
-		goto exit_free_config_proc;
-	}
-	return 0;
-
-exit_free_config_proc:
-	remove_proc_entry(GT91XX_CONFIG_PROC_FILE, gtp_config_proc);
-	return -ENODEV;
-}
 
 s32 gtp_get_fw_info(struct i2c_client *client, struct goodix_fw_info *fw_info)
 {
@@ -2158,12 +1999,6 @@ static int gtp_probe(struct i2c_client *client, const struct i2c_device_id *id)
 
 	gtp_register_powermanager(ts);
 
-	ret = gtp_create_file(ts);
-	if (ret) {
-		dev_info(&client->dev, "Failed create attributes file");
-		goto exit_powermanager;
-	}
-
 	gtp_esd_init(ts);
 	gtp_esd_on(ts);
 	/* probe init finished */
@@ -2181,7 +2016,7 @@ static int gtp_probe(struct i2c_client *client, const struct i2c_device_id *id)
 	xiaomi_msm8937_touchscreen_is_probed = true;
 	return 0;
 
-exit_powermanager:
+//exit_powermanager:
 	gtp_unregister_powermanager(ts);
 exit_unreg_input_dev:
 	input_unregister_device(ts->input_dev);
