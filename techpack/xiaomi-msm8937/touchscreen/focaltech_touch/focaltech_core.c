@@ -3250,6 +3250,8 @@ static int fts_ts_probe_entry(struct fts_ts_data *ts_data)
 		fts_esdcheck_switch(ENABLE);
 #endif
 
+	fts_irq_enable();
+
 #if IS_ENABLED(CONFIG_TOUCHSCREEN_SYSCTL_MI8937)
 	fts_mi8937_ts_ops.dev = ts_data->dev;
 	xiaomi_msm8937_touchscreen_register_operations(&fts_mi8937_ts_ops);
