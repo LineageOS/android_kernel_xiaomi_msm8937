@@ -174,6 +174,10 @@ static struct kobj_attribute xiaomi_sdm439_mach_product_name_attr = {
 static int __init xiaomi_sdm439_mach_detect_init(void) {
 	int rc;
 
+	// Print version
+	pr_info("%s: Xiaomi SDM439 device tree git version: %s\n", __func__, MI439_DT_GIT_VER);
+	pr_info("%s: Xiaomi SDM439 module git version: %s\n", __func__, MI439_MODULE_GIT_VER);
+
 	// Detect
 	rc = xiaomi_sdm439_mach_early_detect();
 	if (rc < 0) {
