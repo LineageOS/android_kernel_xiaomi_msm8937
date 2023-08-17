@@ -590,7 +590,9 @@ static struct clk_rcg2 blsp1_qup1_i2c_apps_clk_src = {
 
 static const struct freq_tbl ftbl_blsp1_qup1_spi_apps_clk_src[] = {
 	F(960000, P_BI_TCXO, 10, 1, 2),
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
 	F(1920000,P_BI_TCXO, 10, 0, 0),
+#endif
 	F(4800000, P_BI_TCXO, 4, 0, 0),
 	F(9600000, P_BI_TCXO, 2, 0, 0),
 	F(16000000, P_GPLL0_OUT_MAIN, 10, 1, 5),
