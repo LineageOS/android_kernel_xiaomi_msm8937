@@ -8487,11 +8487,20 @@ int __hdd_mon_open (struct net_device *dev)
    hdd_adapter_t *pAdapter = WLAN_HDD_GET_PRIV_PTR(dev);
    hdd_adapter_t *sta_adapter;
    hdd_context_t *hdd_ctx;
+   int ret;
 
    if(pAdapter == NULL) {
       VOS_TRACE( VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_FATAL,
          "%s: HDD adapter context is Null", __func__);
       return -EINVAL;
+   }
+
+   // Register wireless extensions
+   if(VOS_STATUS_SUCCESS !=  (ret = hdd_register_wext(dev))) {
+     hddLog( VOS_TRACE_LEVEL_FATAL,
+	     "hdd_register_wext() failed with status code %08d [x%08x]",
+	        ret, ret);
+     return VOS_STATUS_E_FAILURE;
    }
 
    if (vos_get_concurrency_mode() != VOS_STA_MON)
@@ -10307,15 +10316,6 @@ hdd_adapter_t* hdd_open_adapter( hdd_context_t *pHddCtx, tANI_U8 session_type,
 
          pAdapter->device_mode = session_type;
          pAdapter->wdev.iftype = NL80211_IFTYPE_MONITOR;
-
-         // Register wireless extensions
-         if( VOS_STATUS_SUCCESS !=  (status = hdd_register_wext(pAdapter->dev)))
-         {
-              hddLog(VOS_TRACE_LEVEL_FATAL,
-                   "hdd_register_wext() failed with status code %08d [x%08x]",
-                                                      status, status );
-              status = VOS_STATUS_E_FAILURE;
-         }
 
 #if LINUX_VERSION_CODE > KERNEL_VERSION(2,6,29)
          pAdapter->dev->netdev_ops = &wlan_mon_drv_ops;
