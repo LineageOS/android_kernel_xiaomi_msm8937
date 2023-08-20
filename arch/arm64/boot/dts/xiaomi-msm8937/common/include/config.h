@@ -1,9 +1,9 @@
 #ifndef _DTS_MI8937_CONFIG_H
 #define _DTS_MI8937_CONFIG_H
 
-#ifndef CONFIG_MACH_XIAOMI // This option only exist in old mi8937 kernel
+#ifdef CONFIG_MACH_XIAOMI_MSM8937 // This option only exist in Mi8937v2 kernel
 #define MI8937_V2
-#endif // CONFIG_MACH_XIAOMI=n
+#endif // CONFIG_MACH_XIAOMI_MSM8937=y
 
 #ifndef CONFIG_OF // In case of autoconf.h is not included
 #define CONFIG_INPUT_QTI_HAPTICS
