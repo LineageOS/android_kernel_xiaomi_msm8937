@@ -179,6 +179,10 @@ emerg_wingtech_board_id:
 static int __init xiaomi_msm8937_mach_detect_init(void) {
 	int rc;
 
+	// Print version
+	pr_info("%s: Xiaomi MSM8937 device tree git version: %s\n", __func__, MI8937_DT_GIT_VER);
+	pr_info("%s: Xiaomi MSM8937 module git version: %s\n", __func__, MI8937_MODULE_GIT_VER);
+
 	// Detect
 	rc = xiaomi_msm8937_mach_detect();
 	if (!rc) {

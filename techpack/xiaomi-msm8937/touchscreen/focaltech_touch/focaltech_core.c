@@ -1362,8 +1362,13 @@ int fts_wait_tp_to_valid(void)
 
 	do {
 		ret = fts_read_reg(FTS_REG_CHIP_ID, &idh);
-		ret = fts_read_reg(FTS_REG_CHIP_ID2, &idl);
-		if ((ret < 0) || (idh != chip_idh) || (idl != chip_idl)) {
+		ret |= fts_read_reg(FTS_REG_CHIP_ID2, &idl);
+		if (ret < 0) {
+			FTS_DEBUG("TP Not Ready,ReadData Error");
+		} else if (fts_data->pdata->ignore_id_check) {
+			FTS_DEBUG("Ignore ID check");
+			return 0;
+		} else if ((idh != chip_idh) || (idl != chip_idl)) {
 			FTS_DEBUG("TP Not Ready,ReadData:0x%02x%02x", idh, idl);
 		} else if ((idh == chip_idh) && (idl == chip_idl)) {
 			FTS_INFO("TP Ready,Device ID:0x%02x%02x", idh, idl);
