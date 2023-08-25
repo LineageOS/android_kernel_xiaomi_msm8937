@@ -509,6 +509,8 @@ struct mdss_dsi_ctrl_pdata {
 	struct dsi_panel_cmds cabc_off_cmds;
 	struct dsi_panel_cmds ce_on_cmds;
 	struct dsi_panel_cmds ce_off_cmds;
+	struct dsi_panel_cmds reading_on_cmds;
+	struct dsi_panel_cmds reading_off_cmds;
 	/* LiveDisplay cmds - Combined*/
 	bool cabc_ce_cmds_combined;
 	struct dsi_panel_cmds cabc_ce_on_cmds;

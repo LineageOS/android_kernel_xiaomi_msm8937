@@ -1327,6 +1327,74 @@ static int mdss_dsi_panel_set_ce_mode(struct mdss_panel_data *pdata, u32 ce_mode
 	return mdss_dsi_panel_livedisplay_check_panel_alive(pdata);
 }
 
+static void mdss_dsi_panel_restore_cabc_ce_mode(struct mdss_panel_data *pdata, bool restore)
+{
+	struct mdss_dsi_ctrl_pdata *ctrl = NULL;
+	struct mdss_panel_info *pinfo;
+
+	if (pdata == NULL) {
+		pr_err("%s: Invalid input data\n", __func__);
+		return;
+	}
+	pinfo = &pdata->panel_info;
+	ctrl = container_of(pdata, struct mdss_dsi_ctrl_pdata,
+				panel_data);
+	pr_debug("%s: ndx=%d\n", __func__, ctrl->ndx);
+
+	if (pinfo->livedisplay_disable) {
+		pr_err("%s: LiveDisplay is disabled.\n", __func__);
+		return;
+	}
+
+	if (restore) {
+		if (ctrl->cabc_ce_cmds_combined) {
+			mdss_dsi_panel_set_combined_cabc_ce_mode(pdata, pinfo->cabc_mode, pinfo->ce_mode);
+		} else {
+			mdss_dsi_panel_set_cabc_mode(pdata, pinfo->cabc_mode);
+			mdss_dsi_panel_set_ce_mode(pdata, pinfo->ce_mode);
+		}
+	} else {
+		if (ctrl->cabc_ce_cmds_combined) {
+			mdss_dsi_panel_set_combined_cabc_ce_mode(pdata, 0, 0);
+		} else {
+			mdss_dsi_panel_set_cabc_mode(pdata, 0);
+			mdss_dsi_panel_set_ce_mode(pdata, 0);
+		}
+	}
+}
+
+static int mdss_dsi_panel_set_reading_mode(struct mdss_panel_data *pdata, u32 reading_mode)
+{
+	struct mdss_dsi_ctrl_pdata *ctrl = NULL;
+	struct mdss_panel_info *pinfo;
+
+	if (pdata == NULL) {
+		pr_err("%s: Invalid input data\n", __func__);
+		return -EINVAL;
+	}
+	pinfo = &pdata->panel_info;
+	ctrl = container_of(pdata, struct mdss_dsi_ctrl_pdata,
+				panel_data);
+	pr_debug("%s: ndx=%d\n", __func__, ctrl->ndx);
+
+	if (pinfo->livedisplay_disable) {
+		pr_err("%s: LiveDisplay is disabled.\n", __func__);
+		return -EIO;
+	}
+
+	if (reading_mode && ctrl->reading_on_cmds.cmd_cnt) {
+		// CABC or CE mode must be disabled while reading mode is enabled
+		mdss_dsi_panel_restore_cabc_ce_mode(pdata, false);
+		mdss_dsi_panel_cmds_send(ctrl, &ctrl->reading_on_cmds, CMD_REQ_COMMIT);
+	} else if (!reading_mode && ctrl->reading_off_cmds.cmd_cnt) {
+		mdss_dsi_panel_cmds_send(ctrl, &ctrl->reading_off_cmds, CMD_REQ_COMMIT);
+		mdss_dsi_panel_restore_cabc_ce_mode(pdata, true);
+	} else
+		return -ENXIO;
+
+	return mdss_dsi_panel_livedisplay_check_panel_alive(pdata);
+}
+
 static int mdss_dsi_panel_on(struct mdss_panel_data *pdata)
 {
 	struct mdss_dsi_ctrl_pdata *ctrl = NULL;
@@ -1382,12 +1450,12 @@ static int mdss_dsi_panel_on(struct mdss_panel_data *pdata)
 	/* Ensure low persistence mode is set as before */
 	mdss_dsi_panel_apply_display_setting(pdata, pinfo->persist_mode);
 
+	/* LiveDisplay */
 	if (!pinfo->livedisplay_disable) {
-		if (ctrl->cabc_ce_cmds_combined) {
-			mdss_dsi_panel_set_combined_cabc_ce_mode(pdata, pinfo->cabc_mode, pinfo->ce_mode);
+		if (pinfo->reading_mode) {
+			mdss_dsi_panel_set_reading_mode(pdata, pinfo->reading_mode);
 		} else {
-			mdss_dsi_panel_set_cabc_mode(pdata, pinfo->cabc_mode);
-			mdss_dsi_panel_set_ce_mode(pdata, pinfo->ce_mode);
+			mdss_dsi_panel_restore_cabc_ce_mode(pdata, true);
 		}
 	}
 
@@ -3271,18 +3339,6 @@ static void mdss_panel_parse_dt_livedisplay(struct device_node *np,
 	// Default
 	ctrl_pdata->cabc_ce_cmds_combined = false;
 
-#if IS_ENABLED(CONFIG_MACH_XIAOMI_LAND)
-	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_LAND) {
-		mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->ce_on_cmds,
-			"qcom,mdss-dsi-panel-ce-vivid-command",
-			"qcom,mdss-dsi-panel-ce-command-state");
-		mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->ce_off_cmds,
-			"qcom,mdss-dsi-panel-ce-std-command",
-			"qcom,mdss-dsi-panel-ce-command-state");
-		return;
-	}
-#endif
-
 #if IS_ENABLED(CONFIG_MACH_XIAOMI_PRADA)
 	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_PRADA) {
 		if (of_get_property(np, "qcom,mdss-dsi-cabc-on-ce-on-command", NULL)) {
@@ -3313,6 +3369,12 @@ static void mdss_panel_parse_dt_livedisplay(struct device_node *np,
 				"qcom,mdss-dsi-ce-off-command",
 				"qcom,mdss-dsi-ce-off-command-state");
 		}
+		mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->reading_on_cmds,
+			"qcom,mdss-dsi-eyecare5-command",
+			"qcom,mdss-dsi-eyecare5-command-state");
+		mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->reading_off_cmds,
+			"qcom,mdss-dsi-ct-normal-command",
+			"qcom,mdss-dsi-ct-normal-command-state");
 		return;
 	}
 #endif
@@ -3339,25 +3401,46 @@ static void mdss_panel_parse_dt_livedisplay(struct device_node *np,
 		}
 		mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->ce_off_cmds,
 			"qcom,mdss-dsi-ce-off-command", "qcom,mdss-dsi-ce-off-command-state");
+
+		mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->reading_on_cmds,
+			"qcom,mdss-dsi-level5-command", "qcom,mdss-dsi-level5-command-state");
+
+		mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->reading_off_cmds,
+			"qcom,mdss-dsi-default-command", "qcom,mdss-dsi-default-command-state");
 		return;
 	}
 #endif
 
 #if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_WINGTECH)
-	if (xiaomi_msm8937_mach_get_family() == XIAOMI_MSM8937_MACH_FAMILY_WINGTECH &&
-			xiaomi_msm8937_mach_get() != XIAOMI_MSM8937_MACH_LAND) {
-		mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->cabc_on_cmds,
-			"qcom,mdss-dsi-panel-cabc-on-command",
-			"qcom,mdss-dsi-panel-cabc-command-state");
-		mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->cabc_off_cmds,
-			"qcom,mdss-dsi-panel-cabc-off-command",
-			"qcom,mdss-dsi-panel-cabc-command-state");
+	if (xiaomi_msm8937_mach_get_family() == XIAOMI_MSM8937_MACH_FAMILY_WINGTECH) {
+		if (xiaomi_msm8937_mach_get() != XIAOMI_MSM8937_MACH_LAND) {
+			mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->cabc_on_cmds,
+				"qcom,mdss-dsi-panel-cabc-on-command",
+				"qcom,mdss-dsi-panel-cabc-command-state");
+			mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->cabc_off_cmds,
+				"qcom,mdss-dsi-panel-cabc-off-command",
+				"qcom,mdss-dsi-panel-cabc-command-state");
+		}
 		mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->ce_on_cmds,
 			"qcom,mdss-dsi-panel-ce-vivid-command",
 			"qcom,mdss-dsi-panel-ce-command-state");
 		mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->ce_off_cmds,
 			"qcom,mdss-dsi-panel-ce-std-command",
 			"qcom,mdss-dsi-panel-ce-command-state");
+		if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_RIVA ||
+				xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_ROLEX ||
+				xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_TIARE) {
+			mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->reading_on_cmds,
+				"qcom,mdss-dsi-panel-eye-command05",
+				"qcom,mdss-dsi-panel-gamma-command-state");
+		} else {
+			mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->reading_on_cmds,
+				"qcom,mdss-dsi-panel-warm-command",
+				"qcom,mdss-dsi-panel-gamma-command-state");
+		}
+		mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->reading_off_cmds,
+			"qcom,mdss-dsi-panel-nature-command",
+			"qcom,mdss-dsi-panel-gamma-command-state");
 		return;
 	}
 #endif
@@ -3376,6 +3459,12 @@ static void mdss_panel_parse_dt_livedisplay(struct device_node *np,
 		mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->ce_off_cmds,
 			"qcom,mdss-dsi-CE_off-command",
 			"qcom,mdss-dsi-CE_off-command-state");
+		mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->reading_on_cmds,
+			"qcom,mdss-dsi-PM5-command",
+			"qcom,mdss-dsi-PM5-command-state");
+		mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->reading_off_cmds,
+			"qcom,mdss-dsi-default_gamma-command",
+			"qcom,mdss-dsi-default_gamma-command-state");
 		return;
 	}
 #endif
@@ -3701,6 +3790,7 @@ int mdss_dsi_panel_init(struct device_node *node,
 	ctrl_pdata->panel_data.set_backlight = mdss_dsi_panel_bl_ctrl;
 	ctrl_pdata->panel_data.set_cabc = mdss_dsi_panel_set_cabc_mode;
 	ctrl_pdata->panel_data.set_ce = mdss_dsi_panel_set_ce_mode;
+	ctrl_pdata->panel_data.set_reading = mdss_dsi_panel_set_reading_mode;
 	ctrl_pdata->panel_data.apply_display_setting =
 			mdss_dsi_panel_apply_display_setting;
 	ctrl_pdata->switch_mode = mdss_dsi_panel_switch_mode;

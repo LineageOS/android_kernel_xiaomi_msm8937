@@ -942,6 +942,7 @@ struct mdss_panel_info {
 	bool livedisplay_disable;
 	u32 cabc_mode;
 	u32 ce_mode;
+	u32 reading_mode;
 };
 
 struct mdss_panel_timing {
@@ -983,6 +984,7 @@ struct mdss_panel_data {
 	void (*set_backlight)(struct mdss_panel_data *pdata, u32 bl_level);
 	int (*set_cabc)(struct mdss_panel_data *pdata, u32 cabc_mode);
 	int (*set_ce)(struct mdss_panel_data *pdata, u32 ce_mode);
+	int (*set_reading)(struct mdss_panel_data *pdata, u32 reading_mode);
 	int (*apply_display_setting)(struct mdss_panel_data *pdata, u32 mode);
 	unsigned char *mmss_cc_base;
 
