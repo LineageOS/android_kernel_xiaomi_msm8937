@@ -946,8 +946,13 @@ static ssize_t mdss_fb_change_cabc(struct device *dev,
 	mutex_lock(&mfd->bl_lock);
 
 	pdata = dev_get_platdata(&mfd->pdev->dev);
-	if ((pdata) && (pdata->set_cabc))
-		ret = pdata->set_cabc(pdata, cabc_mode);
+	if ((pdata) && (pdata->set_cabc)) {
+		if (pinfo->reading_mode) {
+			pr_info("%s: Not applying CABC mode because reading mode is currently enabled\n", __func__);
+		} else {
+			ret = pdata->set_cabc(pdata, cabc_mode);
+		}
+	}
 
 	mutex_unlock(&mfd->bl_lock);
 
@@ -1016,8 +1021,13 @@ static ssize_t mdss_fb_change_ce(struct device *dev,
 	mutex_lock(&mfd->bl_lock);
 
 	pdata = dev_get_platdata(&mfd->pdev->dev);
-	if ((pdata) && (pdata->set_ce))
-		ret = pdata->set_ce(pdata, ce_mode);
+	if ((pdata) && (pdata->set_ce)) {
+		if (pinfo->reading_mode) {
+			pr_info("%s: Not applying CE mode because reading mode is currently enabled\n", __func__);
+		} else {
+			ret = pdata->set_ce(pdata, ce_mode);
+		}
+	}
 
 	mutex_unlock(&mfd->bl_lock);
 
@@ -1051,6 +1061,76 @@ static ssize_t mdss_fb_get_ce(struct device *dev,
 		ret = scnprintf(buf, PAGE_SIZE, "0\n");
 	else
 		ret = scnprintf(buf, PAGE_SIZE, "%d\n", pinfo->ce_mode);
+
+	return ret;
+}
+
+static ssize_t mdss_fb_change_reading(struct device *dev,
+		struct device_attribute *attr, const char *buf, size_t len)
+{
+	struct fb_info *fbi = dev_get_drvdata(dev);
+	struct msm_fb_data_type *mfd = (struct msm_fb_data_type *)fbi->par;
+	struct mdss_panel_info *pinfo = NULL;
+	struct mdss_panel_data *pdata;
+	int ret = 0;
+	u32 reading_mode;
+
+	if (!mfd || !mfd->panel_info) {
+		pr_err("%s: Panel info is NULL!\n", __func__);
+	return len;
+	}
+
+	pinfo = mfd->panel_info;
+
+	if (kstrtouint(buf, 0, &reading_mode)) {
+		pr_err("kstrtouint buf error!\n");
+		return len;
+	}
+
+	mutex_lock(&mfd->mdss_sysfs_lock);
+	if (mdss_panel_is_power_off(mfd->panel_power_state)) {
+		pinfo->reading_mode = reading_mode;
+		goto end;
+	}
+
+	mutex_lock(&mfd->bl_lock);
+
+	pdata = dev_get_platdata(&mfd->pdev->dev);
+	if ((pdata) && (pdata->set_reading))
+		ret = pdata->set_reading(pdata, reading_mode);
+
+	mutex_unlock(&mfd->bl_lock);
+
+	if (ret == 0) {
+		pr_debug("%s: reading mode %d\n", __func__, reading_mode);
+		pinfo->reading_mode = reading_mode;
+	}
+
+end:
+	mutex_unlock(&mfd->mdss_sysfs_lock);
+	return len;
+}
+
+static ssize_t mdss_fb_get_reading(struct device *dev,
+		struct device_attribute *attr, char *buf)
+{
+	struct fb_info *fbi = dev_get_drvdata(dev);
+	struct msm_fb_data_type *mfd = (struct msm_fb_data_type *)fbi->par;
+	struct mdss_panel_data *pdata;
+	struct mdss_panel_info *pinfo;
+	int ret;
+
+	pdata = dev_get_platdata(&mfd->pdev->dev);
+	if (!pdata) {
+		pr_err("no panel connected!\n");
+		return -EINVAL;
+	}
+	pinfo = &pdata->panel_info;
+
+	if (pinfo->livedisplay_disable)
+		ret = scnprintf(buf, PAGE_SIZE, "0\n");
+	else
+		ret = scnprintf(buf, PAGE_SIZE, "%d\n", pinfo->reading_mode);
 
 	return ret;
 }
@@ -1133,6 +1213,8 @@ static DEVICE_ATTR(cabc, 0644,
 	mdss_fb_get_cabc, mdss_fb_change_cabc);
 static DEVICE_ATTR(color_enhance, 0644,
 	mdss_fb_get_ce, mdss_fb_change_ce);
+static DEVICE_ATTR(reading_mode, 0644,
+	mdss_fb_get_reading, mdss_fb_change_reading);
 static DEVICE_ATTR(hbm, 0644,
 	mdss_fb_get_hbm, mdss_fb_change_hbm);
 
@@ -1152,6 +1234,7 @@ static struct attribute *mdss_fb_attrs[] = {
 	&dev_attr_idle_power_collapse.attr,
 	&dev_attr_cabc.attr,
 	&dev_attr_color_enhance.attr,
+	&dev_attr_reading_mode.attr,
 	&dev_attr_hbm.attr,
 	NULL,
 };
