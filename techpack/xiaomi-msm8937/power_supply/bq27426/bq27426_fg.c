@@ -1985,7 +1985,7 @@ static int fg_get_battid_resister_xiaomi_riva(struct bq_fg_chip *bq)
 	return bq_battid_resister;
 }
 
-static int fg_batterydata_get_best_profile_xiaomi_riva(struct bq_fg_chip *bq)
+static void fg_batterydata_get_best_profile_xiaomi_riva(struct bq_fg_chip *bq)
 {
 	int delta = 0, best_id_kohm = 0, id_range_pct = 15, batt_id_kohm = 0,
 	    i = 0, limit = 0;
@@ -1997,16 +1997,15 @@ static int fg_batterydata_get_best_profile_xiaomi_riva(struct bq_fg_chip *bq)
 		limit = (bq_batt_ids_attr_xiaomi_riva[i].kohm * id_range_pct) / 100;
 		if (delta <= limit) {
 			best_id_kohm = bq_batt_ids_attr_xiaomi_riva[i].kohm;
+			pr_info("%s: Battery %s found\n", __func__, bq_batt_ids_attr_xiaomi_riva[i].battery_type);
 			goto out;
 		}
 	}
 
-	pr_err("out of range, using default battery, best_id_kohm=%d\n",
-	       batt_id_kohm);
+	pr_err("%s: Out of range, fallback to default battery. batt_id_kohm=%d\n",
+	       __func__, batt_id_kohm);
 
 out:
-	pr_err("%s found\n", bq_batt_ids_attr_xiaomi_riva[i].battery_type);
-
 	if (best_id_kohm == 30) {
 		bq->batt_id = BQFS_IMAGE_XIAOMI_RIVA_1;
 	} else if (best_id_kohm == 68) {
@@ -2015,10 +2014,11 @@ out:
 		bq->batt_id = BQFS_IMAGE_XIAOMI_RIVA_3;
 	} else if (best_id_kohm == 82) {
 		bq->batt_id = BQFS_IMAGE_XIAOMI_RIVA_4;
-	} else
+	} else {
 		bq->batt_id = BQFS_IMAGE_XIAOMI_RIVA_0;
+	}
 
-	return 0;
+	return;
 }
 #endif
 
