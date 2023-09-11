@@ -388,7 +388,9 @@ struct synaptics_rmi4_data {
 	struct workqueue_struct *rb_workqueue;
 	struct work_struct rmi4_probe_work;
 	struct workqueue_struct *rmi4_probe_wq;
+#ifdef CONFIG_DRM
 	struct completion drm_init_done;
+#endif
 	struct pinctrl *ts_pinctrl;
 	struct pinctrl_state *pinctrl_state_active;
 	struct pinctrl_state *pinctrl_state_suspend;
