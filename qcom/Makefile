@@ -495,6 +495,8 @@ qm215-qrd-overlay.dtbo-base := qm215.dtb
 qcm2150-qrd-overlay.dtbo-base := qcm2150.dtb
 qm215-qrd-smb1360-overlay.dtbo-base := qm215.dtb
 else
+dtb-$(CONFIG_ARCH_MSM8937) += msm8937-pmi8950-qrd-sku1-dvt1.dtb
+
 dtb-$(CONFIG_ARCH_SDM439) += sdm439-mtp.dtb \
 	sdm439-cdp.dtb \
 	sdm439-qrd.dtb \
