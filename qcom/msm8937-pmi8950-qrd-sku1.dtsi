@@ -11,7 +11,7 @@
  * GNU General Public License for more details.
  */
 
-#include "msm-pmi8950.dtsi"
+#include "pmi8950.dtsi"
 #include "msm8937-qrd.dtsi"
 #include "msm8937-mdss-panels.dtsi"
 
