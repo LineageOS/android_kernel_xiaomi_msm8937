@@ -109,6 +109,9 @@
 		qcom,force-warm-reboot;
 	};
 };
+&thermal_zones {
+	/delete-node/ pa-therm1-adc;
+};
 #ifdef CONFIG_MSM_BCL_PERIPHERAL_CTL_LEGACY
 &bcl_sensor {
 	compatible = "qcom,msm-bcl-legacy";
