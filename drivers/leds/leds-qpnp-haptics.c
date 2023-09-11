@@ -31,9 +31,6 @@
 #include <linux/slab.h>
 #include <linux/qpnp/qpnp-misc.h>
 #include <linux/qpnp/qpnp-revid.h>
-#if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
-#include <xiaomi-msm8937/mach.h>
-#endif
 
 /* Register definitions */
 #define HAP_STATUS_1_REG(chip)		(chip->base + 0x0A)
@@ -2428,8 +2425,8 @@ static int qpnp_haptics_probe(struct platform_device *pdev)
 	struct hap_chip *chip;
 	int rc, i;
 
-#if IS_ENABLED(CONFIG_PARSE_ANDROIDBOOT_MODE) && IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
-	if (xiaomi_msm8937_mach_get() && androidboot_mode_get() != ANDROIDBOOT_MODE_RECOVERY)
+#if IS_ENABLED(CONFIG_PARSE_ANDROIDBOOT_MODE) && IS_ENABLED(CONFIG_INPUT_QTI_HAPTICS)
+	if (androidboot_mode_get() != ANDROIDBOOT_MODE_RECOVERY)
 		return -ENODEV;
 #endif
 
