@@ -10,6 +10,57 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
+
+&tlmm {
+	cam_sensor_rear_default: cam_sensor_rear_default {
+		/* RESET, STANDBY */
+		mux {
+			pins = "gpio36", "gpio35";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio36","gpio35";
+			bias-disable; /* No PULL */
+			drive-strength = <2>; /* 2 MA */
+		};
+	};
+
+	cam_sensor_rear_sleep: cam_sensor_rear_sleep {
+		/* RESET, STANDBY */
+		mux {
+			pins = "gpio36","gpio35";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio36","gpio35";
+			bias-disable; /* No PULL */
+			drive-strength = <2>; /* 2 MA */
+		};
+	};
+};
+
+&cam_sensor_rear_default {
+	mux {
+		pins = "gpio36", "gpio35";
+	};
+
+	config {
+		pins = "gpio36","gpio35";
+	};
+};
+
+&cam_sensor_rear_sleep {
+	mux {
+		pins = "gpio36","gpio35";
+	};
+
+	config {
+		pins = "gpio36","gpio35";
+	};
+};
+
 &cci {
 	actuator0: qcom,actuator@0 {
 		cell-index = <0>;
