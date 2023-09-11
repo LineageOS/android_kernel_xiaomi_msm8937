@@ -66,7 +66,7 @@
 
 	i2c@78b7000 {
 		synaptics@4b {
-			vdd-supply = <&pm8937_l6>;
+			vcc_i2c-supply = <&pm8937_l6>;
 		};
 	};
 };
