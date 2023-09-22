@@ -2143,6 +2143,7 @@ static int fts_irq_registration(struct fts_ts_data *ts_data)
 				pdata->irq_gpio_flags,
 				FTS_DRIVER_NAME, ts_data);
 #endif
+	fts_irq_disable();
 	return ret;
 }
 
