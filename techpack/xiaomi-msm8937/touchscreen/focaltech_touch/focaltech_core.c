@@ -3029,11 +3029,7 @@ static void fts_charger_mode_work(struct work_struct *work)
 	return;
 }
 
-static int fts_charger_detect(struct fts_ts_data *ts_data) {
-	union power_supply_propval pval = {0, };
-	bool was_charging = ts_data->is_charging;
-	int ret = 0;
-
+static int fts_charger_get_psy(struct fts_ts_data *ts_data) {
 	if (IS_ERR_OR_NULL(ts_data->charger_psy)) {
 		ts_data->charger_psy = power_supply_get_by_name("usb");
 		if (IS_ERR_OR_NULL(ts_data->charger_psy)) {
@@ -3041,6 +3037,16 @@ static int fts_charger_detect(struct fts_ts_data *ts_data) {
 			return -ENODEV;
 		}
 	}
+	return 0;
+}
+
+static int fts_charger_detect(struct fts_ts_data *ts_data) {
+	union power_supply_propval pval = {0, };
+	bool was_charging = ts_data->is_charging;
+	int ret = 0;
+
+	if (IS_ERR_OR_NULL(ts_data->charger_psy))
+		return -ENODEV;
 
 	ret = power_supply_get_property(ts_data->charger_psy, POWER_SUPPLY_PROP_ONLINE, &pval);
 	if (ret) {
@@ -3066,7 +3072,7 @@ static int fts_charger_notify(struct notifier_block *nb,
 		container_of(nb, struct fts_ts_data, charger_nb);
 	struct power_supply *psy = v;
 
-	if (IS_ERR_OR_NULL(ts_data->charger_psy))
+	if (fts_charger_get_psy(ts_data) == -ENODEV)
 		goto out;
 
 	if (val == PSY_EVENT_PROP_CHANGED && psy == ts_data->charger_psy)
@@ -3329,7 +3335,9 @@ static int fts_ts_probe_entry(struct fts_ts_data *ts_data)
 		} else {
 			INIT_WORK(&ts_data->charger_mode_work, fts_charger_mode_work);
 
-			fts_charger_detect(ts_data);
+			ret = fts_charger_get_psy(ts_data);
+			if (ret == 0)
+				fts_charger_detect(ts_data);
 
 			if (!ts_data->is_charging)
 				// Make sure the reg is written, even though initial status is false
