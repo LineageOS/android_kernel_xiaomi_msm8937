@@ -1491,19 +1491,15 @@ static void fts_fill_empty_chip_types(
 	struct fts_ts_data *ts_data,
 	u8 id_h, u8 id_l)
 {
-	struct ft_chip_t ctype;
-
-	ctype.type = 0;
-	ctype.chip_idh = id_h;
-	ctype.chip_idl = id_l;
-	ctype.rom_idh = 0;
-	ctype.rom_idl = 0;
-	ctype.pb_idh = 0;
-	ctype.pb_idl = 0;
-	ctype.bl_idh = 0;
-	ctype.bl_idl = 0;
-
-	ts_data->ic_info.ids = ctype;
+	ts_data->ic_info.ids.type = 0;
+	ts_data->ic_info.ids.chip_idh = id_h;
+	ts_data->ic_info.ids.chip_idl = id_l;
+	ts_data->ic_info.ids.rom_idh = 0;
+	ts_data->ic_info.ids.rom_idl = 0;
+	ts_data->ic_info.ids.pb_idh = 0;
+	ts_data->ic_info.ids.pb_idl = 0;
+	ts_data->ic_info.ids.bl_idh = 0;
+	ts_data->ic_info.ids.bl_idl = 0;
 }
 
 static int fts_get_chip_types(
