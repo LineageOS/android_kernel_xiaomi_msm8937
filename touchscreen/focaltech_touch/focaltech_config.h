@@ -213,6 +213,9 @@
  */
 #define FTS_POWER_SOURCE_CUST_EN                1
 
+/* Detect charging mode */
+#define FTS_CHARGER_DETECT			1
+
 /****************************************************/
 
 /********************** Upgrade ****************************/
