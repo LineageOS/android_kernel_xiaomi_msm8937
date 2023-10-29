@@ -21,6 +21,7 @@
 		focaltech,vkeys-y-beyond-maxy;
 		focaltech,ignore-id-check;
 		focaltech,use-old-touchdata-reading-behavior;
+		focaltech,charger-detect;
 #else
 		ftech,name = "ft5336";
 		ftech,family-id = <0x36>;
