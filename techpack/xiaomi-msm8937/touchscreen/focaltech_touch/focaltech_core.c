@@ -2884,6 +2884,7 @@ static int fts_parse_dt(struct device *dev, struct fts_ts_platform_data *pdata)
 	else
 		pdata->type = temp_val;
 
+	pdata->charger_detect = of_property_read_bool(np, "focaltech,charger-detect");
 	pdata->esdcheck = of_property_read_bool(np, "focaltech,esd-check");
 	pdata->ignore_id_check = of_property_read_bool(np, "focaltech,ignore-id-check");
 	pdata->use_old_touchdata_reading_behavior =
@@ -3009,6 +3010,74 @@ static void fts_ts_late_resume(struct early_suspend *handler)
 					early_suspend);
 
 	fts_ts_resume(ts_data->dev);
+}
+#endif
+
+#if FTS_CHARGER_DETECT
+static void fts_charger_mode_work(struct work_struct *work)
+{
+	struct fts_ts_data *ts_data =
+		container_of(work, struct fts_ts_data, charger_mode_work);
+	int ret = 0;
+
+	if (ts_data->suspended)
+		return;
+
+	FTS_DEBUG("Write FTS_REG_CHARGER_MODE_EN reg: %d", ts_data->is_charging);
+
+	ret = fts_write_reg(FTS_REG_CHARGER_MODE_EN, ts_data->is_charging);
+	if (ret < 0) {
+		FTS_ERROR("Failed to write FTS_REG_CHARGER_MODE_EN reg");
+	}
+
+	return;
+}
+
+static int fts_charger_detect(struct fts_ts_data *ts_data) {
+	union power_supply_propval pval = {0, };
+	bool was_charging = ts_data->is_charging;
+	int ret = 0;
+
+	if (IS_ERR_OR_NULL(ts_data->charger_psy)) {
+		ts_data->charger_psy = power_supply_get_by_name("usb");
+		if (IS_ERR_OR_NULL(ts_data->charger_psy)) {
+			FTS_ERROR("Failed to get usb power supply");
+			return -ENODEV;
+		}
+	}
+
+	ret = power_supply_get_property(ts_data->charger_psy, POWER_SUPPLY_PROP_ONLINE, &pval);
+	if (ret) {
+		FTS_ERROR("Failed to get charging status");
+		return -EINVAL;
+	}
+
+	ts_data->is_charging = !!pval.intval;
+
+	if (ts_data->suspended)
+		return 0;
+
+	if (was_charging != ts_data->is_charging)
+		queue_work(ts_data->ts_workqueue, &ts_data->charger_mode_work);
+
+	return 0;
+}
+
+static int fts_charger_notify(struct notifier_block *nb,
+				      unsigned long val, void *v)
+{
+	struct fts_ts_data *ts_data =
+		container_of(nb, struct fts_ts_data, charger_nb);
+	struct power_supply *psy = v;
+
+	if (IS_ERR_OR_NULL(ts_data->charger_psy))
+		goto out;
+
+	if (val == PSY_EVENT_PROP_CHANGED && psy == ts_data->charger_psy)
+		fts_charger_detect(ts_data);
+
+out:
+	return NOTIFY_OK;
 }
 #endif
 
@@ -3256,6 +3325,30 @@ static int fts_ts_probe_entry(struct fts_ts_data *ts_data)
 		fts_esdcheck_switch(ENABLE);
 #endif
 
+#if FTS_CHARGER_DETECT
+	if (ts_data->pdata->charger_detect) {
+		if (!ts_data->ts_workqueue) {
+			FTS_ERROR("Charger detection feature could not be enabled, due to no ts_workqueue");
+			ts_data->pdata->charger_detect = false;
+		} else {
+			INIT_WORK(&ts_data->charger_mode_work, fts_charger_mode_work);
+
+			fts_charger_detect(ts_data);
+
+			if (!ts_data->is_charging)
+				// Make sure the reg is written, even though initial status is false
+				queue_work(ts_data->ts_workqueue, &ts_data->charger_mode_work);
+
+			ts_data->charger_nb.notifier_call = fts_charger_notify;
+			ts_data->charger_nb.priority = 0;
+			ret = power_supply_reg_notifier(&ts_data->charger_nb);
+			if (ret) {
+				FTS_ERROR("Failed to register power supply notifier");
+			}
+		}
+	}
+#endif
+
 	fts_irq_enable();
 
 #if IS_ENABLED(CONFIG_TOUCHSCREEN_SYSCTL_MI8937)
@@ -3305,6 +3398,12 @@ static int fts_ts_remove_entry(struct fts_ts_data *ts_data)
 	fts_remove_sysfs(ts_data);
 	fts_ex_mode_exit(ts_data);
 
+#if FTS_CHARGER_DETECT
+	if (ts_data->pdata->charger_detect) {
+		cancel_work_sync(&ts_data->charger_mode_work);
+		power_supply_unreg_notifier(&ts_data->charger_nb);
+	}
+#endif
 
 #if FTS_ESDCHECK_EN
 	fts_esdcheck_exit(ts_data);
@@ -3423,6 +3522,11 @@ static int fts_ts_suspend(struct device *dev)
 
 	mutex_lock(&ts_data->transition_lock);
 
+#if FTS_CHARGER_DETECT
+	if (ts_data->pdata->charger_detect)
+		cancel_work_sync(&ts_data->charger_mode_work);
+#endif
+
 #if FTS_ESDCHECK_EN
 	fts_esdcheck_suspend();
 #endif
@@ -3527,6 +3631,11 @@ static int fts_ts_resume(struct device *dev)
 
 #if FTS_ESDCHECK_EN
 	fts_esdcheck_resume();
+#endif
+
+#if FTS_CHARGER_DETECT
+	if (ts_data->pdata->charger_detect)
+		queue_work(fts_data->ts_workqueue, &ts_data->charger_mode_work);
 #endif
 
 	if (ts_data->gesture_mode) {

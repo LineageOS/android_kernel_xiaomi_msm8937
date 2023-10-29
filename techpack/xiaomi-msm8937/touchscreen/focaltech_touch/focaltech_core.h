@@ -61,6 +61,7 @@
 #include <linux/sched.h>
 #include <linux/kthread.h>
 #include <linux/dma-mapping.h>
+#include <linux/power_supply.h>
 #ifdef CONFIG_ARCH_QTI_VM
 #include <linux/gunyah/gh_irq_lend.h>
 #include <linux/gunyah/gh_mem_notifier.h>
@@ -147,6 +148,7 @@ struct fts_ts_platform_data {
 	u32 x_min;
 	u32 y_min;
 	u32 max_touch_number;
+	bool charger_detect;
 	bool esdcheck;
 	bool ignore_id_check;
 	bool use_old_touchdata_reading_behavior;
@@ -303,6 +305,12 @@ struct fts_ts_data {
 	struct notifier_block fb_notif;
 #elif defined(CONFIG_HAS_EARLYSUSPEND)
 	struct early_suspend early_suspend;
+#endif
+#if FTS_CHARGER_DETECT
+	bool is_charging;
+	struct notifier_block charger_nb;
+	struct power_supply *charger_psy;
+	struct work_struct charger_mode_work;
 #endif
 
 #ifdef CONFIG_FTS_TRUSTED_TOUCH
