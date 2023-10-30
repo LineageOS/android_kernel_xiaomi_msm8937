@@ -1934,7 +1934,7 @@ static int qti_haptics_probe(struct platform_device *pdev)
 	int rc = 0, effect_count_max;
 
 #if IS_ENABLED(CONFIG_PARSE_ANDROIDBOOT_MODE)
-	if (androidboot_mode_get() != ANDROIDBOOT_MODE_NORMAL)
+	if (androidboot_mode_get() == ANDROIDBOOT_MODE_RECOVERY)
 		return -ENODEV;
 #endif
 
