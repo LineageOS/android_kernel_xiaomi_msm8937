@@ -51,3 +51,10 @@
 &sdhc_1 {
 	qcom,ddr-config = <0x00040868>;
 };
+
+/* Custom */
+&soc {
+	restart@4ab000 {
+		qcom,force-warm-reboot;
+	};
+};
