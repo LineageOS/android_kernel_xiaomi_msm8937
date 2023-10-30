@@ -1118,5 +1118,9 @@ static inline void clk_writel(u32 val, u32 __iomem *reg)
 
 struct of_device_id;
 
+static inline const char *__clk_get_name(void *clk) {
+	return "Unknown clock name";
+};
+
 #endif /* CONFIG_COMMON_CLK */
 #endif /* CLK_PROVIDER_H */
