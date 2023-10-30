@@ -20,6 +20,7 @@
 #include <linux/clk.h>
 #include <linux/io.h>
 #include <linux/sched.h>
+#include <linux/sched/clock.h>
 #include <soc/qcom/clock-pll.h>
 #include <soc/qcom/msm-clock-controller.h>
 

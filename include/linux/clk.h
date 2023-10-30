@@ -78,8 +78,8 @@ struct clk_notifier_data {
 	unsigned long		old_rate;
 	unsigned long		new_rate;
 };
+#endif /*CONFIG_COMMON_CLK*/
 
-<<<<<<< HEAD
 /**
  * struct clk_bulk_data - Data used for bulk clk operations.
  *
@@ -96,9 +96,6 @@ struct clk_bulk_data {
 };
 
 #ifdef CONFIG_COMMON_CLK
-
-=======
->>>>>>> 0dc6e78a3fb3 (clk: msm: Add snapshot of clock framework files)
 /**
  * clk_notifier_register: register a clock rate-change notifier callback
  * @clk: clock whose rate we are interested in
@@ -242,11 +239,13 @@ static inline long clk_get_phase(struct clk *clk)
 	return -ENOTSUPP;
 }
 
+#ifndef CONFIG_COMMON_CLK_MSM
 static inline int clk_set_duty_cycle(struct clk *clk, unsigned int num,
 				     unsigned int den)
 {
 	return -ENOTSUPP;
 }
+#endif // CONFIG_COMMON_CLK_MSM
 
 static inline unsigned int clk_get_scaled_duty_cycle(struct clk *clk,
 						     unsigned int scale)

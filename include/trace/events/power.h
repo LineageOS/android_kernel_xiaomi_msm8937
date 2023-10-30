@@ -325,7 +325,6 @@ DEFINE_EVENT(wakeup_source, wakeup_source_deactivate,
  * The clock events are used for clock enable/disable and for
  *  clock rate change
  */
-#if defined(CONFIG_COMMON_CLK_MSM)
 DECLARE_EVENT_CLASS(clock,
 
 	TP_PROTO(const char *name, unsigned int state, unsigned int cpu_id),
@@ -369,32 +368,12 @@ DEFINE_EVENT(clock, clock_set_rate,
 	TP_ARGS(name, state, cpu_id)
 );
 
-<<<<<<< HEAD
-=======
+#if defined(CONFIG_COMMON_CLK_MSM)
 DEFINE_EVENT(clock, clock_set_rate_complete,
 
 	TP_PROTO(const char *name, unsigned int state, unsigned int cpu_id),
 
 	TP_ARGS(name, state, cpu_id)
-);
-
-TRACE_EVENT(clock_set_parent,
-
-	TP_PROTO(const char *name, const char *parent_name),
-
-	TP_ARGS(name, parent_name),
-
-	TP_STRUCT__entry(
-		__string(       name,           name            )
-		__string(       parent_name,    parent_name     )
-	),
-
-	TP_fast_assign(
-		__assign_str(name, name);
-		__assign_str(parent_name, parent_name);
-	),
-
-	TP_printk("%s parent=%s", __get_str(name), __get_str(parent_name))
 );
 
 TRACE_EVENT(clock_state,
@@ -423,7 +402,6 @@ TRACE_EVENT(clock_state,
 );
 #endif /* CONFIG_COMMON_CLK_MSM */
 
->>>>>>> 0dc6e78a3fb3 (clk: msm: Add snapshot of clock framework files)
 /*
  * The power domain events are used for power domains transitions
  */

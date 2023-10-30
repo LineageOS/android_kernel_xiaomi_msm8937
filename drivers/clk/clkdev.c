@@ -70,17 +70,16 @@ static struct clk *__of_clk_get_by_name(struct device_node *np,
 		if (name)
 			index = of_property_match_string(np, "clock-names", name);
 		clk = __of_clk_get(np, index, dev_id, name);
-		if (!IS_ERR(clk))
+		if (!IS_ERR(clk)) {
 			break;
-<<<<<<< HEAD
 		} else if (name && index >= 0) {
+#ifdef CONFIG_COMMON_CLK
 			if (PTR_ERR(clk) != -EPROBE_DEFER)
 				pr_err("ERROR: could not get clock %pOF:%s(%i)\n",
 					np, name ? name : "", index);
-=======
-		else if (name && index >= 0)
->>>>>>> 0dc6e78a3fb3 (clk: msm: Add snapshot of clock framework files)
+#endif
 			return clk;
+		}
 
 		/*
 		 * No matching clock found on this node.  If the parent node
@@ -190,7 +189,11 @@ struct clk *clk_get_sys(const char *dev_id, const char *con_id)
 out:
 	mutex_unlock(&clocks_mutex);
 
+#ifdef CONFIG_COMMON_CLK
+	return cl ? clk : ERR_PTR(-ENOENT);
+#else
 	return cl ? cl->clk : ERR_PTR(-ENOENT);
+#endif
 }
 EXPORT_SYMBOL(clk_get_sys);
 

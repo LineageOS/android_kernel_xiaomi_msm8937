@@ -1114,19 +1114,9 @@ static inline void clk_writel(u32 val, u32 __iomem *reg)
 
 #endif	/* platform dependent I/O accessors */
 
-<<<<<<< HEAD
-=======
-#ifdef CONFIG_DEBUG_FS
-struct dentry *clk_debugfs_add_file(struct clk_hw *hw, char *name, umode_t mode,
-				void *data, const struct file_operations *fops);
-#endif
-#else
+#else /* CONFIG_COMMON_CLK */
+
 struct of_device_id;
 
-static inline void __init of_clk_init(const struct of_device_id *matches)
-{
-}
-
->>>>>>> 0dc6e78a3fb3 (clk: msm: Add snapshot of clock framework files)
 #endif /* CONFIG_COMMON_CLK */
 #endif /* CLK_PROVIDER_H */

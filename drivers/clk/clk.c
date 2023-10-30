@@ -5211,7 +5211,6 @@ int of_clk_add_hw_provider(struct device_node *np,
 }
 EXPORT_SYMBOL_GPL(of_clk_add_hw_provider);
 
-<<<<<<< HEAD
 static void devm_of_clk_release_provider(struct device *dev, void *res)
 {
 	of_clk_del_provider(*(struct device_node **)res);
@@ -5243,27 +5242,6 @@ int devm_of_clk_add_hw_provider(struct device *dev,
 }
 EXPORT_SYMBOL_GPL(devm_of_clk_add_hw_provider);
 
-/**
- * of_clk_del_provider() - Remove a previously registered clock provider
- * @np: Device node pointer associated with clock provider
- */
-void of_clk_del_provider(struct device_node *np)
-{
-	struct of_clk_provider *cp;
-
-	mutex_lock(&of_clk_mutex);
-	list_for_each_entry(cp, &of_clk_providers, link) {
-		if (cp->node == np) {
-			list_del(&cp->link);
-			of_node_put(cp->node);
-			kfree(cp);
-			break;
-		}
-	}
-	mutex_unlock(&of_clk_mutex);
-}
-EXPORT_SYMBOL_GPL(of_clk_del_provider);
-
 static int devm_clk_provider_match(struct device *dev, void *res, void *data)
 {
 	struct device_node **np = res;
@@ -5285,8 +5263,6 @@ void devm_of_clk_del_provider(struct device *dev)
 }
 EXPORT_SYMBOL(devm_of_clk_del_provider);
 
-=======
->>>>>>> 0dc6e78a3fb3 (clk: msm: Add snapshot of clock framework files)
 static struct clk_hw *
 __of_clk_get_hw_from_provider(struct of_clk_provider *provider,
 			      struct of_phandle_args *clkspec)
