@@ -1050,7 +1050,9 @@ static int wsa881x_shutdown(struct wsa881x_pdata *pdata)
 		return ret;
 	}
 
+#ifndef CONFIG_COMMON_CLK_MSM
 	if (__clk_is_enabled(pdata->wsa_mclk))
+#endif
 		clk_disable_unprepare(pdata->wsa_mclk);
 
 	ret = msm_cdc_pinctrl_select_sleep_state(pdata->wsa_clk_gpio_p);
