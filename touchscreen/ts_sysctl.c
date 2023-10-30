@@ -1,6 +1,3 @@
-#if IS_ENABLED(CONFIG_PARSE_ANDROIDBOOT_MODE)
-#include <linux/androidboot_mode.h>
-#endif
 #include <linux/device.h>
 #include <linux/module.h>
 #include <linux/sysctl.h>
@@ -161,11 +158,6 @@ static int __init xiaomi_msm8937_touchscreen_sysctl_init(void)
 {
 	if (!xiaomi_msm8937_mach_get())
 		return -ENODEV;
-
-#if IS_ENABLED(CONFIG_PARSE_ANDROIDBOOT_MODE)
-	if (androidboot_mode_get() == ANDROIDBOOT_MODE_CHARGER)
-		return -ENODEV;
-#endif
 
 #if IS_ENABLED(CONFIG_MACH_XIAOMI_LAND) || IS_ENABLED(CONFIG_MACH_XIAOMI_SANTONI)
 	if (xiaomi_msm8937_mach_get() == XIAOMI_MSM8937_MACH_LAND ||
