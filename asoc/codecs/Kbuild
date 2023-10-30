@@ -149,7 +149,13 @@ endif
 	WCD9XXX_OBJS += wcd9xxx-soc-init.o
 	WCD9XXX_OBJS += wcd-dsp-utils.o
 	WCD9XXX_OBJS += wcd-dsp-mgr.o
+
+ifdef CONFIG_COMMON_CLK_QCOM
 	WCD9XXX_OBJS += audio-ext-clk-up.o
+endif
+ifdef CONFIG_COMMON_CLK_MSM
+	WCD9XXX_OBJS += audio-ext-clk.o
+endif
 endif
 
 ifdef CONFIG_SND_SOC_WCD9335
