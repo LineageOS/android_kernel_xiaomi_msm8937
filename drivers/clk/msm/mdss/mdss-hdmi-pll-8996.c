@@ -2566,7 +2566,7 @@ static enum handoff hdmi_8996_vco_handoff(struct clk *c)
 	return ret;
 }
 
-static const struct clk_ops hdmi_8996_v1_vco_clk_ops = {
+const struct clk_ops hdmi_8996_v1_vco_clk_ops = {
 	.enable = hdmi_8996_v1_vco_enable,
 	.set_rate = hdmi_8996_v1_vco_set_rate,
 	.get_rate = hdmi_8996_vco_get_rate,
@@ -2576,7 +2576,7 @@ static const struct clk_ops hdmi_8996_v1_vco_clk_ops = {
 	.handoff = hdmi_8996_vco_handoff,
 };
 
-static const struct clk_ops hdmi_8996_v2_vco_clk_ops = {
+const struct clk_ops hdmi_8996_v2_vco_clk_ops = {
 	.enable = hdmi_8996_v2_vco_enable,
 	.set_rate = hdmi_8996_v2_vco_set_rate,
 	.get_rate = hdmi_8996_vco_get_rate,
@@ -2586,7 +2586,7 @@ static const struct clk_ops hdmi_8996_v2_vco_clk_ops = {
 	.handoff = hdmi_8996_vco_handoff,
 };
 
-static const struct clk_ops hdmi_8996_v3_vco_clk_ops = {
+const struct clk_ops hdmi_8996_v3_vco_clk_ops = {
 	.enable = hdmi_8996_v3_vco_enable,
 	.set_rate = hdmi_8996_v3_vco_set_rate,
 	.get_rate = hdmi_8996_vco_get_rate,
@@ -2596,7 +2596,7 @@ static const struct clk_ops hdmi_8996_v3_vco_clk_ops = {
 	.handoff = hdmi_8996_vco_handoff,
 };
 
-static const struct clk_ops hdmi_8996_v3_1p8_vco_clk_ops = {
+const struct clk_ops hdmi_8996_v3_1p8_vco_clk_ops = {
 	.enable = hdmi_8996_v3_1p8_vco_enable,
 	.set_rate = hdmi_8996_v3_1p8_vco_set_rate,
 	.get_rate = hdmi_8996_vco_get_rate,
