@@ -1,5 +1,26 @@
+choice
+	prompt "Clock framework to use"
+	depends on (ARCH_MSM8937 || ARCH_MSM8953)
+	default USE_COMMON_CLK_QCOM
+
+config USE_COMMON_CLK_QCOM
+	bool "Use QCOM clk framework"
+	select COMMON_CLK
+	select COMMON_CLK_QCOM
+	select QCOM_GDSC if ARCH_MSM8953
+
+config USE_COMMON_CLK_MSM
+	bool "Use MSM clk framework"
+	select CLKDEV_LOOKUP
+	select HAVE_CLK
+	select HAVE_CLK_PREPARE
+	select COMMON_CLK_MSM
+
+endchoice
+
 config COMMON_CLK_MSM
 	tristate "Support for MSM clock controllers"
+	depends on !COMMON_CLK
 	depends on OF
 	depends on ARCH_QCOM
 	select RATIONAL

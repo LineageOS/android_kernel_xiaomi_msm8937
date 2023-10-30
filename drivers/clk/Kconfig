@@ -7,7 +7,7 @@ config HAVE_CLK_PREPARE
 	bool
 
 config COMMON_CLK
-	bool
+	bool "Enable Common Clock Framework"
 	select HAVE_CLK_PREPARE
 	select CLKDEV_LOOKUP
 	select SRCU
