@@ -1992,7 +1992,7 @@
 		qcom,proxy-reg-names = "vdd_cx";
 		qcom,vdd_cx-uV-uA = <RPM_SMD_REGULATOR_LEVEL_TURBO 100000>;
 
-		clocks = <&rpmcc CXO_SMD_PIL_PRONTO_CLK>,
+		clocks = <&rpmcc CXO_SMD_PIL_LPASS_CLK>,
 			 <&gcc GCC_CRYPTO_CLK>,
 			 <&gcc GCC_CRYPTO_AHB_CLK>,
 			 <&gcc GCC_CRYPTO_AXI_CLK>,
