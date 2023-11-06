@@ -196,6 +196,8 @@
 #define GCC_GTCU_AHB_CLK		187
 #define GCC_OXILI_GMEM_CLK		188
 #define GCC_IPA_TBU_CLK		189
+#define GCC_QUSB2_PHY_CLK		190
+#define GCC_USB2_HS_PHY_ONLY_CLK	191
 
 /* GCC resets */
 #define GCC_CAMSS_MICRO_BCR			0

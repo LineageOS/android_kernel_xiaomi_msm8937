@@ -2856,6 +2856,32 @@ static struct clk_branch gcc_usb_hs_phy_cfg_ahb_clk = {
 	},
 };
 
+static struct clk_branch gcc_usb2_hs_phy_only_clk = {
+	.halt_reg = 0x41034,
+	.halt_check = BRANCH_HALT,
+	.clkr = {
+		.enable_reg = 0x41034,
+		.enable_mask = BIT(0),
+		.hw.init = &(struct clk_init_data){
+			.name = "gcc_usb2_hs_phy_only_clk",
+			.ops = &clk_branch2_ops,
+		},
+	},
+};
+
+static struct clk_branch gcc_qusb2_phy_clk = {
+	.halt_reg = 0x4103C,
+	.halt_check = BRANCH_HALT,
+	.clkr = {
+		.enable_reg = 0x4103C,
+		.enable_mask = BIT(0),
+		.hw.init = &(struct clk_init_data){
+			.name = "gcc_qusb2_phy_clk",
+			.ops = &clk_branch2_ops,
+		},
+	},
+};
+
 static struct clk_branch gcc_usb_hs_system_clk = {
 	.halt_reg = 0x41004,
 	.halt_check = BRANCH_HALT,
@@ -4244,6 +4270,8 @@ static struct clk_regmap *gcc_sdm429w_clocks[] = {
 	[GCC_VFE1_TBU_CLK] = &gcc_vfe1_tbu_clk.clkr,
 	[GCC_QDSS_DAP_CLK] = &gcc_qdss_dap_clk.clkr,
 	[GCC_IPA_TBU_CLK] = &gcc_ipa_tbu_clk.clkr,
+	[GCC_QUSB2_PHY_CLK] = &gcc_qusb2_phy_clk.clkr,
+	[GCC_USB2_HS_PHY_ONLY_CLK] = &gcc_usb2_hs_phy_only_clk.clkr,
 };
 
 static const struct qcom_reset_map gcc_sdm429w_resets[] = {
