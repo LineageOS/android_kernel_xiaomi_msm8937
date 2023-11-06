@@ -2,7 +2,10 @@
 #include "sdm439-pm8953.dtsi"
 #include "sdm439-pmi632.dtsi"
 #include "sdm439-audio.dtsi"
+#ifndef CONFIG_COMMON_CLK_MSM
 #include <dt-bindings/clock/mdss-12nm-pll-clk.h>
+#endif
+
 / {
 	model = "Qualcomm Technologies, Inc. SDM439";
 	compatible = "qcom,sdm439";
@@ -237,12 +240,23 @@
 	};
 };
 
+#ifdef CONFIG_COMMON_CLK_MSM
+&clock_cpu {
+	compatible = "qcom,cpu-clock-sdm439";
+	vdd-c0-supply = <&apc_vreg_corner>;
+	vdd-c1-supply = <&apc_vreg_corner>;
+	vdd-cci-supply = <&apc_vreg_corner>;
+};
+#else
 &apsscc {
 	cpu-vdd-supply = <&apc_vreg_corner>;
 	vdd_hf_pll-supply = <&pm8953_l7_ao>;
 	vdd_dig_ao-supply = <&pm8953_s2_level_ao>;
 	vdd_sr2_pll-supply = <&pm8953_l7_ao>;
 	vdd_sr2_dig_ao-supply = <&pm8953_s2_level_ao>;
+};
+#endif
+&apsscc {
 	qcom,speed0-bin-v0-c0 =
 		<          0 0>,
 		<  768000000 1>,
@@ -328,13 +342,42 @@
 		<  533333333 3>;
 };
 
+#ifdef CONFIG_COMMON_CLK_MSM
+&clock_gcc {
+	compatible = "qcom,gcc-sdm439";
+	reg = <0x1800000 0x80000>,
+		<0xb016000 0x00040>,
+		<0xb116000 0x00040>,
+		<0x00a6018 0x00004>;
+	reg-names = "cc_base", "apcs_c1_base",
+			"apcs_c0_base", "efuse";
+	vdd_dig-supply = <&pm8953_s2_level>;
+	vdd_sr2_dig-supply = <&pm8953_s2_level_ao>;
+	vdd_sr2_pll-supply = <&pm8953_l7_ao>;
+	vdd_hf_dig-supply = <&pm8953_s2_level_ao>;
+	vdd_hf_pll-supply = <&pm8953_l7_ao>;
+};
+#else
 &gcc {
 	compatible = "qcom,gcc-sdm439", "syscon";
 	reg = <0x1800000 0x80000>;
 	reg-names = "cc_base";
 	vdd_cx-supply = <&pm8953_s2_level>;
 };
+#endif
 
+#ifdef CONFIG_COMMON_CLK_MSM
+&clock_gcc_mdss {
+	compatible = "qcom,gcc-mdss-sdm439";
+	clocks = <&mdss_dsi0_pll clk_dsi0pll_pixel_clk_src>,
+		 <&mdss_dsi0_pll clk_dsi0pll_byte_clk_src>,
+		 <&mdss_dsi1_pll clk_dsi1pll_pixel_clk_src>,
+		 <&mdss_dsi1_pll clk_dsi1pll_byte_clk_src>;
+	clock-names = "pclk0_src", "byte0_src", "pclk1_src",
+		"byte1_src";
+	#clock-cells = <1>;
+};
+#else
 &gcc_mdss {
 	compatible = "qcom,gcc-mdss-sdm439";
 	clocks = <&mdss_dsi0_pll PCLK_SRC_MUX_0_CLK>,
@@ -345,9 +388,14 @@
 		"byte1_src";
 	#clock-cells = <1>;
 };
+#endif
 
 &mdss_dsi0_pll {
+#ifdef CONFIG_COMMON_CLK_MSM
+	compatible = "qcom,mdss_dsi_pll_sdm439";
+#else
 	compatible = "qcom,mdss_dsi_pll_12nm";
+#endif
 	reg = <0x001a94400 0x400>,
 		<0x0184d074 0x8>;
 	reg-names = "pll_base", "gdsc_base";
@@ -358,7 +406,11 @@
 };
 
 &mdss_dsi1_pll {
+#ifdef CONFIG_COMMON_CLK_MSM
+	compatible = "qcom,mdss_dsi_pll_sdm439";
+#else
 	compatible = "qcom,mdss_dsi_pll_12nm";
+#endif
 	reg = <0x001a96400 0x400>,
 		<0x0184d074 0x8>;
 	reg-names = "pll_base", "gdsc_base";
@@ -376,6 +428,7 @@
 		0x1a96400 0x1a96400 0x400
 		0x193e000 0x193e000 0x30>;
 
+#ifndef CONFIG_COMMON_CLK_MSM
 	clocks = <&gcc_mdss MDSS_MDP_VOTE_CLK>,
 		<&gcc GCC_MDSS_AHB_CLK>,
 		<&gcc GCC_MDSS_AXI_CLK>,
@@ -387,6 +440,7 @@
 	clock-names = "mdp_core_clk", "iface_clk", "bus_clk",
 		"ext_byte0_clk", "ext_byte1_clk", "ext_pixel0_clk",
 		"ext_pixel1_clk";
+#endif
 
 };
 

@@ -23,9 +23,15 @@
 	};
 };
 
+#ifdef CONFIG_COMMON_CLK_MSM
+&clock_gcc {
+	compatible = "qcom,gcc-qm215";
+};
+#else
 &gcc {
 	compatible = "qcom,gcc-qm215", "syscon";
 };
+#endif
 
 &msm_cpufreq {
 	/delete-property/qcom,cpufreq-table;

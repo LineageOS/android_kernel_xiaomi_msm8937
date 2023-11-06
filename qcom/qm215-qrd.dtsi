@@ -1,5 +1,8 @@
+#ifndef CONFIG_COMMON_CLK_MSM
 #include <dt-bindings/clock/qcom,rpmcc.h>
+#endif
 #include <dt-bindings/iio/qcom,spmi-vadc.h>
+#include "msm8952-clk-wrapper.h"
 
 &blsp1_uart2 {
 	status = "ok";
@@ -7,7 +10,11 @@
 	pinctrl-0 = <&uart_console_active>;
 };
 
+#ifdef CONFIG_COMMON_CLK_MSM
+#include <dt-bindings/clock/msm-clocks-8952.h>
+#else
 #include <dt-bindings/clock/qcom,gcc-sdm429w.h>
+#endif
 #include "qm215-camera-sensor-qrd.dtsi"
 
 &pm8916_chg {

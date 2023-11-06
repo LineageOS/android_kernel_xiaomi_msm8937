@@ -1,7 +1,12 @@
 #include "msm8937-mdss-panels.dtsi"
 #ifdef DO_NOT_INCLUDE_DEFAULT_CAMERA_SENSOR_DTSI
+#ifdef CONFIG_COMMON_CLK_MSM
+#include <dt-bindings/clock/msm-clocks-8952.h>
+#else
 #include <dt-bindings/clock/qcom,gcc-sdm429w.h>
 #include <dt-bindings/clock/qcom,rpmcc.h>
+#endif
+#include "msm8952-clk-wrapper.h"
 #else
 #include "sdm439-camera-sensor-qrd.dtsi"
 #endif

@@ -14,9 +14,11 @@
 	status = "disabled";
 };
 
+#ifndef CONFIG_COMMON_CLK_MSM
 &wsa881x_analog_clk {
 	status = "disabled";
 };
+#endif
 
 &cdc_pri_mi2s_gpios {
 	status = "disabled";

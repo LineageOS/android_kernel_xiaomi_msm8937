@@ -108,6 +108,25 @@
 	};
 };
 
+#ifdef CONFIG_COMMON_CLK_MSM
+&clock_gcc {
+	compatible = "qcom,gcc-sdm429";
+	reg = <0x1800000 0x80000>,
+		<0xb016000 0x00040>;
+	reg-names = "cc_base", "apcs_c1_base";
+	vdd_dig-supply = <&pm8953_s2_level>;
+	vdd_hf_dig-supply = <&pm8953_s2_level_ao>;
+	vdd_hf_pll-supply = <&pm8953_l7_ao>;
+};
+
+&clock_debug {
+	compatible = "qcom,cc-debug-8917";
+	reg = <0x1874000 0x4>,
+		<0xb01101c 0x8>;
+	reg-names = "cc_base", "meas";
+	#clock-cells = <1>;
+};
+#else
 &gcc {
 	reg = <0x1800000 0x80000>;
 	reg-names = "cc_base";
@@ -118,8 +137,32 @@
 	compatible = "qcom,sdm429-debugcc";
 	qcom,cpu = <&cpu_debug>;
 };
+#endif
 
 &soc {
+#ifdef CONFIG_COMMON_CLK_MSM
+	/delete-node/ qcom,cpu-clock-8939@b111050;
+	clock_cpu: qcom,cpu-clock-8939@b111050 {
+		compatible = "qcom,cpu-clock-sdm429";
+
+		reg =   <0xb011050 0x8>,
+			<0xb1d1050 0x8>,
+			<0x00a412c 0x8>;
+		reg-names = "apcs-c1-rcg-base",
+			"apcs-cci-rcg-base", "efuse";
+
+		qcom,num-cluster;
+		vdd-c1-supply = <&apc_vreg_corner>;
+		vdd-cci-supply = <&apc_vreg_corner>;
+
+		clocks = <&clock_gcc clk_gpll0_ao_clk_src>,
+			<&clock_gcc clk_a53ss_c1_pll>,
+			<&clock_gcc clk_gpll0_ao_clk_src>,
+			<&clock_gcc clk_gpll0_ao_clk_src>;
+		clock-names = "clk-c1-4", "clk-c1-5",
+				"clk-cci-4", "clk-cci-2";
+	};
+#else
 	/delete-node/ qcom,clock-cpu@b111050;
 	apsscc: qcom,clock-cpu@b111050 {
 		compatible = "qcom,cpu-clock-sdm429";
@@ -137,84 +180,8 @@
 		cpu-vdd-supply = <&apc_vreg_corner>;
 		vdd_dig_ao-supply = <&pm8953_s2_level_ao>;
 		vdd_hf_pll-supply = <&pm8953_l7_ao>;
-
-		qcom,speed0-bin-v0-c1 =
-			<          0 0>,
-			<  960000000 1>,
-			< 1305600000 1>,
-			< 1497600000 2>,
-			< 1708800000 3>,
-			< 1958400000 5>;
-
-		qcom,speed0-bin-v0-cci =
-			<          0 0>,
-			<  400000000 1>,
-			<  533333333 3>;
-
-		qcom,speed1-bin-v0-c1 =
-			<          0 0>,
-			<  960000000 1>,
-			< 1305600000 1>,
-			< 1497600000 2>,
-			< 1708800000 3>,
-			< 1804800000 5>;
-
-		qcom,speed1-bin-v0-cci =
-			<          0 0>,
-			<  400000000 1>,
-			<  533333333 3>;
-
-		qcom,speed4-bin-v0-c1 =
-			<          0 0>,
-			<  960000000 1>,
-			< 1305600000 1>,
-			< 1497600000 2>,
-			< 1708800000 3>,
-			< 1958400000 5>,
-			< 2016000000 6>;
-
-		qcom,speed4-bin-v0-cci =
-			<          0 0>,
-			<  400000000 1>,
-			<  533333333 3>;
-
-		qcom,speed5-bin-v0-c1 =
-			<          0 0>,
-			<  960000000 1>,
-			< 1305600000 1>,
-			< 1497600000 2>,
-			< 1708800000 3>;
-
-		qcom,speed5-bin-v0-cci =
-			<          0 0>,
-			<  400000000 1>,
-			<  533333333 3>;
-
-		#clock-cells = <1>;
-
-		qcom,cpu-isolation {
-			compatible = "qcom,cpu-isolate";
-			cpu0_isolate: cpu0-isolate {
-				qcom,cpu = <&CPU0>;
-				#cooling-cells = <2>;
-			};
-
-			cpu1_isolate: cpu1-isolate {
-				qcom,cpu = <&CPU1>;
-				#cooling-cells = <2>;
-			};
-
-			cpu2_isolate: cpu2-isolate {
-				qcom,cpu = <&CPU2>;
-				#cooling-cells = <2>;
-			};
-
-			cpu3_isolate: cpu3-isolate {
-				qcom,cpu = <&CPU3>;
-				#cooling-cells = <2>;
-			};
-		};
 	};
+#endif
 
 	/* Disable secure_mem node */
 	qcom,ion {
@@ -222,6 +189,85 @@
 	};
 	/* delete hypervisor node for GPU*/
 	/delete-node/ qcom,kgsl-hyp;
+};
+
+&apsscc {
+	qcom,speed0-bin-v0-c1 =
+		<          0 0>,
+		<  960000000 1>,
+		< 1305600000 1>,
+		< 1497600000 2>,
+		< 1708800000 3>,
+		< 1958400000 5>;
+
+	qcom,speed0-bin-v0-cci =
+		<          0 0>,
+		<  400000000 1>,
+		<  533333333 3>;
+
+	qcom,speed1-bin-v0-c1 =
+		<          0 0>,
+		<  960000000 1>,
+		< 1305600000 1>,
+		< 1497600000 2>,
+		< 1708800000 3>,
+		< 1804800000 5>;
+
+	qcom,speed1-bin-v0-cci =
+		<          0 0>,
+		<  400000000 1>,
+		<  533333333 3>;
+
+	qcom,speed4-bin-v0-c1 =
+		<          0 0>,
+		<  960000000 1>,
+		< 1305600000 1>,
+		< 1497600000 2>,
+		< 1708800000 3>,
+		< 1958400000 5>,
+		< 2016000000 6>;
+
+	qcom,speed4-bin-v0-cci =
+		<          0 0>,
+		<  400000000 1>,
+		<  533333333 3>;
+
+	qcom,speed5-bin-v0-c1 =
+		<          0 0>,
+		<  960000000 1>,
+		< 1305600000 1>,
+		< 1497600000 2>,
+		< 1708800000 3>;
+
+	qcom,speed5-bin-v0-cci =
+		<          0 0>,
+		<  400000000 1>,
+		<  533333333 3>;
+
+	#clock-cells = <1>;
+
+	qcom,cpu-isolation {
+		compatible = "qcom,cpu-isolate";
+		cpu0_isolate: cpu0-isolate {
+			qcom,cpu = <&CPU0>;
+			#cooling-cells = <2>;
+		};
+
+		cpu1_isolate: cpu1-isolate {
+			qcom,cpu = <&CPU1>;
+			#cooling-cells = <2>;
+		};
+
+		cpu2_isolate: cpu2-isolate {
+			qcom,cpu = <&CPU2>;
+			#cooling-cells = <2>;
+		};
+
+		cpu3_isolate: cpu3-isolate {
+			qcom,cpu = <&CPU3>;
+			#cooling-cells = <2>;
+		};
+	};
 };
 
 &secure_mem {
@@ -232,6 +278,18 @@
 	size = <0 0x400000>;
 };
 
+#ifdef CONFIG_COMMON_CLK_MSM
+&clock_gcc_mdss {
+	compatible = "qcom,gcc-mdss-sdm429";
+	clocks = <&mdss_dsi0_pll clk_dsi0pll_pixel_clk_src>,
+		 <&mdss_dsi0_pll clk_dsi0pll_byte_clk_src>,
+		 <&mdss_dsi1_pll clk_dsi1pll_pixel_clk_src>,
+		 <&mdss_dsi1_pll clk_dsi1pll_byte_clk_src>;
+	clock-names = "pclk0_src", "byte0_src", "pclk1_src",
+		"byte1_src";
+	#clock-cells = <1>;
+};
+#else
 &gcc_mdss {
 	compatible = "qcom,gcc-mdss-sdm439";
 	clocks = <&mdss_dsi0_pll PCLK_SRC_MUX_0_CLK>,
@@ -242,6 +300,7 @@
 		"byte1_src";
 	#clock-cells = <1>;
 };
+#endif
 
 /* GPU overrides */
 &msm_gpu {

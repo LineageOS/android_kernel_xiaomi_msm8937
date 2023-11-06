@@ -37,6 +37,17 @@
 		};
 	};
 
+#ifdef CONFIG_COMMON_CLK_MSM
+	qcom,cpu-clock-8939@b111050 {
+		/delete-property/ vdd-c1-supply;
+	};
+
+	qcom,gcc@1800000 {
+		/delete-property/ vdd_dig-supply;
+		/delete-property/ vdd_hf_dig-supply;
+		/delete-property/ vdd_hf_pll-supply;
+	};
+#else
 	qcom,clock-cpu@b011050 {
 		/delete-property/ cpu-vdd-supply;
 	};
@@ -46,6 +57,7 @@
 		/delete-property/ vdd_hf_dig-supply;
 		/delete-property/ vdd_hf_pll-supply;
 	};
+#endif
 
 	usb@78db000 {
 		/delete-property/ hsusb_vdd_dig-supply;
@@ -195,6 +207,17 @@
 	};
 };
 
+#ifdef CONFIG_COMMON_CLK_MSM
+&clock_cpu {
+	vdd-c1-supply = <&apc_vreg_corner>;
+};
+
+&clock_gcc {
+	vdd_dig-supply = <&pm8916_s1_level>;
+	vdd_hf_dig-supply = <&pm8916_s1_level_ao>;
+	vdd_hf_pll-supply = <&pm8916_l7_ao>;
+};
+#else
 &apsscc {
 	cpu-vdd-supply = <&apc_vreg_corner>;
 	vdd_dig_ao-supply = <&pm8916_s1_level_ao>;
@@ -206,6 +229,7 @@
 	vdd_hf_dig-supply = <&pm8916_s1_level_ao>;
 	vdd_hf_pll-supply = <&pm8916_l7_ao>;
 };
+#endif
 
 &pm8916_vadc {
 	#thermal-sensor-cells = <1>;
