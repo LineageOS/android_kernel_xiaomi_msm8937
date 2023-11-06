@@ -187,6 +187,19 @@
 	};
 };
 
+#ifdef CONFIG_COMMON_CLK_MSM
+&clock_gcc {
+	compatible = "qcom,gcc-8920";
+};
+
+&clock_debug {
+	compatible = "qcom,cc-debug-8920";
+};
+
+&clock_gcc_mdss {
+	compatible = "qcom,gcc-mdss-8920";
+};
+#else
 &gcc {
 	compatible = "qcom,gcc-msm8920";
 };
@@ -194,6 +207,7 @@
 &rpmcc {
 	compatible = "qcom,rpmcc-msm8920";
 };
+#endif
 
 &apc_vreg_corner {
 	/delete-property/ qcom,cpr-fuse-version-map;

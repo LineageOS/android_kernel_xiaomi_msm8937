@@ -8,11 +8,19 @@
 		0x1a94b80 0x1a94b80 0x30
 		0x193e000 0x193e000 0x30>;
 
+#ifdef CONFIG_COMMON_CLK_MSM
+	clocks = <&clock_gcc_mdss clk_mdss_mdp_vote_clk>,
+		<&clock_gcc clk_gcc_mdss_ahb_clk>,
+		<&clock_gcc clk_gcc_mdss_axi_clk>,
+		<&clock_gcc_mdss clk_ext_byte0_clk_src>,
+		<&clock_gcc_mdss clk_ext_pclk0_clk_src>;
+#else
 	clocks = <&gcc_mdss MDSS_MDP_VOTE_CLK>,
 		<&gcc GCC_MDSS_AHB_CLK>,
 		<&gcc GCC_MDSS_AXI_CLK>,
 		<&mdss_dsi0_pll BYTECLK_SRC_0_CLK>,
 		<&mdss_dsi0_pll PCLK_SRC_0_CLK>;
+#endif
 	clock-names = "mdp_core_clk", "iface_clk", "bus_clk",
 		"ext_byte0_clk", "ext_pixel0_clk";
 

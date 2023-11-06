@@ -1,6 +1,10 @@
 &soc {
 	mdss_dsi0_pll: qcom,mdss_dsi_pll@1a94a00 {
+#ifdef CONFIG_COMMON_CLK_MSM
+		compatible = "qcom,mdss_dsi_pll_8937";
+#else
 		compatible = "qcom,mdss_dsi_pll_28lpm";
+#endif
 		label = "MDSS DSI 0 PLL";
 		cell-index = <0>;
 		#clock-cells = <1>;
@@ -45,7 +49,11 @@
 	};
 
 	mdss_dsi1_pll: qcom,mdss_dsi_pll@1a96a00 {
+#ifdef CONFIG_COMMON_CLK_MSM
+		compatible = "qcom,mdss_dsi_pll_8937";
+#else
 		compatible = "qcom,mdss_dsi_pll_28lpm";
+#endif
 		label = "MDSS DSI 1 PLL";
 		cell-index = <1>;
 		#clock-cells = <1>;

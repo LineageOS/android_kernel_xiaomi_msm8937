@@ -207,6 +207,19 @@
 
 };
 
+#ifdef CONFIG_COMMON_CLK_MSM
+&clock_gcc {
+	compatible = "qcom,gcc-8940";
+};
+
+&clock_debug {
+	compatible = "qcom,cc-debug-8940";
+};
+
+&clock_gcc_mdss {
+	compatible = "qcom,gcc-mdss-8940";
+};
+#else
 &gcc {
 	compatible = "qcom,gcc-msm8940";
 };
@@ -214,6 +227,7 @@
 &rpmcc {
 	compatible = "qcom,rpmcc-msm8940";
 };
+#endif
 
 &bam_dmux {
 	status = "disabled";

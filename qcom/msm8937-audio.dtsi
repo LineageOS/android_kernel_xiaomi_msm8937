@@ -1,4 +1,6 @@
+#ifndef CONFIG_COMMON_CLK_MSM
 #include <dt-bindings/clock/qcom,audio-ext-clk.h>
+#endif
 #include "msm-audio-lpass.dtsi"
 #include "msm8953-wsa881x.dtsi"
 
@@ -149,8 +151,10 @@
 			status = "okay";
 			compatible = "qcom,wsa881x-i2c-codec";
 			reg = <0x0f>;
+#ifndef CONFIG_COMMON_CLK_MSM
 			clock-names = "wsa_mclk";
 			clocks = <&wsa881x_analog_clk 0>;
+#endif
 			qcom,wsa-analog-vi-gpio = <&wsa881x_analog_vi_gpio>;
 			qcom,wsa-analog-clk-gpio = <&wsa881x_analog_clk_gpio>;
 			qcom,wsa-analog-reset-gpio =
@@ -185,6 +189,7 @@
 		pinctrl-1 = <&wsa_reset_off>;
 	};
 
+#ifndef CONFIG_COMMON_CLK_MSM
 	wsa881x_analog_clk: wsa_ana_clk {
 		compatible = "qcom,audio-ref-clk";
 		qcom,codec-ext-clk-src = <AUDIO_LPASS_MCLK_2>;
@@ -192,6 +197,7 @@
 		qcom,codec-lpass-clk-id = <0x300>;
 		#clock-cells = <1>;
 	};
+#endif
 
 	ext_codec: sound-9335 {
 		status = "disabled";
