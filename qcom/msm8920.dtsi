@@ -64,10 +64,8 @@
 			 <&rpmcc BIMC_USB_CLK>,
 			 <&rpmcc SNOC_USB_CLK>,
 			 <&rpmcc PNOC_USB_CLK>,
-/* TODO
-			 <&clock_gcc clk_gcc_qusb2_phy_clk>,
-			 <&clock_gcc clk_gcc_usb2_hs_phy_only_clk>,
-*/
+			 <&gcc GCC_QUSB2_PHY_CLK>,
+			 <&gcc GCC_USB2_HS_PHY_ONLY_CLK>,
 			 <&gcc GCC_USB_HS_PHY_CFG_AHB_CLK>,
 			 <&rpmcc CXO_SMD_OTG_CLK>;
 
