@@ -253,7 +253,9 @@ struct qpnp_flash_led {
 	struct workqueue_struct		*ordered_workq;
 	struct iio_channel		*iio_chan;
 	struct mutex			flash_led_lock;
+#if IS_ENABLED(CONFIG_DEBUG_FS)
 	struct dentry			*dbgfs_root;
+#endif
 	int				num_leds;
 	u16				base;
 	u16				current_addr;
@@ -2435,11 +2437,12 @@ static int qpnp_flash_led_probe(struct platform_device *pdev)
 	struct qpnp_flash_led *led;
 	unsigned int base;
 	struct device_node *node, *temp;
-	struct dentry *root, *file;
+#if IS_ENABLED(CONFIG_DEBUG_FS)
+	struct dentry *root = NULL, *file = NULL;
+#endif
 	int rc, i = 0, j, num_leds = 0;
 	u32 val;
 
-	root = NULL;
 	node = pdev->dev.of_node;
 	if (node == NULL) {
 		dev_info(&pdev->dev, "No flash device defined\n");
@@ -2606,6 +2609,7 @@ static int qpnp_flash_led_probe(struct platform_device *pdev)
 
 	led->num_leds = i;
 
+#if IS_ENABLED(CONFIG_DEBUG_FS)
 	root = debugfs_create_dir("flashLED", NULL);
 	if (IS_ERR_OR_NULL(root)) {
 		pr_err("Error creating top level directory err%ld",
@@ -2636,14 +2640,17 @@ static int qpnp_flash_led_probe(struct platform_device *pdev)
 		pr_err("error creating 'strobe' entry\n");
 		goto error_led_debugfs;
 	}
+#endif
 
 	dev_set_drvdata(&pdev->dev, led);
 
 	return 0;
 
+#if IS_ENABLED(CONFIG_DEBUG_FS)
 error_led_debugfs:
 	debugfs_remove_recursive(root);
 error_free_led_sysfs:
+#endif
 	i = led->num_leds - 1;
 	j = ARRAY_SIZE(qpnp_flash_led_attrs) - 1;
 error_led_register:
@@ -2678,7 +2685,9 @@ static int qpnp_flash_led_remove(struct platform_device *pdev)
 						&qpnp_flash_led_attrs[j].attr);
 		led_classdev_unregister(&led->flash_node[i].cdev);
 	}
+#if IS_ENABLED(CONFIG_DEBUG_FS)
 	debugfs_remove_recursive(led->dbgfs_root);
+#endif
 	mutex_destroy(&led->flash_led_lock);
 	destroy_workqueue(led->ordered_workq);
 
