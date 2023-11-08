@@ -653,8 +653,10 @@ struct fg_chip {
 #define MAX_LINE_LENGTH  (ADDR_LEN + (ITEMS_PER_LINE * CHARS_PER_ITEM) + 1)
 #define MAX_REG_PER_TRANSACTION	(8)
 
+#if IS_ENABLED(CONFIG_DEBUG_FS)
 static const char *DFS_ROOT_NAME	= "fg_memif";
 static const mode_t DFS_MODE		= 00600;
+#endif
 static const char *default_batt_type	= "Unknown Battery";
 static const char *loading_batt_type	= "Loading Battery Data";
 static const char *missing_batt_type	= "Disconnected Battery";
@@ -7503,6 +7505,7 @@ static int fg_remove(struct platform_device *pdev)
 	return 0;
 }
 
+#if IS_ENABLED(CONFIG_DEBUG_FS)
 static int fg_memif_data_open(struct inode *inode, struct file *file)
 {
 	struct fg_log_buffer *log;
@@ -7938,6 +7941,7 @@ err_remove_fs:
 	debugfs_remove_recursive(root);
 	return -ENOMEM;
 }
+#endif // CONFIG_DEBUG_FS
 
 #define EXTERNAL_SENSE_OFFSET_REG	0x41C
 #define EXT_OFFSET_TRIM_REG		0xF8
@@ -8897,6 +8901,7 @@ static int fg_probe(struct platform_device *pdev)
 	 */
 	chip->batt_psy_name = "battery";
 
+#if IS_ENABLED(CONFIG_DEBUG_FS)
 	if (chip->mem_base) {
 		rc = fg_dfs_create(chip);
 		if (rc < 0) {
@@ -8904,6 +8909,7 @@ static int fg_probe(struct platform_device *pdev)
 			goto power_supply_unregister;
 		}
 	}
+#endif
 
 	/* Fake temperature till the actual temperature is read */
 	chip->last_good_temp = 250;
@@ -8922,7 +8928,9 @@ static int fg_probe(struct platform_device *pdev)
 
 	return rc;
 
+#if IS_ENABLED(CONFIG_DEBUG_FS)
 power_supply_unregister:
+#endif
 	power_supply_unregister(chip->bms_psy);
 cancel_work:
 	fg_cancel_all_works(chip);
