@@ -14,8 +14,12 @@
 
 /* Copied from stock sdm439-camera-sensor-mtp.dtsi */
 
+#ifdef CONFIG_COMMON_CLK_MSM
+#include <dt-bindings/clock/msm-clocks-8952.h>
+#else
 #include <dt-bindings/clock/qcom,gcc-sdm429w.h>
 #include <dt-bindings/clock/qcom,rpmcc.h>
+#endif
 
 &cci {
 	qcom,camera@0 {

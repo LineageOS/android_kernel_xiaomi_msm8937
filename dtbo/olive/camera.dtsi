@@ -12,8 +12,12 @@
  * GNU General Public License for more details.
  */
 
+#ifdef CONFIG_COMMON_CLK_MSM
+#include <dt-bindings/clock/msm-clocks-8952.h>
+#else
 #include <dt-bindings/clock/qcom,gcc-sdm429w.h>
 #include <dt-bindings/clock/qcom,rpmcc.h>
+#endif
 
 
 &cci {
