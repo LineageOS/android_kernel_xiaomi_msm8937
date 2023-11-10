@@ -2650,12 +2650,14 @@ static void kgsl_pwrctrl_disable(struct kgsl_device *device)
 {
 	int status;
 
-	status = clk_set_rate(device->l3_clk, device->l3_freq[0]);
-	if (!status)
-		device->cur_l3_pwrlevel = 0;
-	else
-		dev_err(device->dev, "Could not clear l3_vote: %d\n",
-			     status);
+	if (!IS_ERR_OR_NULL(device->l3_clk)) {
+		status = clk_set_rate(device->l3_clk, device->l3_freq[0]);
+		if (!status)
+			device->cur_l3_pwrlevel = 0;
+		else
+			dev_err(device->dev, "Could not clear l3_vote: %d\n",
+					status);
+	}
 
 	if (gmu_core_gpmu_isenabled(device)) {
 		kgsl_pwrctrl_axi(device, KGSL_PWRFLAGS_OFF);
