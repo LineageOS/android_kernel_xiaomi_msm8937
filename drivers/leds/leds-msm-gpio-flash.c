@@ -22,8 +22,10 @@
 #include <linux/of.h>
 #include <linux/printk.h>
 #include <linux/list.h>
+#ifdef CONFIG_COMMON_CLK_MSM
 #include <linux/clk/msm-clk.h>
 #include <linux/clk/msm-clk-provider.h>
+#endif
 #include <linux/pinctrl/consumer.h>
 
 /* #define CONFIG_GPIO_FLASH_DEBUG */
