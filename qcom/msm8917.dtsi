@@ -1480,6 +1480,8 @@
 
 		qcom,scaling-lower-bus-speed-mode = "DDR52";
 		status = "disabled";
+
+		qcom,force-sdhc1-probe;
 	};
 
 	sdhc_2: sdhci@7864900 {
