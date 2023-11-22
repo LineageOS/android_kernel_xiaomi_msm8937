@@ -111,3 +111,10 @@ config PROC_CMDLINE_APPEND_ANDROID_FSTAB_SUFFIX
 	help
 	  Append Android fstab suffix parameter to /proc/cmdline.
 	  Parameter value is read from dt property "/android,fstab_suffix".
+
+config PROC_CMDLINE_OVERRIDE_ANDROID_BOOT_DEVICES
+	bool "Override Android boot devices parameter"
+	default y
+	help
+	  Say Y here to override Android boot devices parameter value
+	  from bootdevice parameter that supplied by the LK bootloader.
