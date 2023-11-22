@@ -278,6 +278,8 @@ struct sdhci_msm_host {
 	struct clk	 *ice_clk; /* SDHC peripheral ICE clock */
 	atomic_t clks_on; /* Set if clocks are enabled */
 	struct sdhci_msm_pltfm_data *pdata;
+	struct sdhci_host *host;
+	bool added_host;
 	struct mmc_host  *mmc;
 	struct cqhci_host *cq_host;
 	struct sdhci_msm_debug_data cached_data;

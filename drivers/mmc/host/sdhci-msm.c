@@ -5316,6 +5316,41 @@ static void sdhci_msm_select_bus_mode(struct sdhci_host *host)
 	}
 }
 
+static int sdhci_msm_add_host(struct sdhci_msm_host *msm_host)
+{
+	struct platform_device *pdev = msm_host->pdev;
+	struct device *dev = &pdev->dev;
+	struct device_node *node = pdev->dev.of_node;
+	struct sdhci_host *host = msm_host->host;
+	int ret;
+
+	if (msm_host->added_host) {
+		dev_err(dev, "%s: Have already added host\n", __func__);
+		return 0;
+	}
+
+	if (of_device_is_compatible(node, "qcom,sdhci-msm-cqe")) {
+		dev_dbg(dev, "node with qcom,sdhci-msm-cqe\n");
+		ret = sdhci_msm_cqe_add_host(host, pdev);
+	} else {
+		ret = sdhci_add_host(host);
+	}
+	if (ret) {
+		dev_err(dev, "Add host failed (%d)\n", ret);
+		goto out;
+	}
+
+	pm_runtime_set_active(&pdev->dev);
+	pm_runtime_enable(&pdev->dev);
+	pm_runtime_set_autosuspend_delay(&pdev->dev, MSM_AUTOSUSPEND_DELAY_MS);
+	pm_runtime_use_autosuspend(&pdev->dev);
+
+	msm_host->added_host = true;
+
+out:
+	return ret;
+}
+
 static int sdhci_msm_probe(struct platform_device *pdev)
 {
 	const struct sdhci_msm_offset *msm_host_offset;
@@ -5323,7 +5358,6 @@ static int sdhci_msm_probe(struct platform_device *pdev)
 	struct sdhci_pltfm_host *pltfm_host;
 	struct sdhci_msm_host *msm_host;
 	struct resource *core_memres = NULL;
-	struct device_node *node = pdev->dev.of_node;
 	int ret = 0, dead = 0;
 	u16 host_version;
 	u32 irq_status, irq_ctl;
@@ -5357,6 +5391,7 @@ static int sdhci_msm_probe(struct platform_device *pdev)
 
 	pltfm_host = sdhci_priv(host);
 	pltfm_host->priv = msm_host;
+	msm_host->host = host;
 	msm_host->mmc = host->mmc;
 	msm_host->pdev = pdev;
 
@@ -5771,16 +5806,10 @@ static int sdhci_msm_probe(struct platform_device *pdev)
 		}
 	}
 
-	if (of_device_is_compatible(node, "qcom,sdhci-msm-cqe")) {
-		dev_dbg(&pdev->dev, "node with qcom,sdhci-msm-cqe\n");
-		ret = sdhci_msm_cqe_add_host(host, pdev);
-	} else {
-		ret = sdhci_add_host(host);
-	}
-	if (ret) {
-		dev_err(&pdev->dev, "Add host failed (%d)\n", ret);
-		goto vreg_deinit;
-	}
+	if (sdhci_msm_is_bootdevice(&pdev->dev))
+		sdhci_msm_add_host(msm_host);
+	else
+		dev_info(&pdev->dev, "%s: Defer adding host as this is not boot device\n", __func__);
 
 	/*
 	 * To avoid polling and to avoid this R1b command conversion
@@ -5792,11 +5821,6 @@ static int sdhci_msm_probe(struct platform_device *pdev)
 	msm_host->pltfm_init_done = true;
 
 	msm_host->mmc->caps |= MMC_CAP_WAIT_WHILE_BUSY | MMC_CAP_NEED_RSP_BUSY;
-
-	pm_runtime_set_active(&pdev->dev);
-	pm_runtime_enable(&pdev->dev);
-	pm_runtime_set_autosuspend_delay(&pdev->dev, MSM_AUTOSUSPEND_DELAY_MS);
-	pm_runtime_use_autosuspend(&pdev->dev);
 
 	msm_host->msm_bus_vote.max_bus_bw.show = show_sdhci_max_bus_bw;
 	msm_host->msm_bus_vote.max_bus_bw.store = store_sdhci_max_bus_bw;
@@ -5937,7 +5961,8 @@ static int sdhci_msm_remove(struct platform_device *pdev)
 	if (msm_host->pm_qos_wq)
 		destroy_workqueue(msm_host->pm_qos_wq);
 
-	sdhci_remove_host(host, dead);
+	if (msm_host->added_host)
+		sdhci_remove_host(host, dead);
 
 	sdhci_msm_vreg_init(&pdev->dev, msm_host->pdata, false);
 
@@ -6169,7 +6194,63 @@ static struct platform_driver sdhci_msm_driver = {
 	},
 };
 
-module_platform_driver(sdhci_msm_driver);
+static DEFINE_MUTEX(sdhci_msm_add_host_store_mutex);
+static struct kobject *sdhci_msm_kobj = NULL;
+
+static ssize_t sdhci_msm_add_host_store(struct kobject *kobj,
+	struct kobj_attribute *attr,
+	const char *buf,
+	size_t count)
+{
+	int i = 0, val = 0;
+
+	if (sscanf(buf, "%du", &val) != 1)
+		return -EINVAL;
+
+	mutex_lock(&sdhci_msm_add_host_store_mutex);
+	if (val == 1) {
+		for (i = 0; i < ARRAY_SIZE(sdhci_slot); i++) {
+			if (IS_ERR_OR_NULL(sdhci_slot[i]) ||
+				IS_ERR_OR_NULL(sdhci_slot[i]->host) ||
+				!sdhci_slot[i]->pltfm_init_done)
+				continue;
+
+			sdhci_msm_add_host(sdhci_slot[i]);
+		}
+	}
+	mutex_unlock(&sdhci_msm_add_host_store_mutex);
+
+	return count;
+}
+
+static struct kobj_attribute sdhci_msm_add_host_attr = {
+	.attr = {
+		.name = "add_host",
+		.mode = 0220,
+	},
+	.store = sdhci_msm_add_host_store,
+};
+
+static int __init sdhci_msm_module_init(void)
+{
+	sdhci_msm_kobj = kobject_create_and_add("sdhci_msm", kernel_kobj);
+	if (sdhci_msm_kobj) {
+		sysfs_create_file(sdhci_msm_kobj, &sdhci_msm_add_host_attr.attr);
+	}
+
+	return platform_driver_register(&sdhci_msm_driver);
+}
+
+static void __exit sdhci_msm_module_exit(void)
+{
+	if (sdhci_msm_kobj)
+		kobject_del(sdhci_msm_kobj);
+
+	return platform_driver_unregister(&sdhci_msm_driver);
+}
+
+module_init(sdhci_msm_module_init);
+module_exit(sdhci_msm_module_exit);
 
 MODULE_DESCRIPTION("Qualcomm Technologies, Inc. SDHCI driver");
 MODULE_LICENSE("GPL v2");
