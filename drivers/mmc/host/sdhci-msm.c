@@ -4868,7 +4868,7 @@ static int sdhci_msm_probe(struct platform_device *pdev)
 	struct sdhci_pltfm_host *pltfm_host;
 	struct sdhci_msm_host *msm_host;
 	struct resource *core_memres = NULL;
-	int ret = 0, dead = 0;
+	int ret = 0, dead = 0, slot = 0;
 	u16 host_version;
 	u32 irq_status, irq_ctl;
 	struct resource *tlmm_memres = NULL;
@@ -4937,10 +4937,10 @@ static int sdhci_msm_probe(struct platform_device *pdev)
 
 	/* Extract platform data */
 	if (pdev->dev.of_node) {
-		ret = of_alias_get_id(pdev->dev.of_node, "sdhc");
-		if (ret <= 0) {
+		slot = of_alias_get_id(pdev->dev.of_node, "sdhc");
+		if (slot <= 0) {
 			dev_err(&pdev->dev, "Failed to get slot index %d\n",
-				ret);
+				slot);
 			goto pltfm_free;
 		}
 
@@ -4949,21 +4949,21 @@ static int sdhci_msm_probe(struct platform_device *pdev)
 			"qcom,force-sdhc1-probe", NULL);
 
 		/* skip the probe if eMMC isn't a boot device */
-		if ((ret == 1) && !sdhci_msm_is_bootdevice(&pdev->dev)
+		if ((slot == 1) && !sdhci_msm_is_bootdevice(&pdev->dev)
 		    && !force_probe) {
 			ret = -ENODEV;
 			goto pltfm_free;
 		}
 
-		if (disable_slots & (1 << (ret - 1))) {
+		if (disable_slots & (1 << (slot - 1))) {
 			dev_info(&pdev->dev, "%s: Slot %d disabled\n", __func__,
-				ret);
+				slot);
 			ret = -ENODEV;
 			goto pltfm_free;
 		}
 
-		if (ret <= 2)
-			sdhci_slot[ret-1] = msm_host;
+		if (slot <= 2)
+			sdhci_slot[slot-1] = msm_host;
 
 		msm_host->pdata = sdhci_msm_populate_pdata(&pdev->dev,
 							   msm_host);
