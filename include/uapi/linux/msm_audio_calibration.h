@@ -452,7 +452,11 @@ struct audio_cal_info_lsm {
 	int32_t		app_type;
 };
 
+#ifdef CONFIG_SND_SOC_MSM_QDSP6V2_VSS_NUM_CHANNELS_MAX_OVERRIDE
+#define VSS_NUM_CHANNELS_MAX	CONFIG_SND_SOC_MSM_QDSP6V2_VSS_NUM_CHANNELS_MAX_OVERRIDE
+#else
 #define VSS_NUM_CHANNELS_MAX	32
+#endif
 
 struct audio_cal_info_voc_top {
 	int32_t		topology;
