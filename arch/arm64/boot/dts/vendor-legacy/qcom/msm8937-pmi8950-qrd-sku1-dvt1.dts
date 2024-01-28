@@ -1,0 +1,186 @@
+/*
+ * Copyright (c) 2015-2016, The Linux Foundation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 and
+ * only version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/dts-v1/;
+
+#include "msm8937.dtsi"
+#include "msm8937-pmi8950-qrd-sku1.dtsi"
+
+/ {
+	model = "Qualcomm Technologies, Inc. MSM8937-PMI8950 QRD SKU1 DVT1";
+	compatible = "qcom,msm8937-pmi8950-qrd-sku1",
+		   "qcom,msm8937-qrd", "qcom,msm8937", "qcom,qrd";
+	qcom,board-id= <0x3000b 0>;
+};
+
+/ {
+	qrd_batterydata: qcom,battery-data {
+		qcom,batt-id-range-pct = <15>;
+		#include "batterydata-qrd-sku1-4v4-2800mah.dtsi"
+	};
+};
+
+&qpnp_smbcharger {
+	qcom,battery-data = <&qrd_batterydata>;
+	qcom,float-voltage-mv = <4400>;
+	qcom,chg-led-sw-controls;
+	qcom,chg-led-support;
+	status = "okay";
+};
+
+&qpnp_fg {
+	qcom,battery-data = <&qrd_batterydata>;
+	qcom,cold-bat-decidegc = <(-100)>;
+	qcom,cool-bat-decidegc = <(-100)>;
+	qcom,hot-bat-decidegc = <550>;
+	qcom,warm-bat-decidegc = <550>;
+	qcom,bad-battery-detection-enable;
+	qcom,hold-soc-while-full;
+};
+
+&soc {
+	sound {
+		qcom,model = "msm8952-sku1-snd-card";
+		qcom,msm-hs-micbias-type = "internal";
+		qcom,audio-routing =
+			"RX_BIAS", "MCLK",
+			"SPK_RX_BIAS", "MCLK",
+			"INT_LDO_H", "MCLK",
+			"MIC BIAS External", "Handset Mic",
+			"MIC BIAS Internal2", "Headset Mic",
+			"MIC BIAS External", "Secondary Mic",
+			"AMIC1", "MIC BIAS External",
+			"AMIC2", "MIC BIAS Internal2",
+			"AMIC3", "MIC BIAS External";
+	};
+
+	i2c@78b7000 {
+		synaptics@4b {
+			vcc_i2c-supply = <&pm8937_l6>;
+		};
+	};
+};
+
+&i2c_2 {
+	pericom-type-c@1d {
+		status="disabled";
+	};
+};
+
+// Customizations
+/ {
+	qcom,enable-legacy-adsp-hacks;
+
+	reserved-memory {
+		ramoops: ramoops {
+			compatible = "ramoops";
+			reg = <0 0xb0000000 0 0x800000>;
+			record-size = <0x200000>;
+			console-size = <0x200000>;
+			pmsg-size = <0x200000>;
+		};
+	};
+};
+&firmware {
+	android {
+		/delete-node/ fstab;
+		/delete-node/ vbmeta;
+	};
+};
+&msm_gpu {
+	qcom,disable-wake-on-touch;
+};
+&soc {
+	qcom,lpm-levels {
+		qcom,use-psci;
+	};
+
+	restart@4ab000 {
+		qcom,force-warm-reboot;
+	};
+};
+&thermal_zones {
+	/delete-node/ pa-therm1-adc;
+};
+#ifdef CONFIG_MSM_BCL_PERIPHERAL_CTL_LEGACY
+&bcl_sensor {
+	compatible = "qcom,msm-bcl-legacy";
+};
+#endif
+#if !defined(CONFIG_INPUT_QTI_HAPTICS) || defined(CONFIG_PARSE_ANDROIDBOOT_MODE)
+&pmi_haptic {
+	qcom,actuator-type = <1>;
+};
+#endif
+#ifdef CONFIG_INPUT_QTI_HAPTICS
+&spmi_bus {
+	qcom,pmi8950@3 {
+#ifndef CONFIG_PARSE_ANDROIDBOOT_MODE
+		/delete-node/ qcom,haptics@c000;
+#endif
+		pmi_qcom_haptics: qcom,qcom_haptics@c000 {};
+	};
+};
+&pmi_qcom_haptics {
+	status = "okay";
+	compatible = "qcom,haptics";
+	reg = <0xc000 0x100>;
+	interrupts = <0x3 0xc0 0x0 IRQ_TYPE_EDGE_BOTH>,
+		     <0x3 0xc0 0x1 IRQ_TYPE_EDGE_BOTH>;
+	interrupt-names = "hap-sc-irq", "hap-play-irq";
+	qcom,actuator-type = "erm"; // Default actuator type was ERM in kernel 3.18
+	qcom,vmax-mv = <2000>;
+	qcom,ilim-ma = <800>;
+	qcom,play-rate-us = <10000>;
+	wf_0 {
+		/* CLICK */
+		qcom,effect-id = <0>;
+		qcom,wf-vmax-mv = <2000>;
+		qcom,wf-pattern = [3e 3e 3e];
+		qcom,wf-brake-pattern = [01 00 00 00];
+	};
+	wf_1 {
+		/* DOUBLE CLICK */
+		qcom,effect-id = <1>;
+		qcom,wf-vmax-mv = <2000>;
+		qcom,wf-pattern = [7e 7e 02 02 02 02 02 02];
+		qcom,wf-repeat-count = <2>;
+		qcom,wf-s-repeat-count = <1>;
+	};
+	wf_2 {
+		/* TICK */
+		qcom,effect-id = <2>;
+		qcom,wf-vmax-mv = <2000>;
+		qcom,wf-pattern = [7e 7e];
+	};
+	wf_3 {
+		/* THUD */
+		qcom,effect-id = <3>;
+		qcom,wf-vmax-mv = <2000>;
+		qcom,wf-pattern = [7e 7e 7e];
+	};
+	wf_4 {
+		/* POP */
+		qcom,effect-id = <4>;
+		qcom,wf-vmax-mv = <2000>;
+		qcom,wf-pattern = [7e 7e];
+	};
+	wf_5 {
+		/* HEAVY CLICK */
+		qcom,effect-id = <5>;
+		qcom,wf-vmax-mv = <2000>;
+		qcom,wf-pattern = [7e 7e 7e];
+		qcom,wf-play-rate-us = <6667>;
+	};
+};
+#endif

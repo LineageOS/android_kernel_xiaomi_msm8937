@@ -1,0 +1,6 @@
+#include "msm8937-audio.dtsi"
+
+&ext_codec {
+	asoc-codec = <&stub_codec>;
+	asoc-codec-names = "msm-stub-codec.1";
+};
