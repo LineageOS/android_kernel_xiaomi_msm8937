@@ -1,0 +1,39 @@
+#ifdef MI8937_V2
+#include "../common/include/msm-cdc-pinctrl.h"
+MSM_CDC_PINCTRL_PA_GPIO_DOUBLE_PINS(hph, gpio94, gpio95)
+MSM_CDC_PINCTRL_PA_GPIO_SINGLE_PIN(spk, gpio93)
+#endif
+
+&int_codec {
+	/delete-property/ qcom,cdc-us-eu-gpios;
+	/delete-property/ qcom,cdc-us-euro-gpios;
+	/delete-property/ qcom,quin-mi2s-gpios;
+	qcom,msm-mbhc-gnd-swh = <1>;
+	qcom,msm-mbhc-hphl-swh = <1>;
+	qcom,msm-micbias2-ext-cap;
+#ifdef MI8937_V2
+	qcom,use-legacy-voice-cpu-dais;
+#else
+	qcom,msm-spk-ext-pa = <&tlmm 93 0>;
+	qcom,msm-switch-headphone-en = <&tlmm 94 0>;
+	qcom,msm-switch-headphone-in = <&tlmm 95 0>;
+#endif
+};
+
+&soc {
+	/delete-node/ msm_cdc_pinctrl_us_euro_sw;
+	/delete-node/ msm_cdc_pinctrl_quin;
+};
+
+&wcd_rst_gpio {
+	/delete-property/ pinctrl-0;
+	/delete-property/ pinctrl-1;
+	/delete-property/ pinctrl-names;
+};
+
+&tlmm {
+	/delete-node/ cdc_reset_ctrl;
+	/delete-node/ cross-conn-det;
+	/delete-node/ pri-tlmm-lines;
+	/delete-node/ pri-tlmm-ws-lines;
+};

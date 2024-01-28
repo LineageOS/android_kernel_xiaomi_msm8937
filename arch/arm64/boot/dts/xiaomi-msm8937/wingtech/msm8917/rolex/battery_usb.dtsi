@@ -1,0 +1,102 @@
+/* From stock msm8917-pmi8937-qrd-sku5_S88503.dtsi */
+&i2c_5 {
+	cw2015: cw2015@62 {
+#ifdef CONFIG_BATTERY_CW2015_ROLEX
+		compatible = "cellwise,cw2015-rolex";
+#else
+		compatible = "cellwise,cw2015";
+#endif
+		reg = <0x62>;
+		vdd-supply = <&pm8937_l17>;
+		vcc_i2c-supply = <&pm8937_l5>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <86 8>;
+		cw2015,irq-gpio=<86>;
+#ifndef CONFIG_BATTERY_CW2015_ROLEX
+		qcom,battery-data = <&qrd_batterydata>;
+#endif
+	};
+
+#ifdef CONFIG_SMB358_CHARGER_ROLEX
+	smb358_otg_vreg: smb358-charger@57 {
+		compatible = "qcom,smb358-charger-rolex";
+		reg = <0x57>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <61 0x0>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&smb_int_default>;
+		qcom,irq-gpio = <&tlmm 61 0x0>;
+		qcom,battid-gpio = <&pm8937_gpios 5 0>;
+		qcom,float-voltage-mv = <4400>;
+		qcom,recharge-mv = <50>;
+		regulator-name = "smb358_otg_vreg";
+		qcom,thermal-mitigation = <1500 1000 700 700>;
+		qcom,fastchg-current-max-ma = <1500>;
+		qcom,bms-psy-name = "bms";
+
+		qcom,bms-controlled-charging;
+		qcom,chg-inhibit-disabled;
+		io-channels = <&pm8937_vadc VADC_P_MUX2_1_1>,
+		      		  <&pm8937_vadc VADC_P_MUX4_1_1>;
+		io-channel-names = "batt_therm",
+						   "batt_id_therm";
+		qcom,chg-adc_tm = <&pm8937_adc_tm>;
+		qcom,using-pmic-therm;
+		qcom,bat-present-decidegc = <(300)>;
+		qcom,disable-apsd;
+/*
+ * Below properties are used for enable JEITA
+ */
+		qcom,hot-bat-decidegc = <600>;
+		qcom,warm-bat-decidegc = <450>;
+		qcom,cool-bat-decidegc = <100>;
+		qcom,cold-bat-decidegc = <0>;
+		qcom,warm-bat-ma = <600>;
+
+		qcom,cool-normal-bat-ma = <600>;
+		qcom,cool-cold-bat-ma = <300>;
+		qcom,iterm-ma = <150>;
+		qcom,warm-bat-mv = <4100>;
+		qcom,cool-bat-mv = <4400>;
+
+		qcom,battery-fcc = <3030>;
+		status = "ok";
+	};
+#else
+	smb358_otg_vreg: smb358-charger@57 {
+		compatible = "qcom,smb358-charger";
+		reg = <0x57>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <61 0x0>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&smb_int_default>;
+		qcom,irq-gpio = <&tlmm 61 0x0>;
+		qcom,float-voltage-mv = <4400>;
+		qcom,recharge-mv = <50>;
+		qcom,battery-data = <&qrd_batterydata>;
+		regulator-name = "smb358_otg_vreg";
+		qcom,bms-psy-name = "bms";
+		qcom,chg-inhibit-disabled;
+		io-channels = <&pm8937_vadc VADC_P_MUX2_1_1>,
+		      		  <&pm8937_vadc VADC_P_MUX4_1_1>;
+		io-channel-names = "batt_therm",
+						   "batt_id_therm";
+		qcom,iterm-ma = <150>;
+		/* Optional Properties */
+		qcom,thermal-mitigation = <1500 1000 700 700>;
+		status = "ok";
+	};
+#endif
+};
+&qrd_batterydata {
+	#include "batterydata/batterydata-wingtech-feimaotui_SONY-4v4-3030mah.dtsi"
+	#include "batterydata/batterydata-wingtech-xingwangda_ATL-4v4-3030mah.dtsi"
+};
+&usb_otg {
+#ifndef CONFIG_MSM_USB_POWER_SUPPLY_MI8937
+	extcon = <&smb358_otg_vreg>;
+#endif
+	qcom,hsusb-otg-phy-init-seq =
+		<0x39 0x81 0x37 0x82 0xffffffff>;
+	vbus_otg-supply = <&smb358_otg_vreg>;
+};

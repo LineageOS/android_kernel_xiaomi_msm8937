@@ -1,0 +1,7 @@
+/* From stock msm8937-mtp.dtsi */
+&soc {
+	ant_check {
+		compatible = "ant_check";
+		ant_check_gpio = <&tlmm 46 0x0>;
+	};
+};

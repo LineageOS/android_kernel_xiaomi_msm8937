@@ -1,0 +1,5 @@
+/* From stock msm8917-pmi8937-mtp.dts */
+&bq2560x_otg_supply {
+	qcom,thermal-mitigation = <1000 1000 500 200 0>;
+	ti,bq2560x,ta-ichg = <1000>;
+};

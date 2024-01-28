@@ -1,0 +1,98 @@
+/* From stock msm-pm8937.dtsi */
+&pm8937_pwm {
+	qcom,period = <4000000>;
+	qcom,mode-select = <0>;
+	qcom,dtest-line = <2>;
+	qcom,dtest-output = <2>;
+	status = "okay";
+	qcom,pwm {
+		qcom,duty = <2000000>;
+		label = "pwm";
+	};
+};
+&spmi_bus {
+	qcom,pm8937@0 {
+		qcom,power-on@800 {
+			qcom,pon_1 {
+				qcom,support-reset = <1>;
+				qcom,s1-timer = <4480>;
+				qcom,s2-timer = <2000>;
+				qcom,s2-type = <8>;
+			};
+			qcom,pon_3 {
+				qcom,pon-type = <3>;
+				qcom,pull-up = <1>;
+				qcom,support-reset = <1>;
+				qcom,s1-timer = <4480>;
+				qcom,s2-timer = <1000>;
+				qcom,s2-type = <1>;
+			};
+		};
+	};
+};
+
+/* From stock msm8937-mtp.dtsi */
+/* Adapted for msm-4.9 */
+&pm8937_gpios {
+	interrupts = <0x0 0xc0 0 IRQ_TYPE_NONE>,
+		 <0x0 0xc1 0 IRQ_TYPE_NONE>,
+		 <0x0 0xc4 0 IRQ_TYPE_NONE>,
+		 <0x0 0xc5 0 IRQ_TYPE_NONE>,
+		 <0x0 0xc6 0 IRQ_TYPE_NONE>,
+		 <0x0 0xc7 0 IRQ_TYPE_NONE>;
+	interrupt-names = "pm8937_gpio1", "pm8937_gpio2", "pm8937_gpio5",
+			  "pm8937_gpio6", "pmi8937_gpio7", "pm8937_gpio8";
+	qcom,gpios-disallowed = <3 4>;
+
+	pwm_ir {
+		pwm_ir_default: pwm_ir_default {
+			pins = "gpio6";
+#ifdef CONFIG_IR_PWM_MI8937
+			function = "func1";
+#else
+			function = "dtest2";
+#endif
+			qcom,drive-strength = <2>;
+#ifdef CONFIG_IR_PWM_MI8937
+			output-high;
+			bias-disable;
+#else
+			output-low;
+			bias-pull-down;
+#endif
+			status = "okay";
+		};
+
+#ifdef CONFIG_IR_PWM_MI8937
+		pwm_ir_sleep: pwm_ir_sleep {
+			pins = "gpio6";
+			function = "func1";
+			qcom,drive-strength = <2>;
+			output-low;
+			bias-pull-down;
+			status = "okay";
+		};
+#endif
+	};
+};
+
+/* From stock msm8940-pmi8937-mtp.dts */
+&pm8937_vadc {
+	/delete-node/ pa_therm1;
+	batt_rid {
+		label = "batt_rid";
+		reg = <VADC_P_MUX2_1_1>;
+		qcom,ratiometric;
+		qcom,hw-settle-time = <200>;
+		qcom,pre-scaling = <1 1>;
+		status = "okay";
+
+		qcom,iio-chan-type-override = "IIO_VOLTAGE";
+		qcom,scale-fn-type = <0>; // SCALE_DEFAULT
+	};
+};
+
+/* Custom */
+&thermal_zones {
+	/delete-node/ pa-therm1-adc;
+};

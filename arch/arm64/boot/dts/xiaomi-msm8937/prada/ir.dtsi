@@ -1,0 +1,17 @@
+&soc {
+	ir_transmitter {
+#ifdef CONFIG_IR_PWM_MI8937
+		compatible = "pwm-ir-mi8937";
+#else
+		compatible = "pwm-ir";
+#endif
+		pwms = <&pmi8950_pwm 0 0>;
+		qcom,pwm-mpp = <&pmi8950_gpios 1 0>;
+
+#ifdef CONFIG_IR_PWM_MI8937
+		pinctrl-names = "ir_active", "ir_sleep";
+		pinctrl-0 = <&pwm_ir_default>;
+		pinctrl-1 = <&pwm_ir_sleep>;
+#endif
+	};
+};

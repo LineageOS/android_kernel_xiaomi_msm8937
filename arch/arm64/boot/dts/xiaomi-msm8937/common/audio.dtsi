@@ -1,0 +1,37 @@
+/ {
+	qcom,enable-legacy-adsp-hacks;
+};
+
+&i2c_2 {
+	/delete-node/ wsa881x-i2c-codec@44;
+	/delete-node/ wsa881x-i2c-codec@45;
+	/delete-node/ wsa881x-i2c-codec@e;
+	/delete-node/ wsa881x-i2c-codec@f;
+};
+
+&int_codec {
+	/delete-property/ asoc-wsa-codec-names;
+	/delete-property/ asoc-wsa-codec-prefixes;
+	/delete-property/ msm-vdd-wsa-switch-supply;
+	/delete-property/ qcom,msm-vdd-wsa-switch-voltage;
+	/delete-property/ qcom,msm-vdd-wsa-switch-current;
+};
+
+&soc {
+	/delete-node/ sound-9335;
+	/delete-node/ wsa881x_analog_vi_pctrl;
+	/delete-node/ wsa881x_analog_clk_pctrl;
+	/delete-node/ wsa881x_analog_reset_pctrl;
+};
+
+&slim_msm {
+	tasha_codec {
+		/delete-node/ swr_master;
+	};
+};
+
+&tlmm {
+	/delete-node/ wsa_clk;
+	/delete-node/ wsa_reset;
+	/delete-node/ wsa-vi;
+};

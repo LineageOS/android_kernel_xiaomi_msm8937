@@ -1,0 +1,23 @@
+/* From stock msm8937.dtsi */
+&other_ext_mem {
+	reg = <0x0 0x84A00000 0x0 0x1E00000>;
+};
+&qcom_seecom {
+	reg = <0x84A00000 0x1900000>;
+};
+&soc {
+	qcom,bcl {
+		/delete-property/ qcom,bcl-enable;
+	};
+
+	qcom,wdt@b017000 {
+		qcom,bark-time = <15000>;
+	};
+
+	sn_fuse: snfuse@0xA4128 {
+		compatible = "qcom,sn-fuse";
+		reg = <0xA4128 0x4>,
+			<0xA6034 0x4>;
+		reg-names = "sn-base","fuse-state";
+	};
+};

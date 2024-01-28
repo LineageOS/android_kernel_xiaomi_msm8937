@@ -1,0 +1,62 @@
+/* From stock msm8917-pinctrl.dtsi */
+&tlmm {
+	spi7 {
+		spi7_default: spi7_default {
+			/* active state */
+			mux {
+				/* MOSI, MISO, CLK */
+				pins = "gpio85", "gpio86", "gpio88";
+				function = "blsp_spi7";
+			};
+
+			config {
+				pins = "gpio85", "gpio86", "gpio88";
+				drive-strength = <12>; /* 12 MA */
+				bias-disable = <0>; /* No PULL */
+			};
+		};
+
+		spi7_sleep: spi7_sleep {
+			/* suspended state */
+			mux {
+				/* MOSI, MISO, CLK */
+				pins = "gpio85", "gpio86", "gpio88";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio85", "gpio86", "gpio88";
+				drive-strength = <2>; /* 2 MA */
+				bias-pull-down; /* PULL Down */
+			};
+		};
+
+		spi7_cs0_active: cs0_active {
+			/* CS */
+			mux {
+				pins = "gpio87";
+				function = "blsp_spi7";
+			};
+
+			config {
+				pins = "gpio87";
+				drive-strength = <2>;
+				bias-disable = <0>;
+			};
+		};
+
+		spi7_cs0_sleep: cs0_sleep {
+			/* CS */
+			mux {
+				pins = "gpio87";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio87";
+				drive-strength = <2>;
+				bias-disable = <0>;
+			};
+		};
+	};
+};

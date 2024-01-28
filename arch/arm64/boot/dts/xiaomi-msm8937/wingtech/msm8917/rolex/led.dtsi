@@ -1,0 +1,15 @@
+#ifndef CONFIG_LEDS_AW2013_MI8937
+#include <dt-bindings/leds/common.h>
+#endif
+
+&led_aw2013 {
+#ifdef CONFIG_LEDS_AW2013_MI8937
+	AW2013_LED(red, 0)
+	AW2013_LED(green, 1)
+	AW2013_LED(blue, 2)
+#else
+	AW2013_MAINLINE_LED(red, 0, LED_COLOR_ID_RED)
+	AW2013_MAINLINE_LED(green, 1, LED_COLOR_ID_GREEN)
+	AW2013_MAINLINE_LED(blue, 2, LED_COLOR_ID_BLUE)
+#endif
+};

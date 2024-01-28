@@ -1,0 +1,8 @@
+/* From stock msm8917-qrd_S88505.dtsi */
+&int_codec {
+	qcom,msm-micbias2-ext-cap;
+#ifndef MI8937_V2
+	ext-spk-amp-gpio;
+	qcom,msm-spk-ext-pa = <&tlmm 124 0>;
+#endif
+};

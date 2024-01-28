@@ -1,0 +1,29 @@
+/ {
+	qrd_batterydata: qcom,battery-data {
+		qcom,batt-id-range-pct = <15>;
+		#include "batterydata/batterydata-qrd-Desay-4v4-4100mah.dtsi"
+		#include "batterydata/batterydata-qrd-Atl-4v4-4100mah.dtsi"
+		#include "batterydata/batterydata-qrd-Coslight-4v4-4100mah.dtsi"
+		#include "batterydata/batterydata-qrd-Default-4v4-4100mah.dtsi"
+	};
+};
+
+&qpnp_smbcharger {
+	qcom,battery-data = <&qrd_batterydata>;
+	qcom,chg-inhibit-fg;
+	qcom,thermal-mitigation = <2000 1500 1200 700 0>;
+};
+
+&qpnp_fg {
+	qcom,battery-data = <&qrd_batterydata>;
+	qcom,cool-bat-decidegc = <(150)>;
+	qcom,hot-bat-decidegc = <550>;
+	qcom,fg-iterm-ma = <180>;
+	qcom,fg-chg-iterm-ma = <130>;
+	qcom,fg-cutoff-voltage-mv = <3400>;
+	qcom,thermal-coefficients = [B7 85 B2 49 71 35];
+};
+
+&usb_otg {
+	qcom,usbin-vadc = <&pmi8950_vadc>;
+};

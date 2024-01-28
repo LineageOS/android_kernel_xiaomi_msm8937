@@ -1,0 +1,28 @@
+#include "panel/BOE_hx8394F_720p_video_mode_dsi_panel.dtsi"
+#include "panel/CTC_nt35521s_720p_video_mode_dsi_panel.dtsi"
+#include "panel/Tianma_ili9881c_720p_video_mode_dsi_panel.dtsi"
+
+&mdss_dsi0 {
+	qcom,dsi-pref-prim-pan = <&dsi_hx8394f_boe_720p_video>;
+};
+
+&wled {
+#ifdef CONFIG_BACKLIGHT_QCOM_WLED
+	/delete-property/ qcom,external-pfet;
+	qcom,cabc;
+
+	default-brightness = <1024>;
+	max-brightness = <2047>;
+#else
+	/delete-property/ qcom,en-ext-pfet-sc-pro;
+	qcom,en-cabc;
+	qcom,wled-stepper-en;
+#endif
+};
+
+/* From msm-3.18 msm8937-mtp.dtsi */
+&mdss_dsi0 {
+	qcom,platform-enable-gpio = <&tlmm 99 0>;
+	qcom,platform-reset-gpio = <&tlmm 60 0>;
+	qcom,platform-bklight-en-gpio = <&tlmm 98 0>;
+};

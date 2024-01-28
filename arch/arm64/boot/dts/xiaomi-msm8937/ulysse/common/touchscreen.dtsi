@@ -1,0 +1,105 @@
+/* From stock msm8940-pmi8937-mtp.dts */
+&i2c_3 {
+	status = "ok";
+	clock-frequency = <400000>;
+	focaltech@38 {
+#ifdef CONFIG_TOUCHSCREEN_FTS_MI8937
+		compatible = "focaltech,fts_ts-mi8937";
+		focaltech,ic-type = <0x54350402>; // _FT5435
+		focaltech,key-dim = <50>;
+		focaltech,key-y-coords = <1350 1350 1350>;
+		focaltech,esd-check;
+		focaltech,use-old-touchdata-reading-behavior;
+#else
+		compatible = "focaltech,ft5435";
+#endif
+		reg = <0x38>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <65 0x2008>;
+		vdd-supply = <&pm8937_l10>;
+		vcc_i2c-supply = <&pm8937_l6>;
+		pinctrl-names = "pmx_ts_active","pmx_ts_suspend","pmx_ts_release";
+		pinctrl-0 = <&ts_int_active &ts_reset_active>;
+		pinctrl-1 = <&ts_int_suspend &ts_reset_suspend>;
+		pinctrl-2 = <&ts_release>;
+		focaltech,name = "fts_ts";
+		focaltech,reset-gpio = <&tlmm 64 0x00>;
+		focaltech,irq-gpio = <&tlmm 65 0x02>;
+		focaltech,display-coords = <0 0 720 1280>;
+		focaltech,max-touch-number = <10>;
+		focaltech,have-key;
+		focaltech,key-number = <3>;
+		focaltech,keys = <139 172 158>;
+		focaltech,key-y-coord = <1350>;
+		focaltech,key-x-coords = <180 350 540>;
+	};
+	goodix@5d{
+#ifdef CONFIG_TOUCHSCREEN_GT9XX_MI8937
+		compatible = "goodix,gt9xx-mi8937";
+#else
+		compatible = "goodix,gt9xx";
+#endif
+		status = "okay";
+		reg = <0x5d>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <65 0x2008>;
+		vdd_ana-supply = <&pm8937_l10>;
+		vcc_i2c-supply = <&pm8937_l6>;
+		pinctrl-names = "gdix_ts_int_default", "gdix_ts_int_output_low",
+				"gdix_ts_int_output_high", "gdix_ts_int_input",
+				"gdix_ts_rst_default", "gdix_ts_rst_output_low",
+				"gdix_ts_rst_output_high", "gdix_ts_rst_input";
+		pinctrl-0 = <&ts_int_default>;
+		pinctrl-1 = <&ts_int_output_low>;
+		pinctrl-2 = <&ts_int_output_high>;
+		pinctrl-3 = <&ts_int_input>;
+		pinctrl-4 = <&ts_rst_default>;
+		pinctrl-5 = <&ts_rst_output_low>;
+		pinctrl-6 = <&ts_rst_output_high>;
+		pinctrl-7 = <&ts_rst_input>;
+		reset-gpios = <&tlmm 64 0x00>;
+		irq-gpios = <&tlmm 65 0x2008>;
+		irq-flags = <1>;
+		touchscreen-max-id = <10>;
+		touchscreen-size-x = <720>;
+		touchscreen-size-y = <1280>;
+		touchscreen-max-w = <1024>;
+		touchscreen-max-p = <1024>;
+		touchscreen-key-map = <139 172 158>;
+		goodix,type-a-report = <0>;
+		goodix,driver-send-cfg = <1>;
+		goodix,wakeup-with-reset = <0>;
+		goodix,resume-in-workqueue = <1>;
+		goodix,int-sync = <1>;
+		goodix,swap-x2y = <0>;
+		goodix,esd-protect = <1>;
+		goodix,pen-suppress-finger = <0>;
+		goodix,auto-update = <1>;
+		goodix,auto-update-cfg = <0>;
+		goodix,power-off-sleep = <0>;
+		goodix,slide-wakeup = <1>;
+		goodix,cfg-group0 = [
+			52 D0 02 00 05 0A 3C CF 11 CF 32
+			0F 5A 46 05 64 00 00 00 00 24 33
+			00 14 16 28 14 87 27 CD 40 42 B8
+			08 0F 0A 00 5A 33 91 00 00 00 00
+			00 C4 C4 32 C8 00 31 1E 50 82 E0
+			E4 0F 28 19 04 E2 21 00 97 28 00
+			89 2E 00 80 3B 00 70 48 00 6E 10
+			38 68 00 57 55 40 66 6F 17 3C 02
+			02 00 00 00 00 00 00 02 00 00 0F
+			28 00 00 00 00 00 0A 5A 00 00 00
+			00 46 00 07 08 09 0A 0B 0C 0D 0E
+			0F 10 11 18 17 16 15 14 13 06 05
+			04 03 02 01 12 FF FF FF FF FF 29
+			28 24 22 20 1F 1E 0A 08 06 05 04
+			02 00 FF FF FF 00 00 00 00 00 00
+			00 00 00 32 41 41 00 23 28 86 00
+			00 00 00 00 00 00 0F 46 00 00 00
+			00 00 00 28 4B 00 00 00 00 00 00
+			00 01 01 14 78 1D 23 1E 3E 1E 01
+			01 14 50 00 05 00 00 00 00 00 00
+			00 00 00 00 00 00 EC 01
+		];
+	};
+};

@@ -1,0 +1,45 @@
+#include "panel/dsi-panel-ili9881c-ebbg-720p-video.dtsi"
+#include "panel/dsi-panel-ili9881c-ebbgDJN-720p-video.dtsi"
+
+&dsi_ili9881c_ebbg_720p_video {
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+};
+
+&dsi_ili9881c_ebbgDJN_720p_video {
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+};
+
+&dsi_panel_pwr_supply {
+	qcom,panel-supply-entry@2 {
+		qcom,supply-post-on-sleep = <5>;
+	};
+
+	qcom,panel-supply-entry@3 {
+		qcom,supply-post-on-sleep = <5>;
+	};
+};
+
+&ibb_regulator {
+	qcom,qpnp-ibb-discharge-resistor = <32>;
+};
+
+&lab_regulator {
+	qcom,qpnp-ibb-init-lcd-voltage = <5500000>;
+};
+
+&ibb_regulator {
+	qcom,qpnp-ibb-init-lcd-voltage = <5500000>;
+};
+
+&mdss_dsi0 {
+	qcom,dsi-pref-sub-pan = <&dsi_ili9881c_ebbg_720p_video>;
+	qcom,dsi-pref-sub1-pan = <&dsi_ili9881c_ebbgDJN_720p_video>;
+};
+
+&wled {
+#ifdef CONFIG_BACKLIGHT_QCOM_WLED
+	qcom,cabc;
+#else
+	qcom,en-cabc;
+#endif
+};

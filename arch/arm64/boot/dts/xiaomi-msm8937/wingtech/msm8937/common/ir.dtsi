@@ -1,0 +1,20 @@
+&soc {
+	gpio-leds {
+#ifdef CONFIG_LEDS_GPIO_IR_MI8937
+		compatible = "gpio-leds-ir-mi8937";
+#else
+		compatible = "gpio-leds-ir";
+#endif
+		status = "okay";
+		pinctrl-names = "default";
+		pinctrl-0 = <&gpio_led_off>;
+
+		infred {
+			gpios = <&tlmm 45 0>;
+			label = "infrared";
+			linux,default-trigger = "infra-red";
+			default-state = "off";
+			retain-state-suspended;
+		};
+	};
+};

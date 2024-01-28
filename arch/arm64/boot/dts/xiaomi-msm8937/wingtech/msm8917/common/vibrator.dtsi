@@ -1,0 +1,13 @@
+/* From stock msm8917-pmi8937-qrd-sku5_S8850?.dtsi */
+&soc {
+	vibrator_gpio {
+#ifdef CONFIG_LEDS_VIBRATOR_GPIO_MI8937
+		compatible = "qcom,vibrator-gpio-mi8937";
+#else
+		compatible = "qcom,vibrator-gpio";
+#endif
+		qcom,vibrator-timeout-ms = <50000>;
+		qcom,vib-gpio_one = <&tlmm 97 0x00>;
+		label = "vibrator";
+	};
+};

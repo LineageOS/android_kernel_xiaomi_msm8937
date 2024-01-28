@@ -1,0 +1,105 @@
+/* From stock msm8940-pmi8937-mtp.dts */
+&i2c_2 {
+	status = "ok";
+	bq2560x_otg_supply: bq2560x@6B {
+#ifdef CONFIG_CHARGER_BQ2560X_MI8937
+		compatible = "ti,bq25601-charger-mi8937";
+#else
+		compatible = "ti,bq25601-charger";
+#endif
+		reg = <0x6B>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <61 2>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&smb_int_default>;
+		regulator-name = "bq2560x_otg_vreg";
+#ifndef CONFIG_MSM_USB_POWER_SUPPLY_MI8937
+		dpdm-supply = <&usb_otg>;
+#endif
+		ti,bq2560x,chip-enable-gpio = <48>;
+		ti,bq2560x,usb-vlim = <4500>;
+		ti,bq2560x,usb-ilim = <500>;
+		ti,bq2560x,usb-vreg = <4400>;
+		ti,bq2560x,usb-ichg = <500>;
+		ti,bq2560x,ta-vlim = <4500>;
+		ti,bq2560x,ta-ilim = <2000>;
+		ti,bq2560x,ta-vreg = <4400>;
+		ti,bq2560x,precharge-current = <120>;
+		ti,bq2560x,termination-current = <120>;
+		ti,bq2560x,boost-voltage = <4998>;
+		ti,bq2560x,boost-current = <1200>;
+		ti,bq2560x,enable_term;
+		ti,bq2560x,stat-pin-ctrl = <3>;
+		ti,bq2560x,vac-ovp-threshold = <6200>;
+		ti,bq2560x,jeita-hot-degc = <540>;
+		ti,bq2560x,jeita-warm-degc = <450>;
+#ifdef CONFIG_CHARGER_BQ2560X_MI8937
+		ti,bq2560x,jeita-cool-degc = <150>;
+		ti,bq2560x,jeita-cool-xiaomi-degc = <50>;
+#else
+		ti,bq2560x,jeita-cool-normal-degc = <150>;
+		ti,bq2560x,jeita-cold-cool-degc = <50>;
+#endif
+		ti,bq2560x,jeita-cold-degc = <0>;
+		ti,bq2560x,jeita-hot-hysteresis = <10>;
+		ti,bq2560x,jeita-cold-hysteresis = <0>;
+#ifdef CONFIG_CHARGER_BQ2560X_MI8937
+		ti,bq2560x,jeita-cool-ma = <900>;
+		ti,bq2560x,jeita-cool-xiaomi-ma = <300>;
+#else
+		ti,bq2560x,jeita-cool-normal-ma = <900>;
+		ti,bq2560x,jeita-cold-cool-ma = <300>;
+#endif
+		ti,bq2560x,jeita-cool-mv = <4400>;
+		ti,bq2560x,jeita-warm-ma = <900>;
+		ti,bq2560x,jeita-warm-mv = <4112>;
+		ti,bq2560x,software-jeita-supported;
+	};
+	bq27426@55 {
+#ifdef CONFIG_FUEL_GAUGE_BQ27426_MI8937
+		compatible = "ti,bq27426-mi8937";
+#else
+		compatible = "ti,bq27426";
+#endif
+		reg = <0x55>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <62 2>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&bq_int_default>;
+		vdd-supply = <&pm8937_l16>;
+		ti,battery-type-b = "feimaotui_3080mah";
+		ti,battery-type-a = "guangyu_3080mah";
+		ti,batt-profile-select;
+		io-channels = <&pm8937_vadc VADC_P_MUX2_1_1>;
+		io-channel-names = "batt_id";
+		ti,profile-a-rid-kohm = <22>;
+		ti,profile-b-rid-kohm = <110>;
+		ti,batt-id-vref-uv = <1800000>;
+		ti,batt-id-rpullup-kohm = <68>;
+		agassiz,force-select-profile-b;
+	};
+};
+
+/* Custom */
+#ifdef CONFIG_MSM_USB_POWER_SUPPLY_MI8937
+&soc {
+	usb_power_supply: usb_power_supply {
+		compatible = "qcom,msm_usb_psy-mi8937";
+		dpdm-supply = <&usb_otg>;
+		qcom,dpdm-regulator-always-on;
+	};
+};
+#endif
+
+/* From stock msm8940-pmi8937-mtp.dts */
+&usb_otg {
+#ifdef CONFIG_MSM_USB_POWER_SUPPLY_MI8937
+	extcon = <&usb_power_supply>;
+#else
+	extcon = <&bq2560x_otg_supply>;
+#endif
+	interrupts = <0 134 IRQ_TYPE_LEVEL_HIGH>,<0 140 IRQ_TYPE_LEVEL_HIGH>,<0 136 IRQ_TYPE_LEVEL_HIGH>;
+	interrupt-names = "core_irq", "async_irq","phy_irq";
+	qcom,hsusb-otg-mode = <3>;
+	vbus_otg-supply = <&bq2560x_otg_supply>;
+};

@@ -1,0 +1,26 @@
+/* From stock msm8937-mdss-panels.dtsi */
+#include "panel/dsi-panel-hx-otm1901a-720p-video.dtsi"
+#include "panel/dsi-panel-tm-otm1901a-720p-video.dtsi"
+#include "panel/dsi-panel-shenchao-ili9881c-720p-video.dtsi"
+
+/* From stock msm8937-mtp.dtsi */
+&mdss_dsi0 {
+	pinctrl-names = "mdss_default", "mdss_sleep";
+	pinctrl-0 = <&mdss_dsi_active>;
+	pinctrl-1 = <&mdss_dsi_suspend>;
+
+	/delete-property/ qcom,platform-enable-gpio;
+	/delete-property/ qcom,platform-te-gpio;
+	qcom,dsi-pref-prim-pan = <&dsi_sc_ili9881c_720p_video>;
+	qcom,ocp2131-enp-gpio = <&tlmm 12 0>;
+	qcom,ocp2131-enn-gpio = <&tlmm 13 0>;
+	qcom,platform-bklight-en-gpio = <&tlmm 93 1>;
+	qcom,platform-reset-gpio = <&tlmm 60 0>;
+	qcom,regulator-ldo-mode;
+};
+
+/* Custom */
+&mdss_dsi0 {
+	qcom,xiaomi-ulysse-board-id-gpios = <&tlmm 20 0>, <&tlmm 21 0>;
+	qcom,xiaomi-ulysse-ID-status-gpios = <&tlmm 59 0>, <&tlmm 66 0>;
+};

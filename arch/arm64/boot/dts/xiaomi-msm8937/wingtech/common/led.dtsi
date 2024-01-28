@@ -1,0 +1,16 @@
+&i2c_2 { /* i2c 2 */
+	led_aw2013: aw2013@45 { /*blink */
+#ifdef CONFIG_LEDS_AW2013_MI8937
+		compatible = "awinic,aw2013-mi8937";
+#else
+		compatible = "awinic,aw2013";
+#endif
+		reg = <0x45>;
+#ifdef CONFIG_LEDS_AW2013_MI8937
+		vdd-supply = <&pm8937_l10>;
+		vcc-supply = <&pm8937_l5>;
+#else
+		vcc-supply = <&pm8937_l10>;
+#endif
+	};
+};

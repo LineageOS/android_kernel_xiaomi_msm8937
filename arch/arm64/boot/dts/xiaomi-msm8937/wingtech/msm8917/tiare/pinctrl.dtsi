@@ -1,0 +1,33 @@
+/* From stock msm8917-camera-pinctrl.dtsi */
+&cam_sensor_front1_default {
+	mux {
+		pins = "gpio39";
+	};
+	config {
+		pins = "gpio39";
+	};
+};
+&cam_sensor_front1_sleep {
+	mux {
+		pins = "gpio39";
+	};
+	config {
+		pins = "gpio39";
+	};
+};
+&cam_sensor_rear_default {
+	mux {
+		pins = "gpio35";
+	};
+	config {
+		pins = "gpio35";
+	};
+};
+&cam_sensor_rear_sleep {
+	mux {
+		pins = "gpio35";
+	};
+	config {
+		pins = "gpio35";
+	};
+};

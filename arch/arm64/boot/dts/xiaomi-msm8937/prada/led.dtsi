@@ -1,0 +1,28 @@
+#include <dt-bindings/leds/common.h>
+
+&i2c_2 {
+	aw2013@45 {
+#ifdef CONFIG_LEDS_AW2013_MI8937
+		compatible = "awinic,aw2013-mi8937";
+#else
+		compatible = "awinic,aw2013";
+#endif
+		reg = <0x45>;
+#ifdef CONFIG_LEDS_AW2013_MI8937
+		vdd-supply = <&pm8937_l10>;
+		vcc-supply = <&pm8937_l6>;
+#else
+		vcc-supply = <&pm8937_l10>;
+#endif
+
+#ifdef CONFIG_LEDS_AW2013_MI8937
+		AW2013_LED(red, 0)
+		AW2013_LED(green, 1)
+		AW2013_LED(blue, 2)
+#else
+		AW2013_MAINLINE_LED(red, 0, LED_COLOR_ID_RED)
+		AW2013_MAINLINE_LED(green, 1, LED_COLOR_ID_GREEN)
+		AW2013_MAINLINE_LED(blue, 2, LED_COLOR_ID_BLUE)
+#endif
+	};
+};

@@ -1,0 +1,48 @@
+&soc {
+	fpc1020 {
+#ifdef CONFIG_FINGERPRINT_FPC1020_SANTONI
+		compatible = "soc:fpc1020-santoni";
+#else
+		compatible = "soc:fpc1020";
+#endif
+		interrupt-parent = <&tlmm>;
+		interrupts = <46 0>;
+		fpc,gpio_rst = <&tlmm 62 0>;
+		fpc,gpio_irq = <&tlmm 46 0>;
+		vcc_spi-supply = <&pm8937_l5>;
+		vdd_ana-supply = <&pm8937_l5>;
+		vdd_io-supply = <&pm8937_l5>;
+		fpc,enable-on-boot;
+		fpc,enable-wakeup;
+		fpc,spi-max-frequency = <4800000>;
+		clock-names = "iface_clk", "core_clk";
+		clocks = <&gcc GCC_BLSP1_AHB_CLK>,
+				<&gcc GCC_BLSP1_QUP1_SPI_APPS_CLK>;
+		pinctrl-names = "fpc1020_reset_reset", "fpc1020_reset_active", "fpc1020_irq_active";
+		pinctrl-0 = <&fpc_reset_reset>;
+		pinctrl-1 = <&fpc_reset_active>;
+		pinctrl-2 = <&fpc_irq_active>;
+	};
+
+	goodix_fp {
+#ifdef CONFIG_FINGERPRINT_GOODIX_GF3208_SANTONI
+		compatible = "goodix,fingerprint-santoni";
+#else
+		compatible = "goodix,fingerprint";
+#endif
+		spi-max-frequency = <1000000>;
+		input-device-name = "gf3208";
+		interrupt-parent = <&tlmm>;
+		interrupts = <46 0>;
+		goodix,gpio_reset = <&tlmm 62 0>;
+		goodix,gpio_irq = <&tlmm 46 0>;
+		clock-names = "iface_clk", "core_clk";
+		clocks = <&gcc GCC_BLSP1_AHB_CLK>,
+			<&gcc GCC_BLSP1_QUP1_SPI_APPS_CLK>;
+		pinctrl-names = "goodixfp_spi_active", "goodixfp_reset_reset", "goodixfp_reset_active", "goodixfp_irq_active";
+		pinctrl-0 = <&goodix_spi_active>;
+		pinctrl-1 = <&goodix_reset_reset>;
+		pinctrl-2 = <&goodix_reset_active>;
+		pinctrl-3 = <&goodix_irq_active>;
+	};
+};

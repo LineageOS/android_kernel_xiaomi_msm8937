@@ -1,0 +1,21 @@
+&spmi_bus {
+	qcom,pm8937@0 {
+		qcom,power-on@800 {
+			qcom,store-hard-reset-reason;
+			qcom,pon_1 {
+				qcom,s1-timer = <6720>;
+				qcom,s2-timer = <0>;
+				qcom,s2-type = <7>;
+				qcom,support-reset = <1>;
+			};
+		};
+	};
+};
+
+&pm8937_vadc {
+	/delete-node/ chan@11;
+};
+
+&thermal_zones {
+	/delete-node/ pa-therm1-adc;
+};

@@ -1,0 +1,8 @@
+/* From stock msm8940-pmi8937-mtp.dts */
+&bq2560x_otg_supply {
+	qcom,thermal-mitigation = <2000 1000 500 200 0>;
+	ti,bq2560x,ta-ichg = <2000>;
+};
+&usb_otg {
+	qcom,hsusb-otg-phy-init-seq = <0x38 0x81 0xffffffff>;
+};

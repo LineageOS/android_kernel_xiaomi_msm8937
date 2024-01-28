@@ -1,0 +1,53 @@
+#include "panel/dsi-panel-hx8394f-boe-720p-video.dtsi"
+
+&dsi_hx8394f_boe_720_vid {
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+};
+
+&dsi_panel_pwr_supply {
+	qcom,panel-supply-entry@2 {
+		qcom,supply-min-voltage = <4600000>;
+		qcom,supply-max-voltage = <6000000>;
+		qcom,supply-enable-load = <100000>;
+		qcom,supply-disable-load = <100>;
+	};
+
+	qcom,panel-supply-entry@3 {
+		qcom,supply-min-voltage = <4600000>;
+		qcom,supply-max-voltage = <6000000>;
+		qcom,supply-enable-load = <100000>;
+		qcom,supply-disable-load = <100>;
+	};
+};
+
+&labibb {
+	status = "ok";
+	qpnp,qpnp-labibb-mode = "lcd";
+};
+
+&lab_regulator {
+	/delete-property/ qcom,qpnp-ibb-use-default-voltage;
+};
+
+&ibb_regulator {
+	/delete-property/ qcom,qpnp-ibb-use-default-voltage;
+};
+
+&mdss_dsi0 {
+	lab-supply = <&lab_regulator>;
+	ibb-supply = <&ibb_regulator>;
+
+	pinctrl-names = "mdss_default", "mdss_sleep";
+	pinctrl-0 = <&mdss_dsi_active &mdss_te_active>;
+	pinctrl-1 = <&mdss_dsi_suspend &mdss_te_suspend>;
+
+	qcom,dsi-pref-prim-pan = <&dsi_hx8394f_boe_720_vid>;
+};
+
+&wled {
+#ifdef CONFIG_BACKLIGHT_QCOM_WLED
+	default-brightness = <1024>;
+	max-brightness = <2047>;
+#endif
+	qcom,wled-stepper-en;
+};

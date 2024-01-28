@@ -1,0 +1,36 @@
+/* From stock msm8937-mdss-pll.dtsi */
+&mdss_dsi0_pll {
+	/delete-property/ qcom,dsi-pll-ssc-en;
+};
+
+/* From stock msm8917-pmi8937-qrd-sku5_S88508.dtsi */
+#include "panel/dsi-panel-ili9881c-ebbg-c3b-720p-video.dtsi"
+#include "panel/dsi-panel-hx8394f-boe-c3b-720p-video.dtsi"
+#include "panel/dsi-panel-ili9881c-ebbgDJN-c3b-720p-video.dtsi"
+#include "panel/dsi-panel-ili9881c-tianma-c3b-720p-video.dtsi"
+
+&mdss_dsi0 {
+	qcom,dsi-pref-prim-pan = <&dsi_ili9881c_ebbg_720p_video>;
+	qcom,dsi-pref-sub1-pan = <&dsi_ili9881c_ebbgDJN_720p_video>;
+	qcom,dsi-pref-sub2-pan = <&dsi_ili9881c_tianma_720p_video>;
+};
+
+&dsi_hx8394f_720p_video {
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+};
+
+&dsi_hx8394f_boe_720_vid {
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+};
+
+&dsi_ili9881c_ebbg_720p_video {
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+};
+
+&dsi_ili9881c_ebbgDJN_720p_video {
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+};
+
+&dsi_ili9881c_tianma_720p_video {
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+};

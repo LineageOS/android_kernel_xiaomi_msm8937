@@ -1,0 +1,29 @@
+/dts-v1/;
+
+#include "common/include/config.h"
+
+#include "qcom/msm8917.dtsi"
+#include "qcom/msm8917-audio.dtsi"
+#include "qcom/msm8917-mtp.dtsi"
+#include "qcom/msm8917-pmi8937.dtsi"
+
+#include "common/fragments/delete-msm89x7-camera-sensor-mtp.dtsi"
+
+#define IS_MSM8917
+
+#include "common/common.dtsi"
+#include "ulysse/common/common.dtsi"
+#include "ulysse/ugglite/ugglite.dtsi"
+
+/* From stock msm8917-pmi8937-mtp.dts */
+/ {
+	model = "Qualcomm Technologies, Inc. MSM8917-PMI8937 MTP";
+	compatible = "qcom,msm8917-mtp", "qcom,msm8917", "qcom,mtp", "xiaomi,ugglite";
+	qcom,board-id= <8 0>;
+	qcom,pmic-id = <0x10019 0x0 0x0 0x0>;
+
+#ifndef MI8937_V2
+	xiaomi,series = "ulysse";
+	xiaomi,device = "ugglite";
+#endif
+};

@@ -1,0 +1,62 @@
+/* From stock msm8917-pmi8937-qrd-sku5_S8850?.dtsi */
+&i2c_2 { /* i2c 2 */
+	tps65132@3e {
+#ifdef CONFIG_REGULATOR_TPS65132_MI8937
+		compatible = "ti,tps65132-mi8937";
+#else
+		compatible = "ti,tps65132";
+#endif
+		reg = <0x3e>;
+		i2c-pwr-supply = <&pm8937_l5>;
+		ti,en-gpio-lpm;
+		pinctrl-names = "default";
+		pinctrl-0 = <&tps65132_en_default>;
+
+		regulators {
+			tps65132_pos: pos-boost {
+				regulator-name = "tps65132-pos";
+				regulator-min-microvolt = <5000000>;
+				regulator-max-microvolt = <5000000>;
+				ti,discharge-enable;
+				ti,enable-time = <800>;
+				ti,current-limit = <200000>;
+				ti,en-gpio = <&tlmm 126 0>;
+			};
+
+			tps65132_neg: neg-boost {
+				regulator-name = "tps65132-neg";
+				regulator-min-microvolt = <5000000>;
+				regulator-max-microvolt = <5000000>;
+				ti,discharge-enable;
+				ti,enable-time = <800>;
+				ti,current-limit = <40000>;
+				ti,en-gpio = <&tlmm 127 0>;
+			};
+		};
+	};
+};
+
+&dsi_panel_pwr_supply {
+	qcom,panel-supply-entry@2 {
+		qcom,supply-min-voltage = <5000000>;
+		qcom,supply-max-voltage = <5000000>;
+		qcom,supply-enable-load = <200>;
+		qcom,supply-disable-load = <0>;
+	};
+
+	qcom,panel-supply-entry@3 {
+		qcom,supply-min-voltage = <5000000>;
+		qcom,supply-max-voltage = <5000000>;
+		qcom,supply-enable-load = <40>;
+		qcom,supply-disable-load = <0>;
+		qcom,supply-post-off-sleep = <3>;
+	};
+};
+
+&mdss_dsi0 {
+	pinctrl-names = "mdss_default", "mdss_sleep";
+	pinctrl-0 = <&mdss_dsi_active>;
+	pinctrl-1 = <&mdss_dsi_suspend>;
+	lab-supply = <&tps65132_pos>;
+	ibb-supply = <&tps65132_neg>;
+};

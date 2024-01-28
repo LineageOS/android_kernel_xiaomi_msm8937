@@ -1,0 +1,51 @@
+/* From stock msm8917.dtsi */
+/ {
+	aliases {
+		spi7 = &spi_7;
+	};
+};
+
+&soc {
+	/* WARNING: Copy */
+	spi_7: spi@7af7000 { /* BLSP1 QUP3 */
+		compatible = "qcom,spi-qup-v2";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg-names = "spi_physical", "spi_bam_physical";
+		reg = <0x7af7000 0x600>,
+			<0x7ac4000 0x1f000>;
+		interrupt-names = "spi_irq", "spi_bam_irq";
+		interrupts = <0 301 0>, <0 239 0>;
+		spi-max-frequency = <50000000>;
+		pinctrl-names = "spi_default", "spi_sleep";
+		pinctrl-0 = <&spi7_default &spi7_cs0_active>;
+		pinctrl-1 = <&spi7_sleep &spi7_cs0_sleep>;
+		clocks = <&gcc GCC_BLSP2_AHB_CLK>,
+			<&gcc GCC_BLSP2_QUP3_SPI_APPS_CLK>;
+		clock-names = "iface_clk", "core_clk";
+		qcom,use-bam;
+		qcom,use-pinctrl;
+		qcom,ver-reg-exists;
+		qcom,bam-consumer-pipe-index = <8>;
+		qcom,bam-producer-pipe-index = <9>;
+		qcom,master-id = <84>;
+		qcom,rt-priority;
+		status = "disabled";
+	};
+};
+
+/* From stock msm8917-pmi8937-qrd-sku5_S88505.dtsi */
+&spi_7 {
+	status = "ok";
+	spi_ir@1 {
+#ifdef CONFIG_SPI_SPIDEV_IR_MI8937
+		compatible = "qcom,spi-msm-slave-ir-mi8937";
+#else
+		compatible = "qcom,spi-msm-codec-slave-ir";
+#endif
+		reg = <1>;
+		spi-max-frequency = <50000000>;
+		spi-cpol;
+		status = "ok";
+	};
+};

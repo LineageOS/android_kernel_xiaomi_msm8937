@@ -1,0 +1,12 @@
+#include "pinctrl.dtsi"
+
+#include "audio.dtsi"
+#include "battery_usb.dtsi"
+#include "camera-clk.dtsi"
+#include "camera.dtsi"
+#include "display.dtsi"
+#include "pm8937.dtsi"
+#include "pmi8950.dtsi"
+#include "regulator.dtsi"
+#include "soc.dtsi"
+#include "touchscreen.dtsi"

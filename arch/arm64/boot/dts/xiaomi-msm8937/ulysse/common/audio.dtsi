@@ -1,0 +1,37 @@
+/* From stock msm8937-audio.dtsi */
+&int_codec {
+	/delete-property/ qcom,cdc-us-euro-gpios;
+	qcom,msm-mbhc-hphl-swh = <1>;
+	qcom,msm-mbhc-gnd-swh = <1>;
+	qcom,msm-micbias2-ext-cap;
+#ifndef MI8937_V2
+	qcom,smg3711-enable-gpio = <&tlmm 25 0>;
+	qcom,smg3711-in-gpio = <&tlmm 16 0>;
+	qcom,spk_ext_pa = <&tlmm 1 0>;
+#endif
+	/* WARNING: Override
+	   Changes:
+	   - Remove "WSA_SPK OUT", "VDD_WSA_SWITCH",
+	   - Remove "SpkrMono WSA_IN", "WSA_SPK OUT";
+	*/
+	qcom,audio-routing =
+		"RX_BIAS", "MCLK",
+		"SPK_RX_BIAS", "MCLK",
+		"INT_LDO_H", "MCLK",
+		"MIC BIAS External", "Handset Mic",
+		"MIC BIAS External2", "Headset Mic",
+		"MIC BIAS External", "Secondary Mic",
+		"AMIC1", "MIC BIAS External",
+		"AMIC2", "MIC BIAS External2",
+		"AMIC3", "MIC BIAS External";
+};
+
+/* Custom */
+&cdc_quin_mi2s_gpios {
+	status = "disabled";
+};
+#ifdef MI8937_V2
+#include "../../common/include/msm-cdc-pinctrl.h"
+MSM_CDC_PINCTRL_PA_GPIO_DOUBLE_PINS(hph, gpio16, gpio25)
+MSM_CDC_PINCTRL_PA_GPIO_SINGLE_PIN(spk, gpio1)
+#endif

@@ -1,0 +1,8 @@
+#include "pinctrl.dtsi"
+
+#include "audio.dtsi"
+#include "camera.dtsi"
+#include "display.dtsi"
+#include "led.dtsi"
+#include "pm8937.dtsi"
+#include "touchscreen.dtsi"

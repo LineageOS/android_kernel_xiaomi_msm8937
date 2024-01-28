@@ -1,0 +1,55 @@
+/* From stock msm-pm8937.dtsi */
+&spmi_bus {
+	qcom,pm8937@0 {
+		qcom,power-on@800 {
+			qcom,store-hard-reset-reason;
+			qcom,pon_1 {
+				qcom,s1-timer = <4480>;
+			};
+		};
+	};
+};
+
+/* From stock msm8917-pmi8937-qrd-sku5_S8850?.dtsi */
+&pm8937_pwm {
+	status = "ok";
+	compatible = "qcom,pwm-lpg";
+	reg = <0xbc00 0x100>;
+	reg-names = "lpg-base";
+	#pwm-cells = <2>;
+	qcom,num-lpg-channels = <1>;
+};
+&pm8937_gpios {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pwm_pwr_en_default &batt_id_pin>;
+	pwm_pwr_en_default: pm8937_gpio8 {
+		pins = "gpio8";
+		function = "dtest2";
+		output-low;
+		bias-disable;
+		qcom,drive-strength = <2>;
+		status = "okay";
+	};
+
+	batt_id_pin: pm8937_gpio5 {
+		pins = "gpio5";
+		function = "normal";
+		input-enable;
+		bias-pull-up;
+		qcom,pull-up-strength = <1>;
+		qcom,drive-strength = <2>;
+		status = "okay";
+	};
+};
+&pm8937_vadc {
+	/delete-node/ case_therm;
+	mpp4 {
+		label = "mpp4";
+		reg = <VADC_P_MUX4_1_1>;
+		qcom,hw-settle-time = <200>;
+		qcom,pre-scaling = <1 1>;
+
+		qcom,iio-chan-type-override = "IIO_VOLTAGE";
+		qcom,scale-fn-type = <0>; // SCALE_DEFAULT
+	};
+};

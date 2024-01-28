@@ -1,0 +1,23 @@
+/* From stock msm8917-pmi8937-qrd-sku5_S8850?.dtsi */
+&i2c_5 {
+	status = "ok";
+};
+&usb_otg {
+	qcom,hsusb-otg-mode = <3>;
+	interrupts = <0 134 IRQ_TYPE_LEVEL_HIGH>,<0 140 IRQ_TYPE_LEVEL_HIGH>,<0 136 IRQ_TYPE_LEVEL_HIGH>;
+	interrupt-names = "core_irq", "async_irq", "phy_irq";
+};
+
+/* Custom */
+#ifdef CONFIG_MSM_USB_POWER_SUPPLY_MI8937
+&soc {
+	usb_power_supply: usb_power_supply {
+		compatible = "qcom,msm_usb_psy-mi8937";
+		dpdm-supply = <&usb_otg>;
+		qcom,dpdm-regulator-always-on;
+	};
+};
+&usb_otg {
+	extcon = <&usb_power_supply>;
+};
+#endif

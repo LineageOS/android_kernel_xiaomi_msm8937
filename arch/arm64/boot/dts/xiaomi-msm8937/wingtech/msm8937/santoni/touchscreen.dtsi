@@ -1,0 +1,12 @@
+&i2c_3 {
+	ftech {
+		reg = <0x38>;
+#ifdef CONFIG_TOUCHSCREEN_FTS_MI8937
+		focaltech,alternate-i2c-addr = <0x3E>;
+#else
+		ftech,virtual-key1 = <139 140 2000>;/*menu*/
+		ftech,virtual-key2 = <172 360 2000>;/*home*/
+		ftech,virtual-key3 = <158 580 2000>;/*back*/
+#endif
+	};
+};

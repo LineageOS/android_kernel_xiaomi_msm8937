@@ -1,0 +1,39 @@
+/* From stock msm8917.dtsi */
+&ramoops {
+	reg = <0x0 0x91400000 0x0 0x00100000>;
+	/delete-property/ record-size;
+	console-size = <0x40000>;
+	pmsg-size = <0x20000>;
+};
+&adsp_fw_mem {
+	reg = <0x0 0x8B400000 0x0 0x1100000>;
+};
+&modem_mem {
+	reg = <0x0 0x86800000 0x0 0x4C00000>;
+};
+&other_ext_mem {
+	reg = <0x0 0x85e00000 0x0 0xa00000>;
+};
+&wcnss_fw_mem {
+	reg = <0x0 0x8C500000 0x0 0x700000>;
+};
+&qcom_seecom {
+	reg = <0x85e00000 0x500000>;
+};
+&soc {
+	sec_boot_fuse: secbootfuse@0xA01D0 {
+		compatible = "qcom,sec-boot-fuse";
+		reg = <0xA01D0 0x4>;
+		reg-names = "sec-boot-base";
+	};
+
+	sn_fuse: snfuse@0xA60A8 {
+		compatible = "qcom,sn-fuse";
+		reg = <0xA60A8 0x4>;
+		reg-names = "sn-base";
+	};
+
+	qcom,wdt@b017000 {
+		qcom,bark-time = <15000>;
+	};
+};
