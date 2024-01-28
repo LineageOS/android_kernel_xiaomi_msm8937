@@ -1,0 +1,5 @@
+config GAUGE_CW2017_TIARE
+	tristate "CW2017 Battery Fg"
+	depends on I2C
+	help
+	  Say Y to include support for CW2017 Battery FG.

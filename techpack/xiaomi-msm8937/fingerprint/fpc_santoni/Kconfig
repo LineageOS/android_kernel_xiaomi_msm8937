@@ -1,0 +1,4 @@
+config FINGERPRINT_FPC1020_SANTONI
+	tristate "FingerPrint Cards fingerprint drvier support (santoni)"
+	help
+	  Say Y here to enable goodix fingerprint driver support!

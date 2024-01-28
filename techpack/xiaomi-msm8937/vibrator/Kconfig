@@ -1,0 +1,10 @@
+menu "Vibrator"
+
+config LEDS_VIBRATOR_GPIO_MI8937
+	tristate "Vibrator GPIO driver"
+	depends on LEDS_CLASS && GPIOLIB
+	depends on OF
+	help
+	 This option enables support for GPIO based vibrator.
+
+endmenu

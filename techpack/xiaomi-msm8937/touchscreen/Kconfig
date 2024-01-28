@@ -1,0 +1,14 @@
+menu "Touchscreen"
+	depends on INPUT_TOUCHSCREEN
+
+config TOUCHSCREEN_SYSCTL_MI8937
+	bool "Sysctl control interface for Xiaomi MSM8937 touchscreens"
+	help
+	  Say Y here to enable sysctl control interface for Xiaomi MSM8937 touchscreens
+
+source "techpack/xiaomi-msm8937/touchscreen/Atmel308U/Kconfig"
+source "techpack/xiaomi-msm8937/touchscreen/focaltech_touch/Kconfig"
+source "techpack/xiaomi-msm8937/touchscreen/gt9xx/Kconfig"
+source "techpack/xiaomi-msm8937/touchscreen/IST30xx/Kconfig"
+
+endmenu

@@ -1,0 +1,4 @@
+config TOUCHSCREEN_IST30XX_MI8937
+	tristate "IMAGES IST30XX touchpanel driver"
+	depends on INPUT_TOUCHSCREEN
+	default n

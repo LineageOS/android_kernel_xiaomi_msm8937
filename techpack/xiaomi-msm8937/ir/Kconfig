@@ -1,0 +1,32 @@
+menu "IR"
+
+config LEDS_GPIO_IR_MI8937
+	tristate "IR LED Support for GPIO connected LEDs"
+	depends on LEDS_CLASS
+	depends on GPIOLIB || COMPILE_TEST
+	help
+	  This option enables support for the LEDs connected to GPIO
+	  outputs. To be useful the particular board must have LEDs
+	  and they must be connected to the GPIO lines.  The LEDs must be
+	  defined as platform devices and/or OpenFirmware platform devices.
+	  The code to use these bindings can be selected below.
+
+config IR_PWM_MI8937
+	tristate "PWM IR remote control"
+	depends on RC_CORE
+	---help---
+	   Say Y if you want to use PWM based IR.
+
+	   To compile this driver as a module, choose M here: the module will
+	   be called pwm-ir.
+
+config SPI_SPIDEV_IR_MI8937
+	tristate "User mode SPI IR device driver support"
+	depends on SPI
+	help
+	  This supports user mode SPI protocol drivers.
+
+	  Note that this application programming interface is EXPERIMENTAL
+	  and hence SUBJECT TO CHANGE WITHOUT NOTICE while it stabilizes.
+
+endmenu

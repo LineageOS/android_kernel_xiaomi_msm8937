@@ -1,0 +1,23 @@
+menu "Xiaomi MSM8937 platform"
+	depends on ARCH_MSM8937
+
+config MACH_XIAOMI_MSM8937
+	bool "Support for Xiaomi MSM8937 platform"
+	help
+	  Say Y here to enable support for Xiaomi MSM8937 platform.
+
+if MACH_XIAOMI_MSM8937
+
+source "techpack/xiaomi-msm8937/mach/Kconfig"
+source "techpack/xiaomi-msm8937/audio_pa/Kconfig"
+source "techpack/xiaomi-msm8937/fingerprint/Kconfig"
+source "techpack/xiaomi-msm8937/ir/Kconfig"
+source "techpack/xiaomi-msm8937/leds/Kconfig"
+source "techpack/xiaomi-msm8937/power_supply/Kconfig"
+source "techpack/xiaomi-msm8937/regulator/Kconfig"
+source "techpack/xiaomi-msm8937/touchscreen/Kconfig"
+source "techpack/xiaomi-msm8937/vibrator/Kconfig"
+
+endif # MACH_XIAOMI_MSM8937
+
+endmenu
