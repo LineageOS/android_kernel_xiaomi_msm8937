@@ -1,0 +1,13 @@
+menu "Camera (Legacy)"
+
+config MSMB_CAMERA_LEGACY
+	bool "Qualcomm MSM camera and video capture 2.0 support (Legacy)"
+	select MSMB_CAMERA
+	help
+	---help---
+	  Say Y here to enable selecting the video adapters for
+	  Qualcomm msm camera and video capture 2.0, enabling this
+	  adds support for the camera driver stack including sensor, isp
+	  and postprocessing drivers. (Legacy)
+
+endmenu
