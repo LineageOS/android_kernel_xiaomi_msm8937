@@ -1,0 +1,3 @@
+#include "audio.dtsi"
+#include "touchscreen.dtsi"
+#include "pmi632.dtsi"

@@ -1,0 +1,10 @@
+/* From stock sdm439-mtp.dtsi */
+&i2c_5 {
+	vituralsar@33{/*Add by HQ-102007757 for vituralsar*/
+		compatible = "virtualsar,sar";
+		reg = <0x33>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <126 0x02>;
+		vituralsar,irq-gpio = <&tlmm 126 0x2008>;
+	};
+};

@@ -1,0 +1,10 @@
+&spi_6 {
+	status = "ok";
+	irled@0 {
+		compatible = "ir-spi";
+		reg = <0x0>;
+		vdd-supply = <&pm8953_l8>; //vdd
+		status = "ok";
+		spi-max-frequency = <19200000>;
+	};
+};

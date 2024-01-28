@@ -1,0 +1,25 @@
+&soc {
+	/*add fingerprint for C3I-224 by gaoge start*/
+	goodix_fp {
+		compatible = "goodix,fingerprint";
+		spi-max-frequency = <1000000>;
+		input-device-name = "gf3208";
+		interrupt-parent = <&tlmm>;
+		interrupts = <48 0x0>;
+		goodix,gpio_reset    = <&tlmm 124 0>;
+		goodix,gpio_irq      = <&tlmm 48 0>;
+		clock-names = "iface_clk", "core_clk";
+		clocks = <&gcc GCC_BLSP1_AHB_CLK>,
+			<&gcc GCC_BLSP1_QUP1_SPI_APPS_CLK>;
+		fpc,enable-on-boot;
+		pinctrl-names = "goodixfp_spi_active",
+			"goodixfp_reset_reset",
+			"goodixfp_reset_active",
+			"goodixfp_irq_active";
+		pinctrl-0 = <&goodix_spi_active>;
+		pinctrl-1 = <&goodix_reset_reset>;
+		pinctrl-2 = <&goodix_reset_active>;
+		pinctrl-3 = <&goodix_irq_active>;
+	};
+	/*add fingerprint for C3I-224 by gaoge end*/
+};

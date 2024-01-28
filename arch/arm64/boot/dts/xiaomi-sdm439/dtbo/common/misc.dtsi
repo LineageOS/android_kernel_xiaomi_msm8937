@@ -1,0 +1,7 @@
+/* From stock sdm439-qrd.dtsi */
+&soc {
+	gpio_ldo_power {
+		compatible = "fm,fm_lan_enable";
+		qcom,fm_lan_enable_pin = <&tlmm 87 0>;
+	};
+};

@@ -1,0 +1,19 @@
+&i2c_5 {
+	nq@28 {
+		status = "disabled";
+	};
+};
+
+&soc {
+	hbtp {
+		status = "disabled";
+	};
+};
+
+&smb1355 {
+	status = "disabled";
+};
+
+&smb1355_0 {
+	status = "disabled";
+};

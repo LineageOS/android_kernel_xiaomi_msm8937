@@ -1,0 +1,72 @@
+/* From stock msm8937.dtsi */
+&other_ext_mem {
+	reg = <0x0 0x84a00000 0x0 0x1d00000>;
+};
+
+&qcom_seecom {
+	reg = <0x84a00000 0x1900000>;
+};
+
+&soc {
+	qcom,wdt@b017000 {
+		qcom,bark-time = <15000>;
+	};
+
+	qcom,msm_fastrpc {
+		qcom,secure-domains = <0x03>;
+	};
+
+	qcom,wcnss-wlan@0a000000 {
+		qcom,iris-vddrfa-voltage-level = <1450000 0 1450000>;
+	};
+};
+
+/* From stock sdm439.dtsi */
+&soc {
+	sn_fuse: snfuse@0xa4128 {
+		compatible = "qcom,sn-fuse";
+		reg = <0xa4128 0x4>,
+		      <0x00a0120 0x4>;
+		reg-names = "sn-base","cfi-base";
+	};
+};
+
+&reserved_memory {
+	pstore_reserve_mem: pstore_reserve_mem_region@0 {
+		compatible = "ramoops";
+		reg = <0x0 0x9ff00000 0x0 0x00100000>;
+		console-size = <0x80000>;
+		pmsg-size = <0x8000>;
+	};
+};
+
+&adsp_fw_mem {
+	reg = <0x0 0x8bd00000 0x0 0x1800000>;
+};
+
+&wcnss_fw_mem {
+	reg = <0x0 0x8d500000 0x0 0x700000>;
+};
+
+&sdhc_1 {
+	qcom,ddr-config = <0x00040868>;
+};
+
+/* Custom */
+&soc {
+	restart@4ab000 {
+		qcom,force-warm-reboot;
+	};
+};
+
+&i2c_2 {
+	qcom,disable-dma;
+};
+
+&i2c_3 {
+	qcom,disable-dma;
+};
+
+&i2c_5 {
+	qcom,disable-dma;
+};

@@ -1,0 +1,24 @@
+/* From stock msm8937-regulator.dtsi */
+/* ERROR: Label or path pm8937_l19 not found
+&pm8937_l19 {
+	regulator-min-microvolt = <1450000>;
+	regulator-max-microvolt = <1450000>;
+};
+*/
+
+/* From stock sdm439-regulator.dtsi */
+&pm8953_l3 {
+	regulator-min-microvolt = <1050000>;
+	qcom,init-voltage = <1050000>;
+};
+
+&pm8953_l19 {
+	regulator-min-microvolt = <1450000>;
+	regulator-max-microvolt = <1450000>;
+};
+
+&pm8953_l22 {
+	regulator-min-microvolt = <2800000>;
+	regulator-max-microvolt = <2900000>;
+	qcom,init-voltage = <2800000>;
+};

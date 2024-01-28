@@ -1,0 +1,2 @@
+#include "camera.dtsi"
+#include "disable-unused-peripherals.dtsi"

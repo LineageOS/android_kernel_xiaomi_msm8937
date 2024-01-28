@@ -1,0 +1,5 @@
+&soc {
+	gpio_ldo_power {
+		qcom,fm_lan_enable_pin = <&tlmm 89 0>;
+	};
+};

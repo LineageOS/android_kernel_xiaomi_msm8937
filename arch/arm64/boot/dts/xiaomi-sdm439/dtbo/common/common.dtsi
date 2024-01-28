@@ -1,0 +1,5 @@
+#include "audio.dtsi"
+#include "camera-qrd-delete.dtsi"
+#include "disable-unused-peripherals.dtsi"
+#include "display.dtsi"
+#include "misc.dtsi"

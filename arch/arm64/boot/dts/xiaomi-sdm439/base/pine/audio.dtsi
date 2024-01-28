@@ -1,0 +1,8 @@
+&i2c_2 {
+	aw87329@58{
+		status = "okay";
+		compatible = "awinic,aw87329_pa";
+		reg = <0x58>;
+		reset-gpio = <&tlmm 125 0x01>;
+	};
+};
