@@ -1,0 +1,1 @@
+obj-$(CONFIG_BACKLIGHT_KTD3136_MI439) += ktd3136_bl.o

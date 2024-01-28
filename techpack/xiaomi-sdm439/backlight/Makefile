@@ -1,0 +1,3 @@
+obj-$(CONFIG_MACH_XIAOMI_SDM439) += backlight_ic.o
+obj-$(CONFIG_BACKLIGHT_KTD3136_MI439) += ktd3136/
+obj-$(CONFIG_MFD_TI_LMU_MI439) += lm3697/

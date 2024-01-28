@@ -1,0 +1,4 @@
+config MFD_TI_LMU_MI439
+	tristate "MFD TI LMU"
+	help
+	 Say Y here to support MFD TI LMU chip

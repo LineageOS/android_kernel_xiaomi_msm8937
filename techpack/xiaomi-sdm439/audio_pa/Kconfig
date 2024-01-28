@@ -1,0 +1,16 @@
+menu "Audio Power Amplifier"
+	depends on SND_SOC
+
+config SND_SOC_AW87329_MI439
+	bool "AW87329"
+	depends on I2C
+	help
+	  AW87329
+
+config SND_SOC_AW87519_MI439
+	bool "AW87519"
+	depends on I2C
+	help
+	  AW87519
+
+endmenu

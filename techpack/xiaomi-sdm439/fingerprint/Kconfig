@@ -1,0 +1,6 @@
+menu "Fingerprint"
+
+source "techpack/xiaomi-sdm439/fingerprint/fpr_FingerprintCard/Kconfig"
+source "techpack/xiaomi-sdm439/fingerprint/goodix/Kconfig"
+
+endmenu

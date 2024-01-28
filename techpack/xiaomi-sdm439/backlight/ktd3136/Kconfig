@@ -1,0 +1,4 @@
+config BACKLIGHT_KTD3136_MI439
+	bool "KTD3136"
+	help
+	  KTD3136 backlight driver from olive-q-oss

@@ -1,0 +1,7 @@
+menu "Backlight"
+	depends on BACKLIGHT_CLASS_DEVICE
+
+source "techpack/xiaomi-sdm439/backlight/ktd3136/Kconfig"
+source "techpack/xiaomi-sdm439/backlight/lm3697/Kconfig"
+
+endmenu

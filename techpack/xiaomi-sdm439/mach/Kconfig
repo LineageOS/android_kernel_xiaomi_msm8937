@@ -1,0 +1,35 @@
+menu "Machine selection"
+
+# Machine families
+config MACH_FAMILY_XIAOMI_PINE
+	bool
+
+config MACH_FAMILY_XIAOMI_OLIVE
+	bool
+
+# Machines
+config MACH_XIAOMI_PINE
+	bool "Xiaomi Redmi 7A (pine)"
+	select MACH_FAMILY_XIAOMI_PINE
+	help
+	  Support for Xiaomi Redmi 7A (pine).
+
+config MACH_XIAOMI_OLIVE
+	bool "Xiaomi Redmi 8 (olive)"
+	select MACH_FAMILY_XIAOMI_OLIVE
+	help
+	  Support for Xiaomi Redmi 8 (olive).
+
+config MACH_XIAOMI_OLIVELITE
+	bool "Xiaomi Redmi 8A (olivelite)"
+	select MACH_FAMILY_XIAOMI_OLIVE
+	help
+	  Support for Xiaomi Redmi 8A (olivelite).
+
+config MACH_XIAOMI_OLIVEWOOD
+	bool "Xiaomi Redmi 8A Dual (olivewood)"
+	select MACH_FAMILY_XIAOMI_OLIVE
+	help
+	  Support for Xiaomi Redmi 8A Dual (olivewood).
+
+endmenu
