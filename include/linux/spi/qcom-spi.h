@@ -58,4 +58,5 @@ struct msm_spi_platform_data {
 	bool use_pinctrl;
 	bool is_shared;
 	bool shared_ee;
+	bool disable_dma;
 };

@@ -2328,6 +2328,8 @@ static struct msm_spi_platform_data *msm_spi_dt_to_pdata(
 			&pdata->is_shared,		 DT_OPT,  DT_BOOL,  0},
 		{"qcom,shared_ee",
 			&pdata->shared_ee,		 DT_OPT,  DT_BOOL,  0},
+		{"qcom,disable-dma",
+			&pdata->disable_dma,	DT_OPT,  DT_BOOL,  0},
 		{NULL,  NULL,                            0,       0,        0},
 		};
 
@@ -2609,6 +2611,14 @@ static int msm_spi_probe(struct platform_device *pdev)
 
 	if (pdata) {
 		master->rt = pdata->rt_priority;
+
+		if (pdata->disable_dma) {
+			dev_info(&pdev->dev,
+				"%s: DMA is disabled by dt property\n",
+				__func__);
+			goto skip_dma_resources;
+		}
+
 		if (pdata->dma_config) {
 			rc = pdata->dma_config();
 			if (rc) {
