@@ -142,6 +142,9 @@ struct adc_channel_prop {
 	unsigned int			lut_index;
 	enum vadc_scale_fn_type		scale_fn_type;
 	const char			*datasheet_name;
+
+	/* Copied from `struct iio_chan_spec` */
+	enum iio_chan_type type;
 };
 
 /**
@@ -997,6 +1000,7 @@ static int adc_get_dt_channel_data(struct adc_chip *adc,
 				    const struct adc_data *data)
 {
 	const char *name = node->name, *channel_name;
+	const char *value_str;
 	u32 chan, value, varr[2];
 	u32 sid = 0;
 	int ret;
@@ -1108,6 +1112,22 @@ static int adc_get_dt_channel_data(struct adc_chip *adc,
 	 */
 	prop->cal_val = ADC_TIMER_CAL;
 
+	ret = of_property_read_string(node, "qcom,iio-chan-type-override", &value_str);
+	if (!ret) {
+		if (strcasecmp(value_str, "IIO_TEMP") == 0)
+			prop->type = IIO_TEMP;
+		else if (strcasecmp(value_str, "IIO_VOLTAGE") == 0)
+			prop->type = IIO_VOLTAGE;
+		else if (strcasecmp(value_str, "IIO_POWER") == 0)
+			prop->type = IIO_POWER;
+		else {
+			dev_err(dev, "%02x invalid iio-chan-type-override %s\n", chan, value_str);
+			prop->type = -EINVAL;
+		}
+	} else {
+		prop->type = -EINVAL;
+	}
+
 	dev_dbg(dev, "%02x name %s\n", chan, name);
 
 	return 0;
@@ -1218,11 +1238,19 @@ static int adc_get_dt_data(struct adc_chip *adc, struct device_node *node)
 
 		adc_chan = &data->adc_chans[prop.channel];
 
+		if (prop.type != -EINVAL) {
+			pr_info("Override ADC channel %02x specification from dt property\n", prop.channel);
+			/* All ADC_CHAN_* macros supplies the same info_mask value, so just hardcode it here */
+			iio_chan->info_mask_separate = BIT(IIO_CHAN_INFO_RAW) | BIT(IIO_CHAN_INFO_PROCESSED);
+			iio_chan->type = prop.type;
+		} else {
+			iio_chan->info_mask_separate = adc_chan->info_mask;
+			iio_chan->type = adc_chan->type;
+		}
+
 		iio_chan->channel = prop.channel;
 		iio_chan->datasheet_name = prop.datasheet_name;
 		iio_chan->extend_name = prop.datasheet_name;
-		iio_chan->info_mask_separate = adc_chan->info_mask;
-		iio_chan->type = adc_chan->type;
 		iio_chan->address = index;
 		iio_chan++;
 		index++;
