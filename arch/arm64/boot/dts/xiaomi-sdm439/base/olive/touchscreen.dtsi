@@ -153,6 +153,7 @@
 &soc {
 	spi@78b7000 {
 		status = "okay";
+		qcom,disable-dma;
 		ilitek_spi@00 {
 		    compatible = "tchip,ilitek";
 			reg = <0>;
