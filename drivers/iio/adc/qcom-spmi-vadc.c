@@ -93,6 +93,8 @@ struct vadc_channel_prop {
 	unsigned int hw_settle_time;
 	unsigned int avg_samples;
 	enum vadc_scale_fn_type scale_fn_type;
+
+	/* Copied from `struct iio_chan_spec` */
 	enum iio_chan_type chan_type;
 };
 
@@ -747,7 +749,7 @@ static int vadc_get_dt_channel_data(struct device *dev,
 		else if (strcasecmp(value_str, "IIO_VOLTAGE") == 0)
 			prop->chan_type = IIO_VOLTAGE;
 		else {
-			dev_err(dev, "invalid iio-chan-type-override %s\n", value_str);
+			dev_err(dev, "%02x invalid iio-chan-type-override %s\n", chan, value_str);
 			prop->chan_type = -EINVAL;
 		}
 	} else {
@@ -799,9 +801,6 @@ static int vadc_get_dt_data(struct vadc_priv *vadc, struct device_node *node)
 			scale_fn_type_from_dt = true;
 		}
 
-		if (prop.chan_type == -EINVAL)
-			prop.chan_type = vadc_chans[prop.channel].type;
-
 		vadc->chan_props[index] = prop;
 
 		vadc_chan = &vadc_chans[prop.channel];
@@ -813,7 +812,10 @@ static int vadc_get_dt_data(struct vadc_priv *vadc, struct device_node *node)
 		else
 			iio_chan->info_mask_separate =
 			  vadc_chan->info_mask | BIT(IIO_CHAN_INFO_PROCESSED);
-		iio_chan->type = prop.chan_type;
+		if (prop.chan_type == -EINVAL)
+			iio_chan->type = vadc_chan->type;
+		else
+			prop.chan_type = vadc_chans[prop.channel].type;
 		iio_chan->indexed = 1;
 		iio_chan->address = index++;
 
