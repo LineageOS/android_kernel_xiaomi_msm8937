@@ -21,6 +21,10 @@
 #if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
 #include <xiaomi-msm8937/mach.h>
 #endif
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+#include <xiaomi-sdm439/mach.h>
+#include "msm_sensor_driver_xiaomi_sdm439.h"
+#endif
 
 #if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_ULYSSE)
 extern int xiaomi_ulysse_match_sensor_eeprom(struct msm_camera_sensor_slave_info *slave_info);
@@ -1216,6 +1220,11 @@ CSID_TG:
 	s_ctrl->sensordata->cam_slave_info = slave_info;
 
 	msm_sensor_fill_sensor_info(s_ctrl, probed_info, entity_name);
+
+#if IS_ENABLED(CONFIG_MACH_XIAOMI_SDM439)
+	if (xiaomi_sdm439_mach_get())
+		msm_sensor_driver_probe_xiaomi_sdm439_hqsysfs_register(s_ctrl);
+#endif
 
 	/*
 	 * Set probe succeeded flag to 1 so that no other camera shall
