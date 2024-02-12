@@ -31,7 +31,6 @@ struct vibrator_gpio_data {
 	struct	platform_device *dev;
 	struct	hrtimer vib_timer;
 	struct	led_classdev led_dev;
-	struct	work_struct work;
 	const	char *name;
 	unsigned	int gpio;
 	int	play_time_ms;
@@ -52,11 +51,10 @@ static enum hrtimer_restart vibrator_gpio_timer_func(struct hrtimer *timer)
 }
 
 #ifdef CONFIG_PM
-static vibrator_gpio_suspend(struct device *dev) {
+static int vibrator_gpio_suspend(struct device *dev) {
 	struct vibrator_gpio_data *pdata = dev_get_drvdata(dev);
 
 	hrtimer_cancel(&pdata->vib_timer);
-	cancel_work_sync(&pdata->work);
 	gpio_direction_output(pdata->gpio, 0);
 
 	return 0;
