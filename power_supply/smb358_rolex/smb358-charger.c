@@ -1211,7 +1211,6 @@ static int smb358_get_prop_batt_present(struct smb358_charger *chip)
 	return !chip->battery_missing;
 }
 
-static struct power_supply *cw2015_psy;
 static int smb358_get_prop_batt_capacity(struct smb358_charger *chip)
 {
 	union power_supply_propval ret = {0, };
@@ -1219,30 +1218,44 @@ static int smb358_get_prop_batt_capacity(struct smb358_charger *chip)
 	if (chip->fake_battery_soc >= 0)
 		return chip->fake_battery_soc;
 
-	if (!cw2015_psy)
-		cw2015_psy = power_supply_get_by_name("bms");
-	if (cw2015_psy) {
-		power_supply_get_property(cw2015_psy,
-				POWER_SUPPLY_PROP_CAPACITY, &ret);
-		pr_err("CW2015_BATTERY_CAPACITY IS:%d\n", ret.intval);
-		return ret.intval;
-	}
-
 	if (chip->bms_psy) {
 		power_supply_get_property(chip->bms_psy,
 				POWER_SUPPLY_PROP_CAPACITY, &ret);
 				pr_err("BMS_BATTERY_CAPACITY IS:%d\n", ret.intval);
 		return ret.intval;
-
 	}
 
 	pr_debug("Couldn't get bms_psy, return default capacity\n");
 	return SMB358_DEFAULT_BATT_CAPACITY;
 }
 
+static int smb358_get_prop_charge_type(struct smb358_charger *chip);
 static int get_prop_current_now(struct smb358_charger *chip)
 {
 	union power_supply_propval ret = {0,};
+
+	switch (smb358_get_prop_charge_type(chip)) {
+		case POWER_SUPPLY_CHARGE_TYPE_UNKNOWN:
+		case POWER_SUPPLY_CHARGE_TYPE_NONE:
+			return 500000; // Discharging
+		default:
+			power_supply_get_property(chip->usb_psy,
+				POWER_SUPPLY_PROP_REAL_TYPE, &ret);
+			switch (ret.intval) {
+				case POWER_SUPPLY_TYPE_USB_CDP:
+				case POWER_SUPPLY_TYPE_USB_DCP:
+					return -500000; // Fast charging
+				case POWER_SUPPLY_TYPE_USB:
+					return 30000; // Slow charging
+				default:
+					return 500000; // Discharging
+			}
+			break;
+	}
+
+	return -EINVAL;
+
+/* Disable this, as the paired bms (cw2015) doesn't support it
 	if (chip->bms_psy) {
 		power_supply_get_property(chip->bms_psy,
 			POWER_SUPPLY_PROP_CURRENT_NOW, &ret);
@@ -1252,6 +1265,7 @@ static int get_prop_current_now(struct smb358_charger *chip)
 			pr_debug("No BMS supply registered return 0\n");
 		}
 	return 1000;
+*/
 }
 
 static int smb358_get_prop_charge_type(struct smb358_charger *chip)
@@ -1374,10 +1388,8 @@ smb358_get_prop_battery_voltage_now(struct smb358_charger *chip)
 	if (chip->fake_battery_soc >= 0)
 		return chip->fake_battery_soc;
 
-	if (!cw2015_psy)
-		cw2015_psy = power_supply_get_by_name("bms");
-	if (cw2015_psy) {
-		power_supply_get_property(cw2015_psy,
+	if (chip->bms_psy) {
+		power_supply_get_property(chip->bms_psy,
 				POWER_SUPPLY_PROP_VOLTAGE_NOW, &ret);
 		pr_err("POWER_SUPPLY_PROP_VOLTAGE_NOW IS:%d\n", ret.intval);
 		return ret.intval;
