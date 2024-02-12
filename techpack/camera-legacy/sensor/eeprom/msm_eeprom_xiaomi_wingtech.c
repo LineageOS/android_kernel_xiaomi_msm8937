@@ -893,7 +893,7 @@ void legacy_xiaomi_wingtech_sensor_read_fusion_id(
 
 extern bool camera_legacy_enable;
 
-static int __init msm_eeprom_xiaomi_wingtech_init()
+static int __init msm_eeprom_xiaomi_wingtech_init(void)
 {
 	if (xiaomi_msm8937_mach_get_family() != XIAOMI_MSM8937_MACH_FAMILY_WINGTECH)
 		return -ENODEV;
