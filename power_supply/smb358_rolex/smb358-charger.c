@@ -1205,7 +1205,6 @@ static int smb358_get_prop_batt_present(struct smb358_charger *chip)
 	return !chip->battery_missing;
 }
 
-static struct power_supply *cw2015_psy;
 static int smb358_get_prop_batt_capacity(struct smb358_charger *chip)
 {
 	union power_supply_propval ret = {0, };
@@ -1213,21 +1212,11 @@ static int smb358_get_prop_batt_capacity(struct smb358_charger *chip)
 	if (chip->fake_battery_soc >= 0)
 		return chip->fake_battery_soc;
 
-	if (!cw2015_psy)
-		cw2015_psy = power_supply_get_by_name("bms");
-	if (cw2015_psy) {
-		power_supply_get_property(cw2015_psy,
-				POWER_SUPPLY_PROP_CAPACITY, &ret);
-		pr_err("CW2015_BATTERY_CAPACITY IS:%d\n", ret.intval);
-		return ret.intval;
-	}
-
 	if (chip->bms_psy) {
 		power_supply_get_property(chip->bms_psy,
 				POWER_SUPPLY_PROP_CAPACITY, &ret);
 				pr_err("BMS_BATTERY_CAPACITY IS:%d\n", ret.intval);
 		return ret.intval;
-
 	}
 
 	pr_debug("Couldn't get bms_psy, return default capacity\n");
@@ -1384,10 +1373,8 @@ smb358_get_prop_battery_voltage_now(struct smb358_charger *chip)
 	if (chip->fake_battery_soc >= 0)
 		return chip->fake_battery_soc;
 
-	if (!cw2015_psy)
-		cw2015_psy = power_supply_get_by_name("bms");
-	if (cw2015_psy) {
-		power_supply_get_property(cw2015_psy,
+	if (chip->bms_psy) {
+		power_supply_get_property(chip->bms_psy,
 				POWER_SUPPLY_PROP_VOLTAGE_NOW, &ret);
 		pr_err("POWER_SUPPLY_PROP_VOLTAGE_NOW IS:%d\n", ret.intval);
 		return ret.intval;
