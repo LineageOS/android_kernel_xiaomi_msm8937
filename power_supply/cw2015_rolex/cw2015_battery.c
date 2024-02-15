@@ -882,8 +882,10 @@ static const struct dev_pm_ops cw_bat_pm_ops = {
 static int cw_bat_parse_dt(struct device *dev, struct cw_bat_platform_data *pdata)
 {
 	struct device_node *np = dev->of_node;
+#ifdef BAT_LOW_INTERRUPT
 	pdata->bat_low_pin = of_get_named_gpio_flags(np,
 			"cw2015,irq-gpio", 0, &pdata->irq_flags);
+#endif
 
 	return 0;
 }
