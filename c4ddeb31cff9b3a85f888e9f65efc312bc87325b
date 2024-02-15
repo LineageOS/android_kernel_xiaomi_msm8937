@@ -16,6 +16,24 @@
       "message": "Or, just set deferred_probe_timeout\u003d1 in cmdline",
       "revId": "c4ddeb31cff9b3a85f888e9f65efc312bc87325b",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8436cca6_16a814f5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 32245
+      },
+      "writtenOn": "2024-02-15T21:36:00Z",
+      "side": 1,
+      "message": "I\u0027d prefer this, because\n1) don\u0027t want to add this kernel version specific thing (may no longer needed in next version) into android dt\n2) CONFIG_CMDLINE is already specified in defconfig, overriding it in config fragment would need to copy its value first (similar for dts bootargs)\n3) this doesn\u0027t seem to harm, and is useful in many cases",
+      "parentUuid": "74cbe3ca_63da3de3",
+      "revId": "c4ddeb31cff9b3a85f888e9f65efc312bc87325b",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
     }
   ]
 }
