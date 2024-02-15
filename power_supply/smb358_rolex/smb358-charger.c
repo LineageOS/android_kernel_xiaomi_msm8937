@@ -1348,7 +1348,6 @@ static int smb358_get_prop_batt_temp(struct smb358_charger *chip)
 		return DEFAULT_TEMP;
 
 	if (chip->iio.batt_therm) {
-		msleep(5);
 		rc = iio_read_channel_processed(chip->iio.batt_therm,
 			&batt_therm_result);
 		if (rc < 0) {
