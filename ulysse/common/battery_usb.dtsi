@@ -1,6 +1,7 @@
 /* From stock msm8940-pmi8937-mtp.dts */
 &i2c_2 {
 	status = "ok";
+	qcom,auto-resume-from-sys-suspend;
 	bq2560x_otg_supply: bq2560x@6B {
 #ifdef CONFIG_CHARGER_BQ2560X_MI8937
 		compatible = "ti,bq25601-charger-mi8937";
