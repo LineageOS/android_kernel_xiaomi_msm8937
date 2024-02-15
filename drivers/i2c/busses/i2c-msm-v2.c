@@ -2332,7 +2332,8 @@ i2c_msm_frmwrk_xfer(struct i2c_adapter *adap, struct i2c_msg msgs[], int num)
 	}
 
 	/* if system is suspended just bail out */
-	if (ctrl->pwr_state == I2C_MSM_PM_SYS_SUSPENDED) {
+	if (ctrl->pwr_state == I2C_MSM_PM_SYS_SUSPENDED &&
+			!ctrl->rsrcs.auto_resume_from_sys_suspend) {
 		dev_err(ctrl->dev,
 				"slave:0x%x is calling xfer when system is suspended\n",
 				msgs->addr);
@@ -2489,6 +2490,9 @@ static int i2c_msm_rsrcs_process_dt(struct i2c_msm_ctrl *ctrl,
 
 	struct i2c_msm_dt_to_pdata_map map[] = {
 	{"i2c",				&pdev->id,	DT_REQ,  DT_ID,  -1},
+	{"qcom,auto-resume-from-sys-suspend",
+					&(ctrl->rsrcs.auto_resume_from_sys_suspend),
+							DT_OPT,  DT_BOOL, 0},
 	{"qcom,clk-freq-out",		&ctrl->rsrcs.clk_freq_out,
 							DT_REQ,  DT_U32,  0},
 	{"qcom,clk-freq-in",		&ctrl->rsrcs.clk_freq_in,
