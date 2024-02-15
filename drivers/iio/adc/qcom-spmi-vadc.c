@@ -929,7 +929,9 @@ static int vadc_probe(struct platform_device *pdev)
 		return ret;
 
 	irq_eoc = platform_get_irq(pdev, 0);
-	if (irq_eoc < 0) {
+	if (of_property_read_bool(node, "qcom,vadc-poll-eoc")) {
+		vadc->poll_eoc = true;
+	} else if (irq_eoc < 0) {
 		if (irq_eoc == -EPROBE_DEFER || irq_eoc == -EINVAL)
 			return irq_eoc;
 		vadc->poll_eoc = true;
