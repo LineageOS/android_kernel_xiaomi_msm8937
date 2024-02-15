@@ -460,6 +460,7 @@ struct i2c_msm_resources {
 	struct qup_i2c_clk_path_vote clk_path_vote;
 	int                          irq;
 	bool                         disable_dma;
+	bool                         auto_resume_from_sys_suspend;
 	struct pinctrl              *pinctrl;
 	struct pinctrl_state        *gpio_state_active;
 	struct pinctrl_state        *gpio_state_suspend;

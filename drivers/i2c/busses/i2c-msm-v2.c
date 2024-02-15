@@ -2332,7 +2332,8 @@ i2c_msm_frmwrk_xfer(struct i2c_adapter *adap, struct i2c_msg msgs[], int num)
 	}
 
 	/* if system is suspended just bail out */
-	if (ctrl->pwr_state == I2C_MSM_PM_SYS_SUSPENDED) {
+	if (ctrl->pwr_state == I2C_MSM_PM_SYS_SUSPENDED &&
+			!ctrl->rsrcs.auto_resume_from_sys_suspend) {
 		dev_err(ctrl->dev,
 				"slave:0x%x is calling xfer when system is suspended\n",
 				msgs->addr);
@@ -2505,6 +2506,9 @@ static int i2c_msm_rsrcs_process_dt(struct i2c_msm_ctrl *ctrl,
 							DT_OPT,  DT_U32,  -1},
 	{"qcom,fs-clk-div",		&fs_clk_div,
 							DT_OPT,  DT_U32,  -1},
+	{"qcom,auto-resume-from-sys-suspend",
+					&(ctrl->rsrcs.auto_resume_from_sys_suspend),
+							DT_OPT,  DT_BOOL, 0},
 	{NULL,  NULL,					0,       0,       0},
 	};
 
@@ -2991,6 +2995,7 @@ static int i2c_msm_remove(struct platform_device *pdev)
 	/* Grab mutex to ensure ongoing transaction is over */
 	mutex_lock(&ctrl->xfer.mtx);
 	ctrl->pwr_state = I2C_MSM_PM_SYS_SUSPENDED;
+	ctrl->rsrcs.auto_resume_from_sys_suspend = false;
 	pm_runtime_disable(ctrl->dev);
 	/* no one can call a xfer after the next line */
 	i2c_msm_frmwrk_unreg(ctrl);
