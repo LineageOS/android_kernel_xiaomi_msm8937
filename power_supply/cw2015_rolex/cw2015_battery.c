@@ -612,7 +612,7 @@ static int cw_get_vol(struct cw_battery *cw_bat)
 	return voltage;
 }
 
-#ifdef BAT_LOW_INTERRUPT
+#if BAT_LOW_INTERRUPT
 static int cw_get_alt(struct cw_battery *cw_bat)
 {
 	int ret = 0;
@@ -822,7 +822,7 @@ static enum power_supply_property rk_battery_properties[] = {
 	POWER_SUPPLY_PROP_TECHNOLOGY,
 };
 
-#ifdef BAT_LOW_INTERRUPT
+#if BAT_LOW_INTERRUPT
 
 #define WAKE_LOCK_TIMEOUT       (10 * HZ)
 static struct wakeup_source *bat_low_wakeup_source;
@@ -882,7 +882,7 @@ static const struct dev_pm_ops cw_bat_pm_ops = {
 static int cw_bat_parse_dt(struct device *dev, struct cw_bat_platform_data *pdata)
 {
 	struct device_node *np = dev->of_node;
-#ifdef BAT_LOW_INTERRUPT
+#if BAT_LOW_INTERRUPT
 	pdata->bat_low_pin = of_get_named_gpio_flags(np,
 			"cw2015,irq-gpio", 0, &pdata->irq_flags);
 #endif
@@ -895,7 +895,7 @@ static int cw_bat_parse_dt(struct device *dev, struct cw_bat_platform_data *pdat
 	return 0;
 }
 #endif
-#ifdef BAT_LOW_INTERRUPT
+#if BAT_LOW_INTERRUPT
 #define PINCTRL_STATE_ACTIVE	"pmx_ts_active"
 #define PINCTRL_STATE_SUSPEND	"pmx_ts_suspend"
 #define PINCTRL_STATE_RELEASE	"pmx_ts_release"
@@ -1207,7 +1207,7 @@ static int cw_bat_probe(struct i2c_client *client, const struct i2c_device_id *i
 
 	queue_delayed_work(cw_bat->battery_workqueue, &cw_bat->battery_delay_work, msecs_to_jiffies(10));
 
-#ifdef BAT_LOW_INTERRUPT
+#if BAT_LOW_INTERRUPT
 	ret = cw_bat_regulator_configure(cw_bat, true);
 	if (ret < 0) {
 		dev_err(&client->dev, "%s Failed to configure regulators\n", __func__);
