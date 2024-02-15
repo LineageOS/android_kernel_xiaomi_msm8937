@@ -236,7 +236,7 @@ DEFINE_SHOW_ATTRIBUTE(deferred_devs);
  * In the case of modules, set the default probe timeout to
  * 30 seconds to give userland some time to load needed modules
  */
-static int deferred_probe_timeout = 30;
+static int deferred_probe_timeout = 1;
 #else
 /* In the case of !modules, no probe timeout needed */
 static int deferred_probe_timeout = -1;
