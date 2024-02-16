@@ -9,6 +9,9 @@
 };
 
 /* Custom */
+&i2c_5 {
+	qcom,auto-resume-from-sys-suspend;
+};
 #ifdef CONFIG_MSM_USB_POWER_SUPPLY_MI8937
 &soc {
 	usb_power_supply: usb_power_supply {
