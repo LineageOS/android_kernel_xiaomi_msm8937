@@ -2448,8 +2448,6 @@ static int fts_power_source_ctrl(struct fts_ts_data *ts_data, int enable)
 	if (enable) {
 		if (ts_data->power_disabled) {
 			FTS_DEBUG("regulator enable !");
-			gpio_direction_output(ts_data->pdata->reset_gpio, 0);
-			msleep(1);
 			ret = fts_ts_enable_reg(ts_data, true);
 			if (ret)
 				FTS_ERROR("Touch reg enable failed\n");
@@ -2458,8 +2456,6 @@ static int fts_power_source_ctrl(struct fts_ts_data *ts_data, int enable)
 	} else {
 		if (!ts_data->power_disabled) {
 			FTS_DEBUG("regulator disable !");
-			gpio_direction_output(ts_data->pdata->reset_gpio, 0);
-			msleep(1);
 			ret = fts_ts_enable_reg(ts_data, false);
 			if (ret)
 				FTS_ERROR("Touch reg disable failed");
