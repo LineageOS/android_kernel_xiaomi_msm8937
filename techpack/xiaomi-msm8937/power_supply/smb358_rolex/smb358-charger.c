@@ -490,6 +490,25 @@ module_param_cb(disable_software_temp_monitor, &dis_sof_temp_monitor_ops
 MODULE_PARM_DESC(debug, "1:disable software temp monitor , 0:enable,default:0");
 
 
+static int smb358_get_bms_psy(struct smb358_charger *chip)
+{
+	if (chip->bms_psy)
+		return 0;
+
+	if (chip->bms_psy_name) {
+		chip->bms_psy = power_supply_get_by_name((char *)chip->bms_psy_name);
+		if (!chip->bms_psy) {
+			dev_err(chip->dev, "Unable to get BMS psy\n");
+			return -ENODEV;
+		}
+	} else {
+		dev_err(chip->dev, "chip->bms_psy_name is null\n");
+		return -EINVAL;
+	}
+
+	return -ENODEV;
+}
+
 
 #define DELAY_COUNT 3
 #define VFLT_300MV			0x0C
@@ -1218,6 +1237,8 @@ static int smb358_get_prop_batt_capacity(struct smb358_charger *chip)
 	if (chip->fake_battery_soc >= 0)
 		return chip->fake_battery_soc;
 
+	smb358_get_bms_psy(chip);
+
 	if (chip->bms_psy) {
 		power_supply_get_property(chip->bms_psy,
 				POWER_SUPPLY_PROP_CAPACITY, &ret);
@@ -1225,7 +1246,7 @@ static int smb358_get_prop_batt_capacity(struct smb358_charger *chip)
 		return ret.intval;
 	}
 
-	pr_debug("Couldn't get bms_psy, return default capacity\n");
+	pr_err("Couldn't get bms_psy, return default capacity\n");
 	return SMB358_DEFAULT_BATT_CAPACITY;
 }
 
@@ -1327,8 +1348,6 @@ static int smb358_get_prop_batt_temp(struct smb358_charger *chip)
 		return DEFAULT_TEMP;
 
 	if (chip->iio.batt_therm) {
-		if (!chip->resume_completed)
-			msleep(5);
 		rc = iio_read_channel_processed(chip->iio.batt_therm,
 			&batt_therm_result);
 		if (rc < 0) {
@@ -1388,13 +1407,15 @@ smb358_get_prop_battery_voltage_now(struct smb358_charger *chip)
 	if (chip->fake_battery_soc >= 0)
 		return chip->fake_battery_soc;
 
+	smb358_get_bms_psy(chip);
+
 	if (chip->bms_psy) {
 		power_supply_get_property(chip->bms_psy,
 				POWER_SUPPLY_PROP_VOLTAGE_NOW, &ret);
 		pr_err("POWER_SUPPLY_PROP_VOLTAGE_NOW IS:%d\n", ret.intval);
 		return ret.intval;
 	}
-	pr_debug("Couldn't get bms_psy, return default capacity\n");
+	pr_err("Couldn't get bms_psy, return default voltage\n");
 	return SMB358_DEFAULT_BATT_VOLTAGE;
 }
 
@@ -2516,9 +2537,7 @@ static void smb358_external_power_changed(struct power_supply *psy)
 	vol = smb358_get_prop_battery_voltage_now(chip);
 	pr_debug("batt_vol = %d\n", vol);
 
-	if (chip->bms_psy_name)
-		chip->bms_psy =
-			power_supply_get_by_name((char *)chip->bms_psy_name);
+	smb358_get_bms_psy(chip);
 
 	rc = power_supply_get_property(chip->usb_psy,
 				POWER_SUPPLY_PROP_CURRENT_MAX, &prop);
@@ -3442,9 +3461,7 @@ static int smb358_charger_probe(struct i2c_client *client,
 	dev_info(chip->dev, "SMB358 successfully probed. charger=%d, batt=%d\n",
 			chip->chg_present, smb358_get_prop_batt_present(chip));
 
-	if (chip->bms_psy_name) {
-		chip->bms_psy = power_supply_get_by_name((char *)chip->bms_psy_name);
-	}
+	smb358_get_bms_psy(chip);
 
 	schedule_delayed_work(&chip->abnormal_detect, 0);
 

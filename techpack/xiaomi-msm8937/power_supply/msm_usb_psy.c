@@ -21,8 +21,8 @@ struct msm_usb_psy_data {
 	/* DP/DM regulator */
 	struct regulator *dpdm_reg;
 
-	struct delayed_work dpdm_enable_work;
-	int dpdm_enable_work_retry_count;
+	struct delayed_work register_psy_work;
+	int register_psy_work_retry_count;
 
 	/* Extcon */
 	struct extcon_dev *extcon;
@@ -106,21 +106,6 @@ static int msm_usb_psy_set_dp_dm(struct msm_usb_psy_data *data, int value)
 	}
 
 	return rc;
-}
-
-static void msm_usb_psy_dpdm_enable_work(struct work_struct *work)
-{
-	struct msm_usb_psy_data *data = container_of(work, struct msm_usb_psy_data, dpdm_enable_work.work);
-	int rc = 0;
-
-	rc = msm_usb_psy_set_dp_dm(data, POWER_SUPPLY_DP_DM_DPF_DMF);
-	if (rc < 0) {
-		data->dpdm_enable_work_retry_count++;
-		if (data->dpdm_enable_work_retry_count <= 10) {
-			dev_err(data->dev, "Reschedule DP/DM enable work");
-			schedule_delayed_work(&data->dpdm_enable_work, msecs_to_jiffies(500));
-		}
-	}
 }
 
 static int msm_usb_psy_set_cable_state(struct msm_usb_psy_data *data, bool state)
@@ -253,6 +238,46 @@ static int msm_usb_psy_property_is_writeable(struct power_supply *psy,
 	return 0;
 }
 
+static int msm_usb_psy_register_psy(struct msm_usb_psy_data *data)
+{
+	int rc = 0;
+	struct power_supply_config usb_psy_cfg = {
+		.drv_data = data,
+		.supplied_to = msm_usb_psy_supplied_to,
+		.num_supplicants = ARRAY_SIZE(msm_usb_psy_supplied_to),
+	};
+
+	data->usb_psy = devm_power_supply_register(data->dev, &data->usb_psy_d, &usb_psy_cfg);
+	if (IS_ERR_OR_NULL(data->usb_psy)) {
+		rc = PTR_ERR(data->usb_psy);
+		dev_err(data->dev, "Failed to register usb power supply\n");
+	} else {
+		dev_info(data->dev, "Registered usb power supply\n");
+	}
+
+	return rc;
+}
+
+static void msm_usb_psy_register_psy_work(struct work_struct *work)
+{
+	struct msm_usb_psy_data *data = container_of(work, struct msm_usb_psy_data, register_psy_work.work);
+	int rc = 0;
+
+	rc = msm_usb_psy_set_dp_dm(data, POWER_SUPPLY_DP_DM_DPF_DMF);
+	if (rc < 0) {
+		data->register_psy_work_retry_count++;
+		if (data->register_psy_work_retry_count <= 50) {
+			dev_err(data->dev, "Reschedule usb power supply register work");
+			schedule_delayed_work(&data->register_psy_work, msecs_to_jiffies(100));
+		} else {
+			dev_err(data->dev, "Exceeded max retry count of usb power supply register work\n");
+		}
+		return;
+	}
+
+	msm_usb_psy_register_psy(data);
+}
+
 static int msm_usb_psy_parse_dt(struct msm_usb_psy_data *data)
 {
 	struct platform_device *pdev = data->pdev;
@@ -275,7 +300,6 @@ static int msm_usb_psy_probe(struct platform_device *pdev)
 {
 	int rc = 0;
 	struct msm_usb_psy_data *data = NULL;
-	struct power_supply_config usb_psy_cfg = {};
 
 	/* Allocate memory, initialize data */
 	data = devm_kzalloc(&pdev->dev, sizeof(struct msm_usb_psy_data),
@@ -326,22 +350,14 @@ static int msm_usb_psy_probe(struct platform_device *pdev)
 	data->usb_psy_d.set_property = msm_usb_psy_set_property;
 	data->usb_psy_d.property_is_writeable = msm_usb_psy_property_is_writeable;
 
-	usb_psy_cfg.drv_data = data;
-	usb_psy_cfg.supplied_to = msm_usb_psy_supplied_to;
-	usb_psy_cfg.num_supplicants = ARRAY_SIZE(msm_usb_psy_supplied_to);
-
-	data->usb_psy = devm_power_supply_register(data->dev, &data->usb_psy_d, &usb_psy_cfg);
-	if (IS_ERR_OR_NULL(data->usb_psy)) {
-		rc = PTR_ERR(data->usb_psy);
-		dev_err(data->dev, "Failed to register power supply\n");
-		goto err_undo_extcon_register;
-	}
-
-	INIT_DELAYED_WORK(&data->dpdm_enable_work, msm_usb_psy_dpdm_enable_work);
-
 	if (data->pdata->dpdm_always_on) {
-		data->dpdm_enable_work_retry_count = 0;
-		schedule_delayed_work(&data->dpdm_enable_work, msecs_to_jiffies(3000));
+		dev_info(data->dev, "Will register usb power supply after DP/DM regulator is enabled\n");
+		INIT_DELAYED_WORK(&data->register_psy_work, msm_usb_psy_register_psy_work);
+		data->register_psy_work_retry_count = 0;
+		schedule_delayed_work(&data->register_psy_work, msecs_to_jiffies(1500));
+	} else {
+		if (msm_usb_psy_register_psy(data) != 0)
+			goto err_undo_extcon_register;
 	}
 
 	dev_info(data->dev, "probed successfully!\n");
@@ -363,9 +379,9 @@ static int msm_usb_psy_remove(struct platform_device *pdev)
 {
 	struct msm_usb_psy_data *data =
 	    (struct msm_usb_psy_data *)platform_get_drvdata(pdev);
-	cancel_delayed_work_sync(&data->dpdm_enable_work);
-	devm_extcon_dev_unregister(data->dev, data->extcon);
-	devm_extcon_dev_free(data->dev, data->extcon);
+	if (!IS_ERR_OR_NULL(data->usb_psy))
+		power_supply_unregister(data->usb_psy);
+	cancel_delayed_work_sync(&data->register_psy_work);
 	devm_kfree(&pdev->dev, data->pdata);
 	if (!IS_ERR_OR_NULL(data->dpdm_reg))
 		devm_regulator_put(data->dpdm_reg);
