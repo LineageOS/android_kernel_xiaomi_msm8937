@@ -337,6 +337,8 @@ static int msm_usb_psy_remove(struct platform_device *pdev)
 {
 	struct msm_usb_psy_data *data =
 	    (struct msm_usb_psy_data *)platform_get_drvdata(pdev);
+	if (!IS_ERR_OR_NULL(data->usb_psy))
+		power_supply_unregister(data->usb_psy);
 	devm_extcon_dev_unregister(data->dev, data->extcon);
 	devm_extcon_dev_free(data->dev, data->extcon);
 	devm_kfree(&pdev->dev, data->pdata);
