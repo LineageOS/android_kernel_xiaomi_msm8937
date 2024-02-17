@@ -53,13 +53,11 @@
 };
 
 /* Custom */
-/*
 &soc {
 	restart@4ab000 {
 		qcom,force-warm-reboot;
 	};
 };
-*/
 
 &i2c_2 {
 	qcom,disable-dma;
