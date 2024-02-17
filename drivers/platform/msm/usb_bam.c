@@ -2927,6 +2927,9 @@ static struct msm_usb_bam_data *usb_bam_dt_to_data(
 	else
 		usb_bam_data->usb_bam_fifo_baseaddr = addr;
 
+	usb_bam_data->ignore_core_reset_ack = of_property_read_bool(node,
+		"qcom,ignore-core-reset-ack");
+
 	usb_bam_data->disable_clk_gating = of_property_read_bool(node,
 		"qcom,disable-clk-gating");
 
