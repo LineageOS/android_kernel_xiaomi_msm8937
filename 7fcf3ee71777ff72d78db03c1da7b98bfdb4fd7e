@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e989449f_8236403c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 32245
+      },
+      "writtenOn": "2024-02-18T18:14:17Z",
+      "side": 1,
+      "message": "\u003e Bringing in this property does fix USB not working after warm reset on SDM439 on msm-4.19.\n\nshit, even testers aren\u0027t trustable sometimes",
+      "revId": "7fcf3ee71777ff72d78db03c1da7b98bfdb4fd7e",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
+    }
+  ]
+}
