@@ -201,9 +201,9 @@ void thaw_fingerprintd(void)
 			break;
 		if (!fp_hidl_thawed) {
 			if ((!memcmp(p->comm, "android.hardware.biometrics.fingerprint@2.1-service", 52)) ||
-				(!memcmp(p->comm,"android.hardware.biometrics.fingerprint@2.1-service.xiaomi_landtoni", 68)) ||
 				(!memcmp(p->comm,"android.hardware.biometrics.fingerprint@2.1-service.xiaomi_mi439", 65)) ||
-				(!memcmp(p->comm,"android.hardware.biometrics.fingerprint@2.1-service.xiaomi_ulysse", 66))) {
+				(!memcmp(p->comm,"android.hardware.biometrics.fingerprint@2.1-service.xiaomi_ulysse", 66)) ||
+				(!memcmp(p->comm,"android.hardware.biometrics.fingerprint@2.1-service.xiaomi_wt8937", 66))) {
 				__thaw_task(p);
 				fp_hidl_thawed = true;
 				continue;
