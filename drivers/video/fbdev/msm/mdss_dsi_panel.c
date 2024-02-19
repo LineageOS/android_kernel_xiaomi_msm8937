@@ -2308,6 +2308,7 @@ static int mdss_dsi_parse_reset_seq(struct device_node *np,
 
 static bool mdss_dsi_cmp_panel_reg_v2(struct mdss_dsi_ctrl_pdata *ctrl)
 {
+	bool mismatched;
 	int i, j = 0;
 	int len = 0, *lenp;
 	int group = 0;
@@ -2319,6 +2320,7 @@ static bool mdss_dsi_cmp_panel_reg_v2(struct mdss_dsi_ctrl_pdata *ctrl)
 		len += lenp[i];
 
 	for (j = 0; j < ctrl->groups; ++j) {
+		mismatched = false;
 		for (i = 0; i < len; ++i) {
 #if IS_ENABLED(CONFIG_MACH_FAMILY_XIAOMI_ULYSSE)
 			if (xiaomi_msm8937_mach_get_family() == XIAOMI_MSM8937_MACH_FAMILY_ULYSSE) {
@@ -2337,17 +2339,18 @@ static bool mdss_dsi_cmp_panel_reg_v2(struct mdss_dsi_ctrl_pdata *ctrl)
 				continue;
 			}
 #endif
-			pr_debug("[%i] return:0x%x status:0x%x\n",
-				i, ctrl->return_buf[i],
-				(unsigned int)ctrl->status_value[group + i]);
 			MDSS_XLOG(ctrl->ndx, ctrl->return_buf[i],
 					ctrl->status_value[group + i]);
 			if (ctrl->return_buf[i] !=
-				ctrl->status_value[group + i])
-				break;
+				ctrl->status_value[group + i]) {
+				pr_err("%s: [%i][%i] return:0x%x status:0x%x\n",
+					__func__, j, i, ctrl->return_buf[i],
+					(unsigned int)ctrl->status_value[group + i]);
+				mismatched = true;
+			}
 		}
 
-		if (i == len)
+		if (i == len && !mismatched)
 			return true;
 		group += len;
 	}
