@@ -2361,10 +2361,18 @@ static bool mdss_dsi_cmp_panel_reg_v2(struct mdss_dsi_ctrl_pdata *ctrl)
 static int mdss_dsi_gen_read_status(struct mdss_dsi_ctrl_pdata *ctrl_pdata)
 {
 	if (!mdss_dsi_cmp_panel_reg_v2(ctrl_pdata)) {
-		pr_err("%s: Read back value from panel is incorrect\n",
-							__func__);
-		return -EINVAL;
+		ctrl_pdata->status_error_count++;
+		pr_err("%s: Read value bad. Error_cnt = %i\n",
+				__func__, ctrl_pdata->status_error_count);
+		if (ctrl_pdata->status_error_count <
+				ctrl_pdata->max_status_error_count) {
+			return 1;
+		} else {
+			ctrl_pdata->status_error_count = 0;
+			return -EINVAL;
+		}
 	} else {
+		ctrl_pdata->status_error_count = 0;
 		return 1;
 	}
 }
