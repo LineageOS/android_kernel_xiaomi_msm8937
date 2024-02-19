@@ -2361,10 +2361,18 @@ static bool mdss_dsi_cmp_panel_reg_v2(struct mdss_dsi_ctrl_pdata *ctrl)
 static int mdss_dsi_gen_read_status(struct mdss_dsi_ctrl_pdata *ctrl_pdata)
 {
 	if (!mdss_dsi_cmp_panel_reg_v2(ctrl_pdata)) {
-		pr_err("%s: Read back value from panel is incorrect\n",
-							__func__);
-		return -EINVAL;
+		ctrl_pdata->status_error_count++;
+		pr_err("%s: Read value bad. Error_cnt = %i\n",
+				__func__, ctrl_pdata->status_error_count);
+		if (ctrl_pdata->status_error_count <
+				ctrl_pdata->max_status_error_count) {
+			return 1;
+		} else {
+			ctrl_pdata->status_error_count = 0;
+			return -EINVAL;
+		}
 	} else {
+		ctrl_pdata->status_error_count = 0;
 		return 1;
 	}
 }
@@ -2581,6 +2589,7 @@ static void mdss_dsi_parse_esd_params(struct device_node *np,
 			ctrl->status_mode = ESD_BTA;
 		} else if (!strcmp(string, "reg_read")) {
 			ctrl->status_mode = ESD_REG;
+			ctrl->status_error_count = 0;
 			ctrl->check_read_status =
 				mdss_dsi_gen_read_status;
 		} else if (!strcmp(string, "reg_read_nt35596")) {
