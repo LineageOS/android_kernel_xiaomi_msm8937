@@ -4336,7 +4336,7 @@ void sdhci_msm_dump_iib(struct sdhci_host *host)
 
 	pr_err("----------- IIB HISTORY DUMP -----------\n");
 	for (iter = 0; iter < 8; iter++)
-		pr_err("0x%08x\n", readl_relaxed(host->ioaddr +
+		pr_err("0x%08x\n", sdhci_msm_readl_relaxed(host,
 			SDCC_DEBUG_IIB_REG + (iter * 4)));
 }
 
