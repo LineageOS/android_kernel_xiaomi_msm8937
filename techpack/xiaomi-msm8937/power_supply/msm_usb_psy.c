@@ -354,7 +354,7 @@ static int msm_usb_psy_probe(struct platform_device *pdev)
 		dev_info(data->dev, "Will register usb power supply after DP/DM regulator is enabled\n");
 		INIT_DELAYED_WORK(&data->register_psy_work, msm_usb_psy_register_psy_work);
 		data->register_psy_work_retry_count = 0;
-		schedule_delayed_work(&data->register_psy_work, msecs_to_jiffies(1500));
+		schedule_delayed_work(&data->register_psy_work, msecs_to_jiffies(500));
 	} else {
 		if (msm_usb_psy_register_psy(data) != 0)
 			goto err_undo_extcon_register;
