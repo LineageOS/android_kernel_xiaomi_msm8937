@@ -1127,6 +1127,7 @@ static DEFINE_CLK_VOTER(bimc_wcnss_a_clk, bimc_a_clk, LONG_MAX);
 static DEFINE_CLK_BRANCH_VOTER(bi_tcxo_lpm_clk, bi_tcxo);
 
 static struct clk_hw *qm215_clks[] = {
+	/* SMD clocks */
 	[RPM_SMD_XO_CLK_SRC] = &sdm429w_bi_tcxo.hw,
 	[RPM_SMD_XO_A_CLK_SRC] = &sdm429w_bi_tcxo_ao.hw,
 	[RPM_SMD_QDSS_CLK] = &sdm429w_qdss_clk.hw,
@@ -1142,7 +1143,8 @@ static struct clk_hw *qm215_clks[] = {
 	[RPM_SMD_IPA_CLK]    = &sdm429w_ipa_clk.hw,
 	[RPM_SMD_IPA_A_CLK]  = &sdm429w_ipa_a_clk.hw,
 	[RPM_SMD_SYSMMNOC_CLK] = &sdm429w_sysmmnoc_clk.hw,
-	[RPM_SMD_SYSMMNOC_A_CLK] = &sdm429w_sysmmnoc_a_clk.hw,
+	[RPM_SMD_SYSMMNOC_A_CLK] = &sdm429w_sysmmnoc_a_clk.hw, // num_rpm_clks
+
 	[RPM_SMD_BB_CLK1] = &sdm429w_bb_clk1.hw,
 	[RPM_SMD_BB_CLK1_A] = &sdm429w_bb_clk1_a.hw,
 	[RPM_SMD_BB_CLK2] = &sdm429w_bb_clk2.hw,
@@ -1155,6 +1157,8 @@ static struct clk_hw *qm215_clks[] = {
 	[RPM_SMD_RF_CLK2_A] = &sdm429w_rf_clk2_a.hw,
 	[RPM_SMD_DIV_CLK2] = &sdm429w_div_clk2.hw,
 	[RPM_SMD_DIV_A_CLK2] = &sdm429w_div_clk2_a.hw,
+
+	/* Voter clocks */
 	[PNOC_MSMBUS_CLK] = &pnoc_msmbus_clk.hw,
 	[PNOC_MSMBUS_A_CLK] = &pnoc_msmbus_a_clk.hw,
 	[PNOC_KEEPALIVE_A_CLK] = &pnoc_keepalive_a_clk.hw,
@@ -1172,6 +1176,8 @@ static struct clk_hw *qm215_clks[] = {
 	[BIMC_WCNSS_A_CLK] = &bimc_wcnss_a_clk.hw,
 	[SYSMMNOC_MSMBUS_CLK] = &sysmmnoc_msmbus_clk.hw,
 	[SYSMMNOC_MSMBUS_A_CLK] = &sysmmnoc_msmbus_a_clk.hw,
+
+	/* Branch voter clocks */
 	[CXO_SMD_OTG_CLK] = &bi_tcxo_otg_clk.hw,
 	[CXO_SMD_LPM_CLK] = &bi_tcxo_lpm_clk.hw,
 	[CXO_SMD_PIL_PRONTO_CLK] = &bi_tcxo_pil_pronto_clk.hw,
