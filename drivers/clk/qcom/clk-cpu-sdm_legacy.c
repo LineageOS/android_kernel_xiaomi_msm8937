@@ -38,14 +38,14 @@ enum apcs_mux_clk_parent {
 	P_APCS_CPU_PLL,
 };
 
-struct pll_spm_ctrl {
+struct legacy_pll_spm_ctrl {
 	u32 offset;
 	u32 force_event_offset;
 	u32 event_bit;
 	void __iomem *spm_base;
 };
 
-static struct pll_spm_ctrl apcs_pll_spm = {
+static struct legacy_pll_spm_ctrl apcs_pll_spm = {
 	.offset = 0x50,
 	.force_event_offset = 0x4,
 	.event_bit = 0x4,
@@ -249,7 +249,7 @@ static u8 cpucc_clk_get_parent(struct clk_hw *hw)
 	return clk_regmap_mux_div_ops.get_parent(hw);
 }
 
-static void spm_event(struct pll_spm_ctrl *apcs_pll_spm, bool enable)
+static void spm_event(struct legacy_pll_spm_ctrl *apcs_pll_spm, bool enable)
 {
 	void __iomem *base = apcs_pll_spm->spm_base;
 	u32 offset, force_event_offset, bit, val;
