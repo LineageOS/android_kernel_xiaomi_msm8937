@@ -342,6 +342,9 @@
 /* PM8937 */
 #define PM8937_SUBTYPE		0x19
 
+/* PMI8937 */
+#define PMI8937_SUBTYPE		0x37
+
 /* PM2250 */
 #define PM2250_SUBTYPE		0x37
 
