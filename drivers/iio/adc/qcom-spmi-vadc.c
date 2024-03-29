@@ -948,9 +948,7 @@ static int vadc_probe(struct platform_device *pdev)
 		return ret;
 	}
 
-	ret = vadc_measure_ref_points(vadc);
-	if (ret)
-		return ret;
+	vadc_measure_ref_points(vadc);
 
 	indio_dev->dev.parent = dev;
 	indio_dev->dev.of_node = node;
