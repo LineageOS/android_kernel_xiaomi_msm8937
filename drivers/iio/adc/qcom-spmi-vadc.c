@@ -346,7 +346,7 @@ static int vadc_do_conversion(struct vadc_priv *vadc,
 err_disable:
 	vadc_set_state(vadc, false);
 	if (ret)
-		dev_err(vadc->dev, "conversion failed\n");
+		dev_err(vadc->dev, "%d conversion failed\n", prop->channel);
 unlock:
 	mutex_unlock(&vadc->lock);
 	return ret;
