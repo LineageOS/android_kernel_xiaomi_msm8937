@@ -920,6 +920,10 @@ static ssize_t idle_power_collapse_show(struct device *dev,
 	return scnprintf(buf, PAGE_SIZE, "idle power collapsed\n");
 }
 
+static int mdss_fb_blank_blank(struct msm_fb_data_type *mfd,
+	int req_power_state);
+static int mdss_fb_blank_unblank(struct msm_fb_data_type *mfd);
+
 static ssize_t cabc_store(struct device *dev,
 		struct device_attribute *attr, const char *buf, size_t len)
 {
@@ -964,6 +968,9 @@ static ssize_t cabc_store(struct device *dev,
 	if (ret == 0) {
 		pr_debug("%s: cabc mode %d\n", __func__, cabc_mode);
 		pinfo->cabc_mode = cabc_mode;
+	} else if (ret == -EIO) {
+		mdss_fb_blank_blank(mfd, MDSS_PANEL_POWER_OFF);
+		mdss_fb_blank_unblank(mfd);
 	}
 
 end:
@@ -1039,6 +1046,9 @@ static ssize_t color_enhance_store(struct device *dev,
 	if (ret == 0) {
 		pr_debug("%s: ce mode %d\n", __func__, ce_mode);
 		pinfo->ce_mode = ce_mode;
+	} else if (ret == -EIO) {
+		mdss_fb_blank_blank(mfd, MDSS_PANEL_POWER_OFF);
+		mdss_fb_blank_unblank(mfd);
 	}
 
 end:
@@ -1109,6 +1119,9 @@ static ssize_t reading_mode_store(struct device *dev,
 	if (ret == 0) {
 		pr_debug("%s: reading mode %d\n", __func__, reading_mode);
 		pinfo->reading_mode = reading_mode;
+	} else if (ret == -EIO) {
+		mdss_fb_blank_blank(mfd, MDSS_PANEL_POWER_OFF);
+		mdss_fb_blank_unblank(mfd);
 	}
 
 end:
