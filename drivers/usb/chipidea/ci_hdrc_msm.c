@@ -186,6 +186,10 @@ static int ci_hdrc_msm_probe(struct platform_device *pdev)
 		return -ENOMEM;
 	platform_set_drvdata(pdev, ci);
 
+	ret = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64));
+	if (ret)
+		dev_err(&pdev->dev, "Failed to set DMA mask to 64\n");
+
 	ci->pdata.name = "ci_hdrc_msm";
 	ci->pdata.capoffset = DEF_CAPOFFSET;
 	ci->pdata.flags	= CI_HDRC_REGS_SHARED | CI_HDRC_DISABLE_STREAMING |
