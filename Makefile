@@ -1,15 +1,15 @@
 ifeq ($(CONFIG_MSMB_CAMERA_LEGACY_M),y)
-ccflags-y += -Itechpack/camera-legacy-m
-ccflags-y += -Itechpack/camera-legacy-m/sensor
-ccflags-y += -Itechpack/camera-legacy-m/codecs
-ccflags-y += -Itechpack/camera-legacy-m/isps
-ccflags-y += -Itechpack/camera-legacy-m/pproc
-ccflags-y += -Itechpack/camera-legacy-m/msm_vb2
-ccflags-y += -Itechpack/camera-legacy-m/camera
-ccflags-y += -Itechpack/camera-legacy-m/jpeg_10
-ccflags-y += -Itechpack/camera-legacy-m/jpeg_dma
-ccflags-y += -Itechpack/camera-legacy-m/fd
-ccflags-y += -Itechpack/camera-legacy-m/common
+ccflags-y += -I $(srctree)/techpack/camera-legacy-m
+ccflags-y += -I $(srctree)/techpack/camera-legacy-m/sensor
+ccflags-y += -I $(srctree)/techpack/camera-legacy-m/codecs
+ccflags-y += -I $(srctree)/techpack/camera-legacy-m/isps
+ccflags-y += -I $(srctree)/techpack/camera-legacy-m/pproc
+ccflags-y += -I $(srctree)/techpack/camera-legacy-m/msm_vb2
+ccflags-y += -I $(srctree)/techpack/camera-legacy-m/camera
+ccflags-y += -I $(srctree)/techpack/camera-legacy-m/jpeg_10
+ccflags-y += -I $(srctree)/techpack/camera-legacy-m/jpeg_dma
+ccflags-y += -I $(srctree)/techpack/camera-legacy-m/fd
+ccflags-y += -I $(srctree)/techpack/camera-legacy-m/common
 
 ccflags-y += $(DISABLE_CFI_CLANG) $(DISABLE_LTO_CLANG)
 
