@@ -1,7 +1,7 @@
-ccflags-y += -Itechpack/camera-legacy/sensor/cci
-ccflags-y += -Itechpack/camera-legacy
-ccflags-y += -Itechpack/camera-legacy/common
-ccflags-y += -Itechpack/camera-legacy/sensor/io
+ccflags-y += -I $(srctree)/techpack/camera-legacy/sensor/cci
+ccflags-y += -I $(srctree)/techpack/camera-legacy
+ccflags-y += -I $(srctree)/techpack/camera-legacy/common
+ccflags-y += -I $(srctree)/techpack/camera-legacy/sensor/io
 obj-$(CONFIG_MSMB_CAMERA) += msm_flash.o
 obj-$(CONFIG_MSMB_CAMERA) += msm_led_flash.o
 obj-$(CONFIG_MSMB_CAMERA) += msm_led_trigger.o
