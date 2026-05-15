@@ -136,8 +136,8 @@ BAP_DIR :=	CORE/BAP
 BAP_INC_DIR :=	$(BAP_DIR)/inc
 BAP_SRC_DIR :=	$(BAP_DIR)/src
 
-BAP_INC := 	-I$(WLAN_ROOT)/$(BAP_INC_DIR) \
-		-I$(WLAN_ROOT)/$(BAP_SRC_DIR)
+BAP_INC := 	-I $(srctree)/$(WLAN_ROOT)/$(BAP_INC_DIR) \
+		-I $(srctree)/$(WLAN_ROOT)/$(BAP_SRC_DIR)
 
 BAP_OBJS := 	$(BAP_SRC_DIR)/bapApiData.o \
 		$(BAP_SRC_DIR)/bapApiDebug.o \
@@ -166,8 +166,8 @@ DXE_DIR :=	CORE/DXE
 DXE_INC_DIR :=	$(DXE_DIR)/inc
 DXE_SRC_DIR :=	$(DXE_DIR)/src
 
-DXE_INC := 	-I$(WLAN_ROOT)/$(DXE_INC_DIR) \
-		-I$(WLAN_ROOT)/$(DXE_SRC_DIR)
+DXE_INC := 	-I $(srctree)/$(WLAN_ROOT)/$(DXE_INC_DIR) \
+		-I $(srctree)/$(WLAN_ROOT)/$(DXE_SRC_DIR)
 
 DXE_OBJS = 	$(DXE_SRC_DIR)/wlan_qct_dxe.o \
 		$(DXE_SRC_DIR)/wlan_qct_dxe_cfg_i.o
@@ -177,8 +177,8 @@ HDD_DIR :=	CORE/HDD
 HDD_INC_DIR :=	$(HDD_DIR)/inc
 HDD_SRC_DIR :=	$(HDD_DIR)/src
 
-HDD_INC := 	-I$(WLAN_ROOT)/$(HDD_INC_DIR) \
-		-I$(WLAN_ROOT)/$(HDD_SRC_DIR)
+HDD_INC := 	-I $(srctree)/$(WLAN_ROOT)/$(HDD_INC_DIR) \
+		-I $(srctree)/$(WLAN_ROOT)/$(HDD_SRC_DIR)
 
 HDD_OBJS := 	$(HDD_SRC_DIR)/wlan_hdd_assoc.o \
 		$(HDD_SRC_DIR)/wlan_hdd_cfg.o \
@@ -218,11 +218,11 @@ MAC_DIR :=	CORE/MAC
 MAC_INC_DIR :=	$(MAC_DIR)/inc
 MAC_SRC_DIR :=	$(MAC_DIR)/src
 
-MAC_INC := 	-I$(WLAN_ROOT)/$(MAC_INC_DIR) \
-		-I$(WLAN_ROOT)/$(MAC_SRC_DIR)/dph \
-		-I$(WLAN_ROOT)/$(MAC_SRC_DIR)/include \
-		-I$(WLAN_ROOT)/$(MAC_SRC_DIR)/pe/include \
-		-I$(WLAN_ROOT)/$(MAC_SRC_DIR)/pe/lim
+MAC_INC := 	-I $(srctree)/$(WLAN_ROOT)/$(MAC_INC_DIR) \
+		-I $(srctree)/$(WLAN_ROOT)/$(MAC_SRC_DIR)/dph \
+		-I $(srctree)/$(WLAN_ROOT)/$(MAC_SRC_DIR)/include \
+		-I $(srctree)/$(WLAN_ROOT)/$(MAC_SRC_DIR)/pe/include \
+		-I $(srctree)/$(WLAN_ROOT)/$(MAC_SRC_DIR)/pe/lim
 
 MAC_CFG_OBJS := $(MAC_SRC_DIR)/cfg/cfgApi.o \
 		$(MAC_SRC_DIR)/cfg/cfgDebug.o \
@@ -312,8 +312,8 @@ SAP_DIR :=	CORE/SAP
 SAP_INC_DIR :=	$(SAP_DIR)/inc
 SAP_SRC_DIR :=	$(SAP_DIR)/src
 
-SAP_INC := 	-I$(WLAN_ROOT)/$(SAP_INC_DIR) \
-		-I$(WLAN_ROOT)/$(SAP_SRC_DIR)
+SAP_INC := 	-I $(srctree)/$(WLAN_ROOT)/$(SAP_INC_DIR) \
+		-I $(srctree)/$(WLAN_ROOT)/$(SAP_SRC_DIR)
 
 SAP_OBJS :=	$(SAP_SRC_DIR)/sapApiLinkCntl.o \
 		$(SAP_SRC_DIR)/sapChSelect.o \
@@ -325,8 +325,8 @@ SME_DIR :=	CORE/SME
 SME_INC_DIR :=	$(SME_DIR)/inc
 SME_SRC_DIR :=	$(SME_DIR)/src
 
-SME_INC := 	-I$(WLAN_ROOT)/$(SME_INC_DIR) \
-		-I$(WLAN_ROOT)/$(SME_SRC_DIR)/csr
+SME_INC := 	-I $(srctree)/$(WLAN_ROOT)/$(SME_INC_DIR) \
+		-I $(srctree)/$(WLAN_ROOT)/$(SME_SRC_DIR)/csr
 
 SME_CCM_OBJS := $(SME_SRC_DIR)/ccm/ccmApi.o \
 		$(SME_SRC_DIR)/ccm/ccmLogDump.o
@@ -390,8 +390,8 @@ SVC_DIR :=	CORE/SVC
 SVC_INC_DIR :=	$(SVC_DIR)/inc
 SVC_SRC_DIR :=	$(SVC_DIR)/src
 
-SVC_INC := 	-I$(WLAN_ROOT)/$(SVC_INC_DIR) \
-		-I$(WLAN_ROOT)/$(SVC_DIR)/external
+SVC_INC := 	-I $(srctree)/$(WLAN_ROOT)/$(SVC_INC_DIR) \
+		-I $(srctree)/$(WLAN_ROOT)/$(SVC_DIR)/external
 
 BTC_SRC_DIR :=	$(SVC_SRC_DIR)/btc
 BTC_OBJS :=	$(BTC_SRC_DIR)/wlan_btc_svc.o
@@ -413,11 +413,11 @@ SVC_OBJS :=	$(BTC_OBJS) \
 ############ SYS ############
 SYS_DIR :=	CORE/SYS
 
-SYS_INC := 	-I$(WLAN_ROOT)/$(SYS_DIR)/common/inc \
-		-I$(WLAN_ROOT)/$(SYS_DIR)/legacy/src/pal/inc \
-		-I$(WLAN_ROOT)/$(SYS_DIR)/legacy/src/platform/inc \
-		-I$(WLAN_ROOT)/$(SYS_DIR)/legacy/src/system/inc \
-		-I$(WLAN_ROOT)/$(SYS_DIR)/legacy/src/utils/inc
+SYS_INC := 	-I $(srctree)/$(WLAN_ROOT)/$(SYS_DIR)/common/inc \
+		-I $(srctree)/$(WLAN_ROOT)/$(SYS_DIR)/legacy/src/pal/inc \
+		-I $(srctree)/$(WLAN_ROOT)/$(SYS_DIR)/legacy/src/platform/inc \
+		-I $(srctree)/$(WLAN_ROOT)/$(SYS_DIR)/legacy/src/system/inc \
+		-I $(srctree)/$(WLAN_ROOT)/$(SYS_DIR)/legacy/src/utils/inc
 
 SYS_COMMON_SRC_DIR := $(SYS_DIR)/common/src
 SYS_LEGACY_SRC_DIR := $(SYS_DIR)/legacy/src
@@ -440,8 +440,8 @@ TL_DIR :=	CORE/TL
 TL_INC_DIR :=	$(TL_DIR)/inc
 TL_SRC_DIR :=	$(TL_DIR)/src
 
-TL_INC := 	-I$(WLAN_ROOT)/$(TL_INC_DIR) \
-		-I$(WLAN_ROOT)/$(TL_SRC_DIR)
+TL_INC := 	-I $(srctree)/$(WLAN_ROOT)/$(TL_INC_DIR) \
+		-I $(srctree)/$(WLAN_ROOT)/$(TL_SRC_DIR)
 
 TL_OBJS := 	$(TL_SRC_DIR)/wlan_qct_tl.o \
 		$(TL_SRC_DIR)/wlan_qct_tl_ba.o \
@@ -453,8 +453,8 @@ VOSS_DIR :=	CORE/VOSS
 VOSS_INC_DIR :=	$(VOSS_DIR)/inc
 VOSS_SRC_DIR :=	$(VOSS_DIR)/src
 
-VOSS_INC := 	-I$(WLAN_ROOT)/$(VOSS_INC_DIR) \
-		-I$(WLAN_ROOT)/$(VOSS_SRC_DIR)
+VOSS_INC := 	-I $(srctree)/$(WLAN_ROOT)/$(VOSS_INC_DIR) \
+		-I $(srctree)/$(WLAN_ROOT)/$(VOSS_SRC_DIR)
 
 VOSS_OBJS :=    $(VOSS_SRC_DIR)/vos_api.o \
 		$(VOSS_SRC_DIR)/vos_event.o \
@@ -484,9 +484,9 @@ WDA_DIR :=	CORE/WDA
 WDA_INC_DIR :=	$(WDA_DIR)/inc
 WDA_SRC_DIR :=	$(WDA_DIR)/src
 
-WDA_INC := 	-I$(WLAN_ROOT)/$(WDA_INC_DIR) \
-		-I$(WLAN_ROOT)/$(WDA_INC_DIR)/legacy \
-		-I$(WLAN_ROOT)/$(WDA_SRC_DIR)
+WDA_INC := 	-I $(srctree)/$(WLAN_ROOT)/$(WDA_INC_DIR) \
+		-I $(srctree)/$(WLAN_ROOT)/$(WDA_INC_DIR)/legacy \
+		-I $(srctree)/$(WLAN_ROOT)/$(WDA_SRC_DIR)
 
 WDA_OBJS :=	$(WDA_SRC_DIR)/wlan_qct_wda.o \
 		$(WDA_SRC_DIR)/wlan_qct_wda_debug.o \
@@ -497,21 +497,21 @@ WDA_OBJS :=	$(WDA_SRC_DIR)/wlan_qct_wda.o \
 ############ WDI ############
 WDI_DIR :=	CORE/WDI
 
-WDI_CP_INC :=	-I$(WLAN_ROOT)/$(WDI_DIR)/CP/inc/
+WDI_CP_INC :=	-I $(srctree)/$(WLAN_ROOT)/$(WDI_DIR)/CP/inc/
 
 WDI_CP_SRC_DIR := $(WDI_DIR)/CP/src
 WDI_CP_OBJS :=	$(WDI_CP_SRC_DIR)/wlan_qct_wdi.o \
 		$(WDI_CP_SRC_DIR)/wlan_qct_wdi_dp.o \
 		$(WDI_CP_SRC_DIR)/wlan_qct_wdi_sta.o
 
-WDI_DP_INC := -I$(WLAN_ROOT)/$(WDI_DIR)/DP/inc/
+WDI_DP_INC := -I $(srctree)/$(WLAN_ROOT)/$(WDI_DIR)/DP/inc/
 
 WDI_DP_SRC_DIR := $(WDI_DIR)/DP/src
 WDI_DP_OBJS :=	$(WDI_DP_SRC_DIR)/wlan_qct_wdi_bd.o \
 		$(WDI_DP_SRC_DIR)/wlan_qct_wdi_ds.o
 
-WDI_TRP_INC :=	-I$(WLAN_ROOT)/$(WDI_DIR)/TRP/CTS/inc/ \
-		-I$(WLAN_ROOT)/$(WDI_DIR)/TRP/DTS/inc/
+WDI_TRP_INC :=	-I $(srctree)/$(WLAN_ROOT)/$(WDI_DIR)/TRP/CTS/inc/ \
+		-I $(srctree)/$(WLAN_ROOT)/$(WDI_DIR)/TRP/DTS/inc/
 
 WDI_TRP_CTS_SRC_DIR :=	$(WDI_DIR)/TRP/CTS/src
 WDI_TRP_CTS_OBJS :=	$(WDI_TRP_CTS_SRC_DIR)/wlan_qct_wdi_cts.o
@@ -522,7 +522,7 @@ WDI_TRP_DTS_OBJS :=	$(WDI_TRP_DTS_SRC_DIR)/wlan_qct_wdi_dts.o
 WDI_TRP_OBJS :=	$(WDI_TRP_CTS_OBJS) \
 		$(WDI_TRP_DTS_OBJS)
 
-WDI_WPAL_INC := -I$(WLAN_ROOT)/$(WDI_DIR)/WPAL/inc
+WDI_WPAL_INC := -I $(srctree)/$(WLAN_ROOT)/$(WDI_DIR)/WPAL/inc
 
 WDI_WPAL_SRC_DIR := $(WDI_DIR)/WPAL/src
 WDI_WPAL_OBJS := $(WDI_WPAL_SRC_DIR)/wlan_qct_pal_api.o \
@@ -544,9 +544,9 @@ WDI_OBJS :=	$(WDI_CP_OBJS) \
 		$(WDI_WPAL_OBJS)
 
 
-RIVA_INC :=	-I$(WLAN_ROOT)/riva/inc
+RIVA_INC :=	-I $(srctree)/$(WLAN_ROOT)/riva/inc
 
-LINUX_INC :=	-Iinclude/linux
+LINUX_INC :=	-I $(srctree)/include/linux
 
 INCS :=		$(DXE_INC) \
 		$(HDD_INC) \
