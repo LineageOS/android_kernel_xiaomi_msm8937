@@ -613,8 +613,8 @@ static int inet6_netconf_get_devconf(struct sk_buff *in_skb,
 	int ifindex;
 	int err;
 
-	err = nlmsg_parse(nlh, sizeof(*ncm), tb, NETCONFA_MAX,
-			  devconf_ipv6_policy, extack);
+	err = nlmsg_parse_deprecated(nlh, sizeof(*ncm), tb, NETCONFA_MAX,
+				     devconf_ipv6_policy, extack);
 	if (err < 0)
 		return err;
 
@@ -3473,12 +3473,12 @@ static void addrconf_permanent_addr(struct net *net, struct net_device *dev)
 		if ((ifp->flags & IFA_F_PERMANENT) &&
 		    fixup_permanent_addr(net, idev, ifp) < 0) {
 			write_unlock_bh(&idev->lock);
-			in6_ifa_hold(ifp);
-			ipv6_del_addr(ifp);
-			write_lock_bh(&idev->lock);
 
 			net_info_ratelimited("%s: Failed to add prefix route for address %pI6c; dropping\n",
 					     idev->dev->name, &ifp->addr);
+			in6_ifa_hold(ifp);
+			ipv6_del_addr(ifp);
+			write_lock_bh(&idev->lock);
 		}
 	}
 
@@ -4588,8 +4588,8 @@ inet6_rtm_deladdr(struct sk_buff *skb, struct nlmsghdr *nlh,
 	u32 ifa_flags;
 	int err;
 
-	err = nlmsg_parse(nlh, sizeof(*ifm), tb, IFA_MAX, ifa_ipv6_policy,
-			  extack);
+	err = nlmsg_parse_deprecated(nlh, sizeof(*ifm), tb, IFA_MAX,
+				     ifa_ipv6_policy, extack);
 	if (err < 0)
 		return err;
 
@@ -4775,8 +4775,8 @@ inet6_rtm_newaddr(struct sk_buff *skb, struct nlmsghdr *nlh,
 	struct ifa6_config cfg;
 	int err;
 
-	err = nlmsg_parse(nlh, sizeof(*ifm), tb, IFA_MAX, ifa_ipv6_policy,
-			  extack);
+	err = nlmsg_parse_deprecated(nlh, sizeof(*ifm), tb, IFA_MAX,
+				     ifa_ipv6_policy, extack);
 	if (err < 0)
 		return err;
 
@@ -5168,8 +5168,8 @@ static int inet6_rtm_getaddr(struct sk_buff *in_skb, struct nlmsghdr *nlh,
 	struct sk_buff *skb;
 	int err;
 
-	err = nlmsg_parse(nlh, sizeof(*ifm), tb, IFA_MAX, ifa_ipv6_policy,
-			  extack);
+	err = nlmsg_parse_deprecated(nlh, sizeof(*ifm), tb, IFA_MAX,
+				     ifa_ipv6_policy, extack);
 	if (err < 0)
 		return err;
 
@@ -5549,8 +5549,8 @@ static int inet6_validate_link_af(const struct net_device *dev,
 	if (dev && !__in6_dev_get(dev))
 		return -EAFNOSUPPORT;
 
-	return nla_parse_nested(tb, IFLA_INET6_MAX, nla, inet6_af_policy,
-				NULL);
+	return nla_parse_nested_deprecated(tb, IFLA_INET6_MAX, nla,
+					   inet6_af_policy, NULL);
 }
 
 static int check_addr_gen_mode(int mode)
@@ -5582,7 +5582,7 @@ static int inet6_set_link_af(struct net_device *dev, const struct nlattr *nla)
 	if (!idev)
 		return -EAFNOSUPPORT;
 
-	if (nla_parse_nested(tb, IFLA_INET6_MAX, nla, NULL, NULL) < 0)
+	if (nla_parse_nested_deprecated(tb, IFLA_INET6_MAX, nla, NULL, NULL) < 0)
 		BUG();
 
 	if (tb[IFLA_INET6_TOKEN]) {

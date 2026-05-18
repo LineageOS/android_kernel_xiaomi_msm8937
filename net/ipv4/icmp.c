@@ -827,7 +827,7 @@ EXPORT_SYMBOL(icmp_ndo_send);
 
 static void icmp_socket_deliver(struct sk_buff *skb, u32 info)
 {
-	const struct iphdr *iph = (const struct iphdr *) skb->data;
+	const struct iphdr *iph = (const struct iphdr *)skb->data;
 	const struct net_protocol *ipprot;
 	int protocol = iph->protocol;
 
@@ -848,10 +848,12 @@ static void icmp_socket_deliver(struct sk_buff *skb, u32 info)
 
 static bool icmp_tag_validation(int proto)
 {
+	const struct net_protocol *ipprot;
 	bool ok;
 
 	rcu_read_lock();
-	ok = rcu_dereference(inet_protos[proto])->icmp_strict_tag_validation;
+	ipprot = rcu_dereference(inet_protos[proto]);
+	ok = ipprot ? ipprot->icmp_strict_tag_validation : false;
 	rcu_read_unlock();
 	return ok;
 }
@@ -1178,9 +1180,9 @@ void icmp_err(struct sk_buff *skb, u32 info)
 	}
 
 	if (type == ICMP_DEST_UNREACH && code == ICMP_FRAG_NEEDED)
-		ipv4_update_pmtu(skb, net, info, 0, 0, IPPROTO_ICMP, 0);
+		ipv4_update_pmtu(skb, net, info, 0, IPPROTO_ICMP);
 	else if (type == ICMP_REDIRECT)
-		ipv4_redirect(skb, net, 0, 0, IPPROTO_ICMP, 0);
+		ipv4_redirect(skb, net, 0, IPPROTO_ICMP);
 }
 
 /*

@@ -2782,6 +2782,8 @@ static int validate_set(const struct nlattr *a,
 	case OVS_KEY_ATTR_MPLS:
 		if (!eth_p_mpls(eth_type))
 			return -EINVAL;
+		if (key_len != sizeof(struct ovs_key_mpls))
+			return -EINVAL;
 		break;
 
 	case OVS_KEY_ATTR_SCTP:
@@ -2837,8 +2839,8 @@ static int validate_userspace(const struct nlattr *attr)
 	struct nlattr *a[OVS_USERSPACE_ATTR_MAX + 1];
 	int error;
 
-	error = nla_parse_nested(a, OVS_USERSPACE_ATTR_MAX, attr,
-				 userspace_policy, NULL);
+	error = nla_parse_nested_deprecated(a, OVS_USERSPACE_ATTR_MAX, attr,
+					    userspace_policy, NULL);
 	if (error)
 		return error;
 
