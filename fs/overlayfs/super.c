@@ -272,6 +272,9 @@ static int ovl_sync_fs(struct super_block *sb, int wait)
 	if (!ofs->upper_mnt)
 		return 0;
 
+	if (ofs->config.ovl_volatile)
+		return 0;
+
 	/*
 	 * Not called for sync(2) call or an emergency sync (SB_I_SKIP_SYNC).
 	 * All the super blocks will be iterated, including upper_sb.
@@ -379,6 +382,8 @@ static int ovl_show_options(struct seq_file *m, struct dentry *dentry)
 	if (ofs->config.override_creds != ovl_override_creds_def)
 		seq_show_option(m, "override_creds",
 				ofs->config.override_creds ? "on" : "off");
+	if (ofs->config.ovl_volatile)
+		seq_puts(m, ",volatile");
 	return 0;
 }
 
@@ -420,6 +425,7 @@ enum {
 	OPT_METACOPY_OFF,
 	OPT_OVERRIDE_CREDS_ON,
 	OPT_OVERRIDE_CREDS_OFF,
+	OPT_VOLATILE,
 	OPT_ERR,
 };
 
@@ -440,6 +446,7 @@ static const match_table_t ovl_tokens = {
 	{OPT_METACOPY_OFF,		"metacopy=off"},
 	{OPT_OVERRIDE_CREDS_ON,		"override_creds=on"},
 	{OPT_OVERRIDE_CREDS_OFF,	"override_creds=off"},
+	{OPT_VOLATILE,			"volatile"},
 	{OPT_ERR,			NULL}
 };
 
@@ -585,6 +592,10 @@ static int ovl_parse_opt(char *opt, struct ovl_config *config)
 
 		case OPT_OVERRIDE_CREDS_OFF:
 			config->override_creds = false;
+			break;
+
+		case OPT_VOLATILE:
+			config->ovl_volatile = true;
 			break;
 
 		default:
@@ -1138,6 +1149,18 @@ static int ovl_make_workdir(struct super_block *sb, struct ovl_fs *ofs,
 	ofs->workdir = ovl_workdir_create(ofs, OVL_WORKDIR_NAME, false);
 	if (!ofs->workdir)
 		goto out;
+
+	if (ofs->config.ovl_volatile) {
+		struct dentry *dirty;
+
+		dirty = ovl_workdir_create(ofs, "dirty", false);
+		if (!dirty) {
+			err = -EINVAL;
+			pr_err("overlayfs: dirty volatile mount, refusing to mount\n");
+			goto out;
+		}
+		dput(dirty);
+	}
 
 	err = ovl_setup_trap(sb, ofs->workdir, &ofs->workdir_trap, "workdir");
 	if (err)
