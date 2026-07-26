@@ -21,6 +21,7 @@ struct ovl_config {
 	int xino;
 	bool metacopy;
 	bool override_creds;
+	bool ovl_volatile;
 };
 
 struct ovl_sb {
