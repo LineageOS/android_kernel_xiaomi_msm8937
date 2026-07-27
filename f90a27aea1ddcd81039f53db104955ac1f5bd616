@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "54619496_600514ba",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 19979
+      },
+      "writtenOn": "2026-07-27T19:10:42Z",
+      "side": 1,
+      "message": "See comments https://review.lineageos.org/c/LineageOS/android_kernel_xiaomi_msm8937/+/494739",
+      "revId": "f90a27aea1ddcd81039f53db104955ac1f5bd616",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
+    }
+  ]
+}
