@@ -16,6 +16,23 @@
       "message": "Both the reviewers could be removed and instead @me.cafebabe@gmail.com could be added instead",
       "revId": "b00c20f8e8b30dfbc523d460ce8a0daf1fea4818",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "29423d46_d96a8f54",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 32245
+      },
+      "writtenOn": "2026-07-28T11:15:09Z",
+      "side": 1,
+      "message": "1. Non device specific stuff should go `LineageOS/android_kernel_qcom_sm8250` repo instead\n\n2. Cherry-pick the original commits instead of making your own commit, or at least add the original authors as `Co-authored-by: `\n\n3. Why introducing this?",
+      "revId": "b00c20f8e8b30dfbc523d460ce8a0daf1fea4818",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
     }
   ]
 }
