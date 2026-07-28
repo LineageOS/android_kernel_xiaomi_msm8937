@@ -16,6 +16,24 @@
       "message": "You bombarded the reviewer list with people who do not maintain this project. Refer to the wiki to get the right maintainers to poke",
       "revId": "98b7de4f952024092465e340c4a4d6845fccd06c",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6997e866_d78b3e17",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 37411
+      },
+      "writtenOn": "2026-07-28T07:00:42Z",
+      "side": 1,
+      "message": "Actually I\u0027m new to this setup, thanks for pointing me to the right dirrection.",
+      "parentUuid": "d78c23b4_617cfbc1",
+      "revId": "98b7de4f952024092465e340c4a4d6845fccd06c",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
     }
   ]
 }
