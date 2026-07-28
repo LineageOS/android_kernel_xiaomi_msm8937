@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a3d22215_a83287d5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 34519
+      },
+      "writtenOn": "2026-07-28T10:04:18Z",
+      "side": 1,
+      "message": "Both the reviewers could be removed and instead @me.cafebabe@gmail.com could be added instead",
+      "revId": "b00c20f8e8b30dfbc523d460ce8a0daf1fea4818",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
+    }
+  ]
+}
